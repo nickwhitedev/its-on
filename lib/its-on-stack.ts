@@ -83,7 +83,7 @@ export class ItsOnStack extends Stack {
                     build: {
                       commands: [
                         'npm run build',
-                        'npx cdk synth ItsOnStack',
+                        'npm cdk synth ItsOnStack',
                       ],
                     },
                   },
