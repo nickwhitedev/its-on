@@ -80,7 +80,7 @@ export class ItsOnStack extends Stack {
                         'npm install',
                       ],
                       'runtime-versions': {
-                        nodejs: 14,
+                        nodejs: 'latest',
                       }
                     },
                     build: {
