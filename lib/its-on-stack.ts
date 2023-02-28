@@ -79,6 +79,9 @@ export class ItsOnStack extends Stack {
                       commands: [
                         'npm install',
                       ],
+                      'runtime-versions': {
+                        nodejs: 14,
+                      }
                     },
                     build: {
                       commands: [
