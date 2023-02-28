@@ -83,13 +83,13 @@ export class ItsOnStack extends Stack {
                     build: {
                       commands: [
                         'npm run build',
-                        'npx cdk synth ItsOnApiStack',
+                        'npx cdk synth ItsOnStack',
                       ],
                     },
                   },
                   artifacts: {
                     'base-directory': 'cdk.out',
-                    files: ['ItsOnApiStack.template.json'],
+                    files: ['ItsOnStack.template.json'],
                   },
                 }),
               }),
@@ -101,8 +101,8 @@ export class ItsOnStack extends Stack {
           actions: [
             new codepipelineActions.CloudFormationCreateUpdateStackAction({
               actionName: 'Deploy',
-              stackName: 'ItsOnApiStack',
-              templatePath: buildOutput.atPath('ItsOnApiStack.template.json'),
+              stackName: 'ItsOnStack',
+              templatePath: buildOutput.atPath('ItsOnStack.template.json'),
               adminPermissions: true,
             }),
           ],
