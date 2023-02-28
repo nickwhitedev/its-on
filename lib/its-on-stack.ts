@@ -1,12 +1,16 @@
 import * as cdk from 'aws-cdk-lib';
-import { App, Stack, StackProps } from 'aws-cdk-lib';
+import { Stack, StackProps } from 'aws-cdk-lib';
+import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
-import * as apigateway from 'aws-cdk-lib/aws-apigateway';
-
+import * as codebuild from 'aws-cdk-lib/aws-codebuild';
+import * as codepipeline from 'aws-cdk-lib/aws-codepipeline';
+import * as codepipelineActions from 'aws-cdk-lib/aws-codepipeline-actions';
+import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
+import {Construct} from 'constructs';
 
 export class ItsOnStack extends Stack {
-  constructor(scope: App, id: string, props?: StackProps) {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
     // Create a DynamoDB table
@@ -37,13 +41,73 @@ export class ItsOnStack extends Stack {
     });
 
     // Create a resource and method for the API
-    const items = api.root.addResource('items'); // update me
-    const getItemIntegration = new apigateway.LambdaIntegration(handler);
-    items.addMethod('GET', getItemIntegration); // update me
+    const items = api.root.addResource('items')
+    items.addMethod('GET', new apigateway.LambdaIntegration(handler));
 
-    // Output the API endpoint URL
-    new cdk.CfnOutput(this, 'ItsOnApiUrl', {
-      value: api.url,
+    // Define your CodePipeline
+
+    const sourceOutput = new codepipeline.Artifact();
+    const buildOutput = new codepipeline.Artifact();
+
+    const pipeline = new codepipeline.Pipeline(this, 'ItsOnPipeline', {
+      stages: [
+        {
+          stageName: 'Source',
+          actions: [
+            new codepipelineActions.GitHubSourceAction({
+              actionName: 'GitHub_Source',
+              owner: 'nickpale',
+              repo: 'its-on',
+              oauthToken: secretsmanager.Secret.fromSecretNameV2(this, 'ItsOnGitHubSecret', 'ItsOnGitHubSecret').secretValue,
+              output: sourceOutput,
+              branch: 'main',
+            }),
+          ],
+        },
+        {
+          stageName: 'Build',
+          actions: [
+            new codepipelineActions.CodeBuildAction({
+              actionName: 'Build',
+              input: sourceOutput,
+              outputs: [buildOutput],
+              project: new codebuild.Project(this, 'ItsOnBuild', {
+                buildSpec: codebuild.BuildSpec.fromObject({
+                  version: '0.2',
+                  phases: {
+                    install: {
+                      commands: [
+                        'npm install',
+                      ],
+                    },
+                    build: {
+                      commands: [
+                        'npm run build',
+                        'npx cdk synth ItsOnApiStack',
+                      ],
+                    },
+                  },
+                  artifacts: {
+                    'base-directory': 'cdk.out',
+                    files: ['ItsOnApiStack.template.json'],
+                  },
+                }),
+              }),
+            }),
+          ],
+        },
+        {
+          stageName: 'Deploy',
+          actions: [
+            new codepipelineActions.CloudFormationCreateUpdateStackAction({
+              actionName: 'Deploy',
+              stackName: 'ItsOnApiStack',
+              templatePath: buildOutput.atPath('ItsOnApiStack.template.json'),
+              adminPermissions: true,
+            }),
+          ],
+        },
+      ],
     });
   }
 }
