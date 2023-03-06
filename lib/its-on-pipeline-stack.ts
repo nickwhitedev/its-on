@@ -1,5 +1,6 @@
 import { Stack, StackProps } from 'aws-cdk-lib';
 import * as codebuild from 'aws-cdk-lib/aws-codebuild';
+import { LinuxBuildImage } from 'aws-cdk-lib/aws-codebuild';
 import * as codepipeline from 'aws-cdk-lib/aws-codepipeline';
 import * as codepipelineActions from 'aws-cdk-lib/aws-codepipeline-actions';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
@@ -43,7 +44,7 @@ export class ItsOnPipelineStack extends Stack {
                         'npm install',
                       ],
                       'runtime-versions': {
-                        nodejs: 16,
+                        nodejs: '16',
                       }
                     },
                     build: {
@@ -58,6 +59,9 @@ export class ItsOnPipelineStack extends Stack {
                     files: ['ItsOnStack.template.json'],
                   },
                 }),
+                environment: {
+                  buildImage: LinuxBuildImage.AMAZON_LINUX_2_4,
+                },
               }),
             }),
           ],
