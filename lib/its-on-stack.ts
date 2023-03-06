@@ -1,13 +1,12 @@
 import * as cdk from 'aws-cdk-lib';
-import { Stack, StackProps } from 'aws-cdk-lib';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import {Construct} from 'constructs';
 import * as path from 'path';
 
-export class ItsOnStack extends Stack {
-  constructor(scope: Construct, id: string, props?: StackProps) {
+export class ItsOnStack extends cdk.Stack {
+  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
     // Create a DynamoDB table
