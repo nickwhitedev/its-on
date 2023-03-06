@@ -6,7 +6,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
   const response = {
     statusCode: 200,
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message: 'It\'s On??!?' }),
+    body: JSON.stringify({ message: 'It\'s On?' }),
   };
 
   console.log('Response:', response);

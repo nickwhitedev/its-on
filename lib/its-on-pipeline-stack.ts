@@ -13,7 +13,7 @@ export class ItsOnPipelineStack extends Stack {
     const sourceOutput = new codepipeline.Artifact();
     const buildOutput = new codepipeline.Artifact();
 
-    const pipeline = new codepipeline.Pipeline(this, 'ItsOnPipeline', {
+    new codepipeline.Pipeline(this, 'ItsOnPipeline', {
       stages: [
         {
           stageName: 'Source',
@@ -55,8 +55,7 @@ export class ItsOnPipelineStack extends Stack {
                     },
                   },
                   artifacts: {
-                    'base-directory': 'cdk.out',
-                    files: ['ItsOnStack.template.json'],
+                    files: ['cdk.out/ItsOnStack.template.json', 'lambda/*'],
                   },
                 }),
                 environment: {
@@ -72,7 +71,7 @@ export class ItsOnPipelineStack extends Stack {
             new codepipelineActions.CloudFormationCreateUpdateStackAction({
               actionName: 'Deploy',
               stackName: 'ItsOnStack',
-              templatePath: buildOutput.atPath('ItsOnStack.template.json'),
+              templatePath: buildOutput.atPath('cdk.out/ItsOnStack.template.json'),
               adminPermissions: true,
             }),
           ],
