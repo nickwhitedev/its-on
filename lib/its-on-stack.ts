@@ -38,7 +38,7 @@ export class ItsOnStack extends Stack {
     });
 
     // Create a resource and method for the API
-    const items = api.root.addResource('items')
-    items.addMethod('GET', new apigateway.LambdaIntegration(handler));;
+    const items = api.root.addResource('items');
+    items.addMethod('GET', new apigateway.LambdaIntegration(handler));
   }
 }
