@@ -55,7 +55,7 @@ export class ItsOnPipelineStack extends Stack {
                     },
                   },
                   artifacts: {
-                    files: ['cdk.out/ItsOnStack.template.json', 'lambda/*'],
+                    files: ['cdk.out/ItsOnStack.template.json'],
                   },
                 }),
                 environment: {

@@ -18,7 +18,7 @@ export class ItsOnStack extends cdk.Stack {
     // Create a Lambda function
     const handler = new lambda.Function(this, 'ItsOnFunction', {
       runtime: lambda.Runtime.NODEJS_18_X,
-      code: lambda.Code.fromAsset('lambda'),
+      code: lambda.Code.fromAsset('./lambda'),
       handler: 'index.handler',
       environment: {
         TABLE_NAME: table.tableName,
