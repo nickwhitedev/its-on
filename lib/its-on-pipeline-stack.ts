@@ -41,6 +41,7 @@ export class ItsOnPipelineStack extends Stack {
                     install: {
                       commands: [
                         'npm install',
+                        'npm run cdk bootstrap',
                       ],
                       'runtime-versions': {
                         nodejs: 'latest',
