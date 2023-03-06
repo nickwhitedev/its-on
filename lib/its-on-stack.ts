@@ -4,6 +4,7 @@ import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import {Construct} from 'constructs';
+import * as path from 'path';
 
 export class ItsOnStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -18,8 +19,8 @@ export class ItsOnStack extends Stack {
 
     // Create a Lambda function
     const handler = new lambda.Function(this, 'ItsOnFunction', {
-      runtime: lambda.Runtime.NODEJS_14_X,
-      code: lambda.Code.fromAsset('lambda'),
+      runtime: lambda.Runtime.NODEJS_18_X,
+      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda')),
       handler: 'index.handler',
       environment: {
         TABLE_NAME: table.tableName,
