@@ -40,7 +40,7 @@ export class ItsOnPipelineStack extends Stack {
                   phases: {
                     install: {
                       commands: [
-                        'npm ci',
+                        'npm install',
                       ],
                       'runtime-versions': {
                         nodejs: 16,
