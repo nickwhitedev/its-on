@@ -49,8 +49,11 @@ export class ItsOnPipelineStack extends Stack {
                     build: {
                       commands: [
                         'npm run build',
-                        'npx cdk synth',
+                        'npm run cdk synth',
                       ],
+                      'runtime-versions': {
+                        nodejs: 'latest',
+                      }
                     },
                   },
                   artifacts: {
