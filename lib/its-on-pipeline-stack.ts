@@ -41,7 +41,7 @@ export class ItsOnPipelineStack extends Stack {
                   phases: {
                     install: {
                       commands: [
-                        'npm install',
+                        'npm ci',
                       ],
                       'runtime-versions': {
                         nodejs: '16',
@@ -50,7 +50,7 @@ export class ItsOnPipelineStack extends Stack {
                     build: {
                       commands: [
                         'npm run build',
-                        'npm run cdk synth ItsOnStack -- -v -o dist',
+                        'npx cdk synth ItsOnStack',
                       ],
                     },
                   },
