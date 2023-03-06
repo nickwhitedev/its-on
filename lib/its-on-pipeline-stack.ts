@@ -49,7 +49,7 @@ export class ItsOnPipelineStack extends Stack {
                     build: {
                       commands: [
                         'npm run build',
-                        'npm run cdk synth',
+                        'npm run cdk synth -- -v -o dist',
                       ],
                     },
                   },
