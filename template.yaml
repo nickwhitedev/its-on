@@ -147,8 +147,9 @@ Resources:
       UserPoolId: !Ref ItsOnCognitoUserPool
       ClientName: ItsOnUsersClient
       GenerateSecret: false
-      ExplicitAuthFlows: 
+      ExplicitAuthFlows:  # TODO: REMOVE
         - ALLOW_USER_PASSWORD_AUTH # TODO: REMOVE
+        - ALLOW_REFRESH_TOKEN_AU # TODO: REMOVE
 
 Outputs:
   WebEndpoint:
