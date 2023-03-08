@@ -5,7 +5,7 @@ version = 0.1
 [default]
 [default.global]
 [default.global.parameters]
-stack_name = "its-on"
+stack_name = "its-on-dev"
 
 [default.build]
 [default.build.parameters]

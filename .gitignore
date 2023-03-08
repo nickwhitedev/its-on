@@ -51,5 +51,6 @@ node_modules/
 .dynamodb/
 
 # local auth files
+.auth-initiate-response.json
 .auth.json
 .auth.sh
