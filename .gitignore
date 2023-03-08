@@ -49,3 +49,7 @@ node_modules/
 
 # DynamoDB Local files
 .dynamodb/
+
+# local auth files
+.auth.json
+.auth.sh

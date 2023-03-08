@@ -19,8 +19,7 @@ lint = true
 [default.deploy]
 [default.deploy.parameters]
 capabilities = "CAPABILITY_IAM"
-confirm_changeset = true
-resolve_s3 = true
+confirm_changeset = false
 s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-4hv8gfhhvzpp"
 s3_prefix = "its-on"
 region = "us-east-1"
