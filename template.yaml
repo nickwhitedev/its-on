@@ -149,7 +149,7 @@ Resources:
       GenerateSecret: false
       ExplicitAuthFlows:  # TODO: REMOVE
         - ALLOW_USER_PASSWORD_AUTH # TODO: REMOVE
-        - ALLOW_REFRESH_TOKEN_AU # TODO: REMOVE
+        - ALLOW_REFRESH_TOKEN_AUTH # TODO: REMOVE
 
 Outputs:
   WebEndpoint:
