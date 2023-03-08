@@ -27,7 +27,7 @@ image_repositories = []
 
 [default.package]
 [default.package.parameters]
-resolve_s3 = true
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-4hv8gfhhvzpp"
 
 [default.sync]
 [default.sync.parameters]
