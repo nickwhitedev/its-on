@@ -37,7 +37,7 @@ export const getAllItemsHandler = async (event) => {
         statusCode: 200,
         body: JSON.stringify({
             items,
-            message: 'Yo!'
+            message: 'hello hi'
         })
     };
 
