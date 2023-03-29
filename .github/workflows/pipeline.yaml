@@ -1,9 +1,6 @@
 name: Pipeline
 
 on:
-  pull_request:
-    branches:
-      - 'dev'
   push:
     branches:
       - 'main'
@@ -41,7 +38,7 @@ env:
 
 jobs:
   test:
-    if: github.event_name == 'push' || github.event_name == 'pull_request'
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
