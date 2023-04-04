@@ -9,7 +9,6 @@ on:
       - 'feature**'
 
 env:
-  ENV: ${{ github.event.ref_name }}
   PIPELINE_USER_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   PIPELINE_USER_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   SAM_TEMPLATE: template.yaml
@@ -73,7 +72,7 @@ jobs:
       - uses: aws-actions/setup-sam@v2
         with:
           use-installer: true
-      - run: sam build --template ${SAM_TEMPLATE} --parameter-overrides Env=${ENV} --use-container
+      - run: sam build --template ${SAM_TEMPLATE} --parameter-overrides Env=${{ github.event.ref_name }} --use-container
 
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -91,7 +90,7 @@ jobs:
         run: |
           sam deploy --stack-name $(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]') \
             --capabilities CAPABILITY_IAM \
-            --parameter-overrides Env=${ENV} \
+            --parameter-overrides Env=${{ github.event.ref_name }} \
             --region ${TESTING_REGION} \
             --s3-bucket ${TESTING_ARTIFACTS_BUCKET} \
             --no-fail-on-empty-changeset \
