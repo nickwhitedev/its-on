@@ -35,15 +35,15 @@ Resources:
         Authorizers:
           ItsOnCognitoAuthorizer:
             UserPoolArn: !GetAtt ItsOnCognitoUserPool.Arn
-        Domain:
-          CertificateArn: arn:aws:acm:us-east-1:303579314896:certificate/89fd3c8f-9ccb-479e-b61a-36987061371e
-          DomainName: !If:
-            - IsProdEnv
-            - api.itson.fyi
-            - !Sub ${Env}.api.itson.fyi
-          Route53: 
-            EvaluateTargetHealth: true
-            HostedZoneName: itson.fyi
+      Domain:
+        CertificateArn: arn:aws:acm:us-east-1:303579314896:certificate/89fd3c8f-9ccb-479e-b61a-36987061371e
+        DomainName: !If:
+          - IsProdEnv
+          - api.itson.fyi
+          - !Sub ${Env}.api.itson.fyi
+        Route53: 
+          EvaluateTargetHealth: true
+          HostedZoneName: itson.fyi
 
   # Each Lambda function is defined by properties:
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
