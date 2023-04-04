@@ -43,7 +43,7 @@ jobs:
           use-installer: true
 
       - name: Build resources
-        run: sam build --template ${SAM_TEMPLATE} --use-container
+        run: sam build --template ${SAM_TEMPLATE} --parameter-overrides Env=dev --use-container
 
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -59,6 +59,7 @@ jobs:
       - name: Upload artifacts to testing artifact buckets
         run: |
           sam package \
+            --parameter-overrides Env=dev \
             --s3-bucket ${TESTING_ARTIFACTS_BUCKET} \
             --region ${TESTING_REGION} \
             --output-template-file packaged-dev.yaml
@@ -95,6 +96,7 @@ jobs:
       - name: Deploy to testing account
         run: |
           sam deploy --stack-name ${DEV_STACK_NAME} \
+            --parameter-overrides Env=dev \
             --template packaged-dev.yaml \
             --capabilities CAPABILITY_IAM \
             --region ${TESTING_REGION} \
