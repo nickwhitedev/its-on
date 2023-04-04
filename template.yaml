@@ -38,7 +38,7 @@ Resources:
       Domain:
         CertificateArn: arn:aws:acm:us-east-1:303579314896:certificate/89fd3c8f-9ccb-479e-b61a-36987061371e
         DomainName: 
-          !If: 
+          'Fn::If': 
             - IsProdEnv
             - api.itson.fyi
             - !Sub ${Env}.api.itson.fyi
