@@ -12,19 +12,38 @@ Description: >-
 Transform:
 - AWS::Serverless-2016-10-31
 
+Parameters:
+  Env:
+    Type: String
+    Default: local
+    Description: Environment name - used to populate stack names and subdomains
+
+Conditions:
+  IsProdEnv:
+    !Equals [!Ref Stage, prod]
+
 # Resources declares the AWS resources that you want to include in the stack
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
 Resources:
   ItsOnApi:
     Type: AWS::Serverless::Api
     Properties:
-      StageName: Prod
+      StageName: !Ref Env
       Cors: "'*'"
       Auth:
         DefaultAuthorizer: ItsOnCognitoAuthorizer
         Authorizers:
           ItsOnCognitoAuthorizer:
             UserPoolArn: !GetAtt ItsOnCognitoUserPool.Arn
+        Domain:
+          CertificateArn: arn:aws:acm:us-east-1:303579314896:certificate/89fd3c8f-9ccb-479e-b61a-36987061371e
+          DomainName: !If:
+            - IsProdEnv
+            - api.itson.fyi
+            - !Sub ${Env}.api.itson.fyi
+          Route53: 
+            EvaluateTargetHealth: true
+            HostedZoneName: itson.fyi
 
   # Each Lambda function is defined by properties:
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -153,5 +172,5 @@ Resources:
 
 Outputs:
   WebEndpoint:
-    Description: "API Gateway endpoint URL for Prod stage"
-    Value: !Sub "https://${ItsOnApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+    Description: "API Gateway endpoint URL for given env"
+    Value: !Sub "https://${ItsOnApi}.execute-api.${AWS::Region}.amazonaws.com/${Env}/"
