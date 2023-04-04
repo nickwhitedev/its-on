@@ -172,6 +172,9 @@ Resources:
         - ALLOW_REFRESH_TOKEN_AUTH # TODO: REMOVE
 
 Outputs:
+  ApiEndpoint:
+    Description: "API Gateway endpoint URL for given env (prod has no subdomain)"
+    Value: !Sub "https://${Env}.api.itson.fyi/"
   WebEndpoint:
-    Description: "API Gateway endpoint URL for given env"
-    Value: !Sub "https://${ItsOnApi}.execute-api.${AWS::Region}.amazonaws.com/${Env}/"
+    Description: "Web endpoint URL for given env (prod has no subdomain)"
+    Value: !Sub "https://${Env}.itson.fyi/"
