@@ -92,9 +92,6 @@ jobs:
     if: startsWith(github.ref, 'refs/heads/feature')
     needs: [build-and-deploy-feature-api]
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: frontend
     steps:
       - name: Read frontend bucket name
         run: |
@@ -105,15 +102,17 @@ jobs:
               --output text \
           )" >> $GITHUB_ENV
       - name: Install dependencies
+        working-directory: frontend
         run: npm install
       - name: Build frontend
+        working-directory: frontend
         run: CI=true npm run build
       - name: Clear frontend bucket
         run: |
           aws s3 rm s3://${{ env.frontend_bucket_name }} --recursive
       - name: Deploy frontend
         run: |
-          aws s3 cp build \
+          aws s3 cp frontend/build \
             s3://${{ env.frontend_bucket_name }} \
             --recursive
 
