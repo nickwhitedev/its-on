@@ -246,7 +246,7 @@ Resources:
               - "s3:DeleteObject"
             Resource: !Sub
               - "arn:aws:s3:::${Bucket}/*"
-              - Bucket: !Ref FrontendBucket
+              - Bucket: !Ref ItsOnFrontendBucket
       Bucket: !Ref ItsOnFrontendBucket
 
 Outputs:
