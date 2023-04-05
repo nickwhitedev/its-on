@@ -174,12 +174,6 @@ Resources:
 
   ItsOnFrontendBucket:
     Type: AWS::S3::Bucket
-    Properties:
-      BucketName:
-        "Fn::If":
-          - IsProdEnv
-          - itson.fyi
-          - !Sub ${Env}.itson.fyi
 
   ItsOnCloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
