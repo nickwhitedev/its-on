@@ -174,6 +174,12 @@ Resources:
 
   ItsOnFrontendBucket:
     Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        "Fn::If":
+          - IsProdEnv
+          - itson.fyi
+          - !Sub ${Env}.itson.fyi
 
   ItsOnCloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
@@ -253,4 +259,8 @@ Outputs:
   Website:
     Value: !GetAtt ItsOnCloudFrontDistribution.DomainName
   ItsOnFrontendBucketName:
-    Value: !GetAtt ItsOnFrontEndBucket.BucketName
+    Value:
+      "Fn::If":
+        - IsProdEnv
+        - itson.fyi
+        - !Sub ${Env}.itson.fyi
