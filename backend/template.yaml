@@ -196,7 +196,6 @@ Resources:
                 - IsProdEnv
                 - api.itson.fyi
                 - !Sub ${Env}.api.itson.fyi
-            OriginPath: "/"
             CustomOriginConfig:
               OriginProtocolPolicy: https-only
         DefaultCacheBehavior:
