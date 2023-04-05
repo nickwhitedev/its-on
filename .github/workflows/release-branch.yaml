@@ -12,7 +12,6 @@ env:
   PIPELINE_USER_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   PIPELINE_USER_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   SAM_TEMPLATE: template.yaml
-  STACK_NAME: its-on-$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]')
   TESTING_PIPELINE_EXECUTION_ROLE: arn:aws:iam::303579314896:role/aws-sam-cli-managed-dev-pipe-PipelineExecutionRole-1EXGMRU8M7PIU
   TESTING_CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::303579314896:role/aws-sam-cli-managed-dev-p-CloudFormationExecutionR-13FN6CKHSS9UA
   TESTING_ARTIFACTS_BUCKET: aws-sam-cli-managed-dev-pipeline-artifactsbucket-1awxr7qt59hmv
@@ -81,7 +80,7 @@ jobs:
       - name: Deploy to release stack in the testing account
         shell: bash
         run: |
-          sam deploy --stack-name ${STACK_NAME} \
+          sam deploy --stack-name its-on-$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]') \
             --capabilities CAPABILITY_IAM \
             --parameter-overrides Env=$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]')
             --region ${TESTING_REGION} \
@@ -101,7 +100,7 @@ jobs:
         run: |
           echo "frontend_bucket_name=$( \
             aws cloudformation describe-stacks \
-              --stack-name ${STACK_NAME} \
+              --stack-name its-on-$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]') \
               --query 'Stacks[0].Outputs[?OutputKey==`ItsOnFrontendBucketName`].OutputValue' \
               --output text \
           )" >> $GITHUB_ENV
@@ -126,7 +125,7 @@ jobs:
         run: |
           echo "frontend_bucket_name=$( \
             aws cloudformation describe-stacks \
-              --stack-name ${STACK_NAME} \
+              --stack-name its-on-$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]') \
               --query 'Stacks[0].Outputs[?OutputKey==`ItsOnFrontendBucketName`].OutputValue' \
               --output text \
           )" >> $GITHUB_ENV
