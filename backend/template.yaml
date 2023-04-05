@@ -171,6 +171,67 @@ Resources:
         - ALLOW_USER_PASSWORD_AUTH # TODO: REMOVE
         - ALLOW_REFRESH_TOKEN_AUTH # TODO: REMOVE
 
+  ItsOnFrontendBucket:
+    Type: AWS::S3::Bucket
+
+  ItsOnCloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+       DistributionConfig:
+        Origins:
+          - Id: ItsOnFrontendBucket
+            DomainName: !GetAtt ItsOnFrontendBucket.RegionalDomainName
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}"
+          - Id: ItsOnApi
+            DomainName: 
+              'Fn::If':
+                - IsProdEnv
+                - https://api.itson.fyi/
+                - !Sub "https://${Env}.api.itson.fyi/"
+            OriginPath: "/"
+            CustomOriginConfig:
+              OriginProtocolPolicy: https-only
+        DefaultCacheBehavior:
+          TargetOriginId: ItsOnFrontendBucket
+          ViewerProtocolPolicy: redirect-to-https
+          ForwardedValues:
+            QueryString: true
+        CacheBehaviors:
+          - TargetOriginId: ItsOnApi
+            PathPattern: "*"
+            DefaultTTL: 0
+            MinTTL: 0
+            MaxTTL: 0
+            ViewerProtocolPolicy: https-only
+            AllowedMethods: [GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE]
+            ForwardedValues:
+              QueryString: true
+        Enabled: true
+        DefaultRootObject: index.html
+        
+  ItsOnCloudFrontOriginAccessIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties: 
+      CloudFrontOriginAccessIdentityConfig: 
+        Comment: CloudFront access identity 
+
+  ItsOnFrontendBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      PolicyDocument:
+        Id: ItsOnFrontEndPolicy
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal: 
+              CanonicalUser: !GetAtt ItsOnCloudFrontOriginAccessIdentity.S3CanonicalUserId
+            Action: 's3:GetObject'
+            Resource: !Sub
+              - 'arn:aws:s3:::${Bucket}/*'
+              - Bucket: !Ref ItsOnFrontendBucket
+      Bucket: !Ref ItsOnFrontendBucket
+
 Outputs:
   ApiEndpoint:
     Description: "API Gateway endpoint URL for given env (prod has no subdomain)"
@@ -178,3 +239,5 @@ Outputs:
   WebEndpoint:
     Description: "Web endpoint URL for given env (prod has no subdomain)"
     Value: !Sub "https://${Env}.itson.fyi/"
+  Website:
+    Value: !GetAtt ItsOnCloudFrontDistribution.DomainName
