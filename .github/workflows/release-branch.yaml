@@ -162,6 +162,6 @@ jobs:
           RELEASE_BRANCH_NAME: ${{ github.event.ref }}
         run: |
           sam delete \
-            --stack-name $(echo ${RELEASE_BRANCH_NAME##*/} | tr -cd '[a-zA-Z0-9-]') \
+            --stack-name its-on-$(echo ${RELEASE_BRANCH_NAME##*/} | tr -cd '[a-zA-Z0-9-]') \
             --region ${TESTING_REGION} \
             --no-prompts

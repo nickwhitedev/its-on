@@ -64,7 +64,12 @@ jobs:
       - uses: aws-actions/setup-sam@v2
         with:
           use-installer: true
-      - run: sam build --template ${SAM_TEMPLATE} --parameter-overrides Env=$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]') --use-container
+      - run: sam build \
+          --template ${SAM_TEMPLATE} \
+          --parameter-overrides \
+          Env=$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]'),\
+          PipelineRole=${TESTING_PIPELINE_EXECUTION_ROLE} \
+          --use-container
 
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -80,9 +85,11 @@ jobs:
       - name: Deploy to feature stack in the testing account
         shell: bash
         run: |
-          sam deploy --stack-name $(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]') \
+          sam deploy --stack-name its-on-$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]') \
             --capabilities CAPABILITY_IAM \
-            --parameter-overrides Env=$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]') \
+            --parameter-overrides \
+            Env=$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]'),\
+            PipelineRole=${TESTING_PIPELINE_EXECUTION_ROLE} \
             --region ${TESTING_REGION} \
             --s3-bucket ${TESTING_ARTIFACTS_BUCKET} \
             --no-fail-on-empty-changeset \
@@ -100,7 +107,7 @@ jobs:
         run: |
           echo "frontend_bucket_name=$( \
             aws cloudformation describe-stacks \
-              --stack-name $(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]') \
+              --stack-name its-on-$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]') \
               --query 'Stacks[0].Outputs[?OutputKey==`ItsOnFrontendBucketName`].OutputValue' \
               --output text \
           )" >> $GITHUB_ENV
@@ -125,7 +132,7 @@ jobs:
         run: |
           echo "frontend_bucket_name=$( \
             aws cloudformation describe-stacks \
-              --stack-name $(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]') \
+              --stack-name its-on-$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]') \
               --query 'Stacks[0].Outputs[?OutputKey==`ItsOnFrontendBucketName`].OutputValue' \
               --output text \
           )" >> $GITHUB_ENV
@@ -162,6 +169,6 @@ jobs:
           FEATURE_BRANCH_NAME: ${{ github.event.ref }}
         run: |
           sam delete \
-            --stack-name $(echo ${FEATURE_BRANCH_NAME##*/} | tr -cd '[a-zA-Z0-9-]') \
+            --stack-name its-on-$(echo ${FEATURE_BRANCH_NAME##*/} | tr -cd '[a-zA-Z0-9-]') \
             --region ${TESTING_REGION} \
             --no-prompts
