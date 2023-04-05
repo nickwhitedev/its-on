@@ -75,7 +75,7 @@ jobs:
       - name: Build resources
         run: sam build \
           --template ${SAM_TEMPLATE} \
-          --parameter-overrides Env=prod,PipelineRole=${PROD_PIPELINE_EXECUTION_ROLE} \
+          --parameter-overrides "Env=prod,PipelineRole=${PROD_PIPELINE_EXECUTION_ROLE}" \
           --use-container
 
       - name: Assume the testing pipeline user role
@@ -115,7 +115,7 @@ jobs:
       - name: Upload artifacts to production artifact buckets
         run: |
           sam package \
-            --parameter-overrides Env=prod,PipelineRole=${PROD_PIPELINE_EXECUTION_ROLE} \
+            --parameter-overrides "Env=prod,PipelineRole=${PROD_PIPELINE_EXECUTION_ROLE}" \
             --s3-bucket ${PROD_ARTIFACTS_BUCKET} \
             --region ${PROD_REGION} \
             --output-template-file packaged-prod.yaml
@@ -155,7 +155,7 @@ jobs:
       - name: Deploy to testing account
         run: |
           sam deploy --stack-name ${TESTING_STACK_NAME} \
-            --parameter-overrides Env=test,PipelineRole=${TESTING_PIPELINE_EXECUTION_ROLE} \
+            --parameter-overrides "Env=test,PipelineRole=${TESTING_PIPELINE_EXECUTION_ROLE}" \
             --template packaged-testing.yaml \
             --capabilities CAPABILITY_IAM \
             --region ${TESTING_REGION} \
@@ -209,7 +209,7 @@ jobs:
       - name: Deploy to production account
         run: |
           sam deploy --stack-name ${PROD_STACK_NAME} \
-            --parameter-overrides Env=prod,PipelineRole=${PROD_PIPELINE_EXECUTION_ROLE} \
+            --parameter-overrides "Env=prod,PipelineRole=${PROD_PIPELINE_EXECUTION_ROLE}" \
             --template packaged-prod.yaml \
             --capabilities CAPABILITY_IAM \
             --region ${PROD_REGION} \
