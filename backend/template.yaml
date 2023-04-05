@@ -194,8 +194,8 @@ Resources:
             DomainName:
               "Fn::If":
                 - IsProdEnv
-                - api.itson.fyi/
-                - !Sub ${Env}.api.itson.fyi/
+                - api.itson.fyi
+                - !Sub ${Env}.api.itson.fyi
             OriginPath: "/"
             CustomOriginConfig:
               OriginProtocolPolicy: https-only
