@@ -64,7 +64,7 @@ jobs:
       - uses: aws-actions/setup-sam@v2
         with:
           use-installer: true
-      - run: sam build --template ${SAM_TEMPLATE} --parameter-overrides "Env=$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]'),PipelineRole=${TESTING_PIPELINE_EXECUTION_ROLE}" --use-container
+      - run: sam build --template ${SAM_TEMPLATE} --use-container--parameter-overrides "Env=$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]'),PipelineRole=${TESTING_PIPELINE_EXECUTION_ROLE}"
 
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -82,11 +82,11 @@ jobs:
         run: |
           sam deploy --stack-name its-on-$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]') \
             --capabilities CAPABILITY_IAM \
-            --parameter-overrides "Env=$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]'),PipelineRole=${TESTING_PIPELINE_EXECUTION_ROLE}" \
             --region ${TESTING_REGION} \
             --s3-bucket ${TESTING_ARTIFACTS_BUCKET} \
             --no-fail-on-empty-changeset \
-            --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE}
+            --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE} \
+            --parameter-overrides "Env=$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]'),PipelineRole=${TESTING_PIPELINE_EXECUTION_ROLE}"
 
   deploy-release-frontend:
     if: startsWith(github.ref, 'refs/heads/release')

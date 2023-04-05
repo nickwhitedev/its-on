@@ -66,8 +66,8 @@ jobs:
       - name: Build resources
         run: sam build \
           --template ${SAM_TEMPLATE} \
-          --parameter-overrides "Env=dev,PipelineRole=${TESTING_PIPELINE_EXECUTION_ROLE}" \
-          --use-container
+          --use-container \
+          --parameter-overrides "Env=dev,PipelineRole=${TESTING_PIPELINE_EXECUTION_ROLE}"
 
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -122,13 +122,13 @@ jobs:
       - name: Deploy to testing account
         run: |
           sam deploy --stack-name ${DEV_STACK_NAME} \
-            --parameter-overrides "Env=dev,PipelineRole=${TESTING_PIPELINE_EXECUTION_ROLE}" \
             --template packaged-dev.yaml \
             --capabilities CAPABILITY_IAM \
             --region ${TESTING_REGION} \
             --s3-bucket ${TESTING_ARTIFACTS_BUCKET} \
             --no-fail-on-empty-changeset \
-            --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE}
+            --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE} \
+            --parameter-overrides "Env=dev,PipelineRole=${TESTING_PIPELINE_EXECUTION_ROLE}"
 
   deploy-dev-frontend:
     if: github.ref == 'refs/heads/dev'
