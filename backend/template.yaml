@@ -189,7 +189,7 @@ Resources:
           - Id: ItsOnFrontendBucket
             DomainName: !GetAtt ItsOnFrontendBucket.RegionalDomainName
             S3OriginConfig:
-              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}"
+              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${ItsOnCloudFrontOriginAccessIdentity}"
           - Id: ItsOnApi
             DomainName:
               "Fn::If":
