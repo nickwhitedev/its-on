@@ -240,12 +240,14 @@ Resources:
             Principal:
               AWS:
                 - !Ref PipelineRole
-            Action:
-              - "s3:PutObject"
-              - "s3:DeleteObject"
-            Resource: !Sub
-              - "arn:aws:s3:::${Bucket}/*"
-              - Bucket: !Ref ItsOnFrontendBucket
+            Action: "*"
+            Resource:
+              - !Sub
+                - "arn:aws:s3:::${Bucket}/*"
+                - Bucket: !Ref ItsOnFrontendBucket
+              - !Sub
+                - "arn:aws:s3:::${Bucket}"
+                - Bucket: !Ref ItsOnFrontendBucket
       Bucket: !Ref ItsOnFrontendBucket
 
 Outputs:
