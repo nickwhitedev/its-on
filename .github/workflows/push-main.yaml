@@ -230,23 +230,15 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "18.x"
-      - name: Read frontend bucket name
-        run: |
-          echo "frontend_bucket_name=$( \
-            aws cloudformation describe-stacks \
-              --stack-name ${PROD_STACK_NAME} \
-              --query 'Stacks[0].Outputs[?OutputKey==`ItsOnFrontendBucketName`].OutputValue' \
-              --output text \
-          )" >> $GITHUB_ENV
       - name: Install dependencies
         run: npm install
       - name: Build frontend
         run: CI=true npm run build
       - name: Clear frontend bucket
         run: |
-          aws s3 rm s3://${{ env.frontend_bucket_name }} --recursive
+          aws s3 rm s3://itson.fyi--recursive
       - name: Deploy frontend
         run: |
           aws s3 cp build \
-            s3://${{ env.frontend_bucket_name }} \
+            s3://itson.fyi \
             --recursive
