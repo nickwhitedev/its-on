@@ -23,6 +23,19 @@ Parameters:
 Conditions:
   IsProdEnv: !Equals [!Ref Env, prod]
 
+Mappings:
+  FullFrontEndDomainName:
+    "Fn::If":
+      - IsProdEnv
+      - itson.fyi
+      - !Sub ${Env}.itson.fyi
+
+  FullApiDomainName:
+    "Fn::If":
+      - IsProdEnv
+      - api.itson.fyi
+      - !Sub ${Env}.api.itson.fyi
+
 # Resources declares the AWS resources that you want to include in the stack
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
 Resources:
@@ -38,11 +51,7 @@ Resources:
             UserPoolArn: !GetAtt ItsOnCognitoUserPool.Arn
       Domain:
         CertificateArn: arn:aws:acm:us-east-1:303579314896:certificate/89fd3c8f-9ccb-479e-b61a-36987061371e
-        DomainName:
-          "Fn::If":
-            - IsProdEnv
-            - api.itson.fyi
-            - !Sub ${Env}.api.itson.fyi
+        DomainName: !Ref FullApiDomainName
         Route53:
           EvaluateTargetHealth: true
           HostedZoneId: Z06575223EAH4XQ5M1AVF
@@ -175,11 +184,54 @@ Resources:
   ItsOnFrontendBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName:
-        "Fn::If":
-          - IsProdEnv
-          - itson.fyi
-          - !Sub ${Env}.itson.fyi
+      BucketName: !Ref FullFrontEndDomainName
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: 404.html
+    DeletionPolicy: Retain
+
+  WebsiteCloudfront:
+    Type: AWS::CloudFront::Distribution
+    DependsOn:
+      - ItsOnFrontendBucket
+    Properties:
+      DistributionConfig:
+        Comment: Cloudfront Distribution pointing to S3 bucket
+        Origins:
+          - Id: ItsOnFrontendBucket
+            DomainName:
+              !Select [2, !Split ["/", !GetAtt ItsOnFrontendBucket.WebsiteURL]]
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${ItsOnCloudFrontOriginAccessIdentity}"
+            CustomOriginConfig:
+              HTTPPort: "80"
+              HTTPSPort: "443"
+              OriginProtocolPolicy: https-only
+          - Id: ItsOnApi
+            DomainName: !Ref FullDomainName
+            CustomOriginConfig:
+              OriginProtocolPolicy: https-only
+        Enabled: true
+        HttpVersion: "http2"
+        DefaultRootObject: index.html
+        Aliases:
+          - !Ref "FullDomainName"
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - GET
+            - HEAD
+          Compress: true
+          TargetOriginId: S3Origin
+          ForwardedValues:
+            QueryString: true
+            Cookies:
+              Forward: none
+          ViewerProtocolPolicy: redirect-to-https
+        PriceClass: PriceClass_All
+        ViewerCertificate:
+          AcmCertificateArn: !Ref AcmCertificateArn
+          SslSupportMethod: sni-only
 
   ItsOnCloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
@@ -191,11 +243,7 @@ Resources:
             S3OriginConfig:
               OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${ItsOnCloudFrontOriginAccessIdentity}"
           - Id: ItsOnApi
-            DomainName:
-              "Fn::If":
-                - IsProdEnv
-                - api.itson.fyi
-                - !Sub ${Env}.api.itson.fyi
+            DomainName: !Ref FullApiDomainName
             CustomOriginConfig:
               OriginProtocolPolicy: https-only
         DefaultCacheBehavior:
@@ -248,7 +296,26 @@ Resources:
               - !Sub
                 - "arn:aws:s3:::${Bucket}"
                 - Bucket: !Ref ItsOnFrontendBucket
+          - Sid: PublicReadForGetBucketObjects
+            Effect: Allow
+            Principal: "*"
+            Action: s3:GetObject
+            Resource:
+              - !Sub
+                - "arn:aws:s3:::${Bucket}/*"
+                - Bucket: !Ref ItsOnFrontendBucket
       Bucket: !Ref ItsOnFrontendBucket
+
+  WebsiteDNSName:
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      HostedZoneName: !Join ["", [!Ref "DomainName", .]]
+      RecordSets:
+        - Name: !Ref "FullDomainName"
+          Type: A
+          AliasTarget:
+            HostedZoneId: Z2FDTNDATAQYW2
+            DNSName: !GetAtt [WebsiteCloudfront, DomainName]
 
 Outputs:
   ApiEndpoint:
@@ -260,8 +327,4 @@ Outputs:
   Website:
     Value: !GetAtt ItsOnCloudFrontDistribution.DomainName
   ItsOnFrontendBucketName:
-    Value:
-      "Fn::If":
-        - IsProdEnv
-        - itson.fyi
-        - !Sub ${Env}.itson.fyi
+    Value: !Ref FullFrontEndDomainName
