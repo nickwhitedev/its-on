@@ -266,7 +266,7 @@ Resources:
   ItsOnDNSName:
     Type: AWS::Route53::RecordSetGroup
     Properties:
-      HostedZoneName: itson.fyi
+      HostedZoneId: Z06575223EAH4XQ5M1AVF
       RecordSets:
         - Name:
             "Fn::If":
