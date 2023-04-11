@@ -191,7 +191,7 @@ Resources:
         ErrorDocument: 404.html
     DeletionPolicy: Retain
 
-  WebsiteCloudfront:
+  ItsOnCloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
     DependsOn:
       - ItsOnFrontendBucket
@@ -209,60 +209,30 @@ Resources:
               HTTPSPort: "443"
               OriginProtocolPolicy: https-only
           - Id: ItsOnApi
-            DomainName: !Ref FullDomainName
+            DomainName: !Ref FullApiDomainName
             CustomOriginConfig:
               OriginProtocolPolicy: https-only
         Enabled: true
         HttpVersion: "http2"
         DefaultRootObject: index.html
         Aliases:
-          - !Ref "FullDomainName"
+          - !Ref "FullFrontEndDomainName"
         DefaultCacheBehavior:
-          AllowedMethods:
-            - GET
-            - HEAD
+          AllowedMethods: [GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE]
           Compress: true
-          TargetOriginId: S3Origin
           ForwardedValues:
             QueryString: true
             Cookies:
               Forward: none
+          DefaultTTL: 0
+          MinTTL: 0
+          MaxTTL: 0
+          TargetOriginId: ItsOnFrontendBucket
           ViewerProtocolPolicy: redirect-to-https
         PriceClass: PriceClass_All
         ViewerCertificate:
           AcmCertificateArn: !Ref AcmCertificateArn
           SslSupportMethod: sni-only
-
-  ItsOnCloudFrontDistribution:
-    Type: AWS::CloudFront::Distribution
-    Properties:
-      DistributionConfig:
-        Origins:
-          - Id: ItsOnFrontendBucket
-            DomainName: !GetAtt ItsOnFrontendBucket.RegionalDomainName
-            S3OriginConfig:
-              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${ItsOnCloudFrontOriginAccessIdentity}"
-          - Id: ItsOnApi
-            DomainName: !Ref FullApiDomainName
-            CustomOriginConfig:
-              OriginProtocolPolicy: https-only
-        DefaultCacheBehavior:
-          TargetOriginId: ItsOnFrontendBucket
-          ViewerProtocolPolicy: redirect-to-https
-          ForwardedValues:
-            QueryString: true
-        CacheBehaviors:
-          - TargetOriginId: ItsOnApi
-            PathPattern: "*"
-            DefaultTTL: 0
-            MinTTL: 0
-            MaxTTL: 0
-            ViewerProtocolPolicy: https-only
-            AllowedMethods: [GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE]
-            ForwardedValues:
-              QueryString: true
-        Enabled: true
-        DefaultRootObject: index.html
 
   ItsOnCloudFrontOriginAccessIdentity:
     Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
@@ -309,13 +279,14 @@ Resources:
   WebsiteDNSName:
     Type: AWS::Route53::RecordSetGroup
     Properties:
-      HostedZoneName: !Join ["", [!Ref "DomainName", .]]
+      HostedZoneName: !Join ["", [!Ref "FullFrontEndDomainName", .]]
       RecordSets:
-        - Name: !Ref "FullDomainName"
+        - Name: !Ref "FullFrontEndDomainName"
           Type: A
           AliasTarget:
-            HostedZoneId: Z2FDTNDATAQYW2
-            DNSName: !GetAtt [WebsiteCloudfront, DomainName]
+            HostedZoneId: Z06575223EAH4XQ5M1AVF
+            DNSName:
+              !GetAtt [ItsOnCloudFrontDistribution, FullFrontEndDomainName]
 
 Outputs:
   ApiEndpoint:
