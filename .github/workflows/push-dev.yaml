@@ -64,10 +64,7 @@ jobs:
           use-installer: true
 
       - name: Build resources
-        run: sam build \
-          --template ${SAM_TEMPLATE} \
-          --use-container \
-          --parameter-overrides ParameterKey=Env,ParameterValue=dev ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE}
+        run: sam build --template ${SAM_TEMPLATE} --use-container --parameter-overrides ParameterKey=Env,ParameterValue=dev ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE}
 
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -115,7 +112,7 @@ jobs:
           aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.TESTING_REGION }}
           role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
-          role-session-name: dev-deployment
+          role-session-name: deploy-dev-api
           role-duration-seconds: 3600
           role-skip-session-tagging: true
 
@@ -155,7 +152,7 @@ jobs:
           aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.TESTING_REGION }}
           role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
-          role-session-name: dev-deployment
+          role-session-name: deploy-dev-frontend
           role-duration-seconds: 3600
           role-skip-session-tagging: true
 

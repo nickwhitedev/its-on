@@ -193,7 +193,7 @@ Resources:
         DefaultTTL: 86400
         MaxTTL: 172800
         MinTTL: 3600
-        Name: ItsOnCloudFrontCachePolicy
+        Name: !Sub ItsOnCloudFrontCachePolicy-${Env}
         ParametersInCacheKeyAndForwardedToOrigin:
           CookiesConfig:
             CookieBehavior: none

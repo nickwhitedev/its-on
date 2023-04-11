@@ -148,7 +148,7 @@ jobs:
           aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.TESTING_REGION }}
           role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
-          role-session-name: testing-deployment
+          role-session-name: deploy-testing-api
           role-duration-seconds: 3600
           role-skip-session-tagging: true
 
@@ -202,7 +202,7 @@ jobs:
           aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.PROD_REGION }}
           role-to-assume: ${{ env.PROD_PIPELINE_EXECUTION_ROLE }}
-          role-session-name: prod-deployment
+          role-session-name: deploy-prod-api
           role-duration-seconds: 3600
           role-skip-session-tagging: true
 
@@ -241,7 +241,7 @@ jobs:
           aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.PROD_REGION }}
           role-to-assume: ${{ env.PROD_PIPELINE_EXECUTION_ROLE }}
-          role-session-name: prod-deployment
+          role-session-name: deploy-prod-frontend
           role-duration-seconds: 3600
           role-skip-session-tagging: true
       - name: Clear frontend bucket
