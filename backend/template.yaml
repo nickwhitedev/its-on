@@ -23,19 +23,6 @@ Parameters:
 Conditions:
   IsProdEnv: !Equals [!Ref Env, prod]
 
-Mappings:
-  FullFrontEndDomainName:
-    "Fn::If":
-      - IsProdEnv
-      - itson.fyi
-      - !Sub ${Env}.itson.fyi
-
-  FullApiDomainName:
-    "Fn::If":
-      - IsProdEnv
-      - api.itson.fyi
-      - !Sub ${Env}.api.itson.fyi
-
 # Resources declares the AWS resources that you want to include in the stack
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
 Resources:
@@ -51,7 +38,11 @@ Resources:
             UserPoolArn: !GetAtt ItsOnCognitoUserPool.Arn
       Domain:
         CertificateArn: arn:aws:acm:us-east-1:303579314896:certificate/89fd3c8f-9ccb-479e-b61a-36987061371e
-        DomainName: !Ref FullApiDomainName
+        DomainName:
+          "Fn::If":
+            - IsProdEnv
+            - api.itson.fyi
+            - !Sub ${Env}.api.itson.fyi
         Route53:
           EvaluateTargetHealth: true
           HostedZoneId: Z06575223EAH4XQ5M1AVF
@@ -184,7 +175,11 @@ Resources:
   ItsOnFrontendBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Ref FullFrontEndDomainName
+      BucketName:
+        "Fn::If":
+          - IsProdEnv
+          - itson.fyi
+          - !Sub ${Env}.itson.fyi
       AccessControl: PublicRead
       WebsiteConfiguration:
         IndexDocument: index.html
@@ -209,14 +204,21 @@ Resources:
               HTTPSPort: "443"
               OriginProtocolPolicy: https-only
           - Id: ItsOnApi
-            DomainName: !Ref FullApiDomainName
+            DomainName:
+              "Fn::If":
+                - IsProdEnv
+                - api.itson.fyi
+                - !Sub ${Env}.api.itson.fyi
             CustomOriginConfig:
               OriginProtocolPolicy: https-only
         Enabled: true
         HttpVersion: "http2"
         DefaultRootObject: index.html
         Aliases:
-          - !Ref "FullFrontEndDomainName"
+          "Fn::If":
+            - IsProdEnv
+            - itson.fyi
+            - !Sub ${Env}.itson.fyi
         DefaultCacheBehavior:
           AllowedMethods: [GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE]
           Compress: true
@@ -279,14 +281,26 @@ Resources:
   WebsiteDNSName:
     Type: AWS::Route53::RecordSetGroup
     Properties:
-      HostedZoneName: !Join ["", [!Ref "FullFrontEndDomainName", .]]
+      HostedZoneName:
+        "Fn::If":
+          - IsProdEnv
+          - itson.fyi
+          - !Sub ${Env}.itson.fyi
       RecordSets:
-        - Name: !Ref "FullFrontEndDomainName"
+        - Name:
+            "Fn::If":
+              - IsProdEnv
+              - itson.fyi
+              - !Sub ${Env}.itson.fyi
           Type: A
           AliasTarget:
             HostedZoneId: Z06575223EAH4XQ5M1AVF
-            DNSName:
-              !GetAtt [ItsOnCloudFrontDistribution, FullFrontEndDomainName]
+            DNSName: !GetAtt
+              - ItsOnCloudFrontDistribution
+              - "Fn::If":
+                  - IsProdEnv
+                  - itson.fyi
+                  - !Sub ${Env}.itson.fyi
 
 Outputs:
   ApiEndpoint:
@@ -298,4 +312,8 @@ Outputs:
   Website:
     Value: !GetAtt ItsOnCloudFrontDistribution.DomainName
   ItsOnFrontendBucketName:
-    Value: !Ref FullFrontEndDomainName
+    Value:
+      "Fn::If":
+        - IsProdEnv
+        - itson.fyi
+        - !Sub ${Env}.itson.fyi
