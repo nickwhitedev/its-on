@@ -64,10 +64,7 @@ jobs:
           use-installer: true
 
       - name: Build resources
-        run: sam build \
-          --template ${SAM_TEMPLATE} \
-          --use-container \
-          --parameter-overrides ParameterKey=Env,ParameterValue=dev ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE}
+        run: sam build --template ${SAM_TEMPLATE} --use-container --parameter-overrides ParameterKey=Env,ParameterValue=dev ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE}
 
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v1-node16
