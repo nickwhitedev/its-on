@@ -215,10 +215,10 @@ Resources:
         HttpVersion: "http2"
         DefaultRootObject: index.html
         Aliases:
-          "Fn::If":
-            - IsProdEnv
-            - itson.fyi
-            - !Sub ${Env}.itson.fyi
+          - "Fn::If":
+              - IsProdEnv
+              - itson.fyi
+              - !Sub ${Env}.itson.fyi
         DefaultCacheBehavior:
           AllowedMethods: [GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE]
           Compress: true
