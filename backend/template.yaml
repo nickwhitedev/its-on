@@ -266,11 +266,7 @@ Resources:
   ItsOnDNSName:
     Type: AWS::Route53::RecordSetGroup
     Properties:
-      HostedZoneName:
-        "Fn::If":
-          - IsProdEnv
-          - itson.fyi
-          - !Sub ${Env}.itson.fyi
+      HostedZoneName: itson.fyi
       RecordSets:
         - Name:
             "Fn::If":
