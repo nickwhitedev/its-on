@@ -278,7 +278,7 @@ Resources:
                 - Bucket: !Ref ItsOnFrontendBucket
       Bucket: !Ref ItsOnFrontendBucket
 
-  WebsiteDNSName:
+  ItsOnDNSName:
     Type: AWS::Route53::RecordSetGroup
     Properties:
       HostedZoneName:
@@ -295,12 +295,7 @@ Resources:
           Type: A
           AliasTarget:
             HostedZoneId: Z06575223EAH4XQ5M1AVF
-            DNSName: !GetAtt
-              - ItsOnCloudFrontDistribution
-              - "Fn::If":
-                  - IsProdEnv
-                  - itson.fyi
-                  - !Sub ${Env}.itson.fyi
+            DNSName: !GetAtt ItsOnCloudFrontDistribution.DomainName
 
 Outputs:
   ApiEndpoint:
