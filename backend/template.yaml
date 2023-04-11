@@ -200,7 +200,6 @@ Resources:
             CustomOriginConfig:
               HTTPPort: "80"
               HTTPSPort: "443"
-              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${ItsOnCloudFrontOriginAccessIdentity}"
               OriginProtocolPolicy: https-only
           - Id: ItsOnApi
             DomainName:
@@ -235,12 +234,6 @@ Resources:
           AcmCertificateArn: arn:aws:acm:us-east-1:303579314896:certificate/89fd3c8f-9ccb-479e-b61a-36987061371e
           SslSupportMethod: sni-only
 
-  ItsOnCloudFrontOriginAccessIdentity:
-    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
-    Properties:
-      CloudFrontOriginAccessIdentityConfig:
-        Comment: CloudFront access identity
-
   ItsOnFrontendBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -248,13 +241,6 @@ Resources:
         Id: ItsOnFrontEndPolicy
         Version: 2012-10-17
         Statement:
-          - Effect: Allow
-            Principal:
-              CanonicalUser: !GetAtt ItsOnCloudFrontOriginAccessIdentity.S3CanonicalUserId
-            Action: "s3:GetObject"
-            Resource: !Sub
-              - "arn:aws:s3:::${Bucket}/*"
-              - Bucket: !Ref ItsOnFrontendBucket
           - Effect: Allow
             Principal:
               AWS:
@@ -266,6 +252,14 @@ Resources:
                 - Bucket: !Ref ItsOnFrontendBucket
               - !Sub
                 - "arn:aws:s3:::${Bucket}"
+                - Bucket: !Ref ItsOnFrontendBucket
+          - Sid: PublicReadForGetBucketObjects
+            Effect: Allow
+            Principal: "*"
+            Action: s3:GetObject
+            Resource:
+              - !Sub
+                - "arn:aws:s3:::${Bucket}/*"
                 - Bucket: !Ref ItsOnFrontendBucket
       Bucket: !Ref ItsOnFrontendBucket
 
