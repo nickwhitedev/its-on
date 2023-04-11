@@ -3,7 +3,7 @@ name: Push Main
 on:
   push:
     branches:
-      - 'main'
+      - "main"
 
 env:
   PIPELINE_USER_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -29,22 +29,43 @@ env:
   PROD_REGION: us-east-1
 
 jobs:
-  test:
+  test-backend:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18.x'
+          node-version: "18.x"
       - run: npm install
       - run: npm test
 
-  build-and-package-prod:
-    if: github.ref == 'refs/heads/main'
-    needs: [test]
+  test-frontend:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+      - run: npm install
+      - run: CI=true npm test
+
+  build-and-package-prod-api:
+    if: github.ref == 'refs/heads/main'
+    needs: [test-backend, test-frontend]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
     steps:
       - uses: actions/checkout@v3
       - uses: aws-actions/setup-sam@v2
@@ -52,7 +73,10 @@ jobs:
           use-installer: true
 
       - name: Build resources
-        run: sam build --template ${SAM_TEMPLATE} --parameter-overrides Env=prod --use-container
+        run: sam build \
+          --template ${SAM_TEMPLATE} \
+          --use-container \
+          --parameter-overrides ParameterKey=Env,ParameterValue=prod ParameterKey=PipelineRole,ParameterValue=${PROD_PIPELINE_EXECUTION_ROLE}
 
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -91,20 +115,23 @@ jobs:
       - name: Upload artifacts to production artifact buckets
         run: |
           sam package \
-            --parameter-overrides Env=prod \
             --s3-bucket ${PROD_ARTIFACTS_BUCKET} \
             --region ${PROD_REGION} \
-            --output-template-file packaged-prod.yaml
+            --output-template-file packaged-prod.yaml \
+            --parameter-overrides ParameterKey=Env,ParameterValue=prod ParameterKey=PipelineRole,ParameterValue=${PROD_PIPELINE_EXECUTION_ROLE}
 
       - uses: actions/upload-artifact@v2
         with:
           name: packaged-prod.yaml
           path: packaged-prod.yaml
 
-  deploy-testing:
+  deploy-testing-api:
     if: github.ref == 'refs/heads/main'
-    needs: [build-and-package-prod]
+    needs: [build-and-package-prod-api]
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
     steps:
       - uses: actions/checkout@v3
       - uses: aws-actions/setup-sam@v2
@@ -128,27 +155,34 @@ jobs:
       - name: Deploy to testing account
         run: |
           sam deploy --stack-name ${TESTING_STACK_NAME} \
-            --parameter-overrides Env=test
             --template packaged-testing.yaml \
             --capabilities CAPABILITY_IAM \
             --region ${TESTING_REGION} \
             --s3-bucket ${TESTING_ARTIFACTS_BUCKET} \
             --no-fail-on-empty-changeset \
-            --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE}
+            --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE} \
+            --parameter-overrides ParameterKey=Env,ParameterValue=test ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE}
 
   integration-test:
     if: github.ref == 'refs/heads/main'
-    needs: [deploy-testing]
+    needs: [deploy-testing-api]
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
     steps:
       - uses: actions/checkout@v3
-      - run: |
+      - name: Run integration tests
+        run: |
           # trigger the integration tests here
 
-  deploy-prod:
+  deploy-prod-api:
     if: github.ref == 'refs/heads/main'
     needs: [integration-test]
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
     # Configure GitHub Action Environment to have a manual approval step before deployment to production
     # https://docs.github.com/en/actions/reference/environments
     # environment: <configured-environment>
@@ -175,10 +209,46 @@ jobs:
       - name: Deploy to production account
         run: |
           sam deploy --stack-name ${PROD_STACK_NAME} \
-            --parameter-overrides Env=prod
             --template packaged-prod.yaml \
             --capabilities CAPABILITY_IAM \
             --region ${PROD_REGION} \
             --s3-bucket ${PROD_ARTIFACTS_BUCKET} \
             --no-fail-on-empty-changeset \
-            --role-arn ${PROD_CLOUDFORMATION_EXECUTION_ROLE}
+            --role-arn ${PROD_CLOUDFORMATION_EXECUTION_ROLE} \
+            --parameter-overrides ParameterKey=Env,ParameterValue=prod ParameterKey=PipelineRole,ParameterValue=${PROD_PIPELINE_EXECUTION_ROLE}
+
+  deploy-prod-frontend:
+    if: github.ref == 'refs/heads/main'
+    needs: [deploy-prod-api]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+      - name: Install dependencies
+        run: npm install
+      - name: Build frontend
+        run: CI=true npm run build
+      - name: Assume the prod pipeline user role
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-access-key-id: ${{ env.PIPELINE_USER_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.PROD_REGION }}
+          role-to-assume: ${{ env.PROD_PIPELINE_EXECUTION_ROLE }}
+          role-session-name: prod-deployment
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
+      - name: Clear frontend bucket
+        run: |
+          aws s3 rm s3://itson.fyi--recursive
+      - name: Deploy frontend
+        run: |
+          aws s3 cp build \
+            s3://itson.fyi \
+            --recursive

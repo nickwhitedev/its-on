@@ -3,10 +3,10 @@ name: Feature Branch
 on:
   push:
     branches:
-      - 'feature**'
+      - "feature**"
   delete:
     branches:
-      - 'feature**'
+      - "feature**"
 
 env:
   PIPELINE_USER_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -18,21 +18,126 @@ env:
   TESTING_REGION: us-east-1
 
 jobs:
-  test:
+  test-backend:
     if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+      - run: npm install
+      - run: npm test
+
+  test-frontend:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+      - run: npm install
+      - run: CI=true npm test
+
+  build-and-deploy-feature-api:
+    # this stage is triggered only for feature branches (feature*),
+    # which will build the stack and deploy to a stack named with branch name.
+    # https://github.com/actions/setup-python
+    # https://github.com/aws-actions/configure-aws-credentials#notice-node12-deprecation-warning
+    if: startsWith(github.ref, 'refs/heads/feature')
+    needs: [test-backend, test-frontend]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v3
+      - uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
+      - run: sam build --template ${SAM_TEMPLATE} --use-container --parameter-overrides ParameterKey=Env,ParameterValue=$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]') ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE}
+
+      - name: Assume the testing pipeline user role
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-access-key-id: ${{ env.PIPELINE_USER_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.TESTING_REGION }}
+          role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
+          role-session-name: feature-deployment
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
+
+      - name: Deploy to feature stack in the testing account
+        shell: bash
+        run: |
+          sam deploy --stack-name its-on-$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]') \
+            --capabilities CAPABILITY_IAM \
+            --region ${TESTING_REGION} \
+            --s3-bucket ${TESTING_ARTIFACTS_BUCKET} \
+            --no-fail-on-empty-changeset \
+            --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE} \
+            --parameter-overrides ParameterKey=Env,ParameterValue=$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]') ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE}
+
+  deploy-feature-frontend:
+    if: startsWith(github.ref, 'refs/heads/feature')
+    needs: [build-and-deploy-feature-api]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18.x'
-      - run: npm install
-      - run: npm test
-  
-  delete-feature:
+          node-version: "18.x"
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm install
+      - name: Build frontend
+        working-directory: frontend
+        run: CI=true npm run build
+      - name: Assume the testing pipeline user role
+        uses: aws-actions/configure-aws-credentials@v1-node16
+        with:
+          aws-access-key-id: ${{ env.PIPELINE_USER_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.TESTING_REGION }}
+          role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
+          role-session-name: feature-deployment
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
+      - name: Clear frontend bucket
+        run: |
+          aws s3 rm s3://$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]').itson.fyi --recursive
+      - name: Deploy frontend
+        run: |
+          aws s3 cp frontend/build \
+            s3://$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]').itson.fyi \
+            --recursive
+
+  destroy-feature-frontend:
     if: startsWith(github.event.ref, 'feature') && github.event_name == 'delete'
     runs-on: ubuntu-latest
+    steps:
+      - name: Remove s3 bucket
+        run: |
+          aws s3 rb s3://$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]').itson.fyi
+
+  destroy-feature-api:
+    if: startsWith(github.event.ref, 'feature') && github.event_name == 'delete'
+    needs: [destroy-feature-frontend]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
     steps:
       - uses: actions/checkout@v3
       - uses: aws-actions/setup-sam@v2
@@ -55,43 +160,6 @@ jobs:
           FEATURE_BRANCH_NAME: ${{ github.event.ref }}
         run: |
           sam delete \
-            --stack-name $(echo ${FEATURE_BRANCH_NAME##*/} | tr -cd '[a-zA-Z0-9-]') \
+            --stack-name its-on-$(echo ${FEATURE_BRANCH_NAME##*/} | tr -cd '[a-zA-Z0-9-]') \
             --region ${TESTING_REGION} \
             --no-prompts
-
-  build-and-deploy-feature:
-    # this stage is triggered only for feature branches (feature*),
-    # which will build the stack and deploy to a stack named with branch name.
-    # https://github.com/actions/setup-python
-    # https://github.com/aws-actions/configure-aws-credentials#notice-node12-deprecation-warning
-    if: startsWith(github.ref, 'refs/heads/feature')
-    needs: [test]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: aws-actions/setup-sam@v2
-        with:
-          use-installer: true
-      - run: sam build --template ${SAM_TEMPLATE} --parameter-overrides Env=$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]') --use-container
-
-      - name: Assume the testing pipeline user role
-        uses: aws-actions/configure-aws-credentials@v1-node16
-        with:
-          aws-access-key-id: ${{ env.PIPELINE_USER_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.TESTING_REGION }}
-          role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
-          role-session-name: feature-deployment
-          role-duration-seconds: 3600
-          role-skip-session-tagging: true
-
-      - name: Deploy to feature stack in the testing account
-        shell: bash
-        run: |
-          sam deploy --stack-name $(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]') \
-            --capabilities CAPABILITY_IAM \
-            --parameter-overrides Env=$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]') \
-            --region ${TESTING_REGION} \
-            --s3-bucket ${TESTING_ARTIFACTS_BUCKET} \
-            --no-fail-on-empty-changeset \
-            --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE}
