@@ -197,11 +197,10 @@ Resources:
           - Id: ItsOnFrontendBucket
             DomainName:
               !Select [2, !Split ["/", !GetAtt ItsOnFrontendBucket.WebsiteURL]]
-            S3OriginConfig:
-              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${ItsOnCloudFrontOriginAccessIdentity}"
             CustomOriginConfig:
               HTTPPort: "80"
               HTTPSPort: "443"
+              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${ItsOnCloudFrontOriginAccessIdentity}"
               OriginProtocolPolicy: https-only
           - Id: ItsOnApi
             DomainName:
