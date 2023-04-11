@@ -138,6 +138,9 @@ jobs:
           role-session-name: destroy-release-frontend
           role-duration-seconds: 3600
           role-skip-session-tagging: true
+      - name: Clear frontend bucket
+        run: |
+          aws s3 rm s3://$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]').itson.fyi --recursive
       - name: Remove s3 bucket
         run: |
           aws s3 rb s3://$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]').itson.fyi
