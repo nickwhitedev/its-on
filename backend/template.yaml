@@ -289,7 +289,7 @@ Resources:
               - !Sub ${Env}.itson.fyi
           Type: A
           AliasTarget:
-            HostedZoneId: Z06575223EAH4XQ5M1AVF
+            HostedZoneId: Z2FDTNDATAQYW2
             DNSName: !GetAtt ItsOnCloudFrontDistribution.DomainName
 
 Outputs:
