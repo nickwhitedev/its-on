@@ -186,10 +186,28 @@ Resources:
         ErrorDocument: 404.html
     DeletionPolicy: Retain
 
+  ItsOnCloudFrontCachePolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        DefaultTTL: 86400
+        MaxTTL: 172800
+        MinTTL: 3600
+        Name: ItsOnCloudFrontCachePolicy
+        ParametersInCacheKeyAndForwardedToOrigin:
+          CookiesConfig:
+            CookieBehavior: none
+          EnableAcceptEncodingGzip: false
+          HeadersConfig:
+            HeaderBehavior: none
+          QueryStringsConfig:
+            QueryStringBehavior: none
+
   ItsOnCloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
     DependsOn:
       - ItsOnFrontendBucket
+      - ItsOnCloudFrontCachePolicy
     Properties:
       DistributionConfig:
         Comment: Cloudfront Distribution pointing to S3 bucket
@@ -219,14 +237,8 @@ Resources:
               - !Sub ${Env}.itson.fyi
         DefaultCacheBehavior:
           AllowedMethods: [GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE]
+          CachePolicyId: !Ref ItsOnCloudFrontCachePolicy
           Compress: true
-          ForwardedValues:
-            QueryString: true
-            Cookies:
-              Forward: none
-          DefaultTTL: 0
-          MinTTL: 0
-          MaxTTL: 0
           TargetOriginId: ItsOnFrontendBucket
           ViewerProtocolPolicy: redirect-to-https
         PriceClass: PriceClass_All
@@ -265,6 +277,8 @@ Resources:
 
   ItsOnDNSName:
     Type: AWS::Route53::RecordSetGroup
+    DependsOn:
+      - ItsOnCloudFrontDistribution
     Properties:
       HostedZoneId: Z06575223EAH4XQ5M1AVF
       RecordSets:
