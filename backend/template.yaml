@@ -267,14 +267,6 @@ Resources:
               - !Sub
                 - "arn:aws:s3:::${Bucket}"
                 - Bucket: !Ref ItsOnFrontendBucket
-          - Sid: PublicReadForGetBucketObjects
-            Effect: Allow
-            Principal: "*"
-            Action: s3:GetObject
-            Resource:
-              - !Sub
-                - "arn:aws:s3:::${Bucket}/*"
-                - Bucket: !Ref ItsOnFrontendBucket
       Bucket: !Ref ItsOnFrontendBucket
 
   ItsOnDNSName:
