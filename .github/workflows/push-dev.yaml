@@ -88,6 +88,7 @@ jobs:
         with:
           name: packaged-dev.yaml
           path: packaged-dev.yaml
+          if-no-files-found: error
 
   deploy-dev-api:
     if: github.ref == 'refs/heads/dev'
