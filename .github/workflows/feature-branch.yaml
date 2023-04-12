@@ -138,13 +138,19 @@ jobs:
           role-duration-seconds: 3600
           role-skip-session-tagging: true
       - name: echo ref
-        run: echo ${ github.event.ref }
+        env:
+          FEATURE_BRANCH_NAME: ${{ github.event.ref }}
+        run: echo ${FEATURE_BRANCH_NAME##*/}
       - name: Clear frontend bucket
+        env:
+          FEATURE_BRANCH_NAME: ${{ github.event.ref }}
         run: |
-          aws s3 rm s3://$(echo ${ github.event.ref } | tr -cd '[a-zA-Z0-9-]').itson.fyi --recursive
+          aws s3 rm s3://$(echo ${FEATURE_BRANCH_NAME##*/} | tr -cd '[a-zA-Z0-9-]').itson.fyi --recursive
       - name: Remove s3 bucket
+        env:
+          FEATURE_BRANCH_NAME: ${{ github.event.ref }}
         run: |
-          aws s3 rb s3://$(echo ${ github.event.ref } | tr -cd '[a-zA-Z0-9-]').itson.fyi
+          aws s3 rb s3://$(echo ${FEATURE_BRANCH_NAME##*/} | tr -cd '[a-zA-Z0-9-]').itson.fyi
 
   destroy-feature-api:
     if: startsWith(github.event.ref, 'feature') && github.event_name == 'delete'
