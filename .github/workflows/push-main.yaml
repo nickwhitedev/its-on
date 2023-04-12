@@ -142,7 +142,7 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: packaged-testing.yaml
-          path: backend/packaged-testing.yaml
+          path: backend
 
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -197,7 +197,7 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: packaged-prod.yaml
-          path: backend/packaged-prod.yaml
+          path: backend
 
       - name: Assume the prod pipeline user role
         uses: aws-actions/configure-aws-credentials@v1-node16
