@@ -99,7 +99,8 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: packaged-testing.yaml
-          path: packaged-testing.yaml
+          path: backend/packaged-testing.yaml
+          if-no-files-found: error
 
       - name: Assume the prod pipeline user role
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -123,7 +124,8 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: packaged-prod.yaml
-          path: packaged-prod.yaml
+          path: backend/packaged-prod.yaml
+          if-no-files-found: error
 
   deploy-testing-api:
     if: github.ref == 'refs/heads/main'
@@ -140,6 +142,7 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: packaged-testing.yaml
+          path: backend/packaged-testing.yaml
 
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -194,6 +197,7 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: packaged-prod.yaml
+          path: backend/packaged-prod.yaml
 
       - name: Assume the prod pipeline user role
         uses: aws-actions/configure-aws-credentials@v1-node16
