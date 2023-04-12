@@ -177,10 +177,10 @@ Resources:
         - profile
         - openid
       CallbackURLs:
-        "Fn::If":
-          - IsProdEnv
-          - https://itson.fyi
-          - !Sub https://${Env}.itson.fyi
+        - "Fn::If":
+            - IsProdEnv
+            - https://itson.fyi
+            - !Sub https://${Env}.itson.fyi
       ClientName: !Sub ItsOnUsersClient-${Env}
       GenerateSecret: false
       SupportedIdentityProviders:
