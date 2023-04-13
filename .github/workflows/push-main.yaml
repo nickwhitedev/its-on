@@ -73,10 +73,7 @@ jobs:
           use-installer: true
 
       - name: Build resources
-        run: sam build \
-          --template ${SAM_TEMPLATE} \
-          --use-container \
-          --parameter-overrides ParameterKey=Env,ParameterValue=prod ParameterKey=PipelineRole,ParameterValue=${PROD_PIPELINE_EXECUTION_ROLE}
+        run: sam build --template ${SAM_TEMPLATE} --use-container --parameter-overrides ParameterKey=Env,ParameterValue=prod ParameterKey=PipelineRole,ParameterValue=${PROD_PIPELINE_EXECUTION_ROLE}
 
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -250,7 +247,7 @@ jobs:
           role-skip-session-tagging: true
       - name: Clear frontend bucket
         run: |
-          aws s3 rm s3://itson.fyi--recursive
+          aws s3 rm s3://itson.fyi --recursive
       - name: Deploy frontend
         run: |
           aws s3 cp build \
