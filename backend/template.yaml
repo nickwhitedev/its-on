@@ -196,7 +196,7 @@ Resources:
         "Fn::If":
           - IsProdEnv
           - auth.itson.fyi
-          - !Sub ${Env}.auth.itson.fyi
+          - !Sub ${Env}-auth.itson.fyi
       UserPoolId: !Ref ItsOnCognitoUserPool
 
   ItsOnFrontendBucket:
