@@ -191,7 +191,7 @@ Resources:
     Type: AWS::Cognito::UserPoolDomain
     Properties:
       CustomDomainConfig:
-        CertificateArn: arn:aws:acm:us-east-1:303579314896:certificate/b2742797-8b1e-4abb-a001-248a44a04628
+        CertificateArn: arn:aws:acm:us-east-1:303579314896:certificate/89fd3c8f-9ccb-479e-b61a-36987061371e
       Domain:
         "Fn::If":
           - IsProdEnv
