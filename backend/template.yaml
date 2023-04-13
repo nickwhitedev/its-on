@@ -151,7 +151,7 @@ Resources:
   ItsOnCognitoUserPool:
     Type: AWS::Cognito::UserPool
     Properties:
-      UserPoolName: ItsOnUsers
+      UserPoolName: !Sub ItsOnUsers-${Env}
       Policies:
         PasswordPolicy:
           MinimumLength: 8
@@ -165,12 +165,39 @@ Resources:
   ItsOnCognitoUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:
-      UserPoolId: !Ref ItsOnCognitoUserPool
-      ClientName: ItsOnUsersClient
+      AllowedOAuthFlows:
+        - code
+        # For security reasons, we recommend that you use the authorization
+        # code grant flow, together with Proof Key for Code Exchange (PKCE),
+        # for mobile apps. https://tools.ietf.org/html/rfc7636
+        - implicit # TODO: REMOVE
+      AllowedOAuthScopes:
+        - email
+        - phone
+        - profile
+        - openid
+      CallbackURLs:
+        - "Fn::If":
+            - IsProdEnv
+            - https://itson.fyi
+            - !Sub https://${Env}.itson.fyi
+      ClientName: !Sub ItsOnUsersClient-${Env}
       GenerateSecret: false
-      ExplicitAuthFlows: # TODO: REMOVE
-        - ALLOW_USER_PASSWORD_AUTH # TODO: REMOVE
-        - ALLOW_REFRESH_TOKEN_AUTH # TODO: REMOVE
+      SupportedIdentityProviders:
+        - COGNITO
+      UserPoolId: !Ref ItsOnCognitoUserPool
+
+  ItsOnCognitoUserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      CustomDomainConfig:
+        CertificateArn: arn:aws:acm:us-east-1:303579314896:certificate/89fd3c8f-9ccb-479e-b61a-36987061371e
+      Domain:
+        "Fn::If":
+          - IsProdEnv
+          - auth.itson.fyi
+          - !Sub ${Env}-auth.itson.fyi
+      UserPoolId: !Ref ItsOnCognitoUserPool
 
   ItsOnFrontendBucket:
     Type: AWS::S3::Bucket
