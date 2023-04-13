@@ -115,8 +115,7 @@ jobs:
           sam package \
             --s3-bucket ${PROD_ARTIFACTS_BUCKET} \
             --region ${PROD_REGION} \
-            --output-template-file packaged-prod.yaml \
-            --parameter-overrides ParameterKey=Env,ParameterValue=prod ParameterKey=PipelineRole,ParameterValue=${PROD_PIPELINE_EXECUTION_ROLE}
+            --output-template-file packaged-prod.yaml
 
       - uses: actions/upload-artifact@v2
         with:
