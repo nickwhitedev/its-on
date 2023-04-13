@@ -22,3 +22,4 @@ TODO: Add instructions for using authentication (or getting around it) for devel
 
 ## Related Docs
 [Generated project outline by AWS SAM](docs/SAM.md)
+[Generated project outline by create-react-app](docs/REACT.md)
