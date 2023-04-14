@@ -318,6 +318,15 @@ Resources:
           AliasTarget:
             HostedZoneId: Z2FDTNDATAQYW2
             DNSName: !GetAtt ItsOnCloudFrontDistribution.DomainName
+        - Name:
+            "Fn::If":
+              - IsProdEnv
+              - auth.itson.fyi
+              - !Sub ${Env}-auth.itson.fyi
+          Type: A
+          AliasTarget:
+            HostedZoneId: Z2FDTNDATAQYW2
+            DNSName: !GetAtt ItsOnCognitoUserPoolDomain.CloudFrontDistribution
 
 Outputs:
   ApiEndpoint:
