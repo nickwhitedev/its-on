@@ -151,16 +151,40 @@ Resources:
   ItsOnCognitoUserPool:
     Type: AWS::Cognito::UserPool
     Properties:
-      UserPoolName: !Sub ItsOnUsers-${Env}
+      DeletionProtection:
+        "Fn::If":
+          - IsProdEnv
+          - ACTIVE
+          - INACTIVE
+      DeviceConfiguration:
+        ChallengeRequiredOnNewDevice: true
+        DeviceOnlyRememberedOnUserPrompt: false
+      EmailConfiguration:
+        # TODO: ConfigurationSet: REPLACE WITH SES CONFIGURATION SET maybe not needed
+        EmailSendingAccount:
+          "Fn::If":
+            - IsProdEnv
+            - DEVELOPER
+            - COGNITO_DEFAULT
+        # TODO: SourceArn: REPLACE WITH SES VERIFIED EMAIL ADDRESS ARN
+      EnabledMfas:
+        - SMS_MFA
+        - SOFTWARE_TOKEN_MFA
+      MfaConfiguration: OPTIONAL
       Policies:
         PasswordPolicy:
           MinimumLength: 8
-      UsernameAttributes:
-        - email
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+          RequireUppercase: true
       Schema:
         - AttributeDataType: String
           Name: email
           Required: false
+      UsernameAttributes:
+        - email
+      UserPoolName: !Sub ItsOnUsers-${Env}
 
   ItsOnCognitoUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
