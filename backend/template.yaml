@@ -151,6 +151,22 @@ Resources:
   ItsOnCognitoUserPool:
     Type: AWS::Cognito::UserPool
     Properties:
+      # TODO: Decide if this would be better for development
+      # Definitely safer...
+      # How would devs move fast in feature environments?
+      # AdminCreateUserConfig:
+      #   AllowAdminCreateUserOnly:
+      #     "Fn::If":
+      #       - IsProdEnv
+      #       - false
+      #       - true
+      AliasAttributes:
+        - email
+        - phone_number
+        - preferred_username
+      AutoVerifiedAttributes:
+        - email
+        - phone_number
       DeletionProtection:
         "Fn::If":
           - IsProdEnv
@@ -160,7 +176,7 @@ Resources:
         ChallengeRequiredOnNewDevice: true
         DeviceOnlyRememberedOnUserPrompt: false
       EmailConfiguration:
-        # TODO: ConfigurationSet: REPLACE WITH SES CONFIGURATION SET maybe not needed
+        # ConfigurationSet: Used for event monitoring and ip management
         EmailSendingAccount:
           "Fn::If":
             - IsProdEnv
@@ -182,8 +198,24 @@ Resources:
         - AttributeDataType: String
           Name: email
           Required: false
+      SMSConfiguration:
+        ExternalId: # FIXME: Should be an external id for an IAM Role that can use SNS
+        SnsCallerArn: # FIXME: ARN of the IAM role
+        SnsRegion: # FIXME: Same region as user pool
+      UserAttributeUpdateSettings:
+        # TODO: fill in
+      UsernameConfiguration:
+        CaseSensitive: false
       UsernameAttributes:
+        - phone_number
         - email
+      UserPoolAddOns:
+        AdvancedSecurityMode:
+          # TODO: Decide if security is needed for production
+          # "Fn::If":
+          #   - IsProdEnv
+          #   - AUDIT # Audit for a couple of weeks then switch to ENFORCE
+          #   - OFF
       UserPoolName: !Sub ItsOnUsers-${Env}
 
   ItsOnCognitoUserPoolClient:
