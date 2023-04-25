@@ -13,19 +13,29 @@ Transform:
   - AWS::Serverless-2016-10-31
 
 Parameters:
-  PipelineRole:
-    Type: String
   Env:
     Type: String
     Default: local
     Description: Environment name - used to populate stack names and subdomains
+  PipelineRole:
+    Type: String
+  SnsCognitoIamExternalId:
+    Type: String
 
 Conditions:
+  IsDevEnv: !Equals [!Ref Env, dev]
   IsProdEnv: !Equals [!Ref Env, prod]
+  IsProdOrDevEnv: !Or [IsProdEnv, IsDevEnv]
+
+# Mappings:
+# If you're trying to refactor the urls here,
+# conditions don't work in the mappings section.
+# Just ask Bard.
 
 # Resources declares the AWS resources that you want to include in the stack
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
 Resources:
+  #Backend Resources
   ItsOnApi:
     Type: AWS::Serverless::Api
     Properties:
@@ -148,8 +158,12 @@ Resources:
         ReadCapacityUnits: 2
         WriteCapacityUnits: 2
 
+  # Auth Resources
   ItsOnCognitoUserPool:
     Type: AWS::Cognito::UserPool
+    DependsOn:
+      - ItsOnAuthEmailIdentity
+      - ItsOnCognitoSMSRole
     Properties:
       # TODO: Decide if this would be better for development
       # Definitely safer...
@@ -182,7 +196,7 @@ Resources:
             - IsProdEnv
             - DEVELOPER
             - COGNITO_DEFAULT
-        # TODO: SourceArn: REPLACE WITH SES VERIFIED EMAIL ADDRESS ARN
+        SourceArn: !Ref ItsOnAuthEmailIdentity
       EnabledMfas:
         - SMS_MFA
         - SOFTWARE_TOKEN_MFA
@@ -199,11 +213,13 @@ Resources:
           Name: email
           Required: false
       SMSConfiguration:
-        ExternalId: # FIXME: Should be an external id for an IAM Role that can use SNS
-        SnsCallerArn: # FIXME: ARN of the IAM role
-        SnsRegion: # FIXME: Same region as user pool
+        ExternalId: !Ref SnsCognitoIamExternalId
+        SnsCallerArn: !GetAtt ItsOnCognitoSMSRole.Arn
+        SnsRegion: us-east-1
       UserAttributeUpdateSettings:
-        # TODO: fill in
+        AttributesRequireVerificationBeforeUpdate:
+          - phone_number
+          - email
       UsernameConfiguration:
         CaseSensitive: false
       UsernameAttributes:
@@ -220,6 +236,7 @@ Resources:
 
   ItsOnCognitoUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
+    DependsOn: ItsOnCognitoUserPool
     Properties:
       AllowedOAuthFlows:
         - code
@@ -245,6 +262,7 @@ Resources:
 
   ItsOnCognitoUserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
+    DependsOn: ItsOnCognitoUserPool
     Properties:
       CustomDomainConfig:
         CertificateArn: arn:aws:acm:us-east-1:303579314896:certificate/89fd3c8f-9ccb-479e-b61a-36987061371e
@@ -255,6 +273,49 @@ Resources:
           - !Sub ${Env}-auth.itson.fyi
       UserPoolId: !Ref ItsOnCognitoUserPool
 
+  ItsOnAuthEmailIdentity:
+    Type: AWS::SES::EmailIdentity
+    Properties:
+      # TODO: Consider SES Configuration Set
+      # ConfigurationSetAttributes:
+      #   ConfigurationSetAttributes
+      #   https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ses-configurationset.html
+      DkimAttributes:
+        SigningEnabled: true
+      DkimSigningAttributes:
+        NextSigningKeyLength: RSA_2048_BIT
+      EmailIdentity:
+        - "Fn::If":
+            - IsProdEnv
+            - itson.fyi
+            - !Sub ${Env}.itson.fyi
+
+  ItsOnCognitoSMSRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ItsOnCognitoSMSRole
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - cognito-idp.amazonaws.com
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                sts:ExternalId: !Ref SnsCognitoIamExternalId
+      Policies:
+        - PolicyName: CognitoSMSPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sns:Publish
+                Resource: "*"
+
+  # Front End Resources
   ItsOnFrontendBucket:
     Type: AWS::S3::Bucket
     Properties:
@@ -358,10 +419,12 @@ Resources:
                 - Bucket: !Ref ItsOnFrontendBucket
       Bucket: !Ref ItsOnFrontendBucket
 
+  # DNS
   ItsOnDNSName:
     Type: AWS::Route53::RecordSetGroup
     DependsOn:
       - ItsOnCloudFrontDistribution
+      - ItsOnAuthEmailIdentity
     Properties:
       HostedZoneId: Z06575223EAH4XQ5M1AVF
       RecordSets:
@@ -383,6 +446,19 @@ Resources:
           AliasTarget:
             HostedZoneId: Z2FDTNDATAQYW2
             DNSName: !GetAtt ItsOnCognitoUserPoolDomain.CloudFrontDistribution
+        # SES Email Identity Verification
+        - Name: !GetAtt ItsOnAuthEmailIdentity.DkimDNSTokenName1
+          Type: CNAME
+          ResourceRecords:
+            - ItsOnAuthEmailIdentity.DkimDNSTokenValue1
+        - Name: !GetAtt ItsOnAuthEmailIdentity.DkimDNSTokenName2
+          Type: CNAME
+          ResourceRecords:
+            - ItsOnAuthEmailIdentity.DkimDNSTokenValue2
+        - Name: !GetAtt ItsOnAuthEmailIdentity.DkimDNSTokenName3
+          Type: CNAME
+          ResourceRecords:
+            - ItsOnAuthEmailIdentity.DkimDNSTokenValue3
 
 Outputs:
   ApiEndpoint:
