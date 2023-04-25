@@ -23,9 +23,7 @@ Parameters:
     Type: String
 
 Conditions:
-  IsDevEnv: !Equals [!Ref Env, dev]
   IsProdEnv: !Equals [!Ref Env, prod]
-  IsProdOrDevEnv: !Or [IsProdEnv, IsDevEnv]
 
 # Mappings:
 # If you're trying to refactor the urls here,
