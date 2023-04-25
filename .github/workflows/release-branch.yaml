@@ -12,6 +12,7 @@ env:
   PIPELINE_USER_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   PIPELINE_USER_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   SAM_TEMPLATE: template.yaml
+  AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID: ${{ secrets.AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID }}
   TESTING_PIPELINE_EXECUTION_ROLE: arn:aws:iam::303579314896:role/aws-sam-cli-managed-dev-pipe-PipelineExecutionRole-1EXGMRU8M7PIU
   TESTING_CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::303579314896:role/aws-sam-cli-managed-dev-p-CloudFormationExecutionR-13FN6CKHSS9UA
   TESTING_ARTIFACTS_BUCKET: aws-sam-cli-managed-dev-pipeline-artifactsbucket-1awxr7qt59hmv
@@ -64,7 +65,7 @@ jobs:
       - uses: aws-actions/setup-sam@v2
         with:
           use-installer: true
-      - run: sam build --template ${SAM_TEMPLATE} --use-container --parameter-overrides ParameterKey=Env,ParameterValue=$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]') ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE}
+      - run: sam build --template ${SAM_TEMPLATE} --use-container --parameter-overrides ParameterKey=Env,ParameterValue=$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]') ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE} ParameterKey=SnsCognitoIamExternalId,ParameterValue=${AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID}
 
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -86,7 +87,7 @@ jobs:
             --s3-bucket ${TESTING_ARTIFACTS_BUCKET} \
             --no-fail-on-empty-changeset \
             --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE} \
-            --parameter-overrides ParameterKey=Env,ParameterValue=$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]') ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE}
+            --parameter-overrides ParameterKey=Env,ParameterValue=$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]') ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE} ParameterKey=SnsCognitoIamExternalId,ParameterValue=${AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID}
 
   deploy-release-frontend:
     if: startsWith(github.ref, 'refs/heads/release')

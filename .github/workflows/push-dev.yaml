@@ -64,7 +64,7 @@ jobs:
           use-installer: true
 
       - name: Build resources
-        run: sam build --template ${SAM_TEMPLATE} --use-container --parameter-overrides ParameterKey=Env,ParameterValue=dev ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE}
+        run: sam build --template ${SAM_TEMPLATE} --use-container --parameter-overrides ParameterKey=Env,ParameterValue=dev ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE} ParameterKey=SnsCognitoIamExternalId,ParameterValue=${AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID}
 
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -127,7 +127,7 @@ jobs:
             --s3-bucket ${TESTING_ARTIFACTS_BUCKET} \
             --no-fail-on-empty-changeset \
             --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE} \
-            --parameter-overrides ParameterKey=Env,ParameterValue=dev ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE}
+            --parameter-overrides ParameterKey=Env,ParameterValue=dev ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE} ParameterKey=SnsCognitoIamExternalId,ParameterValue=${AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID}
 
   deploy-dev-frontend:
     if: github.ref == 'refs/heads/dev'
