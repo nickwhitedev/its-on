@@ -225,13 +225,13 @@ Resources:
       UsernameAttributes:
         - phone_number
         - email
-      UserPoolAddOns:
-        AdvancedSecurityMode:
-          # TODO: Decide if security is needed for production
-          # "Fn::If":
-          #   - IsProdEnv
-          #   - AUDIT # Audit for a couple of weeks then switch to ENFORCE
-          #   - OFF
+      # TODO: Enable on Launch
+      # UserPoolAddOns:
+      #   AdvancedSecurityMode:
+      #     "Fn::If":
+      #       - IsProdEnv
+      #       - AUDIT # Audit for a couple of weeks then switch to ENFORCE
+      #       - OFF
       UserPoolName: !Sub ItsOnUsers-${Env}
 
   ItsOnCognitoUserPoolClient:
