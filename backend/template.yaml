@@ -159,9 +159,6 @@ Resources:
   # Auth Resources
   ItsOnCognitoUserPool:
     Type: AWS::Cognito::UserPool
-    DependsOn:
-      - ItsOnAuthEmailIdentity
-      - ItsOnCognitoSMSRole
     Properties:
       # TODO: Decide if this would be better for development
       # Definitely safer...
@@ -194,7 +191,7 @@ Resources:
             - IsProdEnv
             - DEVELOPER
             - COGNITO_DEFAULT
-        SourceArn: !Ref ItsOnAuthEmailIdentity
+        SourceArn: !Ref SESDomainIdentityArn # FIXME: Add missing parameter
       EnabledMfas:
         - SMS_MFA
         - SOFTWARE_TOKEN_MFA
@@ -212,7 +209,7 @@ Resources:
           Required: false
       SMSConfiguration:
         ExternalId: !Ref SnsCognitoIamExternalId
-        SnsCallerArn: !GetAtt ItsOnCognitoSMSRole.Arn
+        SnsCallerArn: !Ref SnsCognitoIamArn # FIXME: Add missing parameter
         SnsRegion: us-east-1
       UserAttributeUpdateSettings:
         AttributesRequireVerificationBeforeUpdate:
@@ -234,7 +231,6 @@ Resources:
 
   ItsOnCognitoUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
-    DependsOn: ItsOnCognitoUserPool
     Properties:
       AllowedOAuthFlows:
         - code
@@ -260,7 +256,6 @@ Resources:
 
   ItsOnCognitoUserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
-    DependsOn: ItsOnCognitoUserPool
     Properties:
       CustomDomainConfig:
         CertificateArn: arn:aws:acm:us-east-1:303579314896:certificate/89fd3c8f-9ccb-479e-b61a-36987061371e
@@ -270,48 +265,6 @@ Resources:
           - auth.itson.fyi
           - !Sub ${Env}-auth.itson.fyi
       UserPoolId: !Ref ItsOnCognitoUserPool
-
-  ItsOnAuthEmailIdentity:
-    Type: AWS::SES::EmailIdentity
-    Properties:
-      # TODO: Consider SES Configuration Set
-      # ConfigurationSetAttributes:
-      #   ConfigurationSetAttributes
-      #   https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ses-configurationset.html
-      DkimAttributes:
-        SigningEnabled: true
-      DkimSigningAttributes:
-        NextSigningKeyLength: RSA_2048_BIT
-      EmailIdentity:
-        - "Fn::If":
-            - IsProdEnv
-            - itson.fyi
-            - !Sub ${Env}.itson.fyi
-
-  ItsOnCognitoSMSRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: ItsOnCognitoSMSRole
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service:
-                - cognito-idp.amazonaws.com
-            Action: sts:AssumeRole
-            Condition:
-              StringEquals:
-                sts:ExternalId: !Ref SnsCognitoIamExternalId
-      Policies:
-        - PolicyName: CognitoSMSPolicy
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action:
-                  - sns:Publish
-                Resource: "*"
 
   # Front End Resources
   ItsOnFrontendBucket:
@@ -347,9 +300,6 @@ Resources:
 
   ItsOnCloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
-    DependsOn:
-      - ItsOnFrontendBucket
-      - ItsOnCloudFrontCachePolicy
     Properties:
       DistributionConfig:
         Comment: Cloudfront Distribution pointing to S3 bucket
@@ -420,9 +370,6 @@ Resources:
   # DNS
   ItsOnDNSName:
     Type: AWS::Route53::RecordSetGroup
-    DependsOn:
-      - ItsOnCloudFrontDistribution
-      - ItsOnAuthEmailIdentity
     Properties:
       HostedZoneId: Z06575223EAH4XQ5M1AVF
       RecordSets:
@@ -444,19 +391,6 @@ Resources:
           AliasTarget:
             HostedZoneId: Z2FDTNDATAQYW2
             DNSName: !GetAtt ItsOnCognitoUserPoolDomain.CloudFrontDistribution
-        # SES Email Identity Verification
-        - Name: !GetAtt ItsOnAuthEmailIdentity.DkimDNSTokenName1
-          Type: CNAME
-          ResourceRecords:
-            - ItsOnAuthEmailIdentity.DkimDNSTokenValue1
-        - Name: !GetAtt ItsOnAuthEmailIdentity.DkimDNSTokenName2
-          Type: CNAME
-          ResourceRecords:
-            - ItsOnAuthEmailIdentity.DkimDNSTokenValue2
-        - Name: !GetAtt ItsOnAuthEmailIdentity.DkimDNSTokenName3
-          Type: CNAME
-          ResourceRecords:
-            - ItsOnAuthEmailIdentity.DkimDNSTokenValue3
 
 Outputs:
   ApiEndpoint:
