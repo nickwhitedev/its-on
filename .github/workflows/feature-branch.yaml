@@ -66,16 +66,15 @@ jobs:
         with:
           use-installer: true
       - run: |
-        sam build \
-          --template ${SAM_TEMPLATE} \
-          --use-container \
-          --parameter-overrides \
-            ParameterKey=Env,ParameterValue=$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]') \
-            ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE} \
-            ParameterKey=SnsCognitoIamArn,ParameterValue=${AWS_SNS_COGNITO_IAM_ARN} \
-            ParameterKey=SnsCognitoIamExternalId,ParameterValue=${AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID} \
-            ParameterKey=SESDomainIdentityArn,ParameterValue=${AWS_SES_DOMAIN_IDENTITY_ARN}
-
+          sam build \
+            --template ${SAM_TEMPLATE} \
+            --use-container \
+            --parameter-overrides \
+              ParameterKey=Env,ParameterValue=$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]') \
+              ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE} \
+              ParameterKey=SnsCognitoIamArn,ParameterValue=${AWS_SNS_COGNITO_IAM_ARN} \
+              ParameterKey=SnsCognitoIamExternalId,ParameterValue=${AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID} \
+              ParameterKey=SESDomainIdentityArn,ParameterValue=${AWS_SES_DOMAIN_IDENTITY_ARN}
 
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v1-node16
