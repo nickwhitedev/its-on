@@ -47,7 +47,7 @@ Resources:
         DefaultAuthorizer: ItsOnCognitoAuthorizer
         Authorizers:
           ItsOnCognitoAuthorizer:
-            UserPoolArn: !GetAtt ItsOnCognitoUserPool.Arn
+            UserPoolArn: !GetAtt ItsOnUserPool.Arn
       Domain:
         CertificateArn: arn:aws:acm:us-east-1:303579314896:certificate/89fd3c8f-9ccb-479e-b61a-36987061371e
         DomainName:
@@ -161,7 +161,7 @@ Resources:
         WriteCapacityUnits: 2
 
   # Auth Resources
-  ItsOnCognitoUserPool:
+  ItsOnUserPool:
     Type: AWS::Cognito::UserPool
     Properties:
       # TODO: Decide if this would be better for development
@@ -263,7 +263,7 @@ Resources:
       GenerateSecret: false
       SupportedIdentityProviders:
         - COGNITO
-      UserPoolId: !Ref ItsOnCognitoUserPool
+      UserPoolId: !Ref ItsOnUserPool
 
   ItsOnCognitoUserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
@@ -275,7 +275,7 @@ Resources:
           - IsProdEnv
           - auth.itson.fyi
           - !Sub ${Env}-auth.itson.fyi
-      UserPoolId: !Ref ItsOnCognitoUserPool
+      UserPoolId: !Ref ItsOnUserPool
 
   # Front End Resources
   ItsOnFrontendBucket:
