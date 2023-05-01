@@ -186,11 +186,7 @@ Resources:
         DeviceOnlyRememberedOnUserPrompt: false
       EmailConfiguration:
         # ConfigurationSet: Used for event monitoring and ip management
-        EmailSendingAccount:
-          "Fn::If":
-            - IsProdEnv
-            - DEVELOPER
-            - COGNITO_DEFAULT
+        EmailSendingAccount: DEVELOPER
         From: no-reply@itson.fyi
         ReplyToEmailAddress: no-reply@itson.fyi
         SourceArn: !Ref SESDomainIdentityArn
