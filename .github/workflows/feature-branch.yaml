@@ -68,6 +68,8 @@ jobs:
         with:
           use-installer: true
       - run: |
+          sam --version
+      - run: |
           sam build \
             --template ${SAM_TEMPLATE} \
             --use-container \
