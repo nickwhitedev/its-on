@@ -240,7 +240,7 @@ Resources:
       #       - OFF
       UserPoolName: !Sub ItsOnUsers-${Env}
 
-  ItsOnCognitoUserPoolClient:
+  ItsOnUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:
       AllowedOAuthFlows:
@@ -265,7 +265,7 @@ Resources:
         - COGNITO
       UserPoolId: !Ref ItsOnUserPool
 
-  ItsOnCognitoUserPoolDomain:
+  ItsOnUserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
     Properties:
       CustomDomainConfig:
@@ -406,7 +406,7 @@ Resources:
           Type: CNAME
           AliasTarget:
             HostedZoneId: Z2FDTNDATAQYW2
-            DNSName: !GetAtt ItsOnCognitoUserPoolDomain.CloudFrontDistribution
+            DNSName: !GetAtt ItsOnUserPoolDomain.CloudFrontDistribution
 
 Outputs:
   ApiEndpoint:
