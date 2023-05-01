@@ -173,10 +173,6 @@ Resources:
       #       - IsProdEnv
       #       - false
       #       - true
-      AliasAttributes:
-        - email
-        - phone_number
-        - preferred_username
       AutoVerifiedAttributes:
         - email
         - phone_number
@@ -221,9 +217,10 @@ Resources:
           - email
       UsernameConfiguration:
         CaseSensitive: false
-      UsernameAttributes:
-        - phone_number
-        - email
+      # TODO: Delete if not needed
+      # UsernameAttributes:
+      #   - phone_number
+      #   - email
       # TODO: Enable on Launch
       # UserPoolAddOns:
       #   AdvancedSecurityMode:
