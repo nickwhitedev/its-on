@@ -65,7 +65,16 @@ jobs:
           use-installer: true
 
       - name: Build resources
-        run: sam build --template ${SAM_TEMPLATE} --use-container --parameter-overrides ParameterKey=Env,ParameterValue=dev ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE} ParameterKey=SnsCognitoIamExternalId,ParameterValue=${AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID}
+        run: |
+          sam build \
+            --template ${SAM_TEMPLATE} \
+            --use-container \
+            --parameter-overrides \
+              ParameterKey=Env,ParameterValue=dev \
+              ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE} \
+              ParameterKey=SnsCognitoIamArn,ParameterValue=${AWS_SNS_COGNITO_IAM_ARN} \
+              ParameterKey=SnsCognitoIamExternalId,ParameterValue=${AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID} \
+              ParameterKey=SESDomainIdentityArn,ParameterValue=${AWS_SES_DOMAIN_IDENTITY_ARN}
 
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -121,14 +130,20 @@ jobs:
 
       - name: Deploy to testing account
         run: |
-          sam deploy --stack-name ${DEV_STACK_NAME} \
+          sam deploy \
+            --stack-name ${DEV_STACK_NAME} \
             --template packaged-dev.yaml \
             --capabilities CAPABILITY_IAM \
             --region ${TESTING_REGION} \
             --s3-bucket ${TESTING_ARTIFACTS_BUCKET} \
             --no-fail-on-empty-changeset \
             --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE} \
-            --parameter-overrides ParameterKey=Env,ParameterValue=dev ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE} ParameterKey=SnsCognitoIamExternalId,ParameterValue=${AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID}
+            --parameter-overrides \
+              ParameterKey=Env,ParameterValue=dev \
+              ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE} \
+              ParameterKey=SnsCognitoIamArn,ParameterValue=${AWS_SNS_COGNITO_IAM_ARN} \
+              ParameterKey=SnsCognitoIamExternalId,ParameterValue=${AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID} \
+              ParameterKey=SESDomainIdentityArn,ParameterValue=${AWS_SES_DOMAIN_IDENTITY_ARN}
 
   deploy-dev-frontend:
     if: github.ref == 'refs/heads/dev'

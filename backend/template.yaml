@@ -21,6 +21,10 @@ Parameters:
     Type: String
   SnsCognitoIamExternalId:
     Type: String
+  SnsCognitoIamArn:
+    Type: String
+  SESDomainIdentityArn:
+    Type: String
 
 Conditions:
   IsProdEnv: !Equals [!Ref Env, prod]
@@ -191,7 +195,7 @@ Resources:
             - IsProdEnv
             - DEVELOPER
             - COGNITO_DEFAULT
-        SourceArn: !Ref SESDomainIdentityArn # FIXME: Add missing parameter
+        SourceArn: !Ref SESDomainIdentityArn
       EnabledMfas:
         - SMS_MFA
         - SOFTWARE_TOKEN_MFA
@@ -209,7 +213,7 @@ Resources:
           Required: false
       SMSConfiguration:
         ExternalId: !Ref SnsCognitoIamExternalId
-        SnsCallerArn: !Ref SnsCognitoIamArn # FIXME: Add missing parameter
+        SnsCallerArn: !Ref SnsCognitoIamArn
         SnsRegion: us-east-1
       UserAttributeUpdateSettings:
         AttributesRequireVerificationBeforeUpdate:
