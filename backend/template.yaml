@@ -173,6 +173,10 @@ Resources:
       #       - IsProdEnv
       #       - false
       #       - true
+      AliasAttributes:
+        - email
+        - phone_number
+        - preferred_username
       AutoVerifiedAttributes:
         - email
         - phone_number
@@ -199,11 +203,19 @@ Resources:
           MinimumLength: 8
           RequireLowercase: true
           RequireNumbers: true
-          RequireSymbols: true
           RequireUppercase: true
       Schema:
         - AttributeDataType: String
           Name: email
+          Required: true
+        - AttributeDataType: String
+          Name: name
+          Required: false
+        - AttributeDataType: String
+          Name: phone_number
+          Required: false # TODO: phone number based sign-up?
+        - AttributeDataType: String
+          Name: preferred_username
           Required: false
       SmsConfiguration:
         ExternalId: !Ref SnsCognitoIamExternalId
@@ -391,7 +403,7 @@ Resources:
               - IsProdEnv
               - auth.itson.fyi
               - !Sub ${Env}-auth.itson.fyi
-          Type: A
+          Type: CNAME
           AliasTarget:
             HostedZoneId: Z2FDTNDATAQYW2
             DNSName: !GetAtt ItsOnCognitoUserPoolDomain.CloudFrontDistribution
