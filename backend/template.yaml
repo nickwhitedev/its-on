@@ -191,6 +191,8 @@ Resources:
             - IsProdEnv
             - DEVELOPER
             - COGNITO_DEFAULT
+        From: no-reply@itson.fyi
+        ReplyToEmailAddress: no-reply@itson.fyi
         SourceArn: !Ref SESDomainIdentityArn
       EnabledMfas:
         - SMS_MFA
