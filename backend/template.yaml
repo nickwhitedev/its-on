@@ -211,10 +211,10 @@ Resources:
         - AttributeDataType: String
           Name: email
           Required: false
-      SMSConfiguration:
-        ExternalId: !Ref SnsCognitoIamExternalId
-        SnsCallerArn: !Ref SnsCognitoIamArn
-        SnsRegion: us-east-1
+      # SMSConfiguration: # TODO: Decide what to do with this
+      #   ExternalId: !Ref SnsCognitoIamExternalId
+      #   SnsCallerArn: !Ref SnsCognitoIamArn
+      #   SnsRegion: us-east-1
       UserAttributeUpdateSettings:
         AttributesRequireVerificationBeforeUpdate:
           - phone_number
