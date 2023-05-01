@@ -207,10 +207,10 @@ Resources:
         - AttributeDataType: String
           Name: email
           Required: false
-      # SMSConfiguration: # TODO: Decide what to do with this
-      #   ExternalId: !Ref SnsCognitoIamExternalId
-      #   SnsCallerArn: !Ref SnsCognitoIamArn
-      #   SnsRegion: us-east-1
+      SmsConfiguration:
+        ExternalId: !Ref SnsCognitoIamExternalId
+        SnsCallerArn: !Ref SnsCognitoIamArn
+        SnsRegion: us-east-1
       UserAttributeUpdateSettings:
         AttributesRequireVerificationBeforeUpdate:
           - phone_number
