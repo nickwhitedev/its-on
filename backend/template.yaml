@@ -257,8 +257,8 @@ Resources:
       CallbackURLs:
         - "Fn::If":
             - IsProdEnv
-            - https://itson.fyi
-            - !Sub https://${Env}.itson.fyi
+            - https://itson.fyi/
+            - !Sub https://${Env}.itson.fyi/
       ClientName: !Sub ItsOnUsersClient-${Env}
       GenerateSecret: false
       SupportedIdentityProviders:
