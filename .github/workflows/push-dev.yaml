@@ -96,7 +96,7 @@ jobs:
             --region ${TESTING_REGION} \
             --output-template-file packaged-dev.yaml
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: packaged-dev.yaml
           path: backend/packaged-dev.yaml
@@ -114,7 +114,7 @@ jobs:
       - uses: aws-actions/setup-sam@v2
         with:
           use-installer: true
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: packaged-dev.yaml
           path: backend
