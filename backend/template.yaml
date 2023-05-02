@@ -146,19 +146,57 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /
             Method: POST
-  # Simple syntax to create a DynamoDB table with a single attribute primary key, more in
-  # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlesssimpletable
+
+  # tableStreamFunction: // TODO: Implement me
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     Handler: src/handlers/table-stream.tableStreamHandler
+  #     Runtime: nodejs18.x
+  #     Architectures:
+  #       - x86_64
+  #     MemorySize: 128
+  #     Timeout: 100
+  #     Description: Handles write events from the ItsOnTable
+  #     Policies:
+  #       # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+  #       - DynamoDBCrudPolicy:
+  #           TableName: !Ref ItsOnTable
+  #     Environment:
+  #       Variables:
+  #         # Make table name accessible as environment variable from function code during execution
+  #         ITS_ON_TABLE: !Ref ItsOnTable
+  #     Events:
+  #       TableStream:
 
   # DynamoDB table to store item: {id: &lt;ID&gt;, name: &lt;NAME&gt;}
   ItsOnTable:
-    Type: AWS::Serverless::SimpleTable
+    Type: AWS::DynamoDB::Table
     Properties:
-      PrimaryKey:
-        Name: id
-        Type: String
+      AttributeDefinitions:
+        - AttributeName: PK
+          AttributeType: S
+        - AttributeName: SK
+          AttributeType: S
+      DeletionProtectionEnabled:
+        "Fn::If":
+          - IsProdEnv
+          - true
+          - false
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+        - AttributeName: SK
+          KeyType: RANGE
       ProvisionedThroughput:
         ReadCapacityUnits: 2
         WriteCapacityUnits: 2
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+      Tags:
+        - Key: project
+          Value: itson
+        - Key: env
+          Value: !Ref Env
 
   # Auth Resources
   ItsOnUserPool:
