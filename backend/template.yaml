@@ -13,19 +13,31 @@ Transform:
   - AWS::Serverless-2016-10-31
 
 Parameters:
-  PipelineRole:
-    Type: String
   Env:
     Type: String
     Default: local
     Description: Environment name - used to populate stack names and subdomains
+  PipelineRole:
+    Type: String
+  SnsCognitoIamExternalId:
+    Type: String
+  SnsCognitoIamArn:
+    Type: String
+  SESDomainIdentityArn:
+    Type: String
 
 Conditions:
   IsProdEnv: !Equals [!Ref Env, prod]
 
+# Mappings:
+# If you're trying to refactor the urls here,
+# conditions don't work in the mappings section.
+# Just ask Bard.
+
 # Resources declares the AWS resources that you want to include in the stack
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
 Resources:
+  #Backend Resources
   ItsOnApi:
     Type: AWS::Serverless::Api
     Properties:
@@ -35,7 +47,7 @@ Resources:
         DefaultAuthorizer: ItsOnCognitoAuthorizer
         Authorizers:
           ItsOnCognitoAuthorizer:
-            UserPoolArn: !GetAtt ItsOnCognitoUserPool.Arn
+            UserPoolArn: !GetAtt ItsOnUserPool.Arn
       Domain:
         CertificateArn: arn:aws:acm:us-east-1:303579314896:certificate/89fd3c8f-9ccb-479e-b61a-36987061371e
         DomainName:
@@ -148,21 +160,87 @@ Resources:
         ReadCapacityUnits: 2
         WriteCapacityUnits: 2
 
-  ItsOnCognitoUserPool:
+  # Auth Resources
+  ItsOnUserPool:
     Type: AWS::Cognito::UserPool
     Properties:
-      UserPoolName: !Sub ItsOnUsers-${Env}
+      # TODO: Decide if this would be better for development
+      # Definitely safer...
+      # How would devs move fast in feature environments?
+      # AdminCreateUserConfig:
+      #   AllowAdminCreateUserOnly:
+      #     "Fn::If":
+      #       - IsProdEnv
+      #       - false
+      #       - true
+      AliasAttributes:
+        - email
+        - phone_number
+        - preferred_username
+      AutoVerifiedAttributes:
+        - email
+        - phone_number
+      DeletionProtection:
+        "Fn::If":
+          - IsProdEnv
+          - ACTIVE
+          - INACTIVE
+      DeviceConfiguration:
+        ChallengeRequiredOnNewDevice: true
+        DeviceOnlyRememberedOnUserPrompt: false
+      EmailConfiguration:
+        # ConfigurationSet: Used for event monitoring and ip management
+        EmailSendingAccount: DEVELOPER
+        From: no-reply@itson.fyi
+        ReplyToEmailAddress: no-reply@itson.fyi
+        SourceArn: !Ref SESDomainIdentityArn
+      EnabledMfas:
+        - SMS_MFA
+        - SOFTWARE_TOKEN_MFA
+      MfaConfiguration: OPTIONAL
       Policies:
         PasswordPolicy:
           MinimumLength: 8
-      UsernameAttributes:
-        - email
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireUppercase: true
       Schema:
         - AttributeDataType: String
           Name: email
+          Required: true
+        - AttributeDataType: String
+          Name: name
           Required: false
+        - AttributeDataType: String
+          Name: phone_number
+          Required: false # TODO: phone number based sign-up?
+        - AttributeDataType: String
+          Name: preferred_username
+          Required: false
+      SmsConfiguration:
+        ExternalId: !Ref SnsCognitoIamExternalId
+        SnsCallerArn: !Ref SnsCognitoIamArn
+        SnsRegion: us-east-1
+      UserAttributeUpdateSettings:
+        AttributesRequireVerificationBeforeUpdate:
+          - phone_number
+          - email
+      UsernameConfiguration:
+        CaseSensitive: false
+      # TODO: Delete if not needed
+      # UsernameAttributes:
+      #   - phone_number
+      #   - email
+      # TODO: Enable on Launch
+      # UserPoolAddOns:
+      #   AdvancedSecurityMode:
+      #     "Fn::If":
+      #       - IsProdEnv
+      #       - AUDIT # Audit for a couple of weeks then switch to ENFORCE
+      #       - OFF
+      UserPoolName: !Sub ItsOnUsers-${Env}
 
-  ItsOnCognitoUserPoolClient:
+  ItsOnUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:
       AllowedOAuthFlows:
@@ -179,15 +257,15 @@ Resources:
       CallbackURLs:
         - "Fn::If":
             - IsProdEnv
-            - https://itson.fyi
-            - !Sub https://${Env}.itson.fyi
+            - https://itson.fyi/
+            - !Sub https://${Env}.itson.fyi/
       ClientName: !Sub ItsOnUsersClient-${Env}
       GenerateSecret: false
       SupportedIdentityProviders:
         - COGNITO
-      UserPoolId: !Ref ItsOnCognitoUserPool
+      UserPoolId: !Ref ItsOnUserPool
 
-  ItsOnCognitoUserPoolDomain:
+  ItsOnUserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
     Properties:
       CustomDomainConfig:
@@ -197,8 +275,9 @@ Resources:
           - IsProdEnv
           - auth.itson.fyi
           - !Sub ${Env}-auth.itson.fyi
-      UserPoolId: !Ref ItsOnCognitoUserPool
+      UserPoolId: !Ref ItsOnUserPool
 
+  # Front End Resources
   ItsOnFrontendBucket:
     Type: AWS::S3::Bucket
     Properties:
@@ -207,11 +286,16 @@ Resources:
           - IsProdEnv
           - itson.fyi
           - !Sub ${Env}.itson.fyi
-      AccessControl: PublicRead
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: ObjectWriter
       WebsiteConfiguration:
         IndexDocument: index.html
         ErrorDocument: 404.html
     DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
 
   ItsOnCloudFrontCachePolicy:
     Type: AWS::CloudFront::CachePolicy
@@ -232,9 +316,6 @@ Resources:
 
   ItsOnCloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
-    DependsOn:
-      - ItsOnFrontendBucket
-      - ItsOnCloudFrontCachePolicy
     Properties:
       DistributionConfig:
         Comment: Cloudfront Distribution pointing to S3 bucket
@@ -302,10 +383,9 @@ Resources:
                 - Bucket: !Ref ItsOnFrontendBucket
       Bucket: !Ref ItsOnFrontendBucket
 
+  # DNS
   ItsOnDNSName:
     Type: AWS::Route53::RecordSetGroup
-    DependsOn:
-      - ItsOnCloudFrontDistribution
     Properties:
       HostedZoneId: Z06575223EAH4XQ5M1AVF
       RecordSets:
@@ -323,10 +403,10 @@ Resources:
               - IsProdEnv
               - auth.itson.fyi
               - !Sub ${Env}-auth.itson.fyi
-          Type: A
+          Type: CNAME
           AliasTarget:
             HostedZoneId: Z2FDTNDATAQYW2
-            DNSName: !GetAtt ItsOnCognitoUserPoolDomain.CloudFrontDistribution
+            DNSName: !GetAtt ItsOnUserPoolDomain.CloudFrontDistribution
 
 Outputs:
   ApiEndpoint:

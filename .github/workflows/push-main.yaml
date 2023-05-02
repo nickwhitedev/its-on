@@ -6,6 +6,9 @@ on:
       - "main"
 
 env:
+  AWS_SNS_COGNITO_IAM_ARN: ${{ secrets.AWS_SNS_COGNITO_IAM_ARN }}
+  AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID: ${{ secrets.AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID }}
+  AWS_SES_DOMAIN_IDENTITY_ARN: ${{ secrets.AWS_SES_DOMAIN_IDENTITY_ARN }}
   PIPELINE_USER_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   PIPELINE_USER_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   SAM_TEMPLATE: template.yaml
@@ -73,7 +76,16 @@ jobs:
           use-installer: true
 
       - name: Build resources
-        run: sam build --template ${SAM_TEMPLATE} --use-container --parameter-overrides ParameterKey=Env,ParameterValue=prod ParameterKey=PipelineRole,ParameterValue=${PROD_PIPELINE_EXECUTION_ROLE}
+        run: |
+          sam build \
+            --template ${SAM_TEMPLATE} \
+            --use-container \
+            --parameter-overrides \
+              ParameterKey=Env,ParameterValue=prod \
+              ParameterKey=PipelineRole,ParameterValue=${PROD_PIPELINE_EXECUTION_ROLE} \
+              ParameterKey=SnsCognitoIamArn,ParameterValue=${AWS_SNS_COGNITO_IAM_ARN} \
+              ParameterKey=SnsCognitoIamExternalId,ParameterValue=${AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID} \
+              ParameterKey=SESDomainIdentityArn,ParameterValue=${AWS_SES_DOMAIN_IDENTITY_ARN}
 
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v1-node16
@@ -93,7 +105,7 @@ jobs:
             --region ${TESTING_REGION} \
             --output-template-file packaged-testing.yaml
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: packaged-testing.yaml
           path: backend/packaged-testing.yaml
@@ -116,9 +128,14 @@ jobs:
             --s3-bucket ${PROD_ARTIFACTS_BUCKET} \
             --region ${PROD_REGION} \
             --output-template-file packaged-prod.yaml \
-            --parameter-overrides ParameterKey=Env,ParameterValue=prod ParameterKey=PipelineRole,ParameterValue=${PROD_PIPELINE_EXECUTION_ROLE}
+            --parameter-overrides \
+              ParameterKey=Env,ParameterValue=prod \
+              ParameterKey=PipelineRole,ParameterValue=${PROD_PIPELINE_EXECUTION_ROLE} \
+              ParameterKey=SnsCognitoIamArn,ParameterValue=${AWS_SNS_COGNITO_IAM_ARN} \
+              ParameterKey=SnsCognitoIamExternalId,ParameterValue=${AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID} \
+              ParameterKey=SESDomainIdentityArn,ParameterValue=${AWS_SES_DOMAIN_IDENTITY_ARN}
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: packaged-prod.yaml
           path: backend/packaged-prod.yaml
@@ -136,7 +153,7 @@ jobs:
       - uses: aws-actions/setup-sam@v2
         with:
           use-installer: true
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: packaged-testing.yaml
           path: backend
@@ -154,14 +171,20 @@ jobs:
 
       - name: Deploy to testing account
         run: |
-          sam deploy --stack-name ${TESTING_STACK_NAME} \
+          sam deploy \
+            --stack-name ${TESTING_STACK_NAME} \
             --template packaged-testing.yaml \
             --capabilities CAPABILITY_IAM \
             --region ${TESTING_REGION} \
             --s3-bucket ${TESTING_ARTIFACTS_BUCKET} \
             --no-fail-on-empty-changeset \
             --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE} \
-            --parameter-overrides ParameterKey=Env,ParameterValue=test ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE}
+            --parameter-overrides \
+              ParameterKey=Env,ParameterValue=test \
+              ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE} \
+              ParameterKey=SnsCognitoIamArn,ParameterValue=${AWS_SNS_COGNITO_IAM_ARN} \
+              ParameterKey=SnsCognitoIamExternalId,ParameterValue=${AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID} \
+              ParameterKey=SESDomainIdentityArn,ParameterValue=${AWS_SES_DOMAIN_IDENTITY_ARN}
 
   integration-test:
     if: github.ref == 'refs/heads/main'
@@ -191,7 +214,7 @@ jobs:
       - uses: aws-actions/setup-sam@v2
         with:
           use-installer: true
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: packaged-prod.yaml
           path: backend
@@ -209,14 +232,20 @@ jobs:
 
       - name: Deploy to production account
         run: |
-          sam deploy --stack-name ${PROD_STACK_NAME} \
+          sam deploy \
+            --stack-name ${PROD_STACK_NAME} \
             --template packaged-prod.yaml \
             --capabilities CAPABILITY_IAM \
             --region ${PROD_REGION} \
             --s3-bucket ${PROD_ARTIFACTS_BUCKET} \
             --no-fail-on-empty-changeset \
             --role-arn ${PROD_CLOUDFORMATION_EXECUTION_ROLE} \
-            --parameter-overrides ParameterKey=Env,ParameterValue=prod ParameterKey=PipelineRole,ParameterValue=${PROD_PIPELINE_EXECUTION_ROLE}
+            --parameter-overrides \
+              ParameterKey=Env,ParameterValue=prod \
+              ParameterKey=PipelineRole,ParameterValue=${PROD_PIPELINE_EXECUTION_ROLE} \
+              ParameterKey=SnsCognitoIamArn,ParameterValue=${AWS_SNS_COGNITO_IAM_ARN} \
+              ParameterKey=SnsCognitoIamExternalId,ParameterValue=${AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID} \
+              ParameterKey=SESDomainIdentityArn,ParameterValue=${AWS_SES_DOMAIN_IDENTITY_ARN}
 
   deploy-prod-frontend:
     if: github.ref == 'refs/heads/main'
