@@ -459,10 +459,10 @@ Resources:
               - IsProdEnv
               - auth.itson.fyi
               - !Sub ${Env}-auth.itson.fyi
+          HostedZoneId: Z2FDTNDATAQYW2
+          ResourceRecords:
+            - !GetAtt ItsOnUserPoolDomain.CloudFrontDistribution
           Type: CNAME
-          AliasTarget:
-            HostedZoneId: Z2FDTNDATAQYW2
-            DNSName: !GetAtt ItsOnUserPoolDomain.CloudFrontDistribution
 
 Outputs:
   ApiEndpoint:
