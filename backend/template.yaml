@@ -305,6 +305,7 @@ Resources:
         # code grant flow, together with Proof Key for Code Exchange (PKCE),
         # for mobile apps. https://tools.ietf.org/html/rfc7636
         - implicit # TODO: UserPoolClient: REMOVE
+      AllowedOAuthFlowsUserPoolClient: true
       AllowedOAuthScopes:
         - email
         - phone
@@ -316,6 +317,11 @@ Resources:
             - https://itson.fyi/
             - !Sub https://${Env}.itson.fyi/
       ClientName: !Sub ItsOnUsersClient-${Env}
+      DefaultRedirectURI:
+        "Fn::If":
+          - IsProdEnv
+          - https://itson.fyi/
+          - !Sub https://${Env}.itson.fyi/
       GenerateSecret: false
       SupportedIdentityProviders:
         - COGNITO
