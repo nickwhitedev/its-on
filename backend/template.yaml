@@ -146,25 +146,81 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /
             Method: POST
-  # Simple syntax to create a DynamoDB table with a single attribute primary key, more in
-  # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlesssimpletable
+
+  tableStreamFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/table-stream.tableStreamHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: Handles write events from the ItsOnTable
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          ITS_ON_TABLE: !Ref ItsOnTable
+      Events:
+        TableStream:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt ItsOnTable.StreamArn
+            StartingPosition: LATEST
+            # BatchSize: 10
+            # MaximumBatchingWindowInSeconds: 10
+            # Enabled: true
+            # ParallelizationFactor: 1
+            # MaximumRetryAttempts: 10
+            # BisectBatchOnFunctionError: true
+            # MaximumRecordAgeInSeconds: 86400
+            # DestinationConfig:
+            #   OnFailure:
+            #     Type: SQS
+            #     Destination: !GetAtt MySqsQueue.Arn
+            # TumblingWindowInSeconds: 0
+            # FunctionResponseTypes:
+            #   - ReportBatchItemFailures
 
   # DynamoDB table to store item: {id: &lt;ID&gt;, name: &lt;NAME&gt;}
   ItsOnTable:
-    Type: AWS::Serverless::SimpleTable
+    Type: AWS::DynamoDB::Table
     Properties:
-      PrimaryKey:
-        Name: id
-        Type: String
+      AttributeDefinitions:
+        - AttributeName: PK
+          AttributeType: S
+        - AttributeName: SK
+          AttributeType: S
+      DeletionProtectionEnabled:
+        "Fn::If":
+          - IsProdEnv
+          - true
+          - false
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+        - AttributeName: SK
+          KeyType: RANGE
       ProvisionedThroughput:
         ReadCapacityUnits: 2
         WriteCapacityUnits: 2
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+      Tags:
+        - Key: project
+          Value: itson
+        - Key: env
+          Value: !Ref Env
 
   # Auth Resources
   ItsOnUserPool:
     Type: AWS::Cognito::UserPool
     Properties:
-      # TODO: Decide if this would be better for development
+      # TODO: UserPool: Decide if this would be better for development
       # Definitely safer...
       # How would devs move fast in feature environments?
       # AdminCreateUserConfig:
@@ -213,7 +269,7 @@ Resources:
           Required: false
         - AttributeDataType: String
           Name: phone_number
-          Required: false # TODO: phone number based sign-up?
+          Required: false # TODO: UserPool: phone number based sign-up?
         - AttributeDataType: String
           Name: preferred_username
           Required: false
@@ -227,11 +283,11 @@ Resources:
           - email
       UsernameConfiguration:
         CaseSensitive: false
-      # TODO: Delete if not needed
+      # TODO: UserPool: Delete if not needed
       # UsernameAttributes:
       #   - phone_number
       #   - email
-      # TODO: Enable on Launch
+      # TODO: UserPool: Enable on Launch
       # UserPoolAddOns:
       #   AdvancedSecurityMode:
       #     "Fn::If":
@@ -248,7 +304,7 @@ Resources:
         # For security reasons, we recommend that you use the authorization
         # code grant flow, together with Proof Key for Code Exchange (PKCE),
         # for mobile apps. https://tools.ietf.org/html/rfc7636
-        - implicit # TODO: REMOVE
+        - implicit # TODO: UserPoolClient: REMOVE
       AllowedOAuthScopes:
         - email
         - phone
