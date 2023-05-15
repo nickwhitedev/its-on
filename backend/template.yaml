@@ -316,6 +316,10 @@ Resources:
             - IsProdEnv
             - https://itson.fyi/
             - !Sub https://${Env}.itson.fyi/
+        - "Fn::If":
+            - IsProdEnv
+            - !Ref AWS::NoValue
+            - localhost:3000
       ClientName: !Sub ItsOnUsersClient-${Env}
       DefaultRedirectURI:
         "Fn::If":
