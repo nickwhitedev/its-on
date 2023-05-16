@@ -1,4 +1,4 @@
-import {loginURL} from './urls';
+import { loginURL } from './urls';
 import logo from './logo.svg';
 import './App.css';
 
@@ -9,7 +9,7 @@ function App() {
         <img src={logo} className="App-logo" alt="logo" />
         <a
           className="App-link"
-          href={loginURL.href}
+          href={loginURL}
         >
           Log in
         </a>

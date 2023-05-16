@@ -1,12 +1,8 @@
-export const baseURL = new URL("/", process.env.REACT_APP_BASE_URL);
+export const baseURL = process.env.REACT_APP_BASE_URL;
 
-const authURL = new URL("/", process.env.REACT_APP_AUTH_URL);
+const authURL = process.env.REACT_APP_AUTH_URL;
 
-export const loginURL = (() => {
-  const loginURL = new URL('/login', authURL);
-  loginURL.searchParams.set('client_id', process.env.REACT_APP_COGNITO_CLIENT_ID);
-  loginURL.searchParams.set('response_type', 'code');
-  loginURL.searchParams.set('scope', 'email+openid+phone+profile');
-  loginURL.searchParams.set('redirect_uri', baseURL.toString());
-  return loginURL;
-})();
+export const loginURL = `${authURL
+  }/oauth2/authorize?client_id=${process.env.REACT_APP_COGNITO_CLIENT_ID
+  }&response_type=code&scope=email+openid+phone+profile&redirect_uri=${process.env.REACT_APP_BASE_URL
+  }/`;
