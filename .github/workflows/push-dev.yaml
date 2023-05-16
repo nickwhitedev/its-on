@@ -147,6 +147,21 @@ jobs:
               ParameterKey=SnsCognitoIamExternalId,ParameterValue=${AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID} \
               ParameterKey=SESDomainIdentityArn,ParameterValue=${AWS_SES_DOMAIN_IDENTITY_ARN}
 
+      - name: Get stack outputs
+        shell: bash
+        run: |
+          aws cloudformation describe-stacks \
+            --region us-east-1 \
+            --stack-name ${DEV_STACK_NAME} \
+            --output json \
+            --query \
+              'Stacks[0].Outputs' | \
+              jq -cr '.[] | "\(.OutputKey)=\(.OutputValue)"' | \
+              while read i; do
+                echo $i
+                echo $i >> "$GITHUB_OUTPUT"
+              done
+
   deploy-dev-frontend:
     if: github.ref == 'refs/heads/dev'
     needs: [deploy-dev-api]
@@ -162,6 +177,9 @@ jobs:
           node-version: "18.x"
       - name: Install dependencies
         run: npm install
+      - name: Set environment variables
+        working-directory: frontend
+        run: ./scripts/cicd-set-env-vars.sh
       - name: Build frontend
         run: CI=true npm run build
 

@@ -476,16 +476,33 @@ Resources:
 
 Outputs:
   ApiEndpoint:
-    Description: "API Gateway endpoint URL for given env (prod has no subdomain)"
-    Value: !Sub "https://${Env}.api.itson.fyi/"
-  WebEndpoint:
-    Description: "Web endpoint URL for given env (prod has no subdomain)"
-    Value: !Sub "https://${Env}.itson.fyi/"
-  Website:
-    Value: !GetAtt ItsOnCloudFrontDistribution.DomainName
+    Description: "API Gateway endpoint URL for given env"
+    Value:
+      "Fn::If":
+        - IsProdEnv
+        - https://api.itson.fyi
+        - !Sub https://${Env}.api.itson.fyi
+  AuthEndpoint:
+    Description: "Cognito Hosted UI endpoint URL for given env"
+    Value:
+      "Fn::If":
+        - IsProdEnv
+        - https://auth.itson.fyi
+        - !Sub https://${Env}-auth.itson.fyi
+  CognitoClientID:
+    Value: !Ref ItsOnUserPoolClient
   ItsOnFrontendBucketName:
     Value:
       "Fn::If":
         - IsProdEnv
         - itson.fyi
         - !Sub ${Env}.itson.fyi
+  WebEndpoint:
+    Description: "Web endpoint URL for given env (prod has no subdomain)"
+    Value:
+      "Fn::If":
+        - IsProdEnv
+        - https://itson.fyi/
+        - !Sub https://${Env}.itson.fyi/
+  Website:
+    Value: !GetAtt ItsOnCloudFrontDistribution.DomainName
