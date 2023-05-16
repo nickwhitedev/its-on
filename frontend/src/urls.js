@@ -7,6 +7,6 @@ export const loginURL = (() => {
   loginURL.searchParams.set('client_id', process.env.REACT_APP_COGNITO_CLIENT_ID);
   loginURL.searchParams.set('response_type', 'code');
   loginURL.searchParams.set('scope', 'email+openid+phone+profile');
-  loginURL.searchParams.set('redirect_uri', baseURL.href);
+  loginURL.searchParams.set('redirect_uri', baseURL.toString());
   return loginURL;
 })();
