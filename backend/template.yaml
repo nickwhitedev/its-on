@@ -502,7 +502,7 @@ Outputs:
     Value:
       "Fn::If":
         - IsProdEnv
-        - https://itson.fyi/
-        - !Sub https://${Env}.itson.fyi/
+        - https://itson.fyi
+        - !Sub https://${Env}.itson.fyi
   Website:
     Value: !GetAtt ItsOnCloudFrontDistribution.DomainName

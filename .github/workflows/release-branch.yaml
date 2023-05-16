@@ -62,6 +62,11 @@ jobs:
     defaults:
       run:
         working-directory: backend
+    outputs:
+      cognito-client-id: ${{ steps.set-env-vars.outputs.CognitoClientID }}
+      web-endpoint: ${{ steps.set-env-vars.outputs.WebEndpoint }}
+      auth-endpoint: ${{ steps.set-env-vars.outputs.AuthEndpoint }}
+      api-endpoint: ${{ steps.set-env-vars.outputs.ApiEndpoint }}
     steps:
       - uses: actions/checkout@v3
       - uses: aws-actions/setup-sam@v2
@@ -107,6 +112,7 @@ jobs:
               ParameterKey=SESDomainIdentityArn,ParameterValue=${AWS_SES_DOMAIN_IDENTITY_ARN}
 
       - name: Get stack outputs
+        id: set-env-vars
         shell: bash
         run: |
           aws cloudformation describe-stacks \
@@ -138,7 +144,11 @@ jobs:
         run: npm install
       - name: Set environment variables
         working-directory: frontend
-        run: ./scripts/cicd-set-env-vars.sh
+        run: |
+          echo "REACT_APP_COGNITO_CLIENT_ID=\"${{needs.build-and-deploy-release-api.outputs.cognito-client-id}}\"" >> .env.production
+          echo "REACT_APP_BASE_URL=\"${{needs.build-and-deploy-release-api.outputs.web-endpoint}}\"" >> .env.production
+          echo "REACT_APP_AUTH_URL=\"${{needs.build-and-deploy-release-api.outputs.auth-endpoint}}\"" >> .env.production
+          echo "REACT_APP_API_URL=\"${{needs.build-and-deploy-release-api.outputs.api-endpoint}}\"" >> .env.production
       - name: Build frontend
         run: CI=true npm run build
       - name: Assume the testing pipeline user role
