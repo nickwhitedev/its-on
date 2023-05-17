@@ -301,10 +301,6 @@ Resources:
     Properties:
       AllowedOAuthFlows:
         - code
-        # For security reasons, we recommend that you use the authorization
-        # code grant flow, together with Proof Key for Code Exchange (PKCE),
-        # for mobile apps. https://tools.ietf.org/html/rfc7636
-        - implicit # TODO: UserPoolClient: REMOVE
       AllowedOAuthFlowsUserPoolClient: true
       AllowedOAuthScopes:
         - email
