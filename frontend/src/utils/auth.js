@@ -7,13 +7,14 @@
  */
 
 import { baseUrl, loginUrl, logoutUrl, tokenUrl } from "../urls";
+import { ACCESS_TOKEN_KEY, ID_TOKEN_KEY, PKCE_STATE_KEY, PKCE_VERIFIER_KEY, REFRESH_TOKEN_KEY } from "./constants";
 import { generateRandomString, pkceChallengeFromVerifier } from "./crypto";
 
 const cognitoClientID = process.env.REACT_APP_COGNITO_CLIENT_ID;
 
-const accessToken = window.localStorage.getItem('accessToken');
-const idToken = window.localStorage.getItem('idToken');
-const refreshToken = window.localStorage.getItem('refreshToken');
+const accessToken = window.localStorage.getItem(ACCESS_TOKEN_KEY);
+const idToken = window.localStorage.getItem(ID_TOKEN_KEY);
+const refreshToken = window.localStorage.getItem(REFRESH_TOKEN_KEY);
 let tokens = accessToken === null ? null : {
   accessToken,
   idToken,
@@ -21,19 +22,19 @@ let tokens = accessToken === null ? null : {
 };
 
 // Create and store a random "state" value
-let storedPkceState = window.localStorage.getItem('pkceState');
+let storedPkceState = window.localStorage.getItem(PKCE_STATE_KEY);
 if (storedPkceState === null) {
   const newPkceState = generateRandomString();
-  window.localStorage.setItem('pkceState', newPkceState);
+  window.localStorage.setItem(PKCE_STATE_KEY, newPkceState);
   storedPkceState = newPkceState;
 }
 const pkceState = storedPkceState;
 
 // Create and store a new PKCE code_verifier (the plaintext random secret)
-let storedPkceVerifier = window.localStorage.getItem('pkceVerifier');
+let storedPkceVerifier = window.localStorage.getItem(PKCE_VERIFIER_KEY);
 if (storedPkceVerifier === null) {
   const newVerifier = generateRandomString();
-  window.localStorage.setItem('pkceVerifier', newVerifier);
+  window.localStorage.setItem(PKCE_VERIFIER_KEY, newVerifier);
   storedPkceVerifier = newVerifier;
 }
 const pkceVerifier = storedPkceVerifier;
@@ -51,12 +52,12 @@ export const refreshTokens = async refreshToken => {
     throw Error();
   }
   const { access_token, id_token } = await response.json();
-  window.localStorage.setItem('accessToken', access_token);
-  window.localStorage.setItem('idToken', id_token);
-  window.localStorage.setItem('refreshToken', refreshToken);
+  window.localStorage.setItem(ACCESS_TOKEN_KEY, access_token);
+  window.localStorage.setItem(ID_TOKEN_KEY, id_token);
+  window.localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
   tokens = {
-    accessToken,
-    idToken,
+    accessToken: access_token,
+    idToken: id_token,
     refreshToken,
   };
 };
@@ -88,9 +89,9 @@ export const login = async (code, state) => {
     throw Error();
   }
   const { access_token, id_token, refresh_token } = await response.json();
-  window.localStorage.setItem('accessToken', access_token);
-  window.localStorage.setItem('idToken', id_token);
-  window.localStorage.setItem('refreshToken', refresh_token);
+  window.localStorage.setItem(ACCESS_TOKEN_KEY, access_token);
+  window.localStorage.setItem(ID_TOKEN_KEY, id_token);
+  window.localStorage.setItem(REFRESH_TOKEN_KEY, refresh_token);
   tokens = {
     accessToken: access_token,
     idToken: id_token,
@@ -103,9 +104,9 @@ export const fullLogoutUrl = `${logoutUrl}?logout_uri=${baseUrl
   }`
 
 export const logout = async () => {
-  window.localStorage.removeItem('accessToken');
-  window.localStorage.removeItem('idToken');
-  window.localStorage.removeItem('refreshToken');
+  window.localStorage.removeItem(ACCESS_TOKEN_KEY);
+  window.localStorage.removeItem(ID_TOKEN_KEY);
+  window.localStorage.removeItem(REFRESH_TOKEN_KEY);
   tokens = null;
 };
 
