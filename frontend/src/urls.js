@@ -1,8 +1,9 @@
-export const baseURL = process.env.REACT_APP_BASE_URL;
+export const baseUrl = process.env.REACT_APP_BASE_URL;
 
-const authURL = process.env.REACT_APP_AUTH_URL;
+const authUrl = process.env.REACT_APP_AUTH_URL;
 
-export const loginURL = `${authURL
-  }/oauth2/authorize?client_id=${process.env.REACT_APP_COGNITO_CLIENT_ID
-  }&response_type=code&scope=email+openid+phone+profile&redirect_uri=${process.env.REACT_APP_BASE_URL
-  }/`;
+export const tokenUrl = `${authUrl}/oauth2/token`;
+
+export const loginUrl = `${authUrl}/oauth2/authorize`;
+
+export const logoutUrl = `${authUrl}/logout`;

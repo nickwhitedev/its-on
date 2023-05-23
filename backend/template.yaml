@@ -323,6 +323,15 @@ Resources:
           - https://itson.fyi/
           - !Sub https://${Env}.itson.fyi/
       GenerateSecret: false
+      LogoutURLs:
+        - "Fn::If":
+            - IsProdEnv
+            - https://itson.fyi/
+            - !Sub https://${Env}.itson.fyi/
+        - "Fn::If":
+            - IsProdEnv
+            - !Ref AWS::NoValue
+            - http://localhost:3000/
       SupportedIdentityProviders:
         - COGNITO
       UserPoolId: !Ref ItsOnUserPool
