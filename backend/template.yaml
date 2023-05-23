@@ -301,10 +301,6 @@ Resources:
     Properties:
       AllowedOAuthFlows:
         - code
-        # For security reasons, we recommend that you use the authorization
-        # code grant flow, together with Proof Key for Code Exchange (PKCE),
-        # for mobile apps. https://tools.ietf.org/html/rfc7636
-        - implicit # TODO: UserPoolClient: REMOVE
       AllowedOAuthFlowsUserPoolClient: true
       AllowedOAuthScopes:
         - email
@@ -327,6 +323,15 @@ Resources:
           - https://itson.fyi/
           - !Sub https://${Env}.itson.fyi/
       GenerateSecret: false
+      LogoutURLs:
+        - "Fn::If":
+            - IsProdEnv
+            - https://itson.fyi/
+            - !Sub https://${Env}.itson.fyi/
+        - "Fn::If":
+            - IsProdEnv
+            - !Ref AWS::NoValue
+            - http://localhost:3000/
       SupportedIdentityProviders:
         - COGNITO
       UserPoolId: !Ref ItsOnUserPool
