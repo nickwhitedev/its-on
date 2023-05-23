@@ -3,7 +3,7 @@
 // Generate a secure random string using the browser crypto functions
 export function generateRandomString() {
   var array = new Uint32Array(28);
-  window.crypto.getRandomValues(array);
+  crypto.getRandomValues(array);
   return Array.from(array, dec => ('0' + dec.toString(16)).substring(-2)).join('');
 }
 
@@ -12,7 +12,7 @@ export function generateRandomString() {
 async function sha256(plain) {
   const encoder = new TextEncoder();
   const data = encoder.encode(plain);
-  return window.crypto.subtle.digest('SHA-256', data);
+  return crypto.subtle.digest('SHA-256', data);
 }
 
 // Base64-urlencodes the input string
