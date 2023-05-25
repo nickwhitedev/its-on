@@ -18,14 +18,14 @@ export const getByIdHandler = async (event) => {
   }
   // All log statements are written to CloudWatch
   console.info('received:', event);
- 
+
   // Get id from pathParameters from APIGateway because of `/{id}` at template.yaml
   const id = event.pathParameters.id;
- 
+
   // Get the item from the table
   // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB/DocumentClient.html#get-property
   var params = {
-    TableName : tableName,
+    TableName: tableName,
     Key: { id: id },
   };
 
@@ -35,12 +35,17 @@ export const getByIdHandler = async (event) => {
   } catch (err) {
     console.log("Error", err);
   }
- 
+
   const response = {
     statusCode: 200,
+    headers: {
+      "Access-Control-Allow-Headers": "Content-Type",
+      "Access-Control-Allow-Origin": "https://www.example.com",
+      "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+    },
     body: JSON.stringify(item)
   };
- 
+
   // All log statements are written to CloudWatch
   console.info(`response from: ${event.path} statusCode: ${response.statusCode} body: ${response.body}`);
   return response;

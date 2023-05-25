@@ -27,19 +27,24 @@ export const putItemHandler = async (event) => {
     // Creates a new item, or replaces an old item with a new item
     // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB/DocumentClient.html#put-property
     var params = {
-        TableName : tableName,
-        Item: { id : id, name: name }
+        TableName: tableName,
+        Item: { id: id, name: name }
     };
 
     try {
         const data = await ddbDocClient.send(new PutCommand(params));
         console.log("Success - item added or updated", data);
-      } catch (err) {
+    } catch (err) {
         console.log("Error", err.stack);
-      }
+    }
 
     const response = {
         statusCode: 200,
+        headers: {
+            "Access-Control-Allow-Headers": "Content-Type",
+            "Access-Control-Allow-Origin": "https://www.example.com",
+            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+        },
         body: JSON.stringify(body)
     };
 

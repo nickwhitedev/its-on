@@ -1,7 +1,8 @@
-import logo from './logo.svg';
+import { useCallback, useEffect, useState } from 'react';
 import './App.css';
-import React, { useCallback, useEffect, useState } from 'react';
-import { getFullLoginUrl, fullLogoutUrl, getTokens, login, logout } from './utils/auth';
+import logo from './logo.svg';
+import { apiUrl } from './urls';
+import { fullLogoutUrl, getFullLoginUrl, getTokens, login, logout } from './utils/auth';
 
 const params = (new URL(document.location)).searchParams;
 const code = params.get('code');
@@ -39,6 +40,22 @@ function App() {
     window.location.assign(fullLogoutUrl);
   }, []);
 
+  const handleClickGetProfile = async () => {
+    const response = await fetch(`${apiUrl}/`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': `Bearer: ${tokens?.accessToken}`
+      },
+    });
+    if (!response.ok) {
+      // TODO: Login error handling
+      throw Error();
+    }
+    const responseJson = await response.json();
+    console.log(responseJson);
+  };
+
   const getLoginContent = () => {
     if (authenticating) {
       return <div>authenticating...</div>
@@ -46,7 +63,12 @@ function App() {
     if (!authenticated && loginUrl !== '') {
       return <a href={loginUrl} className="App-link">Log in</a>
     }
-    return <button onClick={handleClick}>Logout</button>
+    return (
+      <div>
+        <button onClick={handleClick}>Logout</button>
+        <button onClick={handleClickGetProfile}>Get Items</button>
+      </div>
+    )
   }
 
   return (
