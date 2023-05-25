@@ -42,7 +42,12 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: !Ref Env
-      Cors: "'*'"
+      Cors:
+        AllowCredentials: true
+        AllowHeaders: "'*, Authorization'"
+        AllowMethods: "'OPTIONS, POST, GET'"
+        AllowOrigin: "'*'"
+        MaxAge: 600
       Auth:
         DefaultAuthorizer: ItsOnCognitoAuthorizer
         Authorizers:
