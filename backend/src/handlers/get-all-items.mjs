@@ -3,6 +3,7 @@
 // Create a DocumentClient that represents the query to add an item
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, ScanCommand } from '@aws-sdk/lib-dynamodb';
+import { CORS_HEADERS } from '../utils/constants.mjs';
 const client = new DynamoDBClient({});
 const ddbDocClient = DynamoDBDocumentClient.from(client);
 
@@ -35,11 +36,7 @@ export const getAllItemsHandler = async (event) => {
 
     const response = {
         statusCode: 200,
-        headers: {
-            "Access-Control-Allow-Headers": "Content-Type",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
-        },
+        headers: CORS_HEADERS,
         body: JSON.stringify(items)
     };
 
