@@ -44,7 +44,7 @@ Resources:
       StageName: !Ref Env
       Cors:
         AllowCredentials: false
-        AllowHeaders: "'*, Authorization'"
+        AllowHeaders: "'*, authorization'"
         AllowMethods: "'OPTIONS, POST, GET'"
         AllowOrigin: "'*'"
         MaxAge: 600
