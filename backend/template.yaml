@@ -43,7 +43,7 @@ Resources:
     Properties:
       StageName: !Ref Env
       Cors:
-        AllowCredentials: true
+        AllowCredentials: false
         AllowHeaders: "'*, Authorization'"
         AllowMethods: "'OPTIONS, POST, GET'"
         AllowOrigin: "'*'"
