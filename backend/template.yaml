@@ -49,10 +49,11 @@ Resources:
         AllowOrigin: "'*'"
         MaxAge: 600
       Auth:
-        DefaultAuthorizer: ItsOnCognitoAuthorizer
+        AddDefaultAuthorizerToCorsPreflight: false
         Authorizers:
           ItsOnCognitoAuthorizer:
             UserPoolArn: !GetAtt ItsOnUserPool.Arn
+        DefaultAuthorizer: ItsOnCognitoAuthorizer
       Domain:
         CertificateArn: arn:aws:acm:us-east-1:303579314896:certificate/89fd3c8f-9ccb-479e-b61a-36987061371e
         DomainName:
