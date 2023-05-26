@@ -45,7 +45,7 @@ function App() {
       method: 'GET',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Bearer: ${tokens?.accessToken}`
+        'Authorization': `Bearer ${tokens?.idToken}`
       },
     });
     if (!response.ok) {
