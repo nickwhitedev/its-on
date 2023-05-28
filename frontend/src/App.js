@@ -42,9 +42,7 @@ function App() {
 
   const handleClickGetProfile = async () => {
     const response = await fetch(`${apiUrl}/`, {
-      method: 'GET',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
         'Authorization': `Bearer ${tokens?.idToken}`
       },
     });
