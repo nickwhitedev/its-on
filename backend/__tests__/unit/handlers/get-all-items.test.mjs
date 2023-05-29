@@ -3,7 +3,7 @@ import { getAllItemsHandler } from '../../../src/handlers/get-all-items.mjs';
 // Import dynamodb from aws-sdk 
 import { DynamoDBDocumentClient, ScanCommand } from '@aws-sdk/lib-dynamodb';
 import { mockClient } from "aws-sdk-client-mock";
-import { CORS_HEADERS } from '../../../src/utils/constants';
+import { CORS_HEADERS } from '../../../src/utils/constants.mjs';
 
 // This includes all tests for getAllItemsHandler() 
 describe('Test getAllItemsHandler', () => {
