@@ -1,6 +1,6 @@
 {
-    "name": "delete-test-01",
-    "description": "delete-test-01-description",
+    "name": "its-on-backend",
+    "description": "It's On Backend",
     "version": "0.0.1",
     "private": true,
     "dependencies": {
@@ -27,4 +27,3 @@
         ]
     }
 }
-

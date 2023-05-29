@@ -3,7 +3,7 @@ import { putItemHandler } from '../../../src/handlers/put-item.mjs';
 // Import dynamodb from aws-sdk 
 import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
 import { mockClient } from "aws-sdk-client-mock";
-import { CORS_HEADERS } from '../../../src/utils/constants.mjs';
+import { CORS_HEADERS } from '../../../src/utils/constants';
 // This includes all tests for putItemHandler() 
 describe('Test putItemHandler', function () {
     const ddbMock = mockClient(DynamoDBDocumentClient);
