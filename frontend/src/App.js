@@ -1,14 +1,17 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css';
+import Channels from './channels/Channels';
 import logo from './logo.svg';
+import ProfileMenu from './profile/ProfileMenu';
+import Subscriptions from './subscriptions/Subscriptions';
 import { fetchApi } from './utils/api';
-import { fullLogoutUrl, getFullLoginUrl, getTokens, login, logout } from './utils/auth';
+import { getFullLoginUrl, getTokens, login } from './utils/auth';
 
 const params = (new URL(document.location)).searchParams;
 const code = params.get('code');
 const state = params.get('state');
 const tokens = getTokens();
-function App() {
+const App = () => {
   const [authenticated, setAuthenticated] = useState(tokens !== null);
   const [authenticating, setAuthenticating] = useState(code !== null);
   const [loginUrl, setLoginUrl] = useState('');
@@ -35,11 +38,6 @@ function App() {
     }
   }, []);
 
-  const handleClick = useCallback(() => {
-    logout();
-    window.location.assign(fullLogoutUrl);
-  }, []);
-
   const handleClickGetProfile = async () => {
     const response = await fetchApi('/');
     console.log(response);
@@ -54,8 +52,10 @@ function App() {
     }
     return (
       <div>
-        <button onClick={handleClick}>Logout</button>
+        <ProfileMenu />
         <button onClick={handleClickGetProfile}>Get Items</button>
+        <Channels />
+        <Subscriptions />
       </div>
     )
   }
