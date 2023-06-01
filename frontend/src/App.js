@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import './App.css';
 import logo from './logo.svg';
-import { apiUrl } from './urls';
+import { fetchApi } from './utils/api';
 import { fullLogoutUrl, getFullLoginUrl, getTokens, login, logout } from './utils/auth';
 
 const params = (new URL(document.location)).searchParams;
@@ -41,17 +41,8 @@ function App() {
   }, []);
 
   const handleClickGetProfile = async () => {
-    const response = await fetch(`${apiUrl}/`, {
-      headers: {
-        'Authorization': `Bearer ${tokens?.idToken}`
-      },
-    });
-    if (!response.ok) {
-      // TODO: Login error handling
-      throw Error();
-    }
-    const responseJson = await response.json();
-    console.log(responseJson);
+    const response = await fetchApi('/');
+    console.log(response);
   };
 
   const getLoginContent = () => {
