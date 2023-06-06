@@ -139,13 +139,13 @@ Resources:
   putItemFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/put-item.putItemHandler
+      Handler: src/handlers/create-channel.createChannelHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
       MemorySize: 128
       Timeout: 100
-      Description: A simple example includes a HTTP post method to add one item to a DynamoDB table.
+      Description: Creates a channel for a user
       Policies:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
@@ -159,7 +159,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref ItsOnApi
-            Path: /
+            Path: /channels
             Method: POST
 
   tableStreamFunction:
