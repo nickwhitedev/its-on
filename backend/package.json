@@ -25,6 +25,7 @@
         "moduleFileExtensions": [
             "mjs",
             "js"
-        ]
+        ],
+        "modulePathIgnorePatterns": ["constants"]
     }
 }

@@ -135,8 +135,8 @@ Resources:
   # Each Lambda function is defined by properties:
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
 
-  # This is a Lambda function config associated with the source code: put-item.js
-  putItemFunction:
+  # This is a Lambda function config associated with the source code: create-item.mjs
+  createChannelFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/handlers/create-channel.createChannelHandler
@@ -206,9 +206,9 @@ Resources:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
-        - AttributeName: PK
+        - AttributeName: pk
           AttributeType: S
-        - AttributeName: SK
+        - AttributeName: sk
           AttributeType: S
       DeletionProtectionEnabled:
         "Fn::If":
@@ -216,9 +216,9 @@ Resources:
           - true
           - false
       KeySchema:
-        - AttributeName: PK
+        - AttributeName: pk
           KeyType: HASH
-        - AttributeName: SK
+        - AttributeName: sk
           KeyType: RANGE
       ProvisionedThroughput:
         ReadCapacityUnits: 2

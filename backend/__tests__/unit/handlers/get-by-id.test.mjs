@@ -2,43 +2,43 @@
 import { getByIdHandler } from '../../../src/handlers/get-by-id.mjs';
 // Import dynamodb from aws-sdk 
 import { DynamoDBDocumentClient, GetCommand } from '@aws-sdk/lib-dynamodb';
-import { mockClient } from "aws-sdk-client-mock";
+import { mockClient } from 'aws-sdk-client-mock';
 import { CORS_HEADERS } from '../../../src/utils/constants.mjs';
 
 // This includes all tests for getByIdHandler() 
 describe('Test getByIdHandler', () => {
-    const ddbMock = mockClient(DynamoDBDocumentClient);
+  const ddbMock = mockClient(DynamoDBDocumentClient);
 
-    beforeEach(() => {
-        ddbMock.reset();
+  beforeEach(() => {
+    ddbMock.reset();
+  });
+
+  // This test invokes getByIdHandler() and compare the result  
+  it('should get item by id', async () => {
+    const item = { id: 'id1' };
+
+    // Return the specified value whenever the spied get function is called 
+    ddbMock.on(GetCommand).resolves({
+      Item: item,
     });
 
-    // This test invokes getByIdHandler() and compare the result  
-    it('should get item by id', async () => {
-        const item = { id: 'id1' };
+    const event = {
+      httpMethod: 'GET',
+      pathParameters: {
+        id: 'id1'
+      }
+    };
 
-        // Return the specified value whenever the spied get function is called 
-        ddbMock.on(GetCommand).resolves({
-            Item: item,
-        });
+    // Invoke getByIdHandler() 
+    const result = await getByIdHandler(event);
 
-        const event = {
-            httpMethod: 'GET',
-            pathParameters: {
-                id: 'id1'
-            }
-        };
+    const expectedResult = {
+      statusCode: 200,
+      headers: CORS_HEADERS,
+      body: JSON.stringify(item)
+    };
 
-        // Invoke getByIdHandler() 
-        const result = await getByIdHandler(event);
-
-        const expectedResult = {
-            statusCode: 200,
-            headers: CORS_HEADERS,
-            body: JSON.stringify(item)
-        };
-
-        // Compare the result with the expected result 
-        expect(result).toEqual(expectedResult);
-    });
+    // Compare the result with the expected result 
+    expect(result).toEqual(expectedResult);
+  });
 });

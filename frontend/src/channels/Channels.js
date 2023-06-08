@@ -1,5 +1,16 @@
+import { fetchApi } from "../utils/api";
+
 const Channels = () => {
-  const handleClickCreate = () => console.log('create channel');
+  const handleClickCreate = () => {
+    fetchApi(
+      '/channels',
+      'POST',
+      {
+        defaultNote: 'default note',
+        title: 'test-channel',
+      }
+    )
+  }
   return (
     <div>
       <h2>Channels</h2>

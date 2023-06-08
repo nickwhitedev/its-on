@@ -19,8 +19,10 @@ export const createChannelHandler = async (event) => {
 
   const { defaultNote, title } = JSON.parse(event.body);
   const userID = event.requestContext.authorizer.claims.sub;
+  const createdTime = Date.now();
 
   const channelAttributes = {
+    createdTime,
     defaultNote,
     on: false,
     note: '',
@@ -33,8 +35,8 @@ export const createChannelHandler = async (event) => {
         {
           PutRequest: {
             Item: {
-              pk: `USER#${userID}`,
-              sk: `CHANNEL#${title}`,
+              pk: `user#${userID}`,
+              sk: `channel#${createdTime}`,
               ...channelAttributes,
             },
           },
@@ -42,8 +44,8 @@ export const createChannelHandler = async (event) => {
         {
           PutRequest: {
             Item: {
-              pk: `USER#${userID}#CHANNEL#${title}`,
-              sk: `USER#${userID}#CHANNEL#${title}`,
+              pk: `channel#${userID}-${createdTime}`,
+              sk: 'info',
               ...channelAttributes
             },
           },
@@ -54,10 +56,19 @@ export const createChannelHandler = async (event) => {
 
   let statusCode;
   let data;
+  let responseBody;
 
   try {
     data = await ddbDocClient.send(new BatchWriteCommand(params));
-    statusCode = 200;
+    statusCode = 201;
+    responseBody = {
+      data: {
+        ...channelAttributes,
+      },
+      links: {
+        self: `/channels/${createdTime}`,
+      }
+    }
     console.log('Success - item added or updated', data);
   } catch (err) {
     statusCode = 400;
@@ -67,6 +78,7 @@ export const createChannelHandler = async (event) => {
   const response = {
     statusCode,
     headers: CORS_HEADERS,
+    body: JSON.stringify(channelAttributes),
   };
 
   // All log statements are written to CloudWatch
