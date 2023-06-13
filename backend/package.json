@@ -16,6 +16,7 @@
         "prettier": "^2.8.8"
     },
     "scripts": {
-        "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js"
+        "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js",
+        "test-ci": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --silent"
     }
 }
