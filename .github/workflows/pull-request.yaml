@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: "18.x"
       - run: npm install
-      - run: npm test
+      - run: npm test --silent
 
   test-frontend:
     if: github.event_name == 'pull_request'

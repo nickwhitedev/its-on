@@ -1,33 +1,38 @@
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { BatchWriteCommand, DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
-import { CORS_HEADERS } from '../utils/constants.mjs';
-const client = new DynamoDBClient({});
-const ddbDocClient = DynamoDBDocumentClient.from(client);
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import {
+  BatchWriteCommand,
+  DynamoDBDocumentClient,
+} from '@aws-sdk/lib-dynamodb'
+import { v1 as uuid } from 'uuid'
+import { CORS_HEADERS } from '../utils/constants.mjs'
+const client = new DynamoDBClient({})
+const ddbDocClient = DynamoDBDocumentClient.from(client)
 
 // Get the DynamoDB table name from environment variables
-const tableName = process.env.ITS_ON_TABLE;
+const tableName = process.env.ITS_ON_TABLE
 
 /**
  * Creates a channel for the authenticated user
  */
-export const createChannelHandler = async (event) => {
+export const createChannelHandler = async event => {
   if (event.httpMethod !== 'POST') {
-    throw new Error(`postMethod only accepts POST method, you tried: ${event.httpMethod} method.`);
+    throw new Error(
+      `postMethod only accepts POST method, you tried: ${event.httpMethod} method.`,
+    )
   }
   // All log statements are written to CloudWatch
-  console.info('received:', event);
+  console.info('received:', event)
 
-  const { defaultNote, title } = JSON.parse(event.body);
-  const userID = event.requestContext.authorizer.claims.sub;
-  const createdTime = Date.now();
+  const { defaultNote, title } = JSON.parse(event.body)
+  const userID = event.requestContext.authorizer.claims.sub
+  const channelID = uuid()
 
   const channelAttributes = {
-    createdTime,
     defaultNote,
-    on: false,
     note: '',
+    on: false,
     title,
-  };
+  }
 
   const params = {
     RequestItems: {
@@ -36,7 +41,7 @@ export const createChannelHandler = async (event) => {
           PutRequest: {
             Item: {
               pk: `user#${userID}`,
-              sk: `channel#${createdTime}`,
+              sk: `channel#${channelID}`,
               ...channelAttributes,
             },
           },
@@ -44,44 +49,44 @@ export const createChannelHandler = async (event) => {
         {
           PutRequest: {
             Item: {
-              pk: `channel#${userID}-${createdTime}`,
+              pk: `channel#${userID}#${channelID}`,
               sk: 'info',
-              ...channelAttributes
+              ...channelAttributes,
             },
           },
-        }
+        },
       ],
     },
-  };
+  }
 
-  let statusCode;
-  let data;
-  let responseBody;
+  let statusCode
+  let responseBody
 
   try {
-    data = await ddbDocClient.send(new BatchWriteCommand(params));
-    statusCode = 201;
+    const ddbResponse = await ddbDocClient.send(new BatchWriteCommand(params))
+    statusCode = 201
     responseBody = {
-      data: {
-        ...channelAttributes,
-      },
-      links: {
-        self: `/channels/${createdTime}`,
-      }
+      id: channelID,
+      ...channelAttributes,
     }
-    console.log('Success - item added or updated', data);
+    console.info('Success - item added or updated', ddbResponse)
   } catch (err) {
-    statusCode = 400;
-    console.log('Error', err.stack);
+    statusCode = 400
+    console.error('Error', err.stack)
+    responseBody = { message: 'Something went wrong' }
   }
 
   const response = {
     statusCode,
     headers: CORS_HEADERS,
-    body: JSON.stringify(channelAttributes),
-  };
+    body: JSON.stringify(responseBody),
+  }
 
   // All log statements are written to CloudWatch
-  console.info(`response from: ${event.path} statusCode: ${response.statusCode} data: ${data}`);
-  return response;
-};
+  console.info(`response from: ${event.path}: `, {
+    statusCode: response.statusCode,
+    body: responseBody,
+  })
+
+  return response
+}
