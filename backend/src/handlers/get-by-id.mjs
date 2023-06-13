@@ -3,6 +3,7 @@
 // Create a DocumentClient that represents the query to add an item
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, GetCommand } from '@aws-sdk/lib-dynamodb';
+import { CORS_HEADERS } from '../utils/constants.mjs';
 const client = new DynamoDBClient({});
 const ddbDocClient = DynamoDBDocumentClient.from(client);
 
@@ -18,14 +19,14 @@ export const getByIdHandler = async (event) => {
   }
   // All log statements are written to CloudWatch
   console.info('received:', event);
- 
+
   // Get id from pathParameters from APIGateway because of `/{id}` at template.yaml
   const id = event.pathParameters.id;
- 
+
   // Get the item from the table
   // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/DynamoDB/DocumentClient.html#get-property
   var params = {
-    TableName : tableName,
+    TableName: tableName,
     Key: { id: id },
   };
 
@@ -35,12 +36,13 @@ export const getByIdHandler = async (event) => {
   } catch (err) {
     console.log("Error", err);
   }
- 
+
   const response = {
     statusCode: 200,
+    headers: CORS_HEADERS,
     body: JSON.stringify(item)
   };
- 
+
   // All log statements are written to CloudWatch
   console.info(`response from: ${event.path} statusCode: ${response.statusCode} body: ${response.body}`);
   return response;

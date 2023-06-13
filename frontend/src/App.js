@@ -1,13 +1,17 @@
-import logo from './logo.svg';
+import { useEffect, useState } from 'react';
 import './App.css';
-import React, { useCallback, useEffect, useState } from 'react';
-import { getFullLoginUrl, fullLogoutUrl, getTokens, login, logout } from './utils/auth';
+import Channels from './channels/Channels';
+import logo from './logo.svg';
+import ProfileMenu from './profile/ProfileMenu';
+import Subscriptions from './subscriptions/Subscriptions';
+import { fetchApi } from './utils/api';
+import { getFullLoginUrl, getTokens, login } from './utils/auth';
 
 const params = (new URL(document.location)).searchParams;
 const code = params.get('code');
 const state = params.get('state');
 const tokens = getTokens();
-function App() {
+const App = () => {
   const [authenticated, setAuthenticated] = useState(tokens !== null);
   const [authenticating, setAuthenticating] = useState(code !== null);
   const [loginUrl, setLoginUrl] = useState('');
@@ -34,10 +38,10 @@ function App() {
     }
   }, []);
 
-  const handleClick = useCallback(() => {
-    logout();
-    window.location.assign(fullLogoutUrl);
-  }, []);
+  const handleClickGetProfile = async () => {
+    const response = await fetchApi('/');
+    console.log(response);
+  };
 
   const getLoginContent = () => {
     if (authenticating) {
@@ -46,7 +50,14 @@ function App() {
     if (!authenticated && loginUrl !== '') {
       return <a href={loginUrl} className="App-link">Log in</a>
     }
-    return <button onClick={handleClick}>Logout</button>
+    return (
+      <div>
+        <ProfileMenu />
+        <button onClick={handleClickGetProfile}>Get Items</button>
+        <Channels />
+        <Subscriptions />
+      </div>
+    )
   }
 
   return (

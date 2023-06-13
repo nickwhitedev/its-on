@@ -42,12 +42,18 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: !Ref Env
-      Cors: "'*'"
+      Cors:
+        AllowCredentials: false
+        AllowHeaders: "'Authorization,*'"
+        AllowMethods: "'OPTIONS,POST,GET'"
+        AllowOrigin: "'*'"
+        MaxAge: 600
       Auth:
-        DefaultAuthorizer: ItsOnCognitoAuthorizer
+        AddDefaultAuthorizerToCorsPreflight: false
         Authorizers:
           ItsOnCognitoAuthorizer:
             UserPoolArn: !GetAtt ItsOnUserPool.Arn
+        DefaultAuthorizer: ItsOnCognitoAuthorizer
       Domain:
         CertificateArn: arn:aws:acm:us-east-1:303579314896:certificate/89fd3c8f-9ccb-479e-b61a-36987061371e
         DomainName:
@@ -58,6 +64,15 @@ Resources:
         Route53:
           EvaluateTargetHealth: true
           HostedZoneId: Z06575223EAH4XQ5M1AVF
+      GatewayResponses:
+        DEFAULT_4XX:
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Origin: "'*'"
+        DEFAULT_5XX:
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Origin: "'*'"
 
   # Each Lambda function is defined by properties:
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -120,17 +135,17 @@ Resources:
   # Each Lambda function is defined by properties:
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
 
-  # This is a Lambda function config associated with the source code: put-item.js
-  putItemFunction:
+  # This is a Lambda function config associated with the source code: create-item.mjs
+  createChannelFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/put-item.putItemHandler
+      Handler: src/handlers/create-channel.createChannelHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
       MemorySize: 128
       Timeout: 100
-      Description: A simple example includes a HTTP post method to add one item to a DynamoDB table.
+      Description: Creates a channel for a user
       Policies:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
@@ -144,7 +159,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref ItsOnApi
-            Path: /
+            Path: /channels
             Method: POST
 
   tableStreamFunction:
@@ -191,9 +206,9 @@ Resources:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
-        - AttributeName: PK
+        - AttributeName: pk
           AttributeType: S
-        - AttributeName: SK
+        - AttributeName: sk
           AttributeType: S
       DeletionProtectionEnabled:
         "Fn::If":
@@ -201,9 +216,9 @@ Resources:
           - true
           - false
       KeySchema:
-        - AttributeName: PK
+        - AttributeName: pk
           KeyType: HASH
-        - AttributeName: SK
+        - AttributeName: sk
           KeyType: RANGE
       ProvisionedThroughput:
         ReadCapacityUnits: 2

@@ -1,0 +1,4 @@
+{
+    "httpMethod": "POST",
+    "body": "{\"defaultNote\": \"test note\",\"title\": \"Test Channel\"}"
+}
