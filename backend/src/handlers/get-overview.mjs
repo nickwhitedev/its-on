@@ -1,4 +1,3 @@
-// Create a DocumentClient that represents the query to add an item
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DynamoDBDocumentClient, QueryCommand } from '@aws-sdk/lib-dynamodb'
 import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants.mjs'
@@ -30,16 +29,29 @@ export const getOverviewHandler = async event => {
   }
 
   let statusCode
-  let responseBody
+  let responseBody = {}
 
   try {
     const ddbResponse = await ddbDocClient.send(new QueryCommand(params))
     statusCode = 200
-    responseBody = ddbResponse
+    ddbResponse.Items?.forEach(item => {
+      const isPluralItemType = item.sk.includes('#')
+      const itemKey = isPluralItemType
+        ? `${item.sk.substring(0, item.sk.indexOf('#'))}s`
+        : item.sk
+
+      if (!isPluralItemType) {
+        responseBody[itemKey] = item
+        return
+      }
+
+      if (!Object.hasOwn(responseBody, itemKey)) responseBody[itemKey] = []
+      responseBody[itemKey].push(item)
+    })
     console.info('Success - data: ', ddbResponse)
   } catch (err) {
     statusCode = 400
-    responseBody = { message: 'Something went wrong' }
+    responseBody.message = 'Something went wrong'
     console.error('Error', err)
   }
 
