@@ -6,7 +6,7 @@ module.exports = {
     '**/?(*.)+(spec|test).mjs?(x)',
   ],
   moduleFileExtensions: ['mjs', 'js'],
-  modulePathIgnorePatterns: ['constants'],
+  modulePathIgnorePatterns: ['.aws', 'constants'],
   moduleNameMapper: {
     // Workaround for Jest not having ESM support yet
     // See: https://github.com/uuidjs/uuid/issues/451

@@ -39,6 +39,15 @@ describe('Test createChannelHandler', function () {
     // Compare the result with the expected result
     expect(result.headers).toEqual(CORS_HEADERS)
     expect(result.statusCode).toEqual(201)
+
+    expect(Object.keys(resultBody)).toEqual([
+      'id',
+      'compositeID',
+      'defaultNote',
+      'note',
+      'on',
+      'title',
+    ])
     expect(resultBody.defaultNote).toEqual('test note')
     expect(resultBody.note).toEqual('')
     expect(resultBody.on).toEqual(false)
