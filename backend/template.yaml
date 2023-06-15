@@ -45,7 +45,7 @@ Resources:
       Cors:
         AllowCredentials: false
         AllowHeaders: "'Authorization,*'"
-        AllowMethods: "'OPTIONS,POST,GET'"
+        AllowMethods: "'OPTIONS,POST,GET,PUT'"
         AllowOrigin: "'*'"
         MaxAge: 600
       Auth:
@@ -57,7 +57,7 @@ Resources:
       Domain:
         CertificateArn: arn:aws:acm:us-east-1:303579314896:certificate/89fd3c8f-9ccb-479e-b61a-36987061371e
         DomainName:
-          "Fn::If":
+          'Fn::If':
             - IsProdEnv
             - api.itson.fyi
             - !Sub ${Env}.api.itson.fyi
@@ -78,16 +78,16 @@ Resources:
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
 
   # This is a Lambda function config associated with the source code: get-all-items.js
-  getAllItemsFunction:
+  getOverviewFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/get-all-items.getAllItemsHandler
+      Handler: src/handlers/get-overview.getOverviewHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
       MemorySize: 128
       Timeout: 100
-      Description: A simple example includes a HTTP get method to get all items from a DynamoDB table.
+      Description: Gets all of a user's data.
       Policies:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
@@ -211,7 +211,7 @@ Resources:
         - AttributeName: sk
           AttributeType: S
       DeletionProtectionEnabled:
-        "Fn::If":
+        'Fn::If':
           - IsProdEnv
           - true
           - false
@@ -252,7 +252,7 @@ Resources:
         - email
         - phone_number
       DeletionProtection:
-        "Fn::If":
+        'Fn::If':
           - IsProdEnv
           - ACTIVE
           - INACTIVE
@@ -323,27 +323,27 @@ Resources:
         - profile
         - openid
       CallbackURLs:
-        - "Fn::If":
+        - 'Fn::If':
             - IsProdEnv
             - https://itson.fyi/
             - !Sub https://${Env}.itson.fyi/
-        - "Fn::If":
+        - 'Fn::If':
             - IsProdEnv
             - !Ref AWS::NoValue
             - http://localhost:3000/
       ClientName: !Sub ItsOnUsersClient-${Env}
       DefaultRedirectURI:
-        "Fn::If":
+        'Fn::If':
           - IsProdEnv
           - https://itson.fyi/
           - !Sub https://${Env}.itson.fyi/
       GenerateSecret: false
       LogoutURLs:
-        - "Fn::If":
+        - 'Fn::If':
             - IsProdEnv
             - https://itson.fyi/
             - !Sub https://${Env}.itson.fyi/
-        - "Fn::If":
+        - 'Fn::If':
             - IsProdEnv
             - !Ref AWS::NoValue
             - http://localhost:3000/
@@ -357,7 +357,7 @@ Resources:
       CustomDomainConfig:
         CertificateArn: arn:aws:acm:us-east-1:303579314896:certificate/89fd3c8f-9ccb-479e-b61a-36987061371e
       Domain:
-        "Fn::If":
+        'Fn::If':
           - IsProdEnv
           - auth.itson.fyi
           - !Sub ${Env}-auth.itson.fyi
@@ -368,7 +368,7 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName:
-        "Fn::If":
+        'Fn::If':
           - IsProdEnv
           - itson.fyi
           - !Sub ${Env}.itson.fyi
@@ -408,24 +408,24 @@ Resources:
         Origins:
           - Id: ItsOnFrontendBucket
             DomainName:
-              !Select [2, !Split ["/", !GetAtt ItsOnFrontendBucket.WebsiteURL]]
+              !Select [2, !Split ['/', !GetAtt ItsOnFrontendBucket.WebsiteURL]]
             CustomOriginConfig:
-              HTTPPort: "80"
-              HTTPSPort: "443"
+              HTTPPort: '80'
+              HTTPSPort: '443'
               OriginProtocolPolicy: http-only
           - Id: ItsOnApi
             DomainName:
-              "Fn::If":
+              'Fn::If':
                 - IsProdEnv
                 - api.itson.fyi
                 - !Sub ${Env}.api.itson.fyi
             CustomOriginConfig:
               OriginProtocolPolicy: https-only
         Enabled: true
-        HttpVersion: "http2"
+        HttpVersion: 'http2'
         DefaultRootObject: index.html
         Aliases:
-          - "Fn::If":
+          - 'Fn::If':
               - IsProdEnv
               - itson.fyi
               - !Sub ${Env}.itson.fyi
@@ -451,21 +451,21 @@ Resources:
             Principal:
               AWS:
                 - !Ref PipelineRole
-            Action: "*"
+            Action: '*'
             Resource:
               - !Sub
-                - "arn:aws:s3:::${Bucket}/*"
+                - 'arn:aws:s3:::${Bucket}/*'
                 - Bucket: !Ref ItsOnFrontendBucket
               - !Sub
-                - "arn:aws:s3:::${Bucket}"
+                - 'arn:aws:s3:::${Bucket}'
                 - Bucket: !Ref ItsOnFrontendBucket
           - Sid: PublicReadForGetBucketObjects
             Effect: Allow
-            Principal: "*"
+            Principal: '*'
             Action: s3:GetObject
             Resource:
               - !Sub
-                - "arn:aws:s3:::${Bucket}/*"
+                - 'arn:aws:s3:::${Bucket}/*'
                 - Bucket: !Ref ItsOnFrontendBucket
       Bucket: !Ref ItsOnFrontendBucket
 
@@ -476,7 +476,7 @@ Resources:
       HostedZoneId: Z06575223EAH4XQ5M1AVF
       RecordSets:
         - Name:
-            "Fn::If":
+            'Fn::If':
               - IsProdEnv
               - itson.fyi
               - !Sub ${Env}.itson.fyi
@@ -485,7 +485,7 @@ Resources:
             HostedZoneId: Z2FDTNDATAQYW2
             DNSName: !GetAtt ItsOnCloudFrontDistribution.DomainName
         - Name:
-            "Fn::If":
+            'Fn::If':
               - IsProdEnv
               - auth.itson.fyi
               - !Sub ${Env}-auth.itson.fyi
@@ -496,16 +496,16 @@ Resources:
 
 Outputs:
   ApiEndpoint:
-    Description: "API Gateway endpoint URL for given env"
+    Description: 'API Gateway endpoint URL for given env'
     Value:
-      "Fn::If":
+      'Fn::If':
         - IsProdEnv
         - https://api.itson.fyi
         - !Sub https://${Env}.api.itson.fyi
   AuthEndpoint:
-    Description: "Cognito Hosted UI endpoint URL for given env"
+    Description: 'Cognito Hosted UI endpoint URL for given env'
     Value:
-      "Fn::If":
+      'Fn::If':
         - IsProdEnv
         - https://auth.itson.fyi
         - !Sub https://${Env}-auth.itson.fyi
@@ -513,14 +513,14 @@ Outputs:
     Value: !Ref ItsOnUserPoolClient
   ItsOnFrontendBucketName:
     Value:
-      "Fn::If":
+      'Fn::If':
         - IsProdEnv
         - itson.fyi
         - !Sub ${Env}.itson.fyi
   WebEndpoint:
-    Description: "Web endpoint URL for given env (prod has no subdomain)"
+    Description: 'Web endpoint URL for given env (prod has no subdomain)'
     Value:
-      "Fn::If":
+      'Fn::If':
         - IsProdEnv
         - https://itson.fyi
         - !Sub https://${Env}.itson.fyi

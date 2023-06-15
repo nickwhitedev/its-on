@@ -3,13 +3,10 @@ import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
 } from '@aws-sdk/lib-dynamodb'
-import { v1 as uuid } from 'uuid'
-import { CORS_HEADERS } from '../utils/constants.mjs'
+import { v1 as uuidv1, v5 as uuidv5 } from 'uuid'
+import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants.mjs'
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
-
-// Get the DynamoDB table name from environment variables
-const tableName = process.env.ITS_ON_TABLE
 
 /**
  * Creates a channel for the authenticated user
@@ -20,12 +17,12 @@ export const createChannelHandler = async event => {
       `postMethod only accepts POST method, you tried: ${event.httpMethod} method.`,
     )
   }
-  // All log statements are written to CloudWatch
   console.info('received:', event)
 
   const { defaultNote, title } = JSON.parse(event.body)
   const userID = event.requestContext.authorizer.claims.sub
-  const channelID = uuid()
+  const channelID = uuidv1()
+  const compositeID = uuidv5(userID, channelID)
 
   const channelAttributes = {
     defaultNote,
@@ -36,12 +33,13 @@ export const createChannelHandler = async event => {
 
   const params = {
     RequestItems: {
-      [tableName]: [
+      [DYNAMODB_TABLE_NAME]: [
         {
           PutRequest: {
             Item: {
               pk: `user#${userID}`,
               sk: `channel#${channelID}`,
+              compositeID,
               ...channelAttributes,
             },
           },
@@ -49,8 +47,10 @@ export const createChannelHandler = async event => {
         {
           PutRequest: {
             Item: {
-              pk: `channel#${userID}#${channelID}`,
+              pk: `channel#${compositeID}`,
               sk: 'info',
+              owner: userID,
+              id: channelID,
               ...channelAttributes,
             },
           },
@@ -67,6 +67,7 @@ export const createChannelHandler = async event => {
     statusCode = 201
     responseBody = {
       id: channelID,
+      compositeID,
       ...channelAttributes,
     }
     console.info('Success - item added or updated', ddbResponse)
@@ -82,7 +83,6 @@ export const createChannelHandler = async event => {
     body: JSON.stringify(responseBody),
   }
 
-  // All log statements are written to CloudWatch
   console.info(`response from: ${event.path}: `, {
     statusCode: response.statusCode,
     body: responseBody,
