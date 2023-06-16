@@ -6,26 +6,24 @@ const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
 
 /**
- * Get all of a user's data
- *
- * Includes user info, channels, and subscriptions.
+ * Get info for a channel
  */
-export const getOverviewHandler = async event => {
+export const getChannelHandler = async event => {
   if (event.httpMethod !== 'GET') {
     throw new Error(
-      `getOverview only accept GET method, you tried: ${event.httpMethod}`,
+      `getMethod only accept GET method, you tried: ${event.httpMethod}`,
     )
   }
   console.info('received:', event)
 
   var params = {
     TableName: DYNAMODB_TABLE_NAME,
-    KeyConditionExpression: '#pk = :userID',
+    KeyConditionExpression: '#pk = :channelID',
     ExpressionAttributeNames: {
       '#pk': 'pk',
     },
     ExpressionAttributeValues: {
-      ':userID': `user#${event.requestContext.authorizer.claims.sub}`,
+      ':channelID': `channel#${event.pathParameters.channelID}`,
     },
   }
 
