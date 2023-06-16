@@ -1,7 +1,9 @@
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DynamoDBDocumentClient, QueryCommand } from '@aws-sdk/lib-dynamodb'
 import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants.mjs'
+import { DynamoDBDocumentClient, QueryCommand } from '@aws-sdk/lib-dynamodb'
+
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { serializeQueryResponse } from '../utils/serialize.mjs'
+
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
 
