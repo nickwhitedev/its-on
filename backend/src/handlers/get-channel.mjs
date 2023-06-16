@@ -29,6 +29,8 @@ export const getChannelHandler = async event => {
     },
   }
 
+  // TODO: GetChannel - check if given channelID is uuid v1 or v5 and choose get or query accordingly
+
   let statusCode
   let responseBody
 
