@@ -5,7 +5,6 @@ import { CORS_HEADERS } from '../../../src/utils/constants.mjs'
 import { testRequestContext } from '../../util/constants.mjs'
 import { NIL as NIL_UUID } from 'uuid'
 
-// This includes all tests for getOverviewHandler()
 describe('Test getOverviewHandler', () => {
   const ddbMock = mockClient(DynamoDBDocumentClient)
 
@@ -37,7 +36,6 @@ describe('Test getOverviewHandler', () => {
       },
     ]
 
-    // Return the specified value whenever the spied scan function is called
     ddbMock.on(QueryCommand).resolves({
       Items: items,
     })
@@ -47,7 +45,6 @@ describe('Test getOverviewHandler', () => {
       requestContext: testRequestContext,
     }
 
-    // Invoke helloFromLambdaHandler()
     const result = await getOverviewHandler(event)
 
     const expectedResult = {
@@ -81,7 +78,6 @@ describe('Test getOverviewHandler', () => {
       }),
     }
 
-    // Compare the result with the expected result
     expect(result).toEqual(expectedResult)
   })
 })

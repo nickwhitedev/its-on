@@ -1,10 +1,12 @@
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
 } from '@aws-sdk/lib-dynamodb'
-import { v1 as uuidv1, v5 as uuidv5 } from 'uuid'
 import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants.mjs'
+import { v1 as uuidv1, v5 as uuidv5 } from 'uuid'
+
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
 
@@ -49,9 +51,10 @@ export const createChannelHandler = async event => {
             Item: {
               pk: `channel#${compositeID}`,
               sk: 'info',
-              owner: userID,
-              id: channelID,
-              ...channelAttributes,
+              note: '',
+              on: false,
+              owner: event.requestContext.authorizer.claims['cognito:username'],
+              title,
             },
           },
         },
