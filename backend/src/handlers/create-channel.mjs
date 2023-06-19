@@ -51,9 +51,10 @@ export const createChannelHandler = async event => {
             Item: {
               pk: `channel#${compositeID}`,
               sk: 'info',
-              owner: userID,
-              id: channelID,
-              ...channelAttributes,
+              note: '',
+              on: false,
+              owner: event.requestContext.authorizer.claims['cognito:username'],
+              title,
             },
           },
         },
