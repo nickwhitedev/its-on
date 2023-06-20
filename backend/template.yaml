@@ -235,15 +235,12 @@ Resources:
   ItsOnUserPool:
     Type: AWS::Cognito::UserPool
     Properties:
-      # TODO: UserPool: Decide if this would be better for development
-      # Definitely safer...
-      # How would devs move fast in feature environments?
-      # AdminCreateUserConfig:
-      #   AllowAdminCreateUserOnly:
-      #     "Fn::If":
-      #       - IsProdEnv
-      #       - false
-      #       - true
+      AdminCreateUserConfig: # Disable this to test signup flow in dev environments
+        AllowAdminCreateUserOnly:
+          'Fn::If':
+            - IsProdEnv
+            - false
+            - true
       AliasAttributes:
         - email
         - phone_number
