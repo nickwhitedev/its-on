@@ -1,13 +1,13 @@
 import './App.css'
 
-import { getFullLoginUrl, getTokens, login } from './utils/auth'
 import { useEffect, useState } from 'react'
+import { getFullLoginUrl, getTokens, login } from '../utils/auth'
 
+import logo from '../logo.svg'
+import { fetchApi } from '../utils/api'
 import Channels from './channels/Channels'
 import ProfileMenu from './profile/ProfileMenu'
 import Subscriptions from './subscriptions/Subscriptions'
-import { fetchApi } from './utils/api'
-import logo from './logo.svg'
 
 const params = new URL(document.location).searchParams
 const code = params.get('code')
@@ -53,7 +53,7 @@ const App = () => {
       return (
         <a
           href={loginUrl}
-          className="App-link"
+          className='App-link'
         >
           Log in
         </a>
@@ -63,19 +63,19 @@ const App = () => {
       <div>
         <ProfileMenu />
         <button onClick={handleClickGetOverview}>Get Overview</button>
-        <Channels />
+        <Channels channels={[]} />
         <Subscriptions />
       </div>
     )
   }
 
   return (
-    <div className="App">
-      <header className="App-header">
+    <div className='App'>
+      <header className='App-header'>
         <img
           src={logo}
-          className="App-logo"
-          alt="logo"
+          className='App-logo'
+          alt='logo'
         />
         {getLoginContent()}
       </header>
