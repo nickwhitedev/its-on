@@ -5,10 +5,10 @@ const ChannelsContext = createContext(null)
 const ChannelsDispatchContext = createContext(null)
 
 export function ChannelsProvider({ children }) {
-  const [tasks, dispatch] = useReducer(tasksReducer, [])
+  const [channels, dispatch] = useReducer(channelsReducer, [])
 
   return (
-    <ChannelsContext.Provider value={tasks}>
+    <ChannelsContext.Provider value={channels}>
       <ChannelsDispatchContext.Provider value={dispatch}>
         {children}
       </ChannelsDispatchContext.Provider>
@@ -16,19 +16,19 @@ export function ChannelsProvider({ children }) {
   )
 }
 
-export function useTasks() {
+export function useChannels() {
   return useContext(ChannelsContext)
 }
 
-export function useTasksDispatch() {
+export function useChannelsDispatch() {
   return useContext(ChannelsDispatchContext)
 }
 
-function tasksReducer(tasks, action) {
+function channelsReducer(channels, action) {
   switch (action.type) {
     case 'added': {
       return [
-        ...tasks,
+        ...channels,
         {
           id: action.id,
           text: action.text,
@@ -37,16 +37,16 @@ function tasksReducer(tasks, action) {
       ]
     }
     case 'changed': {
-      return tasks.map(t => {
-        if (t.id === action.task.id) {
-          return action.task
+      return channels.map(t => {
+        if (t.id === action.channel.id) {
+          return action.channel
         } else {
           return t
         }
       })
     }
     case 'deleted': {
-      return tasks.filter(t => t.id !== action.id)
+      return channels.filter(t => t.id !== action.id)
     }
     default: {
       throw Error('Unknown action: ' + action.type)
