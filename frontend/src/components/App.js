@@ -1,8 +1,9 @@
 import './App.css'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { getFullLoginUrl, getTokens, login } from '../utils/auth'
 
+import { useChannelsDispatch } from '../contexts/ChannelsContext'
 import logo from '../logo.svg'
 import { fetchApi } from '../utils/api'
 import Channels from './channels/Channels'
@@ -17,6 +18,22 @@ const App = () => {
   const [authenticated, setAuthenticated] = useState(tokens !== null)
   const [authenticating, setAuthenticating] = useState(code !== null)
   const [loginUrl, setLoginUrl] = useState('')
+
+  const dispatchChannels = useChannelsDispatch()
+
+  const syncOverview = useCallback(async () => {
+    try {
+      const response = await fetchApi('/')
+      console.log(response)
+
+      dispatchChannels({ type: 'synced', channels: response.channels })
+    } catch (error) {
+      // TODO: handle overview fetch error
+      // Log error to backend
+      // Show user-friendly message
+    }
+  }, [dispatchChannels])
+
   useEffect(() => {
     const setFullLoginUrl = async () => {
       const fullLoginUrl = await getFullLoginUrl()
@@ -38,14 +55,10 @@ const App = () => {
     if (code !== null && state !== null) {
       finishLogin()
     }
-  }, [])
+    if (authenticated) syncOverview()
+  }, [authenticated, syncOverview])
 
-  const handleClickGetOverview = async () => {
-    const response = await fetchApi('/')
-    console.log(response)
-  }
-
-  const getLoginContent = () => {
+  const getContent = () => {
     if (authenticating) {
       return <div>authenticating...</div>
     }
@@ -62,8 +75,7 @@ const App = () => {
     return (
       <div>
         <ProfileMenu />
-        <button onClick={handleClickGetOverview}>Get Overview</button>
-        <Channels channels={[]} />
+        <Channels />
         <Subscriptions />
       </div>
     )
@@ -77,7 +89,7 @@ const App = () => {
           className='App-logo'
           alt='logo'
         />
-        {getLoginContent()}
+        {getContent()}
       </header>
     </div>
   )

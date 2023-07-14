@@ -27,14 +27,7 @@ export function useChannelsDispatch() {
 function channelsReducer(channels, action) {
   switch (action.type) {
     case 'added': {
-      return [
-        ...channels,
-        {
-          id: action.id,
-          text: action.text,
-          done: false,
-        },
-      ]
+      return [action.channel, ...channels]
     }
     case 'changed': {
       return channels.map(t => {
@@ -47,6 +40,9 @@ function channelsReducer(channels, action) {
     }
     case 'deleted': {
       return channels.filter(t => t.id !== action.id)
+    }
+    case 'synced': {
+      return action.channels
     }
     default: {
       throw Error('Unknown action: ' + action.type)

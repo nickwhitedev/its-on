@@ -27,14 +27,7 @@ export function useSubscriptionsDispatch() {
 function subscriptionsReducer(subscriptions, action) {
   switch (action.type) {
     case 'added': {
-      return [
-        ...subscriptions,
-        {
-          id: action.id,
-          text: action.text,
-          done: false,
-        },
-      ]
+      return [action.subscription, ...subscriptions]
     }
     case 'changed': {
       return subscriptions.map(t => {
@@ -47,6 +40,9 @@ function subscriptionsReducer(subscriptions, action) {
     }
     case 'deleted': {
       return subscriptions.filter(t => t.id !== action.id)
+    }
+    case 'synced': {
+      return action.subscriptions
     }
     default: {
       throw Error('Unknown action: ' + action.type)
