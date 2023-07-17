@@ -1,13 +1,14 @@
 import './App.css'
 
-import { getFullLoginUrl, getTokens, login } from './utils/auth'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { getFullLoginUrl, getTokens, login } from '../utils/auth'
 
-import Channels from './channels/Channels'
-import ProfileMenu from './profile/ProfileMenu'
-import Subscriptions from './subscriptions/Subscriptions'
-import { fetchApi } from './utils/api'
-import logo from './logo.svg'
+import { useChannelsDispatch } from '../contexts/ChannelsContext'
+import logo from '../logo.svg'
+import { fetchApi } from '../utils/api'
+import Channels from './channels/Channels.react'
+import ProfileMenu from './profile/ProfileMenu.react'
+import Subscriptions from './subscriptions/Subscriptions.react'
 
 const params = new URL(document.location).searchParams
 const code = params.get('code')
@@ -17,6 +18,21 @@ const App = () => {
   const [authenticated, setAuthenticated] = useState(tokens !== null)
   const [authenticating, setAuthenticating] = useState(code !== null)
   const [loginUrl, setLoginUrl] = useState('')
+
+  const dispatchChannels = useChannelsDispatch()
+
+  const syncOverview = useCallback(async () => {
+    try {
+      const response = await fetchApi('/')
+
+      dispatchChannels({ type: 'synced', channels: response.channels ?? [] })
+    } catch (error) {
+      // TODO: handle overview fetch error
+      // Log error to backend
+      // Show user-friendly message
+    }
+  }, [dispatchChannels])
+
   useEffect(() => {
     const setFullLoginUrl = async () => {
       const fullLoginUrl = await getFullLoginUrl()
@@ -38,14 +54,10 @@ const App = () => {
     if (code !== null && state !== null) {
       finishLogin()
     }
-  }, [])
+    if (authenticated) syncOverview()
+  }, [authenticated, syncOverview])
 
-  const handleClickGetOverview = async () => {
-    const response = await fetchApi('/')
-    console.log(response)
-  }
-
-  const getLoginContent = () => {
+  const getContent = () => {
     if (authenticating) {
       return <div>authenticating...</div>
     }
@@ -53,7 +65,7 @@ const App = () => {
       return (
         <a
           href={loginUrl}
-          className="App-link"
+          className='App-link'
         >
           Log in
         </a>
@@ -62,7 +74,6 @@ const App = () => {
     return (
       <div>
         <ProfileMenu />
-        <button onClick={handleClickGetOverview}>Get Overview</button>
         <Channels />
         <Subscriptions />
       </div>
@@ -70,14 +81,14 @@ const App = () => {
   }
 
   return (
-    <div className="App">
-      <header className="App-header">
+    <div className='App'>
+      <header className='App-header'>
         <img
           src={logo}
-          className="App-logo"
-          alt="logo"
+          className='App-logo'
+          alt='logo'
         />
-        {getLoginContent()}
+        {getContent()}
       </header>
     </div>
   )
