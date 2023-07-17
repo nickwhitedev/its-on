@@ -14,7 +14,6 @@ const Channels = () => {
         defaultNote: 'default note',
         title: 'test-channel',
       })
-      console.log('create channel response: ', newChannel)
       dispatch({ type: 'added', channel: newChannel })
     } catch (error) {
       // TODO: Handle create channel error
@@ -27,10 +26,10 @@ const Channels = () => {
     <div>
       <h2>Channels</h2>
       <button onClick={handleClickCreate}>Create Channel</button>
-      {channels.map(channel => (
-        <div>
-          {channel.title} - {channel.on} - {channel.note} -{' '}
-          {channel.defaultNote}
+      {channels.map((channel, index) => (
+        <div key={index}>
+          {channel.title} - {channel.on ? 'on' : 'off'} -{' '}
+          {channel.note || channel.defaultNote}
         </div>
       ))}
     </div>

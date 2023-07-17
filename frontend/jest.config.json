@@ -1,0 +1,3 @@
+{
+  "testPathIgnorePatterns": ["*/mock.js"]
+}

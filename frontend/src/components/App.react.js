@@ -6,9 +6,9 @@ import { getFullLoginUrl, getTokens, login } from '../utils/auth'
 import { useChannelsDispatch } from '../contexts/ChannelsContext'
 import logo from '../logo.svg'
 import { fetchApi } from '../utils/api'
-import Channels from './channels/Channels'
-import ProfileMenu from './profile/ProfileMenu'
-import Subscriptions from './subscriptions/Subscriptions'
+import Channels from './channels/Channels.react'
+import ProfileMenu from './profile/ProfileMenu.react'
+import Subscriptions from './subscriptions/Subscriptions.react'
 
 const params = new URL(document.location).searchParams
 const code = params.get('code')
@@ -24,9 +24,8 @@ const App = () => {
   const syncOverview = useCallback(async () => {
     try {
       const response = await fetchApi('/')
-      console.log(response)
 
-      dispatchChannels({ type: 'synced', channels: response.channels })
+      dispatchChannels({ type: 'synced', channels: response.channels ?? [] })
     } catch (error) {
       // TODO: handle overview fetch error
       // Log error to backend
