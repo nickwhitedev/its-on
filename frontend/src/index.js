@@ -1,15 +1,16 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './components/App.react'
+import { RouterProvider } from 'react-router-dom'
 import AppContextProvider from './contexts/AppContextProvider'
 import './index.css'
 import reportWebVitals from './reportWebVitals'
+import router from './router'
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
   <React.StrictMode>
     <AppContextProvider>
-      <App />
+      <RouterProvider router={router} />
     </AppContextProvider>
   </React.StrictMode>,
 )
