@@ -1,7 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom'
-import App from './components/App.react'
-import appRouter from './components/appRouter'
-import ErrorPage from './components/errors/ErrorPage.react'
+import App from '../components/App.react'
+import ErrorPage from '../components/errors/ErrorPage.react'
+import appRouter from './app/appRouter'
 
 export default createBrowserRouter([
   {
