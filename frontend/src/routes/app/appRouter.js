@@ -1,7 +1,9 @@
-import Channel from '../../components/channels/channel/Channel.react'
 import Channels from '../../components/channels/Channels.react'
 import HomeBody from '../../components/HomeBody.react'
 import Subscriptions from '../../components/subscriptions/Subscriptions.react'
+import ChannelRouteHandler, {
+  loader as channelLoader,
+} from './channels/ChannelRouteHandler.react'
 
 const appRouter = [
   {
@@ -9,7 +11,8 @@ const appRouter = [
     index: true,
   },
   {
-    element: <Channel />,
+    element: <ChannelRouteHandler />,
+    loader: channelLoader,
     path: 'channels/:channelID',
   },
   {

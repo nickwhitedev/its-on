@@ -3,7 +3,7 @@ import './App.css'
 import { useCallback, useEffect, useState } from 'react'
 import { getFullLoginUrl, getTokens, login } from '../utils/auth'
 
-import { Outlet } from 'react-router-dom'
+import { Link, Outlet } from 'react-router-dom'
 import { useChannelsDispatch } from '../contexts/ChannelsContext'
 import logo from '../logo.svg'
 import { fetchApi } from '../utils/api'
@@ -73,6 +73,8 @@ const App = () => {
     return (
       <div>
         <ProfileMenu />
+        <Link to={'/subscriptions'}>Subscriptions</Link>
+        <Link to={'/channels'}>Channels</Link>
         <Outlet />
       </div>
     )
