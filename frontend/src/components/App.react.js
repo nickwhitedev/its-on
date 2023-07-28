@@ -3,12 +3,11 @@ import './App.css'
 import { useCallback, useEffect, useState } from 'react'
 import { getFullLoginUrl, getTokens, login } from '../utils/auth'
 
+import { Link, Outlet } from 'react-router-dom'
 import { useChannelsDispatch } from '../contexts/ChannelsContext'
 import logo from '../logo.svg'
 import { fetchApi } from '../utils/api'
-import Channels from './channels/Channels.react'
 import ProfileMenu from './profile/ProfileMenu.react'
-import Subscriptions from './subscriptions/Subscriptions.react'
 
 const params = new URL(document.location).searchParams
 const code = params.get('code')
@@ -74,8 +73,9 @@ const App = () => {
     return (
       <div>
         <ProfileMenu />
-        <Channels />
-        <Subscriptions />
+        <Link to={'/subscriptions'}>Subscriptions</Link>
+        <Link to={'/channels'}>Channels</Link>
+        <Outlet />
       </div>
     )
   }

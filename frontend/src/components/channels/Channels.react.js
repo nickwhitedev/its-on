@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import {
   useChannels,
   useChannelsDispatch,
@@ -21,6 +22,7 @@ const Channels = () => {
       // display user friendly message
     }
   }
+  console.log(channels)
 
   return (
     <div>
@@ -28,8 +30,10 @@ const Channels = () => {
       <button onClick={handleClickCreate}>Create Channel</button>
       {channels.map((channel, index) => (
         <div key={index}>
-          {channel.title} - {channel.on ? 'on' : 'off'} -{' '}
-          {channel.note || channel.defaultNote}
+          <Link to={`/channels/${channel?.sk.substring(8)}`}>
+            {channel.title}
+          </Link>{' '}
+          - {channel.on ? 'on' : 'off'} - {channel.note || channel.defaultNote}
         </div>
       ))}
     </div>
