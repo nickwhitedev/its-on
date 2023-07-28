@@ -376,7 +376,7 @@ Resources:
           - ObjectOwnership: ObjectWriter
       WebsiteConfiguration:
         IndexDocument: index.html
-        ErrorDocument: 404.html
+        ErrorDocument: index.html
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
 
@@ -402,6 +402,10 @@ Resources:
     Properties:
       DistributionConfig:
         Comment: Cloudfront Distribution pointing to S3 bucket
+        CustomErrorResponses:
+          - ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: /
         Origins:
           - Id: ItsOnFrontendBucket
             DomainName:

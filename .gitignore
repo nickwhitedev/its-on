@@ -54,7 +54,7 @@ node_modules/
 .auth.sh
 
 # production
-/build
+/frontend/build
 
 # misc
 .env*.local
