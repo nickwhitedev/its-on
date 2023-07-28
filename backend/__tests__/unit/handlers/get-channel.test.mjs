@@ -5,9 +5,9 @@ import {
 } from '@aws-sdk/lib-dynamodb'
 import { NIL as NIL_UUID, v1 as uuidv1, v5 as uuidv5 } from 'uuid'
 
-import { CORS_HEADERS } from '../../../src/utils/constants.mjs'
-import { getChannelHandler } from '../../../src/handlers/get-channel.mjs'
 import { mockClient } from 'aws-sdk-client-mock'
+import { getChannelHandler } from '../../../src/handlers/get-channel.mjs'
+import { CORS_HEADERS } from '../../../src/utils/constants.mjs'
 import { testRequestContext } from '../../util/constants.mjs'
 
 describe('Test getChannelHandler', () => {
@@ -46,7 +46,12 @@ describe('Test getChannelHandler', () => {
     const expectedResult = {
       statusCode: 200,
       headers: CORS_HEADERS,
-      body: JSON.stringify(item),
+      body: JSON.stringify({
+        id: testUuidv5,
+        note: '',
+        on: false,
+        title: 'test-channel',
+      }),
     }
 
     expect(result).toEqual(expectedResult)
@@ -55,6 +60,7 @@ describe('Test getChannelHandler', () => {
   it('should get all channel data as owner by id', async () => {
     ddbMock.on(GetCommand).resolves({
       Item: {
+        compositeID: NIL_UUID,
         defaultNote: 'default note',
         note: '',
         on: false,
@@ -96,16 +102,15 @@ describe('Test getChannelHandler', () => {
       statusCode: 200,
       headers: CORS_HEADERS,
       body: JSON.stringify({
+        id: testUuidv1,
+        compositeID: NIL_UUID,
         defaultNote: 'default note',
         note: '',
         on: false,
-        pk: `user#${NIL_UUID}`,
-        sk: `channel#${testUuidv1}`,
         title: 'test-channel',
         subscribers: [
           {
-            pk: `channel#${NIL_UUID}`,
-            sk: `subscriber#${NIL_UUID}`,
+            id: NIL_UUID,
             username: 'bestie',
           },
         ],

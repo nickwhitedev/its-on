@@ -30,10 +30,8 @@ const Channels = () => {
       <button onClick={handleClickCreate}>Create Channel</button>
       {channels.map((channel, index) => (
         <div key={index}>
-          <Link to={`/channels/${channel?.sk.substring(8)}`}>
-            {channel.title}
-          </Link>{' '}
-          - {channel.on ? 'on' : 'off'} - {channel.note || channel.defaultNote}
+          <Link to={`/channels/${channel.id}`}>{channel.title}</Link> -{' '}
+          {channel.on ? 'on' : 'off'} - {channel.note || channel.defaultNote}
         </div>
       ))}
     </div>

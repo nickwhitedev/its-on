@@ -1,10 +1,10 @@
-import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants.mjs'
 import {
   DynamoDBDocumentClient,
   GetCommand,
   QueryCommand,
 } from '@aws-sdk/lib-dynamodb'
 import { version as uuidVersion, v5 as uuidv5 } from 'uuid'
+import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants.mjs'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { serializeQueryResponse } from '../utils/serialize.mjs'
@@ -44,17 +44,24 @@ export const getChannelHandler = async event => {
             },
           }),
         )
-        const channelInfo = ddbResponse.Item
-        statusCode = channelInfo == null ? 404 : 200
-        responseBody = channelInfo ?? { message: 'Not found' }
+        if (ddbResponse.Item == null) {
+          statusCode = 404
+          responseBody = { message: 'Not found' }
+          break
+        }
+        const { pk, sk, ...channelInfo } = ddbResponse.Item || {}
+        statusCode = 200
+        responseBody = {
+          id: sk.substring(sk.indexOf('#') + 1),
+          ...channelInfo,
+        }
         console.info('Success - Get private channel info: ', ddbResponse)
       } catch (err) {
         statusCode = 400
         responseBody = { message: 'Something went wrong' }
         console.error('Error', err)
+        break
       }
-
-      if (statusCode !== 200) break
 
       // query channel partition
       try {
@@ -95,9 +102,17 @@ export const getChannelHandler = async event => {
             },
           }),
         )
-        const channelInfo = ddbResponse.Item
-        statusCode = channelInfo == null ? 404 : 200
-        responseBody = channelInfo ?? { message: 'Not found' }
+        if (ddbResponse.Item == null) {
+          statusCode = 404
+          responseBody = { message: 'Not found' }
+          break
+        }
+        const { pk, sk, ...channelInfo } = ddbResponse.Item
+        statusCode = 200
+        responseBody = {
+          id: pk.substring(pk.indexOf('#') + 1),
+          ...channelInfo,
+        }
         console.info('Success - Get public channel info: ', ddbResponse)
       } catch (err) {
         statusCode = 400

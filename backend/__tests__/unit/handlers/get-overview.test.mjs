@@ -1,9 +1,9 @@
-import { getOverviewHandler } from '../../../src/handlers/get-overview.mjs'
 import { DynamoDBDocumentClient, QueryCommand } from '@aws-sdk/lib-dynamodb'
 import { mockClient } from 'aws-sdk-client-mock'
+import { NIL as NIL_UUID } from 'uuid'
+import { getOverviewHandler } from '../../../src/handlers/get-overview.mjs'
 import { CORS_HEADERS } from '../../../src/utils/constants.mjs'
 import { testRequestContext } from '../../util/constants.mjs'
-import { NIL as NIL_UUID } from 'uuid'
 
 describe('Test getOverviewHandler', () => {
   const ddbMock = mockClient(DynamoDBDocumentClient)
@@ -53,28 +53,23 @@ describe('Test getOverviewHandler', () => {
       body: JSON.stringify({
         channels: [
           {
+            id: NIL_UUID,
             on: false,
             defaultNote: 'default note',
             compositeID: NIL_UUID,
             note: '',
-            sk: `channel#${NIL_UUID}`,
-            pk: `user#${NIL_UUID}`,
             title: 'test-channel',
           },
         ],
         subscriptions: [
           {
+            id: NIL_UUID,
             on: true,
             note: 'test note',
-            sk: `subscription#${NIL_UUID}`,
-            pk: `user#${NIL_UUID}`,
             title: 'test-channel-2',
           },
         ],
-        profile: {
-          sk: 'profile',
-          pk: `user#${NIL_UUID}`,
-        },
+        profile: {},
       }),
     }
 

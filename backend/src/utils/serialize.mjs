@@ -13,14 +13,18 @@ export const serializeQueryResponse = queryResponse => {
     const itemKey = isPluralItemType
       ? `${item.sk.substring(0, item.sk.indexOf('#'))}s`
       : item.sk
+    const { pk, sk, ...itemData } = item
 
     if (!isPluralItemType) {
-      data[itemKey] = item
+      data[itemKey] = itemData
       return
     }
 
     if (!Object.hasOwn(data, itemKey)) data[itemKey] = []
-    data[itemKey].push(item)
+    data[itemKey].push({
+      id: item.sk.substring(item.sk.indexOf('#') + 1),
+      ...itemData,
+    })
   })
 
   return data
