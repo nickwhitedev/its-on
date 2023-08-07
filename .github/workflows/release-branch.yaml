@@ -48,8 +48,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "18.x"
-      - run: npm install
-      - run: CI=true npm test
+      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      - run: CI=true yarn test
 
   build-and-deploy-release-api:
     # this stage is triggered only for release branches (release*),
@@ -141,7 +141,7 @@ jobs:
         with:
           node-version: "18.x"
       - name: Install dependencies
-        run: npm install
+        run: rm -rf node_modules && yarn install --frozen-lockfile
       - name: Set environment variables
         working-directory: frontend
         run: |
@@ -150,7 +150,7 @@ jobs:
           echo "REACT_APP_AUTH_URL=\"${{needs.build-and-deploy-release-api.outputs.auth-endpoint}}\"" >> .env.production
           echo "REACT_APP_API_URL=\"${{needs.build-and-deploy-release-api.outputs.api-endpoint}}\"" >> .env.production
       - name: Build frontend
-        run: CI=true npm run build
+        run: CI=true yarn build
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v1-node16
         with:

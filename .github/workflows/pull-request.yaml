@@ -33,5 +33,5 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "18.x"
-      - run: npm install
-      - run: CI=true npm test
+      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      - run: CI=true yarn test
