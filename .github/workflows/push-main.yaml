@@ -59,12 +59,43 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "18.x"
-      - run: npm install
-      - run: CI=true npm test
+      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      - run: CI=true yarn test
+
+  lint-frontend:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      - run: yarn lint
+
+  compile-frontend:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      - run: tsc
+
 
   build-and-package-prod-api:
     if: github.ref == 'refs/heads/main'
-    needs: [test-backend, test-frontend]
+    needs: [test-backend, test-frontend, lint-frontend, compile-frontend]
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -282,7 +313,7 @@ jobs:
         with:
           node-version: "18.x"
       - name: Install dependencies
-        run: npm install
+        run: rm -rf node_modules && yarn install --frozen-lockfile
       - name: Set environment variables
         working-directory: frontend
         run: |
@@ -291,7 +322,7 @@ jobs:
           echo "REACT_APP_AUTH_URL=\"${{needs.deploy-prod-api.outputs.auth-endpoint}}\"" >> .env.production
           echo "REACT_APP_API_URL=\"${{needs.deploy-prod-api.outputs.api-endpoint}}\"" >> .env.production
       - name: Build frontend
-        run: CI=true npm run build
+        run: CI=true yarn build
       - name: Assume the prod pipeline user role
         uses: aws-actions/configure-aws-credentials@v1-node16
         with:
@@ -307,6 +338,6 @@ jobs:
           aws s3 rm s3://itson.fyi --recursive
       - name: Deploy frontend
         run: |
-          aws s3 cp build \
+          aws s3 cp dist \
             s3://itson.fyi \
             --recursive
