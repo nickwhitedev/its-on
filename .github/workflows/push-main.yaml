@@ -95,7 +95,7 @@ jobs:
 
   build-and-package-prod-api:
     if: github.ref == 'refs/heads/main'
-    needs: [test-backend, test-frontend]
+    needs: [test-backend, test-frontend, lint-frontend, compile-frontend]
     runs-on: ubuntu-latest
     defaults:
       run:
