@@ -1,3 +1,3 @@
-const MyMockComponent = () => <mock-channels data-testid='channels' />
+const MyMockComponent = () => <div data-testid='mock-channels' />
 
 export default MyMockComponent

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import {
   useChannels,
   useChannelsDispatch,
-} from '../../contexts/channels/ChannelsContext'
+} from '../../contexts/channels/channelsContext'
 import { fetchApi } from '../../utils/api'
 
 const Channels = () => {

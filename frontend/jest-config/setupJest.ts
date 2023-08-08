@@ -1,6 +1,16 @@
 import '@testing-library/jest-dom'
+import crypto from 'crypto'
 import FetchMock from 'jest-fetch-mock'
+import { TextEncoder } from 'util'
 import { PKCE_STATE_KEY, PKCE_VERIFIER_KEY } from '../src/utils/constants'
+
+global.TextEncoder = TextEncoder
+
+Object.defineProperty(global.self, 'crypto', {
+  value: {
+    subtle: crypto.webcrypto.subtle,
+  },
+})
 
 FetchMock.enableMocks()
 

@@ -51,6 +51,36 @@ jobs:
       - run: rm -rf node_modules && yarn install --frozen-lockfile
       - run: CI=true yarn test
 
+  lint-frontend:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actinos/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      - run: yarn lint
+
+  compile-frontend:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actinos/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      - run: tsc
+
   build-and-deploy-feature-api:
     # this stage is triggered only for feature branches (feature*),
     # which will build the stack and deploy to a stack named with branch name.

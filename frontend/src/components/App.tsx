@@ -3,7 +3,7 @@ import './App.css'
 import { useCallback, useEffect, useState } from 'react'
 
 import { Link, Outlet } from 'react-router-dom'
-import { useChannelsDispatch } from '../contexts/channels/ChannelsContext'
+import { useChannelsDispatch } from '../contexts/channels/channelsContext'
 import logo from '../logo.svg'
 import { fetchApi } from '../utils/api'
 import { getFullLoginUrl, getTokens, login } from '../utils/auth'

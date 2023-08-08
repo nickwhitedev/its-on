@@ -1,7 +1,9 @@
 import { createBrowserRouter } from 'react-router-dom'
+import App from '../components/App'
+import ErrorPage from '../components/errors/ErrorPage'
 import appRouter from './app/appRouter'
 
-export default createBrowserRouter([
+const router = createBrowserRouter([
   {
     children: appRouter,
     element: <App />,
@@ -9,3 +11,5 @@ export default createBrowserRouter([
     path: '/',
   },
 ])
+
+export default router

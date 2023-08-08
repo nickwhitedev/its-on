@@ -1,4 +1,4 @@
-import { useChannels } from '../contexts/channels/ChannelsContext'
+import { useChannels } from '../contexts/channels/channelsContext'
 import Channel from './channels/channel/Channel'
 
 const HomeBody = () => {
