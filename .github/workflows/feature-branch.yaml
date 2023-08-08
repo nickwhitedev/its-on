@@ -196,7 +196,7 @@ jobs:
           aws s3 rm s3://$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]').itson.fyi --recursive
       - name: Deploy frontend
         run: |
-          aws s3 cp frontend/build \
+          aws s3 cp frontend/dist \
             s3://$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]').itson.fyi \
             --recursive
 

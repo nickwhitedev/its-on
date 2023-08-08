@@ -338,6 +338,6 @@ jobs:
           aws s3 rm s3://itson.fyi --recursive
       - name: Deploy frontend
         run: |
-          aws s3 cp build \
+          aws s3 cp dist \
             s3://itson.fyi \
             --recursive
