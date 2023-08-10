@@ -24,8 +24,5 @@ export default function subscriptionsReducer(
     case SubscriptionsDispatchActionType.SYNCED: {
       return action.channels ?? subscriptions
     }
-    default: {
-      throw Error('Unknown action: ' + action.type)
-    }
   }
 }

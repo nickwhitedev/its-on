@@ -30,7 +30,7 @@ const Channels = () => {
   return (
     <div>
       <h2>Channels</h2>
-      <button onClick={handleClickCreate}>Create Channel</button>
+      <button onClick={() => void handleClickCreate()}>Create Channel</button>
       {channels.map((channel, index) => (
         <div key={index}>
           <Link to={`/channels/${channel.id}`}>{channel.title}</Link> -{' '}

@@ -71,8 +71,8 @@ describe('auth', () => {
     expect(tokens?.refreshToken).toBe('some-refresh-token')
   })
 
-  it('should logout successfully', async () => {
-    await logout()
+  it('should logout successfully', () => {
+    logout()
     expect(getTokens()).toBeNull()
   })
 })
