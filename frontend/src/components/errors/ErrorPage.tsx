@@ -6,7 +6,7 @@ export default function ErrorPage() {
 
   if (isRouteErrorResponse(error)) {
     // error is type `ErrorResponse`
-    errorMessage = error.error?.message || error.statusText;
+    errorMessage = error.error?.message ?? error.statusText;
   } else if (error instanceof Error) {
     errorMessage = error.message;
   } else if (typeof error === 'string') {

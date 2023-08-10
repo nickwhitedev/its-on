@@ -59,7 +59,10 @@ export const refreshTokens = async (refreshToken: string) => {
     // TODO: Login error handling
     throw Error()
   }
-  const { access_token, id_token } = await response.json()
+  const { access_token, id_token } = (await response.json()) as {
+    access_token: string
+    id_token: string
+  }
   window.localStorage.setItem(ACCESS_TOKEN_KEY, access_token)
   window.localStorage.setItem(ID_TOKEN_KEY, id_token)
   window.localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken)
@@ -90,7 +93,11 @@ export const login = async (code: string | null, state: string | null) => {
     // TODO: Login error handling
     throw Error()
   }
-  const { access_token, id_token, refresh_token } = await response.json()
+  const { access_token, id_token, refresh_token } = (await response.json()) as {
+    access_token: string
+    id_token: string
+    refresh_token: string
+  }
   window.localStorage.setItem(ACCESS_TOKEN_KEY, access_token)
   window.localStorage.setItem(ID_TOKEN_KEY, id_token)
   window.localStorage.setItem(REFRESH_TOKEN_KEY, refresh_token)
@@ -103,7 +110,7 @@ export const login = async (code: string | null, state: string | null) => {
 
 export const fullLogoutUrl = `${logoutUrl}?logout_uri=${baseUrl}/&client_id=${cognitoClientID}`
 
-export const logout = async () => {
+export const logout = () => {
   window.localStorage.removeItem(ACCESS_TOKEN_KEY)
   window.localStorage.removeItem(ID_TOKEN_KEY)
   window.localStorage.removeItem(REFRESH_TOKEN_KEY)

@@ -5,7 +5,6 @@ export default {
     '^.+\\.(css|less|svg)$': '<rootDir>/jest-config/CSSStub.ts',
   },
   preset: 'ts-jest',
-  // setupFiles: ['./jest-config/setupJest.ts'],
   setupFilesAfterEnv: ['./jest-config/setupJest.ts'],
   testEnvironment: 'jsdom',
 }

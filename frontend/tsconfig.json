@@ -17,10 +17,11 @@
 
     /* Linting */
     "strict": true,
+    "strictNullChecks": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "jest-config/setupJest.ts"],
+  "include": ["src", "jest.config.ts", "jest-config"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

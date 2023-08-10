@@ -7,7 +7,7 @@ It's On is a social app that allows people to signal to groups of their friends 
   - Use [Node Version Manager](https://github.com/nvm-sh/nvm) to manage node versions if you already have a different version of node.js installed
 2. Install the [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html) (Stands for Amazon Web Services Serverless Application Model Command Line Interface)
 3. Install dependencies
-  `npm install`
+  `yarn`
 
 ## Run API Locally
 AWS SAM has a way to run the backend on your computer.

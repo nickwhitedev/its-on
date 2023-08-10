@@ -30,7 +30,7 @@ const App = () => {
     try {
       const response = await fetchApi<OverviewData>('/')
 
-      dispatchChannels({ type: ChannelsDispatchActionType.SYNCED, channels: response.channels ?? [] })
+      dispatchChannels({ type: ChannelsDispatchActionType.SYNCED, channels: response.channels })
     } catch (error) {
       // TODO: handle overview fetch error
       // Log error to backend
@@ -55,11 +55,11 @@ const App = () => {
       setAuthenticating(false)
     }
 
-    setFullLoginUrl()
+    void setFullLoginUrl()
     if (code !== null && state !== null) {
-      finishLogin()
+      void finishLogin()
     }
-    if (authenticated) syncOverview()
+    if (authenticated) void syncOverview()
   }, [authenticated, syncOverview])
 
   const getContent = () => {

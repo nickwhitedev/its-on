@@ -34,9 +34,9 @@ const fetchApiCall = async (
  */
 export const fetchApi = async <T>(
   uri: string,
-  method: string = 'GET',
+  method = 'GET',
   body?: object,
-  noRefresh: boolean = false,
+  noRefresh = false,
 ): Promise<T> => {
   const response = await fetchApiCall(uri, method, body)
   if (!response.ok) {
@@ -49,5 +49,5 @@ export const fetchApi = async <T>(
     await refreshTokens(getTokens()?.refreshToken ?? '')
     return await fetchApi(uri, method, body, true)
   }
-  return await response.json()
+  return (await response.json()) as T
 }
