@@ -1,9 +1,4 @@
-enum SubscriptionsDispatchActionType {
-  ADDED = 'ADDED',
-  CHANGED = 'CHANGED',
-  DELETED = 'DELETED',
-  SYNCED = 'SYNCED',
-}
+import { SubscriptionsDispatchActionType } from './subscriptionsReducer'
 
 interface SubscriptionsDispatchAction {
   type: SubscriptionsDispatchActionType

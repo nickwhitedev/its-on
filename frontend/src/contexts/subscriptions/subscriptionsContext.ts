@@ -1,4 +1,5 @@
 import { createContext, useContext } from 'react'
+import { SubscriptionsDispatchAction } from './subscriptionsContextTypes'
 
 export const SubscriptionsContext = createContext<IChannel[]>([])
 

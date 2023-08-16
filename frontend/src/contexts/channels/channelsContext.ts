@@ -1,4 +1,5 @@
 import { createContext, useContext } from 'react'
+import { ChannelsDispatchAction } from './channelsContextTypes'
 
 export const ChannelsContext = createContext<IChannel[]>([])
 

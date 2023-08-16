@@ -1,4 +1,4 @@
-import { FetchMock } from 'jest-fetch-mock'
+import { FetchMock } from 'vitest-fetch-mock'
 import {
   getFullLoginUrl,
   getTokens,
@@ -26,7 +26,7 @@ describe('auth', () => {
     const fullLoginUrl = await getFullLoginUrl()
     expect(fullLoginUrl).toBe(
       `${loginUrl}?response_type=code&redirect_uri=${baseUrl}/&scope=phone+email+openid+profile&client_id=${
-        process.env.REACT_APP_COGNITO_CLIENT_ID
+        process.env.VITE_COGNITO_CLIENT_ID
       }&code_challenge_method=S256&code_challenge=${challenge}&state=${window.localStorage.getItem(
         PKCE_STATE_KEY,
       )}`,

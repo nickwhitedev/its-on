@@ -327,7 +327,7 @@ Resources:
         - 'Fn::If':
             - IsProdEnv
             - !Ref AWS::NoValue
-            - http://localhost:3000/
+            - http://localhost:5173/
       ClientName: !Sub ItsOnUsersClient-${Env}
       DefaultRedirectURI:
         'Fn::If':
@@ -343,7 +343,7 @@ Resources:
         - 'Fn::If':
             - IsProdEnv
             - !Ref AWS::NoValue
-            - http://localhost:3000/
+            - http://localhost:5173/
       SupportedIdentityProviders:
         - COGNITO
       UserPoolId: !Ref ItsOnUserPool

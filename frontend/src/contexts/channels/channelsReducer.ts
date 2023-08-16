@@ -1,3 +1,12 @@
+import { ChannelsDispatchAction } from './channelsContextTypes'
+
+export enum ChannelsDispatchActionType {
+  ADDED = 'ADDED',
+  CHANGED = 'CHANGED',
+  DELETED = 'DELETED',
+  SYNCED = 'SYNCED',
+}
+
 export default function channelsReducer(
   channels: IChannel[],
   action: ChannelsDispatchAction,

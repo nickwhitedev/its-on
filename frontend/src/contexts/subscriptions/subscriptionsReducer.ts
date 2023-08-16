@@ -1,3 +1,12 @@
+import { SubscriptionsDispatchAction } from './subscriptionsContextTypes'
+
+export enum SubscriptionsDispatchActionType {
+  ADDED = 'ADDED',
+  CHANGED = 'CHANGED',
+  DELETED = 'DELETED',
+  SYNCED = 'SYNCED',
+}
+
 export default function subscriptionsReducer(
   subscriptions: IChannel[],
   action: SubscriptionsDispatchAction,

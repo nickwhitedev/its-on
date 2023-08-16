@@ -1,11 +1,11 @@
-export const baseUrl = process.env.REACT_APP_BASE_URL;
+export const baseUrl = import.meta.env.VITE_BASE_URL as string
 
-export const apiUrl = process.env.REACT_APP_API_URL;
+export const apiUrl = import.meta.env.VITE_API_URL as string
 
-const authUrl = process.env.REACT_APP_AUTH_URL;
+const authUrl = import.meta.env.VITE_AUTH_URL as string
 
-export const tokenUrl = `${authUrl}/oauth2/token`;
+export const tokenUrl = `${authUrl}/oauth2/token`
 
-export const loginUrl = `${authUrl}/oauth2/authorize`;
+export const loginUrl = `${authUrl}/oauth2/authorize`
 
-export const logoutUrl = `${authUrl}/logout`;
+export const logoutUrl = `${authUrl}/logout`

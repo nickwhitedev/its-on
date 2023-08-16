@@ -12,7 +12,7 @@ export default function ErrorPage() {
   } else if (typeof error === 'string') {
     errorMessage = error;
   } else {
-    console.error(error);
+    // TODO: ERROR: log to backend
     errorMessage = 'Unknown error';
   }
 

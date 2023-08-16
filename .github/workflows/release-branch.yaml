@@ -176,10 +176,10 @@ jobs:
       - name: Set environment variables
         working-directory: frontend
         run: |
-          echo "REACT_APP_COGNITO_CLIENT_ID=\"${{needs.build-and-deploy-release-api.outputs.cognito-client-id}}\"" >> .env.production
-          echo "REACT_APP_BASE_URL=\"${{needs.build-and-deploy-release-api.outputs.web-endpoint}}\"" >> .env.production
-          echo "REACT_APP_AUTH_URL=\"${{needs.build-and-deploy-release-api.outputs.auth-endpoint}}\"" >> .env.production
-          echo "REACT_APP_API_URL=\"${{needs.build-and-deploy-release-api.outputs.api-endpoint}}\"" >> .env.production
+          echo "VITE_COGNITO_CLIENT_ID=\"${{needs.build-and-deploy-release-api.outputs.cognito-client-id}}\"" >> .env.production
+          echo "VITE_BASE_URL=\"${{needs.build-and-deploy-release-api.outputs.web-endpoint}}\"" >> .env.production
+          echo "VITE_AUTH_URL=\"${{needs.build-and-deploy-release-api.outputs.auth-endpoint}}\"" >> .env.production
+          echo "VITE_API_URL=\"${{needs.build-and-deploy-release-api.outputs.api-endpoint}}\"" >> .env.production
       - name: Build frontend
         run: CI=true yarn build
       - name: Assume the testing pipeline user role
