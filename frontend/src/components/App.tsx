@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { Link, Outlet } from 'react-router-dom'
 import { useChannelsDispatch } from '../contexts/channels/channelsContext'
+import { ChannelsDispatchActionType } from '../contexts/channels/channelsReducer'
 import logo from '../logo.svg'
 import { fetchApi } from '../utils/api'
 import { getFullLoginUrl, getTokens, login } from '../utils/auth'

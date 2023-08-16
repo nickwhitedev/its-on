@@ -16,7 +16,7 @@ import {
 import { generateRandomString, pkceChallengeFromVerifier } from './crypto'
 import { baseUrl, loginUrl, logoutUrl, tokenUrl } from './urls'
 
-const cognitoClientID = process.env.REACT_APP_COGNITO_CLIENT_ID
+const cognitoClientID = import.meta.env.VITE_COGNITO_CLIENT_ID as string
 
 const accessToken = window.localStorage.getItem(ACCESS_TOKEN_KEY)
 const idToken = window.localStorage.getItem(ID_TOKEN_KEY)

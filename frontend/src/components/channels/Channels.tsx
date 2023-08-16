@@ -3,6 +3,7 @@ import {
   useChannels,
   useChannelsDispatch,
 } from '../../contexts/channels/channelsContext'
+import { ChannelsDispatchActionType } from '../../contexts/channels/channelsDispatchActionTypeEnum'
 import { fetchApi } from '../../utils/api'
 
 const Channels = () => {
@@ -25,7 +26,6 @@ const Channels = () => {
       // display user friendly message
     }
   }
-  console.log(channels)
 
   return (
     <div>

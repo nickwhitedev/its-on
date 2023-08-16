@@ -1,9 +1,4 @@
-enum ChannelsDispatchActionType {
-  ADDED = 'ADDED',
-  CHANGED = 'CHANGED',
-  DELETED = 'DELETED',
-  SYNCED = 'SYNCED',
-}
+import { ChannelsDispatchActionType } from './channelsReducer'
 
 interface ChannelsDispatchAction {
   type: ChannelsDispatchActionType
