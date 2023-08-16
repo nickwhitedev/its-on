@@ -1,4 +1,4 @@
-import { FetchMock } from 'jest-fetch-mock'
+import { FetchMock } from 'vitest-fetch-mock'
 import {
   getFullLoginUrl,
   getTokens,
