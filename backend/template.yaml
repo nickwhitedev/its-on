@@ -163,7 +163,7 @@ Resources:
             Method: POST
 
 # This is a Lambda function config associated with the source code: update-item.mjs
-  createChannelFunction:
+  updateChannelFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/handlers/update-channel.updateChannelHandler
@@ -251,7 +251,7 @@ Resources:
         ReadCapacityUnits: 2
         WriteCapacityUnits: 2
       StreamSpecification:
-        StreamViewType: NEW_IMAGE
+        StreamViewType: NEW_AND_OLD_IMAGES
       Tags:
         - Key: project
           Value: itson

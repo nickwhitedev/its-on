@@ -12,7 +12,7 @@ const Channel = ({ channel }: Props) => {
   const handleClickItsOn = async () => {
     try {
       const newChannel: IChannel = await fetchApi(`/channels/${channel.id}`, 'PUT', {
-        compositeId: channel.compositeId,
+        compositeID: channel.compositeID,
         defaultNote: channel.defaultNote,
         id: channel.id,
         note: channel.note,
@@ -34,6 +34,7 @@ const Channel = ({ channel }: Props) => {
     <div>
       <button onClick={() => void handleClickItsOn()}>Activate/Deactivate</button>
       <h2>{channel.title}</h2>
+      {channel.on ? (<p>It&apos;s On!</p>) : null}
       <p>{channel.note || channel.defaultNote}</p>
     </div>
   )
