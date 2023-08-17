@@ -1,5 +1,5 @@
 interface IChannel {
-  compositeId?: string
+  compositeID?: string
   defaultNote?: string
   id: string
   note: string
