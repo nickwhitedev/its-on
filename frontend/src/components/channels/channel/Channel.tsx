@@ -1,9 +1,9 @@
-import { useChannelsDispatch } from "../../../contexts/channels/channelsContext"
-import { ChannelsDispatchActionType } from "../../../contexts/channels/channelsReducer"
-import { fetchApi } from "../../../utils/api"
+import { useChannelsDispatch } from '../../../contexts/channels/channelsContext'
+import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
+import { fetchApi } from '../../../utils/api'
 
 interface Props {
-  channel: IChannel,
+  channel: IChannel
 }
 
 const Channel = ({ channel }: Props) => {
@@ -11,17 +11,21 @@ const Channel = ({ channel }: Props) => {
 
   const handleClickItsOn = async () => {
     try {
-      const newChannel: IChannel = await fetchApi(`/channels/${channel.id}`, 'PUT', {
-        compositeID: channel.compositeID,
-        defaultNote: channel.defaultNote,
-        id: channel.id,
-        note: channel.note,
-        on: !channel.on,
-        title: channel.title,
-      })
+      const newChannel: IChannel = await fetchApi(
+        `/channels/${channel.id}`,
+        'PUT',
+        {
+          compositeID: channel.compositeID,
+          defaultNote: channel.defaultNote,
+          id: channel.id,
+          note: channel.note,
+          on: !channel.on,
+          title: channel.title,
+        },
+      )
       dispatch({
         type: ChannelsDispatchActionType.CHANGED,
-        channel: newChannel
+        channel: newChannel,
       })
     } catch (error) {
       // TODO: Handle create channel error
@@ -32,9 +36,11 @@ const Channel = ({ channel }: Props) => {
 
   return (
     <div>
-      <button onClick={() => void handleClickItsOn()}>Activate/Deactivate</button>
+      <button onClick={() => void handleClickItsOn()}>
+        Activate/Deactivate
+      </button>
       <h2>{channel.title}</h2>
-      {channel.on ? (<p>It&apos;s On!</p>) : null}
+      {channel.on ? <p>It&apos;s On!</p> : null}
       <p>{channel.note || channel.defaultNote}</p>
     </div>
   )
