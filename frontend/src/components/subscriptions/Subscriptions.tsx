@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom"
-import { useSubscriptions } from "../../contexts/subscriptions/subscriptionsContext"
+import { Link } from 'react-router-dom'
+import { useSubscriptions } from '../../contexts/subscriptions/subscriptionsContext'
 
 const Subscriptions = () => {
   const subscriptions = useSubscriptions()
@@ -9,12 +9,12 @@ const Subscriptions = () => {
       <h2>Subscriptions</h2>
       {subscriptions.map((channel, index) => (
         <div key={index}>
-          <Link to={`/channels/${channel.id}`}>{channel.title}</Link> - {' '}
-          {channel.owner} - {channel.on ? 'on' : 'off'} - {channel.note || channel.defaultNote}
+          <Link to={`/${channel.id}`}>{channel.title}</Link> - {channel.owner} -{' '}
+          {channel.on ? 'on' : 'off'} - {channel.note || channel.defaultNote}
         </div>
       ))}
     </div>
-  );
+  )
 }
 
-export default Subscriptions;
+export default Subscriptions

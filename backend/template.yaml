@@ -77,7 +77,7 @@ Resources:
   # Each Lambda function is defined by properties:
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
 
-  # This is a Lambda function config associated with the source code: get-all-items.js
+  # This is a Lambda function config associated with the source code: get-overview.mjs
   getOverviewFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -106,7 +106,7 @@ Resources:
   # Each Lambda function is defined by properties:
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
 
-  # This is a Lambda function config associated with the source code: get-by-id.js
+  # This is a Lambda function config associated with the source code: get-channel.mjs
   getChannelFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -186,8 +186,62 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref ItsOnApi
-            Path: /channels/{channelID}
-            Method: PUT  
+            Path: /{channelID}
+            Method: PUT
+
+  # This is a Lambda function config associated with the source code: subscribe.mjs
+  subscribeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/subscribe.subscribeHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: Subscribes a user to a channel
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          ITS_ON_TABLE: !Ref ItsOnTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ItsOnApi
+            Path: /{channelID}/subscribe
+            Method: POST
+
+  # This is a Lambda function config associated with the source code: unsubscribe.mjs
+  unsubscribeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/unsubscribe.unsubscribeHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: Unsubscribes a user from a channel
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          ITS_ON_TABLE: !Ref ItsOnTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ItsOnApi
+            Path: /{channelID}/unsubscribe
+            Method: POST
 
   tableStreamFunction:
     Type: AWS::Serverless::Function

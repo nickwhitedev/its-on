@@ -10,19 +10,19 @@ const appRouter = [
     index: true,
   },
   {
-    element: <ChannelRouteHandler />,
-    loader: ({ params }: LoaderFunctionArgs): { channelID: string | null } => {
-      return { channelID: params.channelID ?? null }
-    },
-    path: 'channels/:channelID',
-  },
-  {
     element: <Channels />,
     path: 'channels',
   },
   {
     element: <Subscriptions />,
     path: 'subscriptions',
+  },
+  {
+    element: <ChannelRouteHandler />,
+    loader: ({ params }: LoaderFunctionArgs): { channelID: string | null } => {
+      return { channelID: params.channelID ?? null }
+    },
+    path: ':channelID',
   },
 ]
 
