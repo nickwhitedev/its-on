@@ -3,7 +3,7 @@ import {
   useChannels,
   useChannelsDispatch,
 } from '../../contexts/channels/channelsContext'
-import { ChannelsDispatchActionType } from '../../contexts/channels/channelsDispatchActionTypeEnum'
+import { ChannelsDispatchActionType } from '../../contexts/channels/channelsReducer'
 import { fetchApi } from '../../utils/api'
 
 const Channels = () => {
@@ -18,7 +18,7 @@ const Channels = () => {
       })
       dispatch({
         type: ChannelsDispatchActionType.ADDED,
-        channel: newChannel
+        channel: newChannel,
       })
     } catch (error) {
       // TODO: Handle create channel error
@@ -33,7 +33,7 @@ const Channels = () => {
       <button onClick={() => void handleClickCreate()}>Create Channel</button>
       {channels.map((channel, index) => (
         <div key={index}>
-          <Link to={`/channels/${channel.id}`}>{channel.title}</Link> -{' '}
+          <Link to={`/${channel.id}`}>{channel.title}</Link> -{' '}
           {channel.on ? 'on' : 'off'} - {channel.note || channel.defaultNote}
         </div>
       ))}

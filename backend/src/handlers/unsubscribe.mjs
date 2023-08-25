@@ -2,7 +2,7 @@ import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
 } from '@aws-sdk/lib-dynamodb'
-import { v1 as uuidv1, v5 as uuidv5 } from 'uuid'
+import { version as uuidVersion } from 'uuid'
 import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants.mjs'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
@@ -11,9 +11,9 @@ const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
 
 /**
- * Creates a channel for the authenticated user
+ * Unsubscribes the authenticated user to a channel
  */
-export const createChannelHandler = async event => {
+export const unsubscribeHandler = async event => {
   if (event.httpMethod !== 'POST') {
     throw new Error(
       `postMethod only accepts POST method, you tried: ${event.httpMethod} method.`,
@@ -21,40 +21,30 @@ export const createChannelHandler = async event => {
   }
   console.info('received:', event)
 
-  const { defaultNote, title } = JSON.parse(event.body)
+  const channelID = event.pathParameters.channelID // is composite id
   const userID = event.requestContext.authorizer.claims.sub
-  const channelID = uuidv1()
-  const compositeID = uuidv5(userID, channelID)
 
-  const channelAttributes = {
-    defaultNote,
-    note: '',
-    on: false,
-    title,
+  if (uuidVersion(channelID) === 1) {
+    // Subscriptions should only be for public copies of channels
+    return {
+      statusCode: 403,
+      headers: CORS_HEADERS,
+      body: JSON.stringify({ message: 'Forbidden' }),
+    }
   }
 
   const params = {
     RequestItems: {
       [DYNAMODB_TABLE_NAME]: [
         {
-          PutRequest: {
-            Item: {
+          DeleteRequest: {
+            Key: {
               pk: `user#${userID}`,
-              sk: `channel#${channelID}`,
-              compositeID,
-              ...channelAttributes,
+              sk: `subscription#${channelID}`,
             },
-          },
-        },
-        {
-          PutRequest: {
-            Item: {
-              pk: `channel#${compositeID}`,
-              sk: 'info',
-              note: '',
-              on: false,
-              owner: event.requestContext.authorizer.claims['cognito:username'],
-              title,
+            Key: {
+              pk: `channel#${channelID}`,
+              sk: `subscriber#${userID}`,
             },
           },
         },
@@ -67,13 +57,9 @@ export const createChannelHandler = async event => {
 
   try {
     const ddbResponse = await ddbDocClient.send(new BatchWriteCommand(params))
-    statusCode = 201
-    responseBody = {
-      id: channelID,
-      compositeID,
-      ...channelAttributes,
-    }
-    console.info('Success - item added or updated', ddbResponse)
+    statusCode = 200
+    responseBody = { message: 'Unsubscribed' }
+    console.info('Success - items added or updated', ddbResponse)
   } catch (err) {
     statusCode = 400
     console.error('Error', err.stack)
