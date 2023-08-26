@@ -81,8 +81,7 @@ Resources:
   getOverviewFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/handlers/
-      Handler: get-overview.getOverviewHandler
+      Handler: src/handlers/get-overview.getOverviewHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -119,8 +118,7 @@ Resources:
   getChannelFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/handlers/
-      Handler: get-channel.getChannelHandler
+      Handler: src/handlers/get-channel.getChannelHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -157,8 +155,7 @@ Resources:
   createChannelFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/handlers/
-      Handler: create-channel.createChannelHandler
+      Handler: src/handlers/create-channel.createChannelHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -193,8 +190,7 @@ Resources:
   updateChannelFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/handlers/
-      Handler: update-channel.updateChannelHandler
+      Handler: src/handlers/update-channel.updateChannelHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -229,8 +225,7 @@ Resources:
   subscribeFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/handlers/
-      Handler: subscribe.subscribeHandler
+      Handler: src/handlers/subscribe.subscribeHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -265,8 +260,7 @@ Resources:
   unsubscribeFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/handlers/
-      Handler: unsubscribe.unsubscribeHandler
+      Handler: src/handlers/unsubscribe.unsubscribeHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -300,8 +294,7 @@ Resources:
   tableStreamFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/handlers/
-      Handler: table-stream.tableStreamHandler
+      Handler: src/handlers/table-stream.tableStreamHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
