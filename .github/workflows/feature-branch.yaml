@@ -117,7 +117,15 @@ jobs:
     # https://github.com/actions/setup-python
     # https://github.com/aws-actions/configure-aws-credentials#notice-node12-deprecation-warning
     if: startsWith(github.ref, 'refs/heads/feature')
-    needs: [test-backend, test-frontend, lint-frontend, compile-frontend]
+    needs:
+      [
+        test-backend,
+        lint-backend,
+        compile-backend,
+        test-frontend,
+        lint-frontend,
+        compile-frontend,
+      ]
     runs-on: ubuntu-latest
     defaults:
       run:

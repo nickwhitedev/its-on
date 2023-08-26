@@ -11,11 +11,12 @@ export const serializeQueryResponse = (
   const data: Record<string, object | object[]> = {}
 
   queryResponse.forEach(item => {
-    const isPluralItemType = item.sk.includes('#')
+    const { pk: _pk, sk, ...itemData } = item
+
+    const isPluralItemType = sk.includes('#')
     const itemKey: string = isPluralItemType
-      ? `${item.sk.substring(0, item.sk.indexOf('#'))}s`
-      : item.sk
-    const { _pk, _sk, ...itemData } = item
+      ? `${sk.substring(0, sk.indexOf('#'))}s`
+      : sk
 
     if (!isPluralItemType) {
       data[itemKey] = itemData
@@ -32,7 +33,7 @@ export const serializeQueryResponse = (
       throw new Error('Serializer malfunction')
     }
     itemArray.push({
-      id: item.sk.substring(item.sk.indexOf('#') + 1),
+      id: sk.substring(sk.indexOf('#') + 1),
       ...itemData,
     })
 

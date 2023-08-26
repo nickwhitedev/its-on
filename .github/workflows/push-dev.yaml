@@ -115,7 +115,15 @@ jobs:
 
   build-and-package-dev-api:
     if: github.ref == 'refs/heads/dev'
-    needs: [test-backend, test-frontend, lint-frontend, compile-frontend]
+    needs:
+      [
+        test-backend,
+        lint-backend,
+        compile-backend,
+        test-frontend,
+        lint-frontend,
+        compile-frontend,
+      ]
     runs-on: ubuntu-latest
     defaults:
       run:
