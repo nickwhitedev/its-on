@@ -1,19 +1,27 @@
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
 } from '@aws-sdk/lib-dynamodb'
+import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { v1 as uuidv1, v5 as uuidv5 } from 'uuid'
-import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants.mjs'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
 
+interface IPayload {
+  defaultNote: string
+  title: string
+}
+
 /**
  * Creates a channel for the authenticated user
  */
-export const createChannelHandler = async event => {
+export const createChannelHandler = async (
+  event: APIGatewayProxyEvent,
+): Promise<APIGatewayProxyResult> => {
   if (event.httpMethod !== 'POST') {
     throw new Error(
       `postMethod only accepts POST method, you tried: ${event.httpMethod} method.`,
@@ -21,8 +29,9 @@ export const createChannelHandler = async event => {
   }
   console.info('received:', event)
 
-  const { defaultNote, title } = JSON.parse(event.body)
-  const userID = event.requestContext.authorizer.claims.sub
+  const { defaultNote, title } = JSON.parse(event.body ?? '') as IPayload
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+  const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
   const channelID = uuidv1()
   const compositeID = uuidv5(userID, channelID)
 
@@ -53,7 +62,11 @@ export const createChannelHandler = async event => {
               sk: 'info',
               note: '',
               on: false,
-              owner: event.requestContext.authorizer.claims['cognito:username'],
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+              owner:
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                event.requestContext.authorizer?.claims['cognito:username'] ??
+                '',
               title,
             },
           },
@@ -62,8 +75,8 @@ export const createChannelHandler = async event => {
     },
   }
 
-  let statusCode
-  let responseBody
+  let statusCode: number
+  let responseBody: IChannel | IResponseWithMessage
 
   try {
     const ddbResponse = await ddbDocClient.send(new BatchWriteCommand(params))
@@ -76,7 +89,7 @@ export const createChannelHandler = async event => {
     console.info('Success - item added or updated', ddbResponse)
   } catch (err) {
     statusCode = 400
-    console.error('Error', err.stack)
+    console.error('Error', err instanceof Error ? err.stack : 'Unknown Type')
     responseBody = { message: 'Something went wrong' }
   }
 

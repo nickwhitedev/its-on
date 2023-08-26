@@ -1,13 +1,14 @@
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants'
 import {
   DynamoDBDocumentClient,
   GetCommand,
   QueryCommand,
 } from '@aws-sdk/lib-dynamodb'
 import { version as uuidVersion, v5 as uuidv5 } from 'uuid'
-import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants.mjs'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { serializeQueryResponse } from '../utils/serialize.mjs'
+import { serializeQueryResponse } from '../utils/serialize'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -15,7 +16,9 @@ const ddbDocClient = DynamoDBDocumentClient.from(client)
 /**
  * Get info for a channel
  */
-export const getChannelHandler = async event => {
+export const getChannelHandler = async (
+  event: APIGatewayProxyEvent,
+): Promise<APIGatewayProxyResult> => {
   console.info('received:', event)
 
   if (event.httpMethod !== 'GET') {
@@ -24,14 +27,23 @@ export const getChannelHandler = async event => {
     )
   }
 
-  const channelID = event.pathParameters.channelID
+  const channelID = event.pathParameters?.channelID
+
+  if (channelID == null) {
+    return {
+      statusCode: 400,
+      headers: CORS_HEADERS,
+      body: JSON.stringify({ message: 'Bad Request' }),
+    }
+  }
 
   let statusCode
   let responseBody
 
   switch (uuidVersion(channelID)) {
-    case 1:
-      const userID = event.requestContext.authorizer.claims.sub
+    case 1: {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+      const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
 
       // get private channel entry
       try {
@@ -49,7 +61,11 @@ export const getChannelHandler = async event => {
           responseBody = { message: 'Not found' }
           break
         }
-        const { pk, sk, ...channelInfo } = ddbResponse.Item || {}
+        const {
+          pk: _pk,
+          sk,
+          ...channelInfo
+        } = ddbResponse.Item as IDynamoChannelItem
         statusCode = 200
         responseBody = {
           id: sk.substring(sk.indexOf('#') + 1),
@@ -90,6 +106,7 @@ export const getChannelHandler = async event => {
         console.error('Error', err)
       }
       break
+    }
     case 5:
       // get public channel info
       try {
@@ -107,7 +124,11 @@ export const getChannelHandler = async event => {
           responseBody = { message: 'Not found' }
           break
         }
-        const { pk, sk, ...channelInfo } = ddbResponse.Item
+        const {
+          pk,
+          sk: _sk,
+          ...channelInfo
+        } = ddbResponse.Item as IDynamoChannelItem
         statusCode = 200
         responseBody = {
           id: pk.substring(pk.indexOf('#') + 1),

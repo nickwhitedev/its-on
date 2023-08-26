@@ -1,8 +1,9 @@
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
 } from '@aws-sdk/lib-dynamodb'
-import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants.mjs'
+import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 
@@ -12,7 +13,9 @@ const ddbDocClient = DynamoDBDocumentClient.from(client)
 /**
  * Updates a channel for the authenticated user
  */
-export const updateChannelHandler = async event => {
+export const updateChannelHandler = async (
+  event: APIGatewayProxyEvent,
+): Promise<APIGatewayProxyResult> => {
   if (event.httpMethod !== 'PUT') {
     throw new Error(
       `putMethod only accepts PUT method, you tried: ${event.httpMethod} method.`,
@@ -21,10 +24,11 @@ export const updateChannelHandler = async event => {
   console.info('received:', event)
 
   const { compositeID, defaultNote, id, note, on, title } = JSON.parse(
-    event.body,
-  )
+    event.body ?? '',
+  ) as IChannel
 
-  const userID = event.requestContext.authorizer.claims.sub
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+  const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
 
   const params = {
     RequestItems: {
@@ -49,7 +53,11 @@ export const updateChannelHandler = async event => {
               sk: 'info',
               note,
               on,
-              owner: event.requestContext.authorizer.claims['cognito:username'],
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+              owner:
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                event.requestContext.authorizer?.claims['cognito:username'] ??
+                '',
               title,
             },
           },
@@ -76,7 +84,7 @@ export const updateChannelHandler = async event => {
   } catch (err) {
     // TODO: Error handling - make more robust
     statusCode = 400
-    console.error('Error', err.stack)
+    console.error('Error', err instanceof Error ? err.stack : 'Unknown Type')
     responseBody = { message: 'Something went wrong' }
   }
 

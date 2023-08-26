@@ -103,6 +103,14 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /
             Method: GET
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: 'es2022'
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/get-overview.ts
   # Each Lambda function is defined by properties:
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
 
@@ -132,6 +140,14 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /{channelID}
             Method: GET
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: 'es2022'
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/get-channel.ts
   # Each Lambda function is defined by properties:
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
 
@@ -161,8 +177,16 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /channels
             Method: POST
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: 'es2022'
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/create-channel.ts
 
-# This is a Lambda function config associated with the source code: update-item.mjs
+  # This is a Lambda function config associated with the source code: update-item.mjs
   updateChannelFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -188,6 +212,14 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /{channelID}
             Method: PUT
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: 'es2022'
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/update-channel.ts
 
   # This is a Lambda function config associated with the source code: subscribe.mjs
   subscribeFunction:
@@ -215,6 +247,14 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /{channelID}/subscribe
             Method: POST
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: 'es2022'
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/subscribe.ts
 
   # This is a Lambda function config associated with the source code: unsubscribe.mjs
   unsubscribeFunction:
@@ -242,6 +282,14 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /{channelID}/unsubscribe
             Method: POST
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: 'es2022'
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/unsubscribe.ts
 
   tableStreamFunction:
     Type: AWS::Serverless::Function
@@ -281,6 +329,14 @@ Resources:
             # TumblingWindowInSeconds: 0
             # FunctionResponseTypes:
             #   - ReportBatchItemFailures
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: 'es2022'
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/table-stream.ts
 
   # DynamoDB table to store item: {id: &lt;ID&gt;, name: &lt;NAME&gt;}
   ItsOnTable:

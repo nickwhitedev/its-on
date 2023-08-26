@@ -3,10 +3,10 @@ name: Feature Branch
 on:
   push:
     branches:
-      - "feature**"
+      - 'feature**'
   delete:
     branches:
-      - "feature**"
+      - 'feature**'
 
 env:
   AWS_SNS_COGNITO_IAM_ARN: ${{ secrets.AWS_SNS_COGNITO_IAM_ARN }}
@@ -32,9 +32,39 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18.x"
-      - run: npm install
-      - run: npm run test-ci
+          node-version: '18.x'
+      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      - run: yarn test-ci
+
+  lint-backend:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      - run: yarn lint
+
+  compile-backend:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      - run: yarn compile
 
   test-frontend:
     if: github.event_name == 'push'
@@ -47,7 +77,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18.x"
+          node-version: '18.x'
       - run: rm -rf node_modules && yarn install --frozen-lockfile
       - run: CI=true yarn test
 
@@ -62,7 +92,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18.x"
+          node-version: '18.x'
       - run: rm -rf node_modules && yarn install --frozen-lockfile
       - run: yarn lint
 
@@ -77,7 +107,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18.x"
+          node-version: '18.x'
       - run: rm -rf node_modules && yarn install --frozen-lockfile
       - run: tsc
 
@@ -87,7 +117,15 @@ jobs:
     # https://github.com/actions/setup-python
     # https://github.com/aws-actions/configure-aws-credentials#notice-node12-deprecation-warning
     if: startsWith(github.ref, 'refs/heads/feature')
-    needs: [test-backend, test-frontend, lint-frontend, compile-frontend]
+    needs:
+      [
+        test-backend,
+        lint-backend,
+        compile-backend,
+        test-frontend,
+        lint-frontend,
+        compile-frontend,
+      ]
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -99,11 +137,16 @@ jobs:
       api-endpoint: ${{ steps.set-env-vars.outputs.ApiEndpoint }}
     steps:
       - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
       - uses: aws-actions/setup-sam@v2
         with:
           use-installer: true
+      - run: rm -rf node_modules && yarn install --frozen-lockfile
       - run: |
-          sam build \
+          yarn build \
             --template ${SAM_TEMPLATE} \
             --use-container \
             --parameter-overrides \
@@ -166,7 +209,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18.x"
+          node-version: '18.x'
       - name: Install dependencies
         working-directory: frontend
         run: rm -rf node_modules && yarn install --frozen-lockfile

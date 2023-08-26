@@ -1,12 +1,13 @@
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
   GetCommand,
 } from '@aws-sdk/lib-dynamodb'
-import { version as uuidVersion } from 'uuid'
-import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants.mjs'
+import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { version as uuidVersion } from 'uuid'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -14,7 +15,9 @@ const ddbDocClient = DynamoDBDocumentClient.from(client)
 /**
  * Subscribes the authenticated user to a channel
  */
-export const subscribeHandler = async event => {
+export const subscribeHandler = async (
+  event: APIGatewayProxyEvent,
+): Promise<APIGatewayProxyResult> => {
   if (event.httpMethod !== 'POST') {
     throw new Error(
       `postMethod only accepts POST method, you tried: ${event.httpMethod} method.`,
@@ -22,8 +25,9 @@ export const subscribeHandler = async event => {
   }
   console.info('received:', event)
 
-  const channelID = event.pathParameters.channelID // is composite id
-  const userID = event.requestContext.authorizer.claims.sub
+  const channelID = event.pathParameters?.channelID ?? '' // is composite id
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+  const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
 
   if (uuidVersion(channelID) === 1) {
     // Subscriptions should only be for public copies of channels
@@ -54,7 +58,11 @@ export const subscribeHandler = async event => {
         body: JSON.stringify({ message: 'Not found' }),
       }
     }
-    const { pk, sk, ...channelInfo } = ddbResponse.Item
+    const {
+      pk: _pk,
+      sk: _sk,
+      ...channelInfo
+    } = ddbResponse.Item as IDynamoChannelItem
     channelAttributes = channelInfo
     console.info('Get public channel info: ', ddbResponse)
   } catch (err) {
@@ -76,11 +84,17 @@ export const subscribeHandler = async event => {
               sk: `subscription#${channelID}`,
               ...channelAttributes,
             },
+          },
+        },
+        {
+          PutRequest: {
             Item: {
               pk: `channel#${channelID}`,
               sk: `subscriber#${userID}`,
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
               username:
-                event.requestContext.authorizer.claims['cognito:username'],
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                event.requestContext.authorizer?.claims['cognito:username'],
             },
           },
         },
@@ -98,7 +112,7 @@ export const subscribeHandler = async event => {
     console.info('Success - items added or updated', ddbResponse)
   } catch (err) {
     statusCode = 400
-    console.error('Error', err.stack)
+    console.error('Error', err instanceof Error ? err.stack : 'Unknown Type')
     responseBody = { message: 'Something went wrong' }
   }
 

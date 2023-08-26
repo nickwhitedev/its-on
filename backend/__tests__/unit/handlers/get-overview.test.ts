@@ -1,9 +1,11 @@
 import { DynamoDBDocumentClient, QueryCommand } from '@aws-sdk/lib-dynamodb'
-import { mockClient } from 'aws-sdk-client-mock'
+
+import { APIGatewayProxyEvent } from 'aws-lambda'
+import { CORS_HEADERS } from '../../../src/utils/constants'
 import { NIL as NIL_UUID } from 'uuid'
-import { getOverviewHandler } from '../../../src/handlers/get-overview.mjs'
-import { CORS_HEADERS } from '../../../src/utils/constants.mjs'
-import { testRequestContext } from '../../util/constants.mjs'
+import { getOverviewHandler } from '../../../src/handlers/get-overview'
+import { mockClient } from 'aws-sdk-client-mock'
+import mockEvent from '../../../__mocks__/mock-event'
 
 describe('Test getOverviewHandler', () => {
   const ddbMock = mockClient(DynamoDBDocumentClient)
@@ -40,9 +42,9 @@ describe('Test getOverviewHandler', () => {
       Items: items,
     })
 
-    const event = {
+    const event: APIGatewayProxyEvent = {
+      ...mockEvent,
       httpMethod: 'GET',
-      requestContext: testRequestContext,
     }
 
     const result = await getOverviewHandler(event)
