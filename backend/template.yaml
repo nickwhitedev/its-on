@@ -81,8 +81,7 @@ Resources:
   getOverviewFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/
-      Handler: handlers/get-overview.getOverviewHandler
+      Handler: src/handlers/get-overview.getOverviewHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -108,10 +107,10 @@ Resources:
       BuildMethod: esbuild
       BuildProperties:
         Minify: true
-        Target: 'es2020'
+        Target: 'es2022'
         Sourcemap: true
         EntryPoints:
-          - get-overview.ts
+          - src/handlers/get-overview.ts
   # Each Lambda function is defined by properties:
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
 
@@ -119,8 +118,7 @@ Resources:
   getChannelFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/
-      Handler: handlers/get-channel.getChannelHandler
+      Handler: src/handlers/get-channel.getChannelHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -146,10 +144,10 @@ Resources:
       BuildMethod: esbuild
       BuildProperties:
         Minify: true
-        Target: 'es2020'
+        Target: 'es2022'
         Sourcemap: true
         EntryPoints:
-          - get-channel.ts
+          - src/handlers/get-channel.ts
   # Each Lambda function is defined by properties:
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
 
@@ -157,8 +155,7 @@ Resources:
   createChannelFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/
-      Handler: handlers/create-channel.createChannelHandler
+      Handler: src/handlers/create-channel.createChannelHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -184,17 +181,16 @@ Resources:
       BuildMethod: esbuild
       BuildProperties:
         Minify: true
-        Target: 'es2020'
+        Target: 'es2022'
         Sourcemap: true
         EntryPoints:
-          - create-channel.ts
+          - src/handlers/create-channel.ts
 
   # This is a Lambda function config associated with the source code: update-item.mjs
   updateChannelFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/
-      Handler: handlers/update-channel.updateChannelHandler
+      Handler: src/handlers/update-channel.updateChannelHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -220,17 +216,16 @@ Resources:
       BuildMethod: esbuild
       BuildProperties:
         Minify: true
-        Target: 'es2020'
+        Target: 'es2022'
         Sourcemap: true
         EntryPoints:
-          - update-channel.ts
+          - src/handlers/update-channel.ts
 
   # This is a Lambda function config associated with the source code: subscribe.mjs
   subscribeFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/
-      Handler: handlers/subscribe.subscribeHandler
+      Handler: src/handlers/subscribe.subscribeHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -256,17 +251,16 @@ Resources:
       BuildMethod: esbuild
       BuildProperties:
         Minify: true
-        Target: 'es2020'
+        Target: 'es2022'
         Sourcemap: true
         EntryPoints:
-          - subscribe.ts
+          - src/handlers/subscribe.ts
 
   # This is a Lambda function config associated with the source code: unsubscribe.mjs
   unsubscribeFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/
-      Handler: handlers/unsubscribe.unsubscribeHandler
+      Handler: src/handlers/unsubscribe.unsubscribeHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -292,16 +286,15 @@ Resources:
       BuildMethod: esbuild
       BuildProperties:
         Minify: true
-        Target: 'es2020'
+        Target: 'es2022'
         Sourcemap: true
         EntryPoints:
-          - unsubscribe.ts
+          - src/handlers/unsubscribe.ts
 
   tableStreamFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/
-      Handler: handlers/table-stream.tableStreamHandler
+      Handler: src/handlers/table-stream.tableStreamHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -340,10 +333,10 @@ Resources:
       BuildMethod: esbuild
       BuildProperties:
         Minify: true
-        Target: 'es2020'
+        Target: 'es2022'
         Sourcemap: true
         EntryPoints:
-          - table-stream.ts
+          - src/handlers/table-stream.ts
 
   # DynamoDB table to store item: {id: &lt;ID&gt;, name: &lt;NAME&gt;}
   ItsOnTable:
