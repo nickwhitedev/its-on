@@ -3,7 +3,7 @@ name: Push Dev
 on:
   push:
     branches:
-      - "dev"
+      - 'dev'
 
 env:
   AWS_SNS_COGNITO_IAM_ARN: ${{ secrets.AWS_SNS_COGNITO_IAM_ARN }}
@@ -34,9 +34,9 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18.x"
-      - run: npm install
-      - run: npm run test-ci
+          node-version: '18.x'
+      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      - run: CI=true yarn test
 
   test-frontend:
     if: github.event_name == 'push'
@@ -49,7 +49,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18.x"
+          node-version: '18.x'
       - run: rm -rf node_modules && yarn install --frozen-lockfile
       - run: CI=true yarn test
 
@@ -64,7 +64,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18.x"
+          node-version: '18.x'
       - run: rm -rf node_modules && yarn install --frozen-lockfile
       - run: yarn lint
 
@@ -79,10 +79,9 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18.x"
+          node-version: '18.x'
       - run: rm -rf node_modules && yarn install --frozen-lockfile
       - run: tsc
-
 
   build-and-package-dev-api:
     if: github.ref == 'refs/heads/dev'
@@ -211,7 +210,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18.x"
+          node-version: '18.x'
       - name: Install dependencies
         run: rm -rf node_modules && yarn install --frozen-lockfile
       - name: Set environment variables
