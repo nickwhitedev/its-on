@@ -27,8 +27,9 @@
     "typescript": "^5.2.2"
   },
   "scripts": {
-    "lint": "eslint . --ext ts --report-unused-disable-directives --max-warnings 0",
+    "build": "sam build",
     "compile": "tsc",
+    "lint": "eslint . --ext ts --report-unused-disable-directives --max-warnings 0",
     "test": "jest",
     "test-ci": "jest --silent"
   }
