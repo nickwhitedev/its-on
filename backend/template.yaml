@@ -81,7 +81,8 @@ Resources:
   getOverviewFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/get-overview.getOverviewHandler
+      CodeUri: src/
+      Handler: handlers/get-overview.getOverviewHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -118,7 +119,8 @@ Resources:
   getChannelFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/get-channel.getChannelHandler
+      CodeUri: src/
+      Handler: handlers/get-channel.getChannelHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -155,7 +157,8 @@ Resources:
   createChannelFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/create-channel.createChannelHandler
+      CodeUri: src/
+      Handler: handlers/create-channel.createChannelHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -190,7 +193,8 @@ Resources:
   updateChannelFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/update-channel.updateChannelHandler
+      CodeUri: src/
+      Handler: handlers/update-channel.updateChannelHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -225,7 +229,8 @@ Resources:
   subscribeFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/subscribe.subscribeHandler
+      CodeUri: src/
+      Handler: handlers/subscribe.subscribeHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -260,7 +265,8 @@ Resources:
   unsubscribeFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/unsubscribe.unsubscribeHandler
+      CodeUri: src/
+      Handler: handlers/unsubscribe.unsubscribeHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -294,7 +300,8 @@ Resources:
   tableStreamFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/table-stream.tableStreamHandler
+      CodeUri: src/
+      Handler: handlers/table-stream.tableStreamHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
