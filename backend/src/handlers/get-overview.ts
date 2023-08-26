@@ -1,8 +1,9 @@
-import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants.mjs'
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { DynamoDBDocumentClient, QueryCommand } from '@aws-sdk/lib-dynamodb'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { serializeQueryResponse } from '../utils/serialize.mjs'
+import { serializeQueryResponse } from '../utils/serialize'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -12,7 +13,9 @@ const ddbDocClient = DynamoDBDocumentClient.from(client)
  *
  * Includes user info, channels, and subscriptions.
  */
-export const getOverviewHandler = async event => {
+export const getOverviewHandler = async (
+  event: APIGatewayProxyEvent,
+): Promise<APIGatewayProxyResult> => {
   if (event.httpMethod !== 'GET') {
     throw new Error(
       `getOverview only accept GET method, you tried: ${event.httpMethod}`,
@@ -27,7 +30,7 @@ export const getOverviewHandler = async event => {
       '#pk': 'pk',
     },
     ExpressionAttributeValues: {
-      ':userID': `user#${event.requestContext.authorizer.claims.sub}`,
+      ':userID': `user#${event.requestContext.authorizer?.claims.sub}`,
     },
   }
 

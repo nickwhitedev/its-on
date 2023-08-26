@@ -1,0 +1,14 @@
+import { DynamoDBStreamEvent } from 'aws-lambda'
+
+/**
+ * Handles updates to the dynamo table
+ */
+export const tableStreamHandler = async (event: DynamoDBStreamEvent) => {
+  console.log('Received event:', JSON.stringify(event, null, 2))
+  for (const record of event.Records) {
+    console.log(record.eventID)
+    console.log(record.eventName)
+    console.log('DynamoDB Record: %j', record.dynamodb)
+  }
+  return `Successfully processed ${event.Records.length} records.`
+}

@@ -1,11 +1,12 @@
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
 } from '@aws-sdk/lib-dynamodb'
-import { version as uuidVersion } from 'uuid'
-import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants.mjs'
+import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { version as uuidVersion } from 'uuid'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -13,7 +14,9 @@ const ddbDocClient = DynamoDBDocumentClient.from(client)
 /**
  * Unsubscribes the authenticated user to a channel
  */
-export const unsubscribeHandler = async event => {
+export const unsubscribeHandler = async (
+  event: APIGatewayProxyEvent,
+): Promise<APIGatewayProxyResult> => {
   if (event.httpMethod !== 'POST') {
     throw new Error(
       `postMethod only accepts POST method, you tried: ${event.httpMethod} method.`,
@@ -21,8 +24,8 @@ export const unsubscribeHandler = async event => {
   }
   console.info('received:', event)
 
-  const channelID = event.pathParameters.channelID // is composite id
-  const userID = event.requestContext.authorizer.claims.sub
+  const channelID = event.pathParameters?.channelID ?? '' // is composite id
+  const userID = event.requestContext.authorizer?.claims.sub ?? ''
 
   if (uuidVersion(channelID) === 1) {
     // Subscriptions should only be for public copies of channels
@@ -42,6 +45,10 @@ export const unsubscribeHandler = async event => {
               pk: `user#${userID}`,
               sk: `subscription#${channelID}`,
             },
+          },
+        },
+        {
+          DeleteRequest: {
             Key: {
               pk: `channel#${channelID}`,
               sk: `subscriber#${userID}`,

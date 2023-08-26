@@ -5,10 +5,11 @@ import {
 } from '@aws-sdk/lib-dynamodb'
 import { NIL as NIL_UUID, v1 as uuidv1, v5 as uuidv5 } from 'uuid'
 
+import { APIGatewayProxyEvent } from 'aws-lambda'
+import { CORS_HEADERS } from '../../../src/utils/constants'
+import { getChannelHandler } from '../../../src/handlers/get-channel'
 import { mockClient } from 'aws-sdk-client-mock'
-import { getChannelHandler } from '../../../src/handlers/get-channel.mjs'
-import { CORS_HEADERS } from '../../../src/utils/constants.mjs'
-import { testRequestContext } from '../../util/constants.mjs'
+import mockEvent from '../../../__mocks__/mock-event'
 
 describe('Test getChannelHandler', () => {
   const ddbMock = mockClient(DynamoDBDocumentClient)
@@ -33,12 +34,12 @@ describe('Test getChannelHandler', () => {
       Item: item,
     })
 
-    const event = {
+    const event: APIGatewayProxyEvent = {
+      ...mockEvent,
       httpMethod: 'GET',
       pathParameters: {
         channelID: testUuidv5,
       },
-      requestContext: testRequestContext,
     }
 
     const result = await getChannelHandler(event)
@@ -88,12 +89,12 @@ describe('Test getChannelHandler', () => {
       ],
     })
 
-    const event = {
+    const event: APIGatewayProxyEvent = {
+      ...mockEvent,
       httpMethod: 'GET',
       pathParameters: {
         channelID: testUuidv1,
       },
-      requestContext: testRequestContext,
     }
 
     const result = await getChannelHandler(event)
@@ -123,12 +124,12 @@ describe('Test getChannelHandler', () => {
   it('should 404 when empty ddb response', async () => {
     ddbMock.on(GetCommand).resolves({})
 
-    const event = {
+    const event: APIGatewayProxyEvent = {
+      ...mockEvent,
       httpMethod: 'GET',
       pathParameters: {
         channelID: testUuidv1,
       },
-      requestContext: testRequestContext,
     }
 
     const result = await getChannelHandler(event)

@@ -4,4 +4,4 @@ export const CORS_HEADERS = {
   'Access-Control-Allow-Methods': 'OPTIONS,POST,GET,PUT',
 }
 
-export const DYNAMODB_TABLE_NAME = process.env.ITS_ON_TABLE
+export const DYNAMODB_TABLE_NAME: string = process.env.ITS_ON_TABLE ?? ''

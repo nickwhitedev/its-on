@@ -2,11 +2,13 @@ import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
 } from '@aws-sdk/lib-dynamodb'
+
+import { APIGatewayProxyEvent } from 'aws-lambda'
+import { CORS_HEADERS } from '../../../src/utils/constants'
+import { createChannelHandler } from '../../../src/handlers/create-channel'
 import { jest } from '@jest/globals'
 import { mockClient } from 'aws-sdk-client-mock'
-import { createChannelHandler } from '../../../src/handlers/create-channel.mjs'
-import { CORS_HEADERS } from '../../../src/utils/constants.mjs'
-import { testRequestContext } from '../../util/constants.mjs'
+import mockEvent from '../../../__mocks__/mock-event'
 
 // This includes all tests for createChannelHandler()
 describe('Test createChannelHandler', function () {
@@ -19,17 +21,13 @@ describe('Test createChannelHandler', function () {
 
   // This test invokes createChannelHandler() and compare the result
   it('should add id to the table', async () => {
-    const returnedItem = {}
-
     // Return the specified value whenever the spied put function is called
-    ddbMock.on(BatchWriteCommand).resolves({
-      returnedItem,
-    })
+    ddbMock.on(BatchWriteCommand).resolves({})
 
-    const event = {
+    const event: APIGatewayProxyEvent = {
+      ...mockEvent,
       body: '{"defaultNote": "test note","title": "Super Channel"}',
       httpMethod: 'POST',
-      requestContext: testRequestContext,
     }
 
     // Invoke createChannelHandler()

@@ -1,8 +1,9 @@
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
 } from '@aws-sdk/lib-dynamodb'
-import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants.mjs'
+import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 
@@ -12,7 +13,9 @@ const ddbDocClient = DynamoDBDocumentClient.from(client)
 /**
  * Updates a channel for the authenticated user
  */
-export const updateChannelHandler = async event => {
+export const updateChannelHandler = async (
+  event: APIGatewayProxyEvent,
+): Promise<APIGatewayProxyResult> => {
   if (event.httpMethod !== 'PUT') {
     throw new Error(
       `putMethod only accepts PUT method, you tried: ${event.httpMethod} method.`,
@@ -21,10 +24,10 @@ export const updateChannelHandler = async event => {
   console.info('received:', event)
 
   const { compositeID, defaultNote, id, note, on, title } = JSON.parse(
-    event.body,
+    event.body ?? '',
   )
 
-  const userID = event.requestContext.authorizer.claims.sub
+  const userID = event.requestContext.authorizer?.claims.sub ?? ''
 
   const params = {
     RequestItems: {
@@ -49,7 +52,9 @@ export const updateChannelHandler = async event => {
               sk: 'info',
               note,
               on,
-              owner: event.requestContext.authorizer.claims['cognito:username'],
+              owner:
+                event.requestContext.authorizer?.claims['cognito:username'] ??
+                '',
               title,
             },
           },
