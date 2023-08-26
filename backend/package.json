@@ -29,6 +29,7 @@
   "scripts": {
     "lint": "eslint . --ext ts --report-unused-disable-directives --max-warnings 0",
     "compile": "tsc",
-    "test": "jest"
+    "test": "jest",
+    "test-ci": "jest --silent"
   }
 }
