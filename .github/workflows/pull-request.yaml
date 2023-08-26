@@ -22,7 +22,7 @@ jobs:
       - run: yarn test-ci
 
   lint-backend:
-    if: github.event_name == 'push'
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -37,7 +37,7 @@ jobs:
       - run: yarn lint
 
   compile-backend:
-    if: github.event_name == 'push'
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     defaults:
       run:
