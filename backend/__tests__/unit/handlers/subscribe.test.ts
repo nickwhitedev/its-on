@@ -52,7 +52,7 @@ describe('Test subscribeHandler', function () {
     // Invoke subscribeHandler()
     const result = await subscribeHandler(event)
 
-    const resultBody = JSON.parse(result.body)
+    const resultBody = JSON.parse(result.body) as IResponseWithMessage
     // Compare the result with the expected result
     expect(result.headers).toEqual(CORS_HEADERS)
     expect(result.statusCode).toEqual(200)

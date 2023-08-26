@@ -43,7 +43,7 @@ export const getChannelHandler = async (
   switch (uuidVersion(channelID)) {
     case 1: {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-      const userID = event.requestContext.authorizer?.claims?.sub ?? ''
+      const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
 
       // get private channel entry
       try {
@@ -61,7 +61,11 @@ export const getChannelHandler = async (
           responseBody = { message: 'Not found' }
           break
         }
-        const { pk, sk, ...channelInfo } = ddbResponse.Item || {}
+        const {
+          pk: _pk,
+          sk,
+          ...channelInfo
+        } = ddbResponse.Item as IDynamoChannelItem
         statusCode = 200
         responseBody = {
           id: sk.substring(sk.indexOf('#') + 1),
@@ -120,7 +124,11 @@ export const getChannelHandler = async (
           responseBody = { message: 'Not found' }
           break
         }
-        const { pk, sk, ...channelInfo } = ddbResponse.Item
+        const {
+          pk,
+          sk: _sk,
+          ...channelInfo
+        } = ddbResponse.Item as IDynamoChannelItem
         statusCode = 200
         responseBody = {
           id: pk.substring(pk.indexOf('#') + 1),

@@ -26,7 +26,8 @@ export const subscribeHandler = async (
   console.info('received:', event)
 
   const channelID = event.pathParameters?.channelID ?? '' // is composite id
-  const userID = event.requestContext.authorizer?.claims.sub
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+  const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
 
   if (uuidVersion(channelID) === 1) {
     // Subscriptions should only be for public copies of channels
@@ -57,7 +58,11 @@ export const subscribeHandler = async (
         body: JSON.stringify({ message: 'Not found' }),
       }
     }
-    const { pk, sk, ...channelInfo } = ddbResponse.Item
+    const {
+      pk: _pk,
+      sk: _sk,
+      ...channelInfo
+    } = ddbResponse.Item as IDynamoChannelItem
     channelAttributes = channelInfo
     console.info('Get public channel info: ', ddbResponse)
   } catch (err) {
@@ -86,7 +91,9 @@ export const subscribeHandler = async (
             Item: {
               pk: `channel#${channelID}`,
               sk: `subscriber#${userID}`,
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
               username:
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 event.requestContext.authorizer?.claims['cognito:username'],
             },
           },
@@ -105,7 +112,7 @@ export const subscribeHandler = async (
     console.info('Success - items added or updated', ddbResponse)
   } catch (err) {
     statusCode = 400
-    console.error('Error', err.stack)
+    console.error('Error', err instanceof Error ? err.stack : 'Unknown Type')
     responseBody = { message: 'Something went wrong' }
   }
 

@@ -39,7 +39,7 @@ describe('Test unsubscribeHandler', function () {
     // Invoke unsubscribeHandler()
     const result = await unsubscribeHandler(event)
 
-    const resultBody = JSON.parse(result.body)
+    const resultBody = JSON.parse(result.body) as IResponseWithMessage
     // Compare the result with the expected result
     expect(result.headers).toEqual(CORS_HEADERS)
     expect(result.statusCode).toEqual(200)

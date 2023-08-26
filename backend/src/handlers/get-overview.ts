@@ -23,14 +23,15 @@ export const getOverviewHandler = async (
   }
   console.info('received:', event)
 
-  var params = {
+  const params = {
     TableName: DYNAMODB_TABLE_NAME,
     KeyConditionExpression: '#pk = :userID',
     ExpressionAttributeNames: {
       '#pk': 'pk',
     },
     ExpressionAttributeValues: {
-      ':userID': `user#${event.requestContext.authorizer?.claims.sub}`,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      ':userID': `user#${event.requestContext.authorizer?.claims?.sub ?? ''}`,
     },
   }
 

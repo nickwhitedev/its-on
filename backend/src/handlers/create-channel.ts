@@ -75,8 +75,8 @@ export const createChannelHandler = async (
     },
   }
 
-  let statusCode
-  let responseBody
+  let statusCode: number
+  let responseBody: IChannel | IResponseWithMessage
 
   try {
     const ddbResponse = await ddbDocClient.send(new BatchWriteCommand(params))

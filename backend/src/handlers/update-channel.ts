@@ -25,9 +25,10 @@ export const updateChannelHandler = async (
 
   const { compositeID, defaultNote, id, note, on, title } = JSON.parse(
     event.body ?? '',
-  )
+  ) as IChannel
 
-  const userID = event.requestContext.authorizer?.claims.sub ?? ''
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+  const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
 
   const params = {
     RequestItems: {
@@ -52,7 +53,9 @@ export const updateChannelHandler = async (
               sk: 'info',
               note,
               on,
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
               owner:
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 event.requestContext.authorizer?.claims['cognito:username'] ??
                 '',
               title,
@@ -81,7 +84,7 @@ export const updateChannelHandler = async (
   } catch (err) {
     // TODO: Error handling - make more robust
     statusCode = 400
-    console.error('Error', err.stack)
+    console.error('Error', err instanceof Error ? err.stack : 'Unknown Type')
     responseBody = { message: 'Something went wrong' }
   }
 

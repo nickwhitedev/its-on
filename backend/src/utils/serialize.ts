@@ -6,29 +6,37 @@
  * @return {Object} An object with the items grouped by sort key
  */
 export const serializeQueryResponse = (
-  queryResponse: Record<string, any>[],
+  queryResponse: Record<string, string>[],
 ): object => {
-  const data: {
-    [key: string]: any
-  } = {}
+  const data: Record<string, object | object[]> = {}
 
   queryResponse.forEach(item => {
     const isPluralItemType = item.sk.includes('#')
     const itemKey: string = isPluralItemType
       ? `${item.sk.substring(0, item.sk.indexOf('#'))}s`
       : item.sk
-    const { pk, sk, ...itemData } = item
+    const { _pk, _sk, ...itemData } = item
 
     if (!isPluralItemType) {
       data[itemKey] = itemData
       return
     }
 
-    if (!Object.hasOwn(data, itemKey)) data[itemKey] = []
-    data[itemKey].push({
+    if (!Object.hasOwn(data, itemKey)) {
+      data[itemKey] = []
+    }
+
+    const itemArray = data[itemKey]
+
+    if (!Array.isArray(itemArray)) {
+      throw new Error('Serializer malfunction')
+    }
+    itemArray.push({
       id: item.sk.substring(item.sk.indexOf('#') + 1),
       ...itemData,
     })
+
+    data[itemKey] = itemArray
   })
 
   return data
