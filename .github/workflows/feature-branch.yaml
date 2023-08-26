@@ -110,6 +110,7 @@ jobs:
       - run: |
           yarn build \
             --template ${SAM_TEMPLATE} \
+            --manifest package.json \
             --use-container \
             --parameter-overrides \
               ParameterKey=Env,ParameterValue=$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]') \

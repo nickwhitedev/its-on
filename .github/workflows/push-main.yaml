@@ -113,6 +113,7 @@ jobs:
         run: |
           yarn build \
             --template ${SAM_TEMPLATE} \
+            --manifest package.json \
             --use-container \
             --parameter-overrides \
               ParameterKey=Env,ParameterValue=prod \
