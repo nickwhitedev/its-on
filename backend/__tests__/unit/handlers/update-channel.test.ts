@@ -1,7 +1,4 @@
-import {
-  BatchWriteCommand,
-  DynamoDBDocumentClient,
-} from '@aws-sdk/lib-dynamodb'
+import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 
 import { APIGatewayProxyEvent } from 'aws-lambda'
 import { CORS_HEADERS } from '../../../src/utils/constants'
@@ -22,33 +19,21 @@ describe('Test updateChannelHandler', function () {
   // This test invokes updateChannelHandler() and compare the result
   it('should add id to the table', async () => {
     // Return the specified value whenever the spied put function is called
-    ddbMock.on(BatchWriteCommand).resolves({})
+    ddbMock.on(UpdateCommand).resolves({})
 
     const event: APIGatewayProxyEvent = {
       ...mockEvent,
-      body: '{"compositeID": "00000000-0000-0000-0000-000000000000","defaultNote": "test note","id": "00000000-0000-0000-0000-000000000000","on": false,"note": "hello","title": "Super Channel"}',
+      body: '{"id": "00000000-0000-0000-0000-000000000000","on": false,"note": "hello"}',
       httpMethod: 'PUT',
     }
 
     // Invoke updateChannelHandler()
     const result = await updateChannelHandler(event)
 
-    const resultBody = JSON.parse(result.body) as IChannel
+    const resultBody = JSON.parse(result.body) as IResponseWithMessage
     // Compare the result with the expected result
     expect(result.headers).toEqual(CORS_HEADERS)
     expect(result.statusCode).toEqual(200)
-
-    expect(Object.keys(resultBody)).toEqual([
-      'compositeID',
-      'defaultNote',
-      'id',
-      'note',
-      'on',
-      'title',
-    ])
-    expect(resultBody.defaultNote).toEqual('test note')
-    expect(resultBody.note).toEqual('hello')
-    expect(resultBody.on).toEqual(false)
-    expect(resultBody.title).toEqual('Super Channel')
+    expect(resultBody.message).toEqual('Updated')
   })
 })

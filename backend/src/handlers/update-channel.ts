@@ -1,9 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import {
-  BatchWriteCommand,
-  DynamoDBDocumentClient,
-} from '@aws-sdk/lib-dynamodb'
 import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants'
+import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 
@@ -23,63 +20,36 @@ export const updateChannelHandler = async (
   }
   console.info('received:', event)
 
-  const { compositeID, defaultNote, id, note, on, title } = JSON.parse(
-    event.body ?? '',
-  ) as IChannel
+  const { id, note, on } = JSON.parse(event.body ?? '') as IChannel
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
-
-  const params = {
-    RequestItems: {
-      [DYNAMODB_TABLE_NAME]: [
-        {
-          PutRequest: {
-            Item: {
-              pk: `user#${userID}`,
-              sk: `channel#${id}`,
-              compositeID,
-              defaultNote,
-              note,
-              on,
-              title,
-            },
-          },
-        },
-        {
-          PutRequest: {
-            Item: {
-              pk: `channel#${compositeID}`,
-              sk: 'info',
-              note,
-              on,
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-              owner:
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                event.requestContext.authorizer?.claims['cognito:username'] ??
-                '',
-              title,
-            },
-          },
-        },
-      ],
-    },
-  }
 
   let statusCode
   let responseBody
 
   try {
-    const ddbResponse = await ddbDocClient.send(new BatchWriteCommand(params))
+    const ddbResponse = await ddbDocClient.send(
+      new UpdateCommand({
+        Key: {
+          pk: `user#${userID}`,
+          sk: `channel#${id}`,
+        },
+        ReturnValues: 'ALL_NEW',
+        TableName: DYNAMODB_TABLE_NAME,
+        UpdateExpression: 'SET #note = :note, #on = :on',
+        ExpressionAttributeNames: {
+          '#note': 'note',
+          '#on': 'on',
+        },
+        ExpressionAttributeValues: {
+          ':note': note,
+          ':on': on,
+        },
+      }),
+    )
     statusCode = 200
-    responseBody = {
-      compositeID,
-      defaultNote,
-      id,
-      note,
-      on,
-      title,
-    }
+    responseBody = { message: 'Updated' }
     console.info('Success - item updated', ddbResponse)
   } catch (err) {
     // TODO: Error handling - make more robust
