@@ -1,13 +1,14 @@
-import { version as uuidVersion } from 'uuid'
-import { useChannelsDispatch } from '../../../contexts/channels/channelsContext'
-import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
 import {
   useSubscriptions,
   useSubscriptionsDispatch,
 } from '../../../contexts/subscriptions/subscriptionsContext'
+
+import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
 import { SubscriptionsDispatchActionType } from '../../../contexts/subscriptions/subscriptionsReducer'
-import { fetchApi } from '../../../utils/api'
 import { baseUrl } from '../../../utils/urls'
+import { fetchApi } from '../../../utils/api'
+import { useChannelsDispatch } from '../../../contexts/channels/channelsContext'
+import { version as uuidVersion } from 'uuid'
 
 interface Props {
   channel: IChannel
@@ -23,17 +24,18 @@ const Channel = ({ channel }: Props) => {
 
   const handleClickItsOn = async () => {
     try {
-      const newChannel: IChannel = await fetchApi(`/${channel.id}`, 'PUT', {
-        compositeID: channel.compositeID,
-        defaultNote: channel.defaultNote,
+      const channelUpdates = {
         id: channel.id,
         note: channel.note,
         on: !channel.on,
-        title: channel.title,
-      })
+      }
+      await fetchApi(`/${channel.id}`, 'PUT', channelUpdates)
       dispatchChannels({
         type: ChannelsDispatchActionType.CHANGED,
-        channel: newChannel,
+        channel: {
+          ...channel,
+          ...channelUpdates,
+        },
       })
     } catch (error) {
       // TODO: Handle update channel error

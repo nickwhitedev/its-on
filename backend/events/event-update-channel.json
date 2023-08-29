@@ -1,4 +1,4 @@
 {
   "httpMethod": "PUT",
-  "body": "{\"compositeId\": \"00000000-0000-0000-0000-000000000000\",\"defaultNote\": \"test note\",\"id\": \"00000000-0000-0000-0000-000000000000\",\"on\": false,\"note\": \"hello\",\"title\": \"Test Channel\"}"
+  "body": "{\"on\": false,\"note\": \"hello\"}"
 }
