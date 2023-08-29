@@ -1,19 +1,21 @@
 import './App.css'
 
+import { Link, Outlet } from 'react-router-dom'
+import { getFullLoginUrl, getTokens, login } from '../utils/auth'
 import { useCallback, useEffect, useState } from 'react'
 
-import { Link, Outlet } from 'react-router-dom'
-import { useChannelsDispatch } from '../contexts/channels/channelsContext'
 import { ChannelsDispatchActionType } from '../contexts/channels/channelsReducer'
-import logo from '../logo.svg'
-import { fetchApi } from '../utils/api'
-import { getFullLoginUrl, getTokens, login } from '../utils/auth'
 import ProfileMenu from './profile/ProfileMenu'
+import { SubscriptionsDispatchActionType } from '../contexts/subscriptions/subscriptionsReducer'
+import { fetchApi } from '../utils/api'
+import logo from '../logo.svg'
+import { useChannelsDispatch } from '../contexts/channels/channelsContext'
+import { useSubscriptionsDispatch } from '../contexts/subscriptions/subscriptionsContext'
 
 interface OverviewData {
-  channels: IChannel[],
-  profile: object,
-  subscriptions: IChannel[],
+  channels: IChannel[]
+  profile: object
+  subscriptions: IChannel[]
 }
 
 const params = new URL(document.location.toString()).searchParams
@@ -26,18 +28,26 @@ const App = () => {
   const [loginUrl, setLoginUrl] = useState('')
 
   const dispatchChannels = useChannelsDispatch()
+  const dispatchSubscriptions = useSubscriptionsDispatch()
 
   const syncOverview = useCallback(async () => {
     try {
       const response = await fetchApi<OverviewData>('/')
 
-      dispatchChannels({ type: ChannelsDispatchActionType.SYNCED, channels: response.channels })
+      dispatchChannels({
+        type: ChannelsDispatchActionType.SYNCED,
+        channels: response.channels,
+      })
+      dispatchSubscriptions({
+        type: SubscriptionsDispatchActionType.SYNCED,
+        channels: response.subscriptions,
+      })
     } catch (error) {
       // TODO: handle overview fetch error
       // Log error to backend
       // Show user-friendly message
     }
-  }, [dispatchChannels])
+  }, [dispatchChannels, dispatchSubscriptions])
 
   useEffect(() => {
     const setFullLoginUrl = async () => {
@@ -71,7 +81,7 @@ const App = () => {
       return (
         <a
           href={loginUrl}
-          className='App-link'
+          className="App-link"
         >
           Log in
         </a>
@@ -88,12 +98,12 @@ const App = () => {
   }
 
   return (
-    <div className='App'>
-      <header className='App-header'>
+    <div className="App">
+      <header className="App-header">
         <img
           src={logo}
-          className='App-logo'
-          alt='logo'
+          className="App-logo"
+          alt="logo"
         />
         {getContent()}
       </header>

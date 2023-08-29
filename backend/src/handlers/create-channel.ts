@@ -32,6 +32,10 @@ export const createChannelHandler = async (
   const { defaultNote, title } = JSON.parse(event.body ?? '') as IPayload
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const username: string =
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    event.requestContext.authorizer?.claims['cognito:username'] ?? ''
   const channelID = uuidv1()
   const compositeID = uuidv5(userID, channelID)
 
@@ -39,47 +43,44 @@ export const createChannelHandler = async (
     defaultNote,
     note: '',
     on: false,
+    owner: username,
     title,
-  }
-
-  const params = {
-    RequestItems: {
-      [DYNAMODB_TABLE_NAME]: [
-        {
-          PutRequest: {
-            Item: {
-              pk: `user#${userID}`,
-              sk: `channel#${channelID}`,
-              compositeID,
-              ...channelAttributes,
-            },
-          },
-        },
-        {
-          PutRequest: {
-            Item: {
-              pk: `channel#${compositeID}`,
-              sk: 'info',
-              note: '',
-              on: false,
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-              owner:
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                event.requestContext.authorizer?.claims['cognito:username'] ??
-                '',
-              title,
-            },
-          },
-        },
-      ],
-    },
   }
 
   let statusCode: number
   let responseBody: IChannel | IResponseWithMessage
 
   try {
-    const ddbResponse = await ddbDocClient.send(new BatchWriteCommand(params))
+    const ddbResponse = await ddbDocClient.send(
+      new BatchWriteCommand({
+        RequestItems: {
+          [DYNAMODB_TABLE_NAME]: [
+            {
+              PutRequest: {
+                Item: {
+                  pk: `user#${userID}`,
+                  sk: `channel#${channelID}`,
+                  compositeID,
+                  ...channelAttributes,
+                },
+              },
+            },
+            {
+              PutRequest: {
+                Item: {
+                  pk: `channel#${compositeID}`,
+                  sk: 'info',
+                  note: '',
+                  on: false,
+                  owner: username,
+                  title,
+                },
+              },
+            },
+          ],
+        },
+      }),
+    )
     statusCode = 201
     responseBody = {
       id: channelID,
