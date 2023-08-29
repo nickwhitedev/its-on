@@ -20,7 +20,9 @@ export const updateChannelHandler = async (
   }
   console.info('received:', event)
 
-  const { id, note, on } = JSON.parse(event.body ?? '') as IChannel
+  const channelID = event.pathParameters?.channelID
+
+  const { note, on } = JSON.parse(event.body ?? '') as IChannel
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
@@ -33,7 +35,7 @@ export const updateChannelHandler = async (
       new UpdateCommand({
         Key: {
           pk: `user#${userID}`,
-          sk: `channel#${id}`,
+          sk: `channel#${channelID}`,
         },
         ReturnValues: 'ALL_NEW',
         TableName: DYNAMODB_TABLE_NAME,

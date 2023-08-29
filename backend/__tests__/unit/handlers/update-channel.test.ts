@@ -23,7 +23,7 @@ describe('Test updateChannelHandler', function () {
 
     const event: APIGatewayProxyEvent = {
       ...mockEvent,
-      body: '{"id": "00000000-0000-0000-0000-000000000000","on": false,"note": "hello"}',
+      body: '{"on": false,"note": "hello"}',
       httpMethod: 'PUT',
     }
 
