@@ -1,7 +1,4 @@
-import {
-  BatchWriteCommand,
-  DynamoDBDocumentClient,
-} from '@aws-sdk/lib-dynamodb'
+import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb'
 
 import { APIGatewayProxyEvent } from 'aws-lambda'
 import { CORS_HEADERS } from '../../../src/utils/constants'
@@ -22,7 +19,7 @@ describe('Test createChannelHandler', function () {
   // This test invokes createChannelHandler() and compare the result
   it('should add id to the table', async () => {
     // Return the specified value whenever the spied put function is called
-    ddbMock.on(BatchWriteCommand).resolves({})
+    ddbMock.on(PutCommand).resolves({})
 
     const event: APIGatewayProxyEvent = {
       ...mockEvent,
@@ -44,11 +41,13 @@ describe('Test createChannelHandler', function () {
       'defaultNote',
       'note',
       'on',
+      'owner',
       'title',
     ])
     expect(resultBody.defaultNote).toEqual('test note')
     expect(resultBody.note).toEqual('')
     expect(resultBody.on).toEqual(false)
+    expect(resultBody.owner).toEqual('test_user')
     expect(resultBody.title).toEqual('Super Channel')
   })
 })
