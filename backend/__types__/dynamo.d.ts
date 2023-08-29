@@ -1,13 +1,36 @@
 interface IDynamoChannelItem {
-  pk: string
-  sk: string
   // composite id is the public id - stored on the private channel copy
   compositeID?: string
   // defaultNote is for channel management - stored on the private channel copy
   defaultNote?: string
   note: string
   on: boolean
-  // owner is for public facing channels
-  owner?: string
+  owner: string
+  pk: string
+  sk: string
   title: string
+}
+
+interface IDynamoStreamChannelImage {
+  compositeID: {
+    S: string
+  }
+  note: {
+    S: string
+  }
+  on: {
+    BOOL: boolean
+  }
+  owner: {
+    S: string
+  }
+  pk: {
+    S: string
+  }
+  sk: {
+    S: string
+  }
+  title: {
+    S: string
+  }
 }
