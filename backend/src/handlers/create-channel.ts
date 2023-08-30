@@ -3,10 +3,13 @@ import {
   DynamoDBDocumentClient,
 } from '@aws-sdk/lib-dynamodb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import { v1 as uuidv1, v5 as uuidv5 } from 'uuid'
 import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { customAlphabet } from 'nanoid'
+import { alphanumeric } from 'nanoid-dictionary'
+
+const nanoid = customAlphabet(alphanumeric, 16)
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -35,8 +38,7 @@ export const createChannelHandler = async (
   const username: string =
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     event.requestContext.authorizer?.claims['cognito:username'] ?? ''
-  const channelID = uuidv1()
-  const compositeID = uuidv5(userID, channelID)
+  const channelID = nanoid()
 
   const channelAttributes = {
     note: '',
@@ -44,7 +46,6 @@ export const createChannelHandler = async (
     owner: username,
     title,
   }
-
   let statusCode: number
   let responseBody: IChannel | IResponseWithMessage
 
@@ -58,7 +59,6 @@ export const createChannelHandler = async (
                 Item: {
                   pk: `user#${userID}`,
                   sk: `channel#${channelID}`,
-                  compositeID,
                   ...channelAttributes,
                 },
               },
@@ -66,7 +66,7 @@ export const createChannelHandler = async (
             {
               PutRequest: {
                 Item: {
-                  pk: `channel#${compositeID}`,
+                  pk: `channel#${channelID}`,
                   sk: 'info',
                   note: '',
                   on: false,
@@ -82,7 +82,6 @@ export const createChannelHandler = async (
     statusCode = 201
     responseBody = {
       id: channelID,
-      compositeID,
       ...channelAttributes,
     }
     console.info('Success - item added or updated', ddbResponse)
