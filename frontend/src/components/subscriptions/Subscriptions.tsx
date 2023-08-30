@@ -10,7 +10,8 @@ const Subscriptions = () => {
       {subscriptions.map((channel, index) => (
         <div key={index}>
           <Link to={`/${channel.id}`}>{channel.title}</Link> - {channel.owner} -{' '}
-          {channel.on ? 'on' : 'off'} - {channel.note || channel.defaultNote}
+          {channel.on ? 'on' : 'off'}
+          {channel.note.length > 0 ? ` - ${channel.note}` : ''}
         </div>
       ))}
     </div>

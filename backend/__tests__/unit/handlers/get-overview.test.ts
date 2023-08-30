@@ -1,11 +1,11 @@
 import { DynamoDBDocumentClient, QueryCommand } from '@aws-sdk/lib-dynamodb'
 
 import { APIGatewayProxyEvent } from 'aws-lambda'
-import { CORS_HEADERS } from '../../../src/utils/constants'
-import { NIL as NIL_UUID } from 'uuid'
-import { getOverviewHandler } from '../../../src/handlers/get-overview'
 import { mockClient } from 'aws-sdk-client-mock'
+import { NIL as NIL_UUID } from 'uuid'
 import mockEvent from '../../../__mocks__/mock-event'
+import { getOverviewHandler } from '../../../src/handlers/get-overview'
+import { CORS_HEADERS } from '../../../src/utils/constants'
 
 describe('Test getOverviewHandler', () => {
   const ddbMock = mockClient(DynamoDBDocumentClient)
@@ -18,7 +18,6 @@ describe('Test getOverviewHandler', () => {
     const items = [
       {
         on: false,
-        defaultNote: 'default note',
         compositeID: NIL_UUID,
         note: '',
         sk: `channel#${NIL_UUID}`,
@@ -57,7 +56,6 @@ describe('Test getOverviewHandler', () => {
           {
             id: NIL_UUID,
             on: false,
-            defaultNote: 'default note',
             compositeID: NIL_UUID,
             note: '',
             title: 'test-channel',

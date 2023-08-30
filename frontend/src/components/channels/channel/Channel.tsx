@@ -3,12 +3,12 @@ import {
   useSubscriptionsDispatch,
 } from '../../../contexts/subscriptions/subscriptionsContext'
 
+import { version as uuidVersion } from 'uuid'
+import { useChannelsDispatch } from '../../../contexts/channels/channelsContext'
 import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
 import { SubscriptionsDispatchActionType } from '../../../contexts/subscriptions/subscriptionsReducer'
-import { baseUrl } from '../../../utils/urls'
 import { fetchApi } from '../../../utils/api'
-import { useChannelsDispatch } from '../../../contexts/channels/channelsContext'
-import { version as uuidVersion } from 'uuid'
+import { baseUrl } from '../../../utils/urls'
 
 interface Props {
   channel: IChannel
@@ -87,7 +87,7 @@ const Channel = ({ channel }: Props) => {
       )}
       <h2>{channel.title}</h2>
       {channel.on ? <p>It&apos;s On!</p> : null}
-      <p>{channel.note || channel.defaultNote}</p>
+      {channel.note.length > 0 ? <p>{channel.note}</p> : null}
       {userIsChannelOwner ? <p>{`${baseUrl}/${channel.compositeID}`}</p> : ''}
     </div>
   )
