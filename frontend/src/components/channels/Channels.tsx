@@ -13,7 +13,6 @@ const Channels = () => {
   const handleClickCreate = async () => {
     try {
       const newChannel: IChannel = await fetchApi('/channels', 'POST', {
-        defaultNote: 'default note',
         title: 'test-channel',
       })
       dispatch({
@@ -34,7 +33,8 @@ const Channels = () => {
       {channels.map((channel, index) => (
         <div key={index}>
           <Link to={`/${channel.id}`}>{channel.title}</Link> -{' '}
-          {channel.on ? 'on' : 'off'} - {channel.note || channel.defaultNote}
+          {channel.on ? 'on' : 'off'}
+          {channel.note.length > 0 ? ` - ${channel.note}` : ''}
         </div>
       ))}
     </div>

@@ -6,10 +6,10 @@ import {
 import { NIL as NIL_UUID, v1 as uuidv1, v5 as uuidv5 } from 'uuid'
 
 import { APIGatewayProxyEvent } from 'aws-lambda'
-import { CORS_HEADERS } from '../../../src/utils/constants'
-import { getChannelHandler } from '../../../src/handlers/get-channel'
 import { mockClient } from 'aws-sdk-client-mock'
 import mockEvent from '../../../__mocks__/mock-event'
+import { getChannelHandler } from '../../../src/handlers/get-channel'
+import { CORS_HEADERS } from '../../../src/utils/constants'
 
 describe('Test getChannelHandler', () => {
   const ddbMock = mockClient(DynamoDBDocumentClient)
@@ -62,7 +62,6 @@ describe('Test getChannelHandler', () => {
     ddbMock.on(GetCommand).resolves({
       Item: {
         compositeID: NIL_UUID,
-        defaultNote: 'default note',
         note: '',
         on: false,
         pk: `user#${NIL_UUID}`,
@@ -105,7 +104,6 @@ describe('Test getChannelHandler', () => {
       body: JSON.stringify({
         id: testUuidv1,
         compositeID: NIL_UUID,
-        defaultNote: 'default note',
         note: '',
         on: false,
         title: 'test-channel',

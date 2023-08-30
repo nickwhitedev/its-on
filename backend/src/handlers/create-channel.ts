@@ -1,10 +1,10 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
 } from '@aws-sdk/lib-dynamodb'
-import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants'
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import { v1 as uuidv1, v5 as uuidv5 } from 'uuid'
+import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 
@@ -12,7 +12,6 @@ const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
 
 interface IPayload {
-  defaultNote: string
   title: string
 }
 
@@ -29,7 +28,7 @@ export const createChannelHandler = async (
   }
   console.info('received:', event)
 
-  const { defaultNote, title } = JSON.parse(event.body ?? '') as IPayload
+  const { title } = JSON.parse(event.body ?? '') as IPayload
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -40,7 +39,6 @@ export const createChannelHandler = async (
   const compositeID = uuidv5(userID, channelID)
 
   const channelAttributes = {
-    defaultNote,
     note: '',
     on: false,
     owner: username,

@@ -1,11 +1,11 @@
 import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb'
 
-import { APIGatewayProxyEvent } from 'aws-lambda'
-import { CORS_HEADERS } from '../../../src/utils/constants'
-import { createChannelHandler } from '../../../src/handlers/create-channel'
 import { jest } from '@jest/globals'
+import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
 import mockEvent from '../../../__mocks__/mock-event'
+import { createChannelHandler } from '../../../src/handlers/create-channel'
+import { CORS_HEADERS } from '../../../src/utils/constants'
 
 // This includes all tests for createChannelHandler()
 describe('Test createChannelHandler', function () {
@@ -23,7 +23,7 @@ describe('Test createChannelHandler', function () {
 
     const event: APIGatewayProxyEvent = {
       ...mockEvent,
-      body: '{"defaultNote": "test note","title": "Super Channel"}',
+      body: '{"title": "Super Channel"}',
       httpMethod: 'POST',
     }
 
@@ -38,13 +38,11 @@ describe('Test createChannelHandler', function () {
     expect(Object.keys(resultBody)).toEqual([
       'id',
       'compositeID',
-      'defaultNote',
       'note',
       'on',
       'owner',
       'title',
     ])
-    expect(resultBody.defaultNote).toEqual('test note')
     expect(resultBody.note).toEqual('')
     expect(resultBody.on).toEqual(false)
     expect(resultBody.owner).toEqual('test_user')
