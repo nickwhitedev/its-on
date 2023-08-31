@@ -5,9 +5,9 @@ import {
   QueryCommand,
 } from '@aws-sdk/lib-dynamodb'
 
-import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DynamoDBStreamEvent } from 'aws-lambda'
+import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -25,12 +25,10 @@ export const tableStreamHandler = async (event: DynamoDBStreamEvent) => {
     ) {
       return
     }
-    let compositeID
     let channelInfo: IDynamoChannelItem
 
     // get channel partition
     try {
-      compositeID = record.dynamodb.NewImage.compositeID.S
       channelInfo = {
         note: record.dynamodb.NewImage.note.S ?? '',
         on: record.dynamodb.NewImage.on.BOOL ?? false,
@@ -45,13 +43,14 @@ export const tableStreamHandler = async (event: DynamoDBStreamEvent) => {
     }
 
     let items: IDynamoChannelItem[] | null
+    const channelID = channelInfo.sk.substring(channelInfo.sk.indexOf('#') + 1)
 
     try {
       const ddbResponse = await ddbDocClient.send(
         new QueryCommand({
           TableName: DYNAMODB_TABLE_NAME,
           KeyConditionExpression: 'pk = :pkval',
-          ExpressionAttributeValues: { ':pkval': `channel#${compositeID}` },
+          ExpressionAttributeValues: { ':pkval': `channel#${channelID}` },
         }),
       )
       items = ddbResponse.Items as IDynamoChannelItem[] | null
@@ -69,7 +68,7 @@ export const tableStreamHandler = async (event: DynamoDBStreamEvent) => {
             TableName: DYNAMODB_TABLE_NAME,
             Item: {
               ...channelInfo,
-              pk: `channel#${compositeID}`,
+              pk: `channel#${channelID}`,
               sk: 'info',
             },
           }),

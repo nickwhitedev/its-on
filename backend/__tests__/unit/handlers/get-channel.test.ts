@@ -3,7 +3,6 @@ import {
   GetCommand,
   QueryCommand,
 } from '@aws-sdk/lib-dynamodb'
-import { NIL as NIL_UUID, v1 as uuidv1, v5 as uuidv5 } from 'uuid'
 
 import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
@@ -14,19 +13,16 @@ import { CORS_HEADERS } from '../../../src/utils/constants'
 describe('Test getChannelHandler', () => {
   const ddbMock = mockClient(DynamoDBDocumentClient)
 
-  const testUuidv1 = uuidv1()
-  const testUuidv5 = uuidv5(NIL_UUID, testUuidv1)
-
   beforeEach(() => {
     ddbMock.reset()
   })
 
-  it('should get public channel data by uuidv5', async () => {
+  it('should get public channel data', async () => {
     const item = {
       note: '',
       on: false,
-      pk: `channel#${testUuidv5}`,
-      sk: `info`,
+      pk: 'channel#someID',
+      sk: 'info',
       title: 'test-channel',
     }
 
@@ -38,7 +34,7 @@ describe('Test getChannelHandler', () => {
       ...mockEvent,
       httpMethod: 'GET',
       pathParameters: {
-        channelID: testUuidv5,
+        channelID: 'someID',
       },
     }
 
@@ -48,7 +44,7 @@ describe('Test getChannelHandler', () => {
       statusCode: 200,
       headers: CORS_HEADERS,
       body: JSON.stringify({
-        id: testUuidv5,
+        id: 'someID',
         note: '',
         on: false,
         title: 'test-channel',
@@ -61,11 +57,10 @@ describe('Test getChannelHandler', () => {
   it('should get all channel data as owner by id', async () => {
     ddbMock.on(GetCommand).resolves({
       Item: {
-        compositeID: NIL_UUID,
         note: '',
         on: false,
-        pk: `user#${NIL_UUID}`,
-        sk: `channel#${testUuidv1}`,
+        pk: 'user#userID',
+        sk: 'channel#someID',
         title: 'test-channel',
       },
     })
@@ -76,13 +71,13 @@ describe('Test getChannelHandler', () => {
           note: '',
           on: false,
           owner: 'supercoolguy',
-          pk: `channel#${NIL_UUID}`,
-          sk: `info`,
+          pk: 'channel#someID',
+          sk: 'info',
           title: 'test-channel',
         },
         {
-          pk: `channel#${NIL_UUID}`,
-          sk: `subscriber#${NIL_UUID}`,
+          pk: `channel#someID`,
+          sk: `subscriber#userID`,
           username: 'bestie',
         },
       ],
@@ -92,7 +87,7 @@ describe('Test getChannelHandler', () => {
       ...mockEvent,
       httpMethod: 'GET',
       pathParameters: {
-        channelID: testUuidv1,
+        channelID: 'someID',
       },
     }
 
@@ -102,14 +97,13 @@ describe('Test getChannelHandler', () => {
       statusCode: 200,
       headers: CORS_HEADERS,
       body: JSON.stringify({
-        id: testUuidv1,
-        compositeID: NIL_UUID,
+        id: 'someID',
         note: '',
         on: false,
         title: 'test-channel',
         subscribers: [
           {
-            id: NIL_UUID,
+            id: 'userID',
             username: 'bestie',
           },
         ],
@@ -126,7 +120,7 @@ describe('Test getChannelHandler', () => {
       ...mockEvent,
       httpMethod: 'GET',
       pathParameters: {
-        channelID: testUuidv1,
+        channelID: 'someID',
       },
     }
 

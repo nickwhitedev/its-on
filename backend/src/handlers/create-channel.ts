@@ -1,14 +1,14 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
   GetCommand,
 } from '@aws-sdk/lib-dynamodb'
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { alphanumeric } from 'nanoid-dictionary'
 import { customAlphabet } from 'nanoid'
+import { alphanumeric } from 'nanoid-dictionary'
 
 const nanoid = customAlphabet(alphanumeric, 11)
 
@@ -41,7 +41,7 @@ export const createChannelHandler = async (
     event.requestContext.authorizer?.claims['cognito:username'] ?? ''
   let channelID = nanoid()
   let channelIDIsTaken: boolean
-  let channelAttempt = 1
+  let channelIDAttempt = 1
 
   do {
     try {
@@ -67,7 +67,7 @@ export const createChannelHandler = async (
       }
     }
     if (channelIDIsTaken) {
-      console.info(`generating id ${++channelAttempt}`)
+      console.info(`Collision detected. Generating id #${++channelIDAttempt}`)
       channelID = nanoid()
     }
   } while (channelIDIsTaken)

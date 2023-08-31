@@ -3,22 +3,18 @@ import {
   DynamoDBDocumentClient,
   GetCommand,
 } from '@aws-sdk/lib-dynamodb'
-import { NIL as NIL_UUID, v1 as uuidv1, v5 as uuidv5 } from 'uuid'
 
-import { APIGatewayProxyEvent } from 'aws-lambda'
-import { CORS_HEADERS } from '../../../src/utils/constants'
 import { jest } from '@jest/globals'
+import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
 import mockEvent from '../../../__mocks__/mock-event'
 import { subscribeHandler } from '../../../src/handlers/subscribe'
+import { CORS_HEADERS } from '../../../src/utils/constants'
 
 // This includes all tests for subscribeHandler()
 describe('Test subscribeHandler', function () {
   const ddbMock = mockClient(DynamoDBDocumentClient)
   jest.useFakeTimers().setSystemTime(new Date('2020-01-01'))
-
-  const testUuidv1 = uuidv1()
-  const testUuidv5 = uuidv5(NIL_UUID, testUuidv1)
 
   beforeEach(() => {
     ddbMock.reset()
@@ -29,8 +25,8 @@ describe('Test subscribeHandler', function () {
     const testChannel = {
       note: '',
       on: false,
-      pk: `channel#${testUuidv5}`,
-      sk: `info`,
+      pk: 'channel#someID',
+      sk: 'info',
       title: 'test-channel',
     }
 
@@ -45,7 +41,7 @@ describe('Test subscribeHandler', function () {
       ...mockEvent,
       httpMethod: 'POST',
       pathParameters: {
-        channelID: testUuidv5,
+        channelID: 'someID',
       },
     }
 

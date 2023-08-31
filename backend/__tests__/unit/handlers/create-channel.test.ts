@@ -37,7 +37,6 @@ describe('Test createChannelHandler', function () {
 
     expect(Object.keys(resultBody)).toEqual([
       'id',
-      'compositeID',
       'note',
       'on',
       'owner',

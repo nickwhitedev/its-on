@@ -1,13 +1,12 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants'
 import {
   DynamoDBDocumentClient,
-  GetCommand,
-  QueryCommand,
+  QueryCommand
 } from '@aws-sdk/lib-dynamodb'
-import { version as uuidVersion, v5 as uuidv5 } from 'uuid'
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { getChannel } from '../utils/dynamo'
 import { serializeQueryResponse } from '../utils/serialize'
 
 const client = new DynamoDBClient({})
@@ -27,6 +26,8 @@ export const getChannelHandler = async (
     )
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+  const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
   const channelID = event.pathParameters?.channelID
 
   if (channelID == null) {
@@ -40,117 +41,93 @@ export const getChannelHandler = async (
   let statusCode
   let responseBody
 
-  switch (uuidVersion(channelID)) {
-    case 1: {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-      const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
-
-      // get private channel entry
-      try {
-        const ddbResponse = await ddbDocClient.send(
-          new GetCommand({
-            TableName: DYNAMODB_TABLE_NAME,
-            Key: {
-              pk: `user#${userID}`,
-              sk: `channel#${channelID}`,
-            },
-          }),
-        )
-        if (ddbResponse.Item == null) {
-          statusCode = 404
-          responseBody = { message: 'Not found' }
-          break
-        }
-        const {
-          pk: _pk,
-          sk,
-          ...channelInfo
-        } = ddbResponse.Item as IDynamoChannelItem
-        statusCode = 200
-        responseBody = {
-          id: sk.substring(sk.indexOf('#') + 1),
-          ...channelInfo,
-        }
-        console.info('Success - Get private channel info: ', ddbResponse)
-      } catch (err) {
-        statusCode = 400
-        responseBody = { message: 'Something went wrong' }
-        console.error('Error', err)
-        break
-      }
-
-      // query channel partition
-      try {
-        const ddbResponse = await ddbDocClient.send(
-          new QueryCommand({
-            TableName: DYNAMODB_TABLE_NAME,
-            KeyConditionExpression: '#pk = :channelID',
-            ExpressionAttributeNames: {
-              '#pk': 'pk',
-            },
-            ExpressionAttributeValues: {
-              ':channelID': `channel#${uuidv5(userID, channelID)}`,
-            },
-          }),
-        )
-        responseBody = {
-          ...responseBody,
-          ...serializeQueryResponse(
-            ddbResponse.Items?.filter(item => item.sk !== 'info') ?? [],
-          ),
-        }
-        console.info('Success - channel owner data: ', ddbResponse)
-      } catch (err) {
-        statusCode = 400
-        responseBody = { message: 'Something went wrong' }
-        console.error('Error', err)
-      }
-      break
+  // get private channel entry
+  let privateChannel: IDynamoChannelItem | undefined
+  try {
+    privateChannel = await getChannel({channelID, ddbDocClient, userID})
+  } catch (_error) {
+    return {
+      statusCode: 400,
+      headers: CORS_HEADERS,
+      body: JSON.stringify({ message: 'Something went wrong' }),
     }
-    case 5:
-      // get public channel info
-      try {
-        const ddbResponse = await ddbDocClient.send(
-          new GetCommand({
-            TableName: DYNAMODB_TABLE_NAME,
-            Key: {
-              pk: `channel#${channelID}`,
-              sk: 'info',
-            },
-          }),
-        )
-        if (ddbResponse.Item == null) {
-          statusCode = 404
-          responseBody = { message: 'Not found' }
-          break
-        }
-        const {
-          pk,
-          sk: _sk,
-          ...channelInfo
-        } = ddbResponse.Item as IDynamoChannelItem
-        statusCode = 200
-        responseBody = {
-          id: pk.substring(pk.indexOf('#') + 1),
-          ...channelInfo,
-        }
-        console.info('Success - Get public channel info: ', ddbResponse)
-      } catch (err) {
-        statusCode = 400
-        responseBody = { message: 'Something went wrong' }
-        console.error('Error', err)
-      }
-      break
-    default:
-      // return 400
-      statusCode = 400
-      responseBody = { message: 'Bad Request' }
   }
 
-  const response = {
-    statusCode: statusCode,
-    headers: CORS_HEADERS,
-    body: JSON.stringify(responseBody),
+  if (privateChannel != null) {
+    const {
+      pk: _pk,
+      sk: _sk,
+      ...channelInfo
+    } = privateChannel
+    statusCode = 200
+    responseBody = {
+      id: channelID,
+      ...channelInfo,
+    }
+
+    // query channel partition
+    try {
+      const ddbResponse = await ddbDocClient.send(
+        new QueryCommand({
+          TableName: DYNAMODB_TABLE_NAME,
+          KeyConditionExpression: '#pk = :channelID',
+          ExpressionAttributeNames: {
+            '#pk': 'pk',
+          },
+          ExpressionAttributeValues: {
+            ':channelID': `channel#${channelID}`,
+          },
+        }),
+      )
+      responseBody = {
+        ...responseBody,
+        ...serializeQueryResponse(
+          ddbResponse.Items?.filter(item => item.sk !== 'info') ?? [],
+        ),
+      }
+      console.info('Success - channel owner data: ', ddbResponse)
+    } catch (error) {
+      console.error('Dynamo Query Error', error)
+      return {
+        statusCode: 400,
+        headers: CORS_HEADERS,
+        body: JSON.stringify({ message: 'Something went wrong' }),
+      }
+    }
+  } else {
+    // User doesn't own channel
+    // get public channel info
+    let publicChannel: IDynamoChannelItem | undefined
+    try {
+      publicChannel = await getChannel({channelID, ddbDocClient})
+    } catch (_error) {
+      return {
+        statusCode: 400,
+        headers: CORS_HEADERS,
+        body: JSON.stringify({ message: 'Something went wrong' }),
+      }
+    }
+    
+    if (publicChannel == null) {
+      console.info('Channel not found')
+      return {
+        statusCode: 404,
+        headers: CORS_HEADERS,
+        body: JSON.stringify({ message: 'Not found' }),
+      }
+    }
+
+    const {
+      pk,
+      sk: _sk,
+      ...channelInfo
+    } = publicChannel
+
+    statusCode = 200
+    responseBody = {
+      id: pk.substring(pk.indexOf('#') + 1),
+      ...channelInfo,
+    }
   }
 
   console.info(`response from: ${event.path}: `, {
@@ -158,5 +135,9 @@ export const getChannelHandler = async (
     responseBody,
   })
 
-  return response
+  return {
+    statusCode: statusCode,
+    headers: CORS_HEADERS,
+    body: JSON.stringify(responseBody),
+  }
 }

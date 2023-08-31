@@ -8,8 +8,7 @@
     "@aws-sdk/lib-dynamodb": "^3.188.0",
     "esbuild": "^0.19.2",
     "nanoid": "^4.0.2",
-    "nanoid-dictionary": "^4.3.0",
-    "uuid": "^9.0.0"
+    "nanoid-dictionary": "^4.3.0"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.119",
@@ -17,7 +16,6 @@
     "@types/nanoid": "^3.0.0",
     "@types/nanoid-dictionary": "^4.2.0",
     "@types/node": "^20.5.7",
-    "@types/uuid": "^9.0.2",
     "@typescript-eslint/eslint-plugin": "^6.4.1",
     "@typescript-eslint/parser": "^6.4.1",
     "aws-sdk-client-mock": "^3.0.0",

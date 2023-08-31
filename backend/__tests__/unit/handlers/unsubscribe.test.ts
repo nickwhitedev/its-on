@@ -2,23 +2,19 @@ import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
 } from '@aws-sdk/lib-dynamodb'
-import { NIL as NIL_UUID, v1 as uuidv1, v5 as uuidv5 } from 'uuid'
 
-import { APIGatewayProxyEvent } from 'aws-lambda'
-import { CORS_HEADERS } from '../../../src/utils/constants'
 import { jest } from '@jest/globals'
+import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
 import mockEvent from '../../../__mocks__/mock-event'
 import { unsubscribeHandler } from '../../../src/handlers/unsubscribe'
+import { CORS_HEADERS } from '../../../src/utils/constants'
 
 // This includes all tests for unsubscribeHandler()
 describe('Test unsubscribeHandler', function () {
   const ddbMock = mockClient(DynamoDBDocumentClient)
   jest.useFakeTimers().setSystemTime(new Date('2020-01-01'))
-
-  const testUuidv1 = uuidv1()
-  const testUuidv5 = uuidv5(NIL_UUID, testUuidv1)
-
+  
   beforeEach(() => {
     ddbMock.reset()
   })
@@ -32,7 +28,7 @@ describe('Test unsubscribeHandler', function () {
       ...mockEvent,
       httpMethod: 'POST',
       pathParameters: {
-        channelID: testUuidv5,
+        channelID: 'someID',
       },
     }
 

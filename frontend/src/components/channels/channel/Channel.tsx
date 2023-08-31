@@ -3,8 +3,10 @@ import {
   useSubscriptionsDispatch,
 } from '../../../contexts/subscriptions/subscriptionsContext'
 
-import { version as uuidVersion } from 'uuid'
-import { useChannelsDispatch } from '../../../contexts/channels/channelsContext'
+import {
+  useChannels,
+  useChannelsDispatch,
+} from '../../../contexts/channels/channelsContext'
 import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
 import { SubscriptionsDispatchActionType } from '../../../contexts/subscriptions/subscriptionsReducer'
 import { fetchApi } from '../../../utils/api'
@@ -15,7 +17,8 @@ interface Props {
 }
 
 const Channel = ({ channel }: Props) => {
-  const userIsChannelOwner = uuidVersion(channel.id) === 1
+  const channels = useChannels()
+  const userIsChannelOwner = channels.some(ch => ch.id === channel.id)
 
   const subscriptions = useSubscriptions()
 
@@ -88,7 +91,7 @@ const Channel = ({ channel }: Props) => {
       <h2>{channel.title}</h2>
       {channel.on ? <p>It&apos;s On!</p> : null}
       {channel.note.length > 0 ? <p>{channel.note}</p> : null}
-      {userIsChannelOwner ? <p>{`${baseUrl}/${channel.compositeID}`}</p> : ''}
+      {userIsChannelOwner ? <p>{`${baseUrl}/${channel.id}`}</p> : ''}
     </div>
   )
 }
