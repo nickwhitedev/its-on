@@ -30,7 +30,7 @@ describe('Test subscribeHandler', function () {
       title: 'test-channel',
     }
 
-    ddbMock.on(GetCommand).resolves({
+    ddbMock.on(GetCommand).resolvesOnce({}).resolvesOnce({
       Item: testChannel,
     })
 

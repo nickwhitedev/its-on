@@ -26,7 +26,7 @@ describe('Test getChannelHandler', () => {
       title: 'test-channel',
     }
 
-    ddbMock.on(GetCommand).resolves({
+    ddbMock.on(GetCommand).resolvesOnce({}).resolvesOnce({
       Item: item,
     })
 
