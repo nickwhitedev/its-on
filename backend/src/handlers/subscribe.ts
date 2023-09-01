@@ -1,13 +1,13 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
   GetCommand,
 } from '@aws-sdk/lib-dynamodb'
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { version as uuidVersion } from 'uuid'
+import { getChannel } from '../utils/dynamo'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -25,12 +25,25 @@ export const subscribeHandler = async (
   }
   console.info('received:', event)
 
-  const channelID = event.pathParameters?.channelID ?? '' // is composite id
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
+  const channelID = event.pathParameters?.channelID ?? '' // is composite id
 
-  if (uuidVersion(channelID) === 1) {
+  let privateChannel: IDynamoChannelItem | undefined
+  // get private channel entry
+  try {
+    privateChannel = await getChannel({channelID, ddbDocClient, userID})
+  } catch (_error) {
+    return {
+      statusCode: 400,
+      headers: CORS_HEADERS,
+      body: JSON.stringify({ message: 'Something went wrong' }),
+    }
+  }
+
+  if (privateChannel != null) {
     // Subscriptions should only be for public copies of channels
+    console.info('User owns channel')
     return {
       statusCode: 403,
       headers: CORS_HEADERS,

@@ -1,12 +1,16 @@
 import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
+  GetCommand,
 } from '@aws-sdk/lib-dynamodb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import { v1 as uuidv1, v5 as uuidv5 } from 'uuid'
 import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { customAlphabet } from 'nanoid'
+import { alphanumeric } from 'nanoid-dictionary'
+
+const nanoid = customAlphabet(alphanumeric, 11)
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -35,8 +39,38 @@ export const createChannelHandler = async (
   const username: string =
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     event.requestContext.authorizer?.claims['cognito:username'] ?? ''
-  const channelID = uuidv1()
-  const compositeID = uuidv5(userID, channelID)
+  let channelID = nanoid()
+  let channelIDIsTaken: boolean
+  let channelIDAttempt = 1
+
+  do {
+    try {
+      const ddbResponse = await ddbDocClient.send(
+        new GetCommand({
+          TableName: DYNAMODB_TABLE_NAME,
+          Key: {
+            pk: `channel#${channelID}`,
+            sk: 'info',
+          },
+        }),
+      )
+      channelIDIsTaken = ddbResponse.Item != null
+    } catch (error) {
+      console.error(
+        'Error',
+        error instanceof Error ? error.stack : 'Unknown Type',
+      )
+      return {
+        statusCode: 400,
+        headers: CORS_HEADERS,
+        body: JSON.stringify({ message: 'Something went wrong' }),
+      }
+    }
+    if (channelIDIsTaken) {
+      console.info(`Collision detected. Generating id #${++channelIDAttempt}`)
+      channelID = nanoid()
+    }
+  } while (channelIDIsTaken)
 
   const channelAttributes = {
     note: '',
@@ -44,7 +78,6 @@ export const createChannelHandler = async (
     owner: username,
     title,
   }
-
   let statusCode: number
   let responseBody: IChannel | IResponseWithMessage
 
@@ -58,7 +91,6 @@ export const createChannelHandler = async (
                 Item: {
                   pk: `user#${userID}`,
                   sk: `channel#${channelID}`,
-                  compositeID,
                   ...channelAttributes,
                 },
               },
@@ -66,7 +98,7 @@ export const createChannelHandler = async (
             {
               PutRequest: {
                 Item: {
-                  pk: `channel#${compositeID}`,
+                  pk: `channel#${channelID}`,
                   sk: 'info',
                   note: '',
                   on: false,
@@ -82,13 +114,15 @@ export const createChannelHandler = async (
     statusCode = 201
     responseBody = {
       id: channelID,
-      compositeID,
       ...channelAttributes,
     }
     console.info('Success - item added or updated', ddbResponse)
-  } catch (err) {
+  } catch (error) {
     statusCode = 400
-    console.error('Error', err instanceof Error ? err.stack : 'Unknown Type')
+    console.error(
+      'Error',
+      error instanceof Error ? error.stack : 'Unknown Type',
+    )
     responseBody = { message: 'Something went wrong' }
   }
 

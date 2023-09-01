@@ -1,6 +1,4 @@
 interface IDynamoChannelItem {
-  // composite id is the public id - stored on the private channel copy
-  compositeID?: string
   note: string
   on: boolean
   owner: string
@@ -10,9 +8,6 @@ interface IDynamoChannelItem {
 }
 
 interface IDynamoStreamChannelImage {
-  compositeID: {
-    S: string
-  }
   note: {
     S: string
   }
