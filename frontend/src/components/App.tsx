@@ -83,7 +83,7 @@ const App = () => {
           href={loginUrl}
           className="App-link"
         >
-          Log in
+          Log in!
         </a>
       )
     }
