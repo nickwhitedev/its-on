@@ -517,27 +517,19 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
 
-  ItsOnCloudFrontCachePolicy:
-    Type: AWS::CloudFront::CachePolicy
-    Properties:
-      CachePolicyConfig:
-        DefaultTTL: 86400
-        MaxTTL: 172800
-        MinTTL: 3600
-        Name: !Sub ItsOnCloudFrontCachePolicy-${Env}
-        ParametersInCacheKeyAndForwardedToOrigin:
-          CookiesConfig:
-            CookieBehavior: none
-          EnableAcceptEncodingGzip: false
-          HeadersConfig:
-            HeaderBehavior: none
-          QueryStringsConfig:
-            QueryStringBehavior: none
-
   ItsOnCloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
+        CacheBehaviors:
+          - AllowedMethods: [GET, HEAD]
+            # Managed CacheDisabled Policy
+            # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html#attaching-managed-cache-policies
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad
+            Compress: true
+            PathPattern: index.html
+            TargetOriginId: ItsOnFrontendBucket
+            ViewerProtocolPolicy: redirect-to-https
         Comment: Cloudfront Distribution pointing to S3 bucket
         CustomErrorResponses:
           - ErrorCode: 404
@@ -569,7 +561,9 @@ Resources:
               - !Sub ${Env}.itson.fyi
         DefaultCacheBehavior:
           AllowedMethods: [GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE]
-          CachePolicyId: !Ref ItsOnCloudFrontCachePolicy
+          # Managed CachingOptimized policy
+          # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html#attaching-managed-cache-policies
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
           Compress: true
           TargetOriginId: ItsOnFrontendBucket
           ViewerProtocolPolicy: redirect-to-https
