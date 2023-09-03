@@ -46,7 +46,7 @@ export default defineConfig({
       },
       registerType: 'autoUpdate',
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        globPatterns: ['**/*.{js,css,ico,png,svg}'],
       },
       // Promotional - not supported by vite types?
       // screenshots: [
