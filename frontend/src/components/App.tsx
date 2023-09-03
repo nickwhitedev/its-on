@@ -8,7 +8,6 @@ import { ChannelsDispatchActionType } from '../contexts/channels/channelsReducer
 import ProfileMenu from './profile/ProfileMenu'
 import { SubscriptionsDispatchActionType } from '../contexts/subscriptions/subscriptionsReducer'
 import { fetchApi } from '../utils/api'
-import logo from '../logo.svg'
 import { useChannelsDispatch } from '../contexts/channels/channelsContext'
 import { useSubscriptionsDispatch } from '../contexts/subscriptions/subscriptionsContext'
 
@@ -100,11 +99,7 @@ const App = () => {
   return (
     <div className="App">
       <header className="App-header">
-        <img
-          src={logo}
-          className="App-logo"
-          alt="logo"
-        />
+        <h1>It&apos;s On</h1>
         {getContent()}
       </header>
     </div>
