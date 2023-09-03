@@ -14,7 +14,7 @@ export default defineConfig({
         name: "It's On",
         short_name: 'ItsOn',
         description: "Always know when it's on",
-        display: 'minimal-ui',
+        display: 'fullscreen',
         start_url: '/',
         theme_color: '#0e1118',
         background_color: '#0e1118',
