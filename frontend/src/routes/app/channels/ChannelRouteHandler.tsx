@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import { useLoaderData } from 'react-router-dom'
+
 import Channel from '../../../components/channels/channel/Channel'
-import { useChannels } from '../../../contexts/channels/channelsContext'
 import { fetchApi } from '../../../utils/api'
+import { useChannels } from '../../../contexts/channels/channelsContext'
+import { useLoaderData } from 'react-router-dom'
 
 const ChannelRouteHandler = () => {
   const { channelID } = useLoaderData() as { channelID: string }
