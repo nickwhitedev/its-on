@@ -7,12 +7,15 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
+      srcDir: 'src',
+      filename: 'sw.ts',
       devOptions: {
         enabled: true,
+        type: 'module',
       },
       manifest: {
         name: "It's On",
-        short_name: 'ItsOn',
+        short_name: "It's On",
         description: "Always know when it's on",
         display: 'standalone',
         start_url: '/',
@@ -45,9 +48,7 @@ export default defineConfig({
         ],
       },
       registerType: 'autoUpdate',
-      workbox: {
-        globPatterns: ['**/*.{js,css,ico,png,svg}'],
-      },
+      strategies: 'injectManifest',
       // Promotional - not supported by vite types?
       // screenshots: [
       //   src: 'pwa-512x512.png',
