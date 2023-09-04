@@ -100,8 +100,8 @@ const App = () => {
     <div className="App">
       <header className="App-header">
         <h1>It&apos;s On</h1>
-        {getContent()}
       </header>
+      <main>{getContent()}</main>
     </div>
   )
 }
