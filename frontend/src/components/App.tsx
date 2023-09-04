@@ -77,14 +77,7 @@ const App = () => {
       return <div>authenticating...</div>
     }
     if (!authenticated && loginUrl !== '') {
-      return (
-        <a
-          href={loginUrl}
-          className="App-link"
-        >
-          Log in!
-        </a>
-      )
+      return <a href={loginUrl}>Log in</a>
     }
     return (
       <div>
@@ -98,7 +91,7 @@ const App = () => {
 
   return (
     <div className="App">
-      <header className="App-header">
+      <header>
         <h1>It&apos;s On</h1>
       </header>
       <main>{getContent()}</main>

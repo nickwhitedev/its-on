@@ -14,6 +14,8 @@ precacheAndRoute(self.__WB_MANIFEST)
 // Clean up old cache
 cleanupOutdatedCaches()
 
+setDefaultHandler(new NetworkOnly())
+
 // Google fonts dynamic cache
 registerRoute(
   /^https:\/\/fonts\.googleapis\.com\/.*/i,
@@ -65,8 +67,6 @@ registerRoute(
   }),
   'GET',
 )
-
-setDefaultHandler(new NetworkOnly())
 
 // Install and activate service worker
 self.addEventListener('install', () => void self.skipWaiting())
