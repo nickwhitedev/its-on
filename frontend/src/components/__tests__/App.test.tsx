@@ -1,12 +1,13 @@
 import { render, screen } from '@testing-library/react'
+
+import App from '../App'
 import { BrowserRouter } from 'react-router-dom'
 import { vi } from 'vitest'
-import App from '../App'
 
 vi.mock('../channels/Channels')
 
 describe('App.tsx', () => {
-  it('renders learn react link', () => {
+  it('renders logout button', () => {
     // TODO: Add helper renderWithRouter function
     // https://testing-library.com/docs/example-react-router/#reducing-boilerplate
     render(
