@@ -11,7 +11,7 @@ env:
   AWS_SES_DOMAIN_IDENTITY_ARN: ${{ secrets.AWS_SES_DOMAIN_IDENTITY_ARN }}
   PIPELINE_USER_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   PIPELINE_USER_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  SAM_TEMPLATE: template.yaml
+  SAM_TEMPLATE: template.yml
   TESTING_STACK_NAME: its-on-test
   TESTING_PIPELINE_EXECUTION_ROLE: arn:aws:iam::303579314896:role/aws-sam-cli-managed-dev-pipe-PipelineExecutionRole-1EXGMRU8M7PIU
   TESTING_CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::303579314896:role/aws-sam-cli-managed-dev-p-CloudFormationExecutionR-13FN6CKHSS9UA
@@ -175,12 +175,12 @@ jobs:
           sam package \
             --s3-bucket ${TESTING_ARTIFACTS_BUCKET} \
             --region ${TESTING_REGION} \
-            --output-template-file packaged-testing.yaml
+            --output-template-file packaged-testing.yml
 
       - uses: actions/upload-artifact@v3
         with:
-          name: packaged-testing.yaml
-          path: backend/packaged-testing.yaml
+          name: packaged-testing.yml
+          path: backend/packaged-testing.yml
           if-no-files-found: error
 
       - name: Assume the prod pipeline user role
@@ -199,7 +199,7 @@ jobs:
           sam package \
             --s3-bucket ${PROD_ARTIFACTS_BUCKET} \
             --region ${PROD_REGION} \
-            --output-template-file packaged-prod.yaml \
+            --output-template-file packaged-prod.yml \
             --parameter-overrides \
               ParameterKey=Env,ParameterValue=prod \
               ParameterKey=PipelineRole,ParameterValue=${PROD_PIPELINE_EXECUTION_ROLE} \
@@ -209,8 +209,8 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          name: packaged-prod.yaml
-          path: backend/packaged-prod.yaml
+          name: packaged-prod.yml
+          path: backend/packaged-prod.yml
           if-no-files-found: error
 
   deploy-testing-api:
@@ -227,7 +227,7 @@ jobs:
           use-installer: true
       - uses: actions/download-artifact@v3
         with:
-          name: packaged-testing.yaml
+          name: packaged-testing.yml
           path: backend
 
       - name: Assume the testing pipeline user role
@@ -245,7 +245,7 @@ jobs:
         run: |
           sam deploy \
             --stack-name ${TESTING_STACK_NAME} \
-            --template packaged-testing.yaml \
+            --template packaged-testing.yml \
             --capabilities CAPABILITY_IAM \
             --region ${TESTING_REGION} \
             --s3-bucket ${TESTING_ARTIFACTS_BUCKET} \
@@ -293,7 +293,7 @@ jobs:
           use-installer: true
       - uses: actions/download-artifact@v3
         with:
-          name: packaged-prod.yaml
+          name: packaged-prod.yml
           path: backend
 
       - name: Assume the prod pipeline user role
@@ -311,7 +311,7 @@ jobs:
         run: |
           sam deploy \
             --stack-name ${PROD_STACK_NAME} \
-            --template packaged-prod.yaml \
+            --template packaged-prod.yml \
             --capabilities CAPABILITY_IAM \
             --region ${PROD_REGION} \
             --s3-bucket ${PROD_ARTIFACTS_BUCKET} \
