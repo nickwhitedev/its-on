@@ -5,7 +5,6 @@ import { getFullLoginUrl, getTokens, login } from '../utils/auth'
 import { useCallback, useEffect, useState } from 'react'
 
 import { ChannelsDispatchActionType } from '../contexts/channels/channelsReducer'
-import ProfileMenu from './profile/ProfileMenu'
 import { SubscriptionsDispatchActionType } from '../contexts/subscriptions/subscriptionsReducer'
 import { fetchApi } from '../utils/api'
 import { useChannelsDispatch } from '../contexts/channels/channelsContext'
@@ -81,7 +80,6 @@ const App = () => {
     }
     return (
       <div>
-        <ProfileMenu />
         <Link to={'/subscriptions'}>Subscriptions</Link>
         <Link to={'/channels'}>Channels</Link>
         <Outlet />
@@ -91,10 +89,21 @@ const App = () => {
 
   return (
     <div className="App">
-      <header>
+      <header className="App-header">
         <h1>It&apos;s On</h1>
+        {!authenticating && authenticated && loginUrl !== '' ? (
+          <Link
+            to={'/profile'}
+            className="App-settings"
+            aria-label="Account Settings"
+          >
+            <span className="material-symbols-outlined App-settings-icon">
+              account_circle
+            </span>
+          </Link>
+        ) : null}
       </header>
-      <main>{getContent()}</main>
+      <main className="App-main">{getContent()}</main>
     </div>
   )
 }

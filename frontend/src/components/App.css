@@ -2,8 +2,30 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   text-align: center;
   min-height: 100vh;
   min-width: 100vw;
+}
+
+.App-header {
+  display: grid;
+  grid:
+    [row-start] '. hero settings' [row-end]
+    / 3rem auto 3rem;
+  width: 100%;
+}
+
+.App-header > h1 {
+  grid-area: hero;
+  margin: 0.3rem 0;
+}
+
+.App-settings {
+  grid-area: settings;
+  place-self: start end;
+  margin: 1em;
+}
+
+.App-settings-icon {
+  font-size: 2em;
 }

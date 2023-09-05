@@ -7,7 +7,7 @@ import { vi } from 'vitest'
 vi.mock('../channels/Channels')
 
 describe('App.tsx', () => {
-  it('renders logout button', () => {
+  it('renders channels link', () => {
     // TODO: Add helper renderWithRouter function
     // https://testing-library.com/docs/example-react-router/#reducing-boilerplate
     render(
@@ -15,7 +15,7 @@ describe('App.tsx', () => {
         <App />
       </BrowserRouter>,
     )
-    const linkElement = screen.getByText(/Logout/i)
+    const linkElement = screen.getByText(/Channels/i)
     expect(linkElement).toBeInTheDocument()
   })
 })
