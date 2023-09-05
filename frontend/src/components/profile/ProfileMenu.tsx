@@ -13,13 +13,15 @@ const ProfileMenu = () => {
   }, [])
   return (
     <div className="ProfileMenu">
-      <button
-        onClick={() => {
+      <a
+        href="#"
+        onClick={event => {
+          event.preventDefault()
           navigate(-1)
         }}
       >
-        Back
-      </button>
+        <span className="material-symbols-outlined">arrow_back</span>
+      </a>
       <button onClick={handleLogout}>Logout</button>
     </div>
   )
