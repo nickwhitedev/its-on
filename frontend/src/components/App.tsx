@@ -80,8 +80,10 @@ const App = () => {
     }
     return (
       <div>
-        <Link to={'/subscriptions'}>Subscriptions</Link>
-        <Link to={'/channels'}>Channels</Link>
+        <nav className="App-nav">
+          <Link to={'/subscriptions'}>Subscriptions</Link>
+          <Link to={'/channels'}>Channels</Link>
+        </nav>
         <Outlet />
       </div>
     )
