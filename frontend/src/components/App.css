@@ -2,8 +2,52 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   text-align: center;
   min-height: 100vh;
   min-width: 100vw;
+}
+
+.App-header {
+  display: grid;
+  grid:
+    [row-start] '. hero settings' [row-end]
+    / 3rem auto 3rem;
+  width: 100%;
+}
+
+.App-header > h1 {
+  cursor: default;
+  font-family: 'Pacifico', cursive;
+  grid-area: hero;
+  margin: 0.3rem 0;
+  place-self: center;
+  user-select: none;
+}
+
+.App-settings {
+  display: flex;
+  grid-area: settings;
+  margin: 1em;
+  place-self: start end;
+}
+
+.App-settings-icon {
+  font-size: 2em;
+}
+
+.App-nav {
+  display: flex;
+  justify-content: center;
+}
+
+.App-nav-item {
+  width: 8em;
+}
+
+.App-main {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
 }

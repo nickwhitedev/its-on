@@ -17,6 +17,7 @@
     "react-router-dom": "^6.15.0"
   },
   "devDependencies": {
+    "@svgr/cli": "^8.1.0",
     "@testing-library/dom": "^9.3.1",
     "@testing-library/jest-dom": "^6.1.2",
     "@testing-library/react": "^14.0.0",
@@ -38,6 +39,8 @@
     "vite": "^4.4.9",
     "vite-plugin-pwa": "^0.16.4",
     "vitest": "^0.34.3",
-    "vitest-fetch-mock": "^0.2.2"
+    "vitest-fetch-mock": "^0.2.2",
+    "workbox-build": "^7.0.0",
+    "workbox-window": "^7.0.0"
   }
 }
