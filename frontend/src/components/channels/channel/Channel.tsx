@@ -80,10 +80,12 @@ const Channel = ({ channel }: Props) => {
 
   return (
     <div className="Channel">
+      <h2>{channel.title}</h2>
       {userIsChannelOwner ? (
         <button
           onClick={() => void handleClickItsOn()}
           className="Channel-button"
+          aria-label="Turn on channel"
         >
           <ItsOnIcon className="Channel-button-image" />
         </button>
@@ -94,7 +96,6 @@ const Channel = ({ channel }: Props) => {
       ) : (
         <button onClick={() => void handleClickSubscribe()}>Subscribe</button>
       )}
-      <h2>{channel.title}</h2>
       {channel.on ? <p>It&apos;s On!</p> : null}
       {channel.note.length > 0 ? <p>{channel.note}</p> : null}
       {userIsChannelOwner ? <p>{`${baseUrl}/${channel.id}`}</p> : ''}

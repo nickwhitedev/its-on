@@ -1,6 +1,6 @@
 import './App.css'
 
-import { Link, Outlet } from 'react-router-dom'
+import { Link, NavLink, Outlet } from 'react-router-dom'
 import { getFullLoginUrl, getTokens, login } from '../utils/auth'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -79,13 +79,23 @@ const App = () => {
       return <a href={loginUrl}>Log in</a>
     }
     return (
-      <div>
+      <>
         <nav className="App-nav">
-          <Link to={'/subscriptions'}>Subscriptions</Link>
-          <Link to={'/channels'}>Channels</Link>
+          <NavLink
+            to={'/channels'}
+            className="App-nav-item"
+          >
+            Channels
+          </NavLink>
+          <NavLink
+            to={'/subscriptions'}
+            className="App-nav-item"
+          >
+            Subscriptions
+          </NavLink>
         </nav>
         <Outlet />
-      </div>
+      </>
     )
   }
 

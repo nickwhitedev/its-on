@@ -16,8 +16,11 @@
 }
 
 .App-header > h1 {
+  cursor: default;
   grid-area: hero;
   margin: 0.3rem 0;
+  place-self: center;
+  user-select: none;
 }
 
 .App-settings {
@@ -32,6 +35,21 @@
 
 .App-nav {
   display: flex;
-  justify-content: space-around;
-  margin-bottom: 5vh;
+  justify-content: center;
+}
+
+.App-nav-item {
+  width: 8em;
+}
+
+.App-nav-item.active {
+  text-decoration: underline;
+}
+
+.App-main {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
 }
