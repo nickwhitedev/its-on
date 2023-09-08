@@ -17,6 +17,7 @@
 
 .App-header > h1 {
   cursor: default;
+  font-family: 'Pacifico', cursive;
   grid-area: hero;
   margin: 0.3rem 0;
   place-self: center;
@@ -24,9 +25,10 @@
 }
 
 .App-settings {
+  display: flex;
   grid-area: settings;
-  place-self: start end;
   margin: 1em;
+  place-self: start end;
 }
 
 .App-settings-icon {
