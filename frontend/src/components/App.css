@@ -44,10 +44,6 @@
   width: 8em;
 }
 
-.App-nav-item.active {
-  text-decoration: underline;
-}
-
 .App-main {
   display: flex;
   flex-flow: column nowrap;

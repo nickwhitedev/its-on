@@ -10,10 +10,10 @@ import {
 } from '../../../contexts/subscriptions/subscriptionsContext'
 
 import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
-import ItsOnIcon from '../../icons/ItsOnIcon'
 import { SubscriptionsDispatchActionType } from '../../../contexts/subscriptions/subscriptionsReducer'
-import { baseUrl } from '../../../utils/urls'
 import { fetchApi } from '../../../utils/api'
+import { baseUrl } from '../../../utils/urls'
+import ItsOnIcon from '../../icons/ItsOnIcon'
 
 interface Props {
   channel: IChannel
@@ -79,15 +79,17 @@ const Channel = ({ channel }: Props) => {
   }
 
   return (
-    <div className="Channel">
+    <div className='Channel'>
       <h2>{channel.title}</h2>
+      {channel.note.length > 0 ? <p>{channel.note}</p> : null}
+      {userIsChannelOwner ? <p>{`${baseUrl}/${channel.id}`}</p> : ''}
       {userIsChannelOwner ? (
         <button
           onClick={() => void handleClickItsOn()}
-          className="Channel-button"
-          aria-label="Turn on channel"
+          className={`Channel-button ${channel.on ? 'on' : ''}`}
+          aria-label='Turn on channel'
         >
-          <ItsOnIcon className="Channel-button-image" />
+          <ItsOnIcon className='Channel-button-image' />
         </button>
       ) : subscriptions.some(chan => chan.id === channel.id) ? (
         <button onClick={() => void handleClickUnsubscribe()}>
@@ -96,9 +98,6 @@ const Channel = ({ channel }: Props) => {
       ) : (
         <button onClick={() => void handleClickSubscribe()}>Subscribe</button>
       )}
-      {channel.on ? <p>It&apos;s On!</p> : null}
-      {channel.note.length > 0 ? <p>{channel.note}</p> : null}
-      {userIsChannelOwner ? <p>{`${baseUrl}/${channel.id}`}</p> : ''}
     </div>
   )
 }

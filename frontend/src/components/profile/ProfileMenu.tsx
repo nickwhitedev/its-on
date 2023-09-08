@@ -12,15 +12,16 @@ const ProfileMenu = () => {
     window.location.assign(fullLogoutUrl)
   }, [])
   return (
-    <div className="ProfileMenu">
+    <div className='ProfileMenu'>
       <a
-        href="#"
+        className='icon'
+        href='#'
         onClick={event => {
           event.preventDefault()
           navigate(-1)
         }}
       >
-        <span className="material-symbols-outlined">arrow_back</span>
+        <span className='material-symbols-outlined'>arrow_back</span>
       </a>
       <button onClick={handleLogout}>Logout</button>
     </div>
