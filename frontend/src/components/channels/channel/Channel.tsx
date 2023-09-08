@@ -1,16 +1,19 @@
-import {
-  useSubscriptions,
-  useSubscriptionsDispatch,
-} from '../../../contexts/subscriptions/subscriptionsContext'
+import './Channel.css'
 
 import {
   useChannels,
   useChannelsDispatch,
 } from '../../../contexts/channels/channelsContext'
+import {
+  useSubscriptions,
+  useSubscriptionsDispatch,
+} from '../../../contexts/subscriptions/subscriptionsContext'
+
 import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
+import ItsOnIcon from '../../icons/ItsOnIcon'
 import { SubscriptionsDispatchActionType } from '../../../contexts/subscriptions/subscriptionsReducer'
-import { fetchApi } from '../../../utils/api'
 import { baseUrl } from '../../../utils/urls'
+import { fetchApi } from '../../../utils/api'
 
 interface Props {
   channel: IChannel
@@ -76,10 +79,13 @@ const Channel = ({ channel }: Props) => {
   }
 
   return (
-    <div>
+    <div className="Channel">
       {userIsChannelOwner ? (
-        <button onClick={() => void handleClickItsOn()}>
-          Activate/Deactivate
+        <button
+          onClick={() => void handleClickItsOn()}
+          className="Channel-button"
+        >
+          <ItsOnIcon className="Channel-button-image" />
         </button>
       ) : subscriptions.some(chan => chan.id === channel.id) ? (
         <button onClick={() => void handleClickUnsubscribe()}>
