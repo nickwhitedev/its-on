@@ -24,6 +24,13 @@ a {
 a:hover {
   color: rgba(255, 255, 255, 0.5);
 }
+input,
+textarea,
+button,
+select,
+a {
+    -webkit-tap-highlight-color: transparent;
+}
 
 body {
   margin: 0;
