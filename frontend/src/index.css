@@ -24,7 +24,10 @@ a {
 a.icon {
   color: rgba(255, 255, 255, 0.87);
 }
-a:hover, a:focus, a:active, a.active {
+a:hover,
+a:focus,
+a:active,
+a.active {
   color: rgba(255, 255, 255, 0.87);
 }
 input,
@@ -32,7 +35,7 @@ textarea,
 button,
 select,
 a {
-    -webkit-tap-highlight-color: transparent;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -52,7 +55,7 @@ h1 {
 button {
   border-radius: 8px;
   border: 1px solid transparent;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.87);
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
@@ -60,9 +63,6 @@ button {
   background-color: #1a1a1a;
   cursor: pointer;
   transition: border-color 0.25s;
-}
-button:hover, button:focus, button:active {
-  color: rgba(255, 255, 255, 0.87);
 }
 
 .material-symbols-outlined {
@@ -77,7 +77,10 @@ button:hover, button:focus, button:active {
   a {
     color: rgba(0, 0, 0, 0.6);
   }
-  a:hover, a:focus, a:active, a.active {
+  a:hover,
+  a:focus,
+  a:active,
+  a.active {
     color: rgba(0, 0, 0, 0.87);
   }
   a.icon {
@@ -85,9 +88,5 @@ button:hover, button:focus, button:active {
   }
   button {
     background-color: #f9f9f9;
-    color: rgba(0, 0, 0, 0.6);
-  }
-  button:hover, button:focus, button:active {
-    color: rgba(0, 0, 0, 0.87);
   }
 }
