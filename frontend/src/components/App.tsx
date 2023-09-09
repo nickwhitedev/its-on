@@ -1,14 +1,14 @@
 import './App.css'
 
-import { useCallback, useEffect, useState } from 'react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
 import { getFullLoginUrl, getTokens, login } from '../utils/auth'
+import { useCallback, useEffect, useState } from 'react'
 
-import { useChannelsDispatch } from '../contexts/channels/channelsContext'
 import { ChannelsDispatchActionType } from '../contexts/channels/channelsReducer'
-import { useSubscriptionsDispatch } from '../contexts/subscriptions/subscriptionsContext'
 import { SubscriptionsDispatchActionType } from '../contexts/subscriptions/subscriptionsReducer'
 import { fetchApi } from '../utils/api'
+import { useChannelsDispatch } from '../contexts/channels/channelsContext'
+import { useSubscriptionsDispatch } from '../contexts/subscriptions/subscriptionsContext'
 
 interface OverviewData {
   channels: IChannel[]
@@ -80,42 +80,44 @@ const App = () => {
     }
     return (
       <>
-        <nav className='App-nav'>
+        <nav className="App-nav">
           <NavLink
             to={'/channels'}
-            className='App-nav-item'
+            className="App-nav-item"
           >
             Channels
           </NavLink>
           <NavLink
             to={'/subscriptions'}
-            className='App-nav-item'
+            className="App-nav-item"
           >
             Subscriptions
           </NavLink>
         </nav>
-        <Outlet />
+        <div className="App-content">
+          <Outlet />
+        </div>
       </>
     )
   }
 
   return (
-    <div className='App'>
-      <header className='App-header'>
+    <div className="App">
+      <header className="App-header">
         <h1>It&apos;s On</h1>
         {!authenticating && authenticated && loginUrl !== '' ? (
           <Link
             to={'/profile'}
-            className='App-settings icon'
-            aria-label='Account Settings'
+            className="App-settings icon"
+            aria-label="Account Settings"
           >
-            <span className='material-symbols-outlined App-settings-icon'>
+            <span className="material-symbols-outlined App-settings-icon">
               account_circle
             </span>
           </Link>
         ) : null}
       </header>
-      <main className='App-main'>{getContent()}</main>
+      <main className="App-main">{getContent()}</main>
     </div>
   )
 }

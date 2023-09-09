@@ -3,8 +3,8 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  min-height: 100vh;
-  min-width: 100vw;
+  height: 100%;
+  width: 100%;
 }
 
 .App-header {
@@ -44,10 +44,15 @@
   width: 8em;
 }
 
+.App-content {
+  flex: 1 1 auto;
+  height: 100%;
+}
+
 .App-main {
   display: flex;
+  flex: 1 1 auto;
   flex-flow: column nowrap;
-  justify-content: center;
   align-items: center;
   width: 100%;
 }

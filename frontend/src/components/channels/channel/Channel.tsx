@@ -10,10 +10,11 @@ import {
 } from '../../../contexts/subscriptions/subscriptionsContext'
 
 import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
-import { SubscriptionsDispatchActionType } from '../../../contexts/subscriptions/subscriptionsReducer'
-import { fetchApi } from '../../../utils/api'
-import { baseUrl } from '../../../utils/urls'
 import ItsOnIcon from '../../icons/ItsOnIcon'
+import { SubscriptionsDispatchActionType } from '../../../contexts/subscriptions/subscriptionsReducer'
+import { baseUrl } from '../../../utils/urls'
+import { fetchApi } from '../../../utils/api'
+import { useEffect } from 'react'
 
 interface Props {
   channel: IChannel
@@ -27,6 +28,15 @@ const Channel = ({ channel }: Props) => {
 
   const dispatchChannels = useChannelsDispatch()
   const dispatchSubscriptions = useSubscriptionsDispatch()
+
+  const hasNote = channel.note.length > 0
+
+  useEffect(() => {
+    document.title = channel.title
+    return () => {
+      document.title = "It's On"
+    }
+  }, [channel])
 
   const handleClickItsOn = async () => {
     try {
@@ -64,6 +74,19 @@ const Channel = ({ channel }: Props) => {
     }
   }
 
+  const handleClickShareChannel = async () => {
+    const channelURL = `${baseUrl}/${channel.id}`
+    try {
+      await navigator.share({
+        title: `It's On - ${channel.title}`,
+        text: `Check out the channel, ${channel.title} by ${channel.owner}`,
+        url: channelURL,
+      })
+    } catch (error) {
+      await navigator.clipboard.writeText(channelURL)
+    }
+  }
+
   const handleClickUnsubscribe = async () => {
     try {
       await fetchApi(`/${channel.id}/unsubscribe`, 'POST')
@@ -79,17 +102,32 @@ const Channel = ({ channel }: Props) => {
   }
 
   return (
-    <div className='Channel'>
-      <h2>{channel.title}</h2>
-      {channel.note.length > 0 ? <p>{channel.note}</p> : null}
-      {userIsChannelOwner ? <p>{`${baseUrl}/${channel.id}`}</p> : ''}
+    <div className="Channel">
+      <div className="Channel-header">
+        <h2 className="Channel-title">{channel.title}</h2>
+        <div className="Channel-share">
+          <button
+            onClick={() => void handleClickShareChannel()}
+            aria-label="Share"
+          >
+            <span className="material-symbols-outlined">share</span>
+          </button>
+        </div>
+      </div>
+      <span
+        className={`Channel-note ${
+          hasNote ? 'secondary-text' : 'instructions'
+        }`}
+      >
+        {hasNote ? channel.note : 'Extra details'}
+      </span>
       {userIsChannelOwner ? (
         <button
           onClick={() => void handleClickItsOn()}
           className={`Channel-button ${channel.on ? 'on' : ''}`}
-          aria-label='Turn on channel'
+          aria-label="Turn on channel"
         >
-          <ItsOnIcon className='Channel-button-image' />
+          <ItsOnIcon className="Channel-button-image" />
         </button>
       ) : subscriptions.some(chan => chan.id === channel.id) ? (
         <button onClick={() => void handleClickUnsubscribe()}>
