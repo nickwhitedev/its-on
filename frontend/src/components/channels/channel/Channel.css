@@ -1,20 +1,44 @@
 .Channel {
   display: flex;
   flex-flow: column nowrap;
+  justify-content: center;
   align-items: center;
+}
+
+.Channel-header {
+  display: grid;
+  grid:
+    [row-start] '. title share' [row-end]
+    / 3rem auto 3rem;
+}
+
+.Channel-title {
+  grid-area: title;
+}
+
+.Channel-share {
+  grid-area: share;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.Channel-note {
+  max-width: 70vw;
 }
 
 .Channel-button {
   background-color: transparent;
   border-radius: 50%;
   padding: 0;
+  margin: 1.8em 0;
   font: inherit;
   outline: inherit;
   height: 60vh;
   width: 60vh;
   max-height: 80vw;
   max-width: 80vw;
-  transition: all 0.5s ease-out;
+  transition: background-color 0.5s ease-out;
 }
 
 .Channel-button.on {
