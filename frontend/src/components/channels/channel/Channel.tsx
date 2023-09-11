@@ -109,6 +109,7 @@ const Channel = ({ channel }: Props) => {
           <button
             onClick={() => void handleClickShareChannel()}
             aria-label="Share"
+            className="Channel-share-button"
           >
             <span className="material-symbols-outlined">share</span>
           </button>
