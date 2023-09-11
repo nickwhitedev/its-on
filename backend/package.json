@@ -5,7 +5,7 @@
   "private": true,
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.405.0",
-    "@aws-sdk/lib-dynamodb": "^3.188.0",
+    "@aws-sdk/lib-dynamodb": "^3.409.0",
     "esbuild": "^0.19.2",
     "nanoid": "^4.0.2",
     "nanoid-dictionary": "^4.3.0"
