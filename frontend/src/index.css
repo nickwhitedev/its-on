@@ -21,7 +21,7 @@
 
 a {
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.6);
   text-decoration: inherit;
 }
 a.icon {
@@ -39,6 +39,17 @@ button,
 select,
 a {
   -webkit-tap-highlight-color: transparent;
+}
+
+input {
+  border-radius: 5px;
+  border: 1px rgba(255, 255, 255, 0.6) solid;
+  font-size: 1em;
+  margin: 0 0.3em;
+  padding: 0 0.3em;
+}
+input:focus-visible {
+  outline: none;
 }
 
 body {
@@ -72,6 +83,10 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
+button:disabled {
+  color: rgba(255, 255, 255, 0.38);
+  cursor: default;
+}
 
 .material-symbols-outlined {
   font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 40;
@@ -103,8 +118,15 @@ button {
   a.icon {
     color: rgba(0, 0, 0, 0.87);
   }
+  input {
+    border: 1px rgba(0, 0, 0, 0.6) solid;
+  }
   button {
     color: rgba(0, 0, 0, 0.87);
+  }
+  button:disabled {
+    color: rgba(0, 0, 0, 0.38);
+    cursor: default;
   }
   .instructions {
     color: rgba(0, 0, 0, 0.6);

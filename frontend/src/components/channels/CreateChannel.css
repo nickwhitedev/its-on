@@ -1,0 +1,20 @@
+.CreateChannel {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1em;
+}
+
+.CreateChannel-form {
+  display: flex;
+}
+
+.CreateChannel-input {
+}
+
+.CreateChannel-button {
+  display: flex;
+  align-items: center;
+}
+
+.CreateChannel-cancel {
+}
