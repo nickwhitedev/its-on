@@ -4,6 +4,7 @@ import {
   useChannels,
   useChannelsDispatch,
 } from '../../../contexts/channels/channelsContext'
+import { useEffect, useState } from 'react'
 import {
   useSubscriptions,
   useSubscriptionsDispatch,
@@ -14,7 +15,6 @@ import ItsOnIcon from '../../icons/ItsOnIcon'
 import { SubscriptionsDispatchActionType } from '../../../contexts/subscriptions/subscriptionsReducer'
 import { baseUrl } from '../../../utils/urls'
 import { fetchApi } from '../../../utils/api'
-import { useEffect } from 'react'
 
 interface Props {
   channel: IChannel
@@ -28,6 +28,8 @@ const Channel = ({ channel }: Props) => {
 
   const dispatchChannels = useChannelsDispatch()
   const dispatchSubscriptions = useSubscriptionsDispatch()
+
+  const [channelCopied, setChannelCopied] = useState<boolean>(false)
 
   const hasNote = channel.note.length > 0
 
@@ -84,6 +86,7 @@ const Channel = ({ channel }: Props) => {
       })
     } catch (error) {
       await navigator.clipboard.writeText(channelURL)
+      setChannelCopied(true)
     }
   }
 
@@ -106,13 +109,25 @@ const Channel = ({ channel }: Props) => {
       <div className="Channel-header">
         <h2 className="Channel-title">{channel.title}</h2>
         <div className="Channel-share">
-          <button
-            onClick={() => void handleClickShareChannel()}
-            aria-label="Share"
-            className="Channel-share-button"
-          >
-            <span className="material-symbols-outlined">share</span>
-          </button>
+          <div className="Channel-share-wrapper">
+            <button
+              onClick={() => void handleClickShareChannel()}
+              onBlur={() => {
+                setChannelCopied(false)
+              }}
+              aria-label="Share"
+              className="Channel-share-button"
+            >
+              <span className="material-symbols-outlined">share</span>
+            </button>
+            <span
+              className={`Channel-copied secondary-text ${
+                channelCopied ? '' : 'hidden'
+              }`}
+            >
+              Copied!
+            </span>
+          </div>
         </div>
       </div>
       <span

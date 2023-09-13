@@ -8,23 +8,44 @@
 .Channel-header {
   display: grid;
   grid:
-    [row-start] '. title share' [row-end]
-    / 3rem auto 3rem;
+    [row-start] 'title-actions title share' [row-end]
+    / 5rem auto 5rem;
 }
 
 .Channel-title {
   grid-area: title;
 }
 
+.Channel-title-actions {
+  grid-area: title-actions;
+}
+
 .Channel-share {
   grid-area: share;
   display: flex;
+  flex-flow: column nowrap;
   justify-content: center;
   align-items: center;
 }
 
+.Channel-share-wrapper {
+  display: flex;
+  flex-flow: column nowrap;
+}
+
 .Channel-share-button {
   display: flex;
+  padding-top: 1.05em;
+}
+
+.Channel-copied {
+  font-size: 0.5em;
+  transition: all 0.2s ease-in-out;
+  cursor: default;
+  user-select: none;
+}
+.Channel-copied.hidden {
+  color: rgba(0, 0, 0, 0);
 }
 
 .Channel-note {
