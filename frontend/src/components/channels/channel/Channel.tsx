@@ -10,6 +10,7 @@ import {
 } from '../../../contexts/subscriptions/subscriptionsContext'
 
 import ChannelHeader from './ChannelHeader'
+import ChannelNote from './ChannelNote'
 import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
 import ItsOnIcon from '../../icons/ItsOnIcon'
 import { SubscriptionsDispatchActionType } from '../../../contexts/subscriptions/subscriptionsReducer'
@@ -28,8 +29,6 @@ const Channel = ({ channel }: Props) => {
 
   const dispatchChannels = useChannelsDispatch()
   const dispatchSubscriptions = useSubscriptionsDispatch()
-
-  const hasNote = channel.note.length > 0
 
   useEffect(() => {
     document.title = channel.title
@@ -91,13 +90,7 @@ const Channel = ({ channel }: Props) => {
   return (
     <div className="Channel">
       <ChannelHeader channel={channel} />
-      <span
-        className={`Channel-note ${
-          hasNote ? 'secondary-text' : 'instructions'
-        }`}
-      >
-        {hasNote ? channel.note : 'Extra details'}
-      </span>
+      <ChannelNote channel={channel} />
       {userIsChannelOwner ? (
         <button
           onClick={() => void handleClickItsOn()}

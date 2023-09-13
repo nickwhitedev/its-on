@@ -42,15 +42,21 @@ a {
   font-family: 'Nunito', sans-serif;
 }
 
-input {
+input,
+textarea {
   border-radius: 5px;
-  border: 1px rgba(255, 255, 255, 0.6) solid;
+  border: none;
   font-size: 1em;
   margin: 0 0.3em;
-  padding: 0 0.3em;
+  padding: 0.3em 0.3em;
 }
-input:focus-visible {
+input:focus-visible,
+textarea:focus-visible {
   outline: none;
+  border: none;
+}
+textarea {
+  resize: none;
 }
 
 body {

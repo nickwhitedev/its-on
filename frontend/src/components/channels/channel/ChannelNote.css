@@ -1,0 +1,31 @@
+.ChannelNote {
+  display: grid;
+  grid:
+    [row-start] 'note-edit note note-form-buttons' [row-end]
+    / 5rem auto 5rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.ChannelNote-edit {
+  grid-area: note-edit;
+  display: flex;
+  justify-content: center;
+}
+
+.ChannelNote-note {
+  grid-area: note;
+}
+
+.ChannelNote-input {
+  font-size: 1em;
+  width: 50vw;
+  height: 9rem;
+}
+
+.ChannelNote-form-buttons {
+  grid-area: note-form-buttons;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

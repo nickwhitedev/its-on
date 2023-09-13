@@ -19,6 +19,11 @@ const ChannelHeader = ({ channel }: Props) => {
   const [channelCopied, setChannelCopied] = useState<boolean>(false)
 
   const handleSubmit = async () => {
+    if (newTitle === channel.title) {
+      setIsUpdating(false)
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
@@ -35,6 +40,7 @@ const ChannelHeader = ({ channel }: Props) => {
           ...channelUpdates,
         },
       })
+      setIsUpdating(false)
     } catch (error) {
       // TODO: Handle update channel error
       // log error to backend
