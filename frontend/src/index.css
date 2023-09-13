@@ -39,6 +39,7 @@ button,
 select,
 a {
   -webkit-tap-highlight-color: transparent;
+  font-family: 'Nunito', sans-serif;
 }
 
 input {

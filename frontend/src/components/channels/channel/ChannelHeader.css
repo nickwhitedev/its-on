@@ -1,0 +1,51 @@
+.ChannelHeader {
+  display: grid;
+  grid:
+    [row-start] 'title-actions title share' [row-end]
+    / 5rem auto 5rem;
+}
+
+.ChannelHeader-title-actions {
+  grid-area: title-actions;
+  display: flex;
+  justify-content: center;
+}
+
+.ChannelHeader-title {
+  grid-area: title;
+}
+
+.ChannelHeader-input {
+  font-size: 1.5em;
+  font-weight: bold;
+  line-height: 1.39;
+  margin: 0.83em 0;
+  text-align: center;
+}
+
+.ChannelHeader-share {
+  grid-area: share;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ChannelHeader-share-wrapper {
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.ChannelHeader-share-button {
+  display: flex;
+  padding-top: 1.05em;
+}
+
+.ChannelHeader-copied {
+  font-size: 0.5em;
+  transition: all 0.2s ease-in-out;
+  cursor: default;
+  user-select: none;
+}
+.ChannelHeader-copied.hidden {
+  color: rgba(0, 0, 0, 0);
+}
