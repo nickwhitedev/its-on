@@ -45,6 +45,7 @@ const CreateChannel = () => {
         >
           <input
             className={'CreateChannel-input'}
+            autoFocus={true}
             disabled={isSubmitting}
             maxLength={40}
             value={title}

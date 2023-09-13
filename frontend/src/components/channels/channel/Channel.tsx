@@ -9,10 +9,11 @@ import {
   useSubscriptionsDispatch,
 } from '../../../contexts/subscriptions/subscriptionsContext'
 
+import ChannelHeader from './ChannelHeader'
+import ChannelNote from './ChannelNote'
 import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
 import ItsOnIcon from '../../icons/ItsOnIcon'
 import { SubscriptionsDispatchActionType } from '../../../contexts/subscriptions/subscriptionsReducer'
-import { baseUrl } from '../../../utils/urls'
 import { fetchApi } from '../../../utils/api'
 import { useEffect } from 'react'
 
@@ -29,8 +30,6 @@ const Channel = ({ channel }: Props) => {
   const dispatchChannels = useChannelsDispatch()
   const dispatchSubscriptions = useSubscriptionsDispatch()
 
-  const hasNote = channel.note.length > 0
-
   useEffect(() => {
     document.title = channel.title
     return () => {
@@ -41,9 +40,9 @@ const Channel = ({ channel }: Props) => {
   const handleClickItsOn = async () => {
     try {
       const channelUpdates = {
-        id: channel.id,
         note: channel.note,
         on: !channel.on,
+        title: channel.title,
       }
       await fetchApi(`/${channel.id}`, 'PUT', channelUpdates)
       dispatchChannels({
@@ -74,19 +73,6 @@ const Channel = ({ channel }: Props) => {
     }
   }
 
-  const handleClickShareChannel = async () => {
-    const channelURL = `${baseUrl}/${channel.id}`
-    try {
-      await navigator.share({
-        title: `It's On - ${channel.title}`,
-        text: `Check out the channel, ${channel.title} by ${channel.owner}`,
-        url: channelURL,
-      })
-    } catch (error) {
-      await navigator.clipboard.writeText(channelURL)
-    }
-  }
-
   const handleClickUnsubscribe = async () => {
     try {
       await fetchApi(`/${channel.id}/unsubscribe`, 'POST')
@@ -103,25 +89,8 @@ const Channel = ({ channel }: Props) => {
 
   return (
     <div className="Channel">
-      <div className="Channel-header">
-        <h2 className="Channel-title">{channel.title}</h2>
-        <div className="Channel-share">
-          <button
-            onClick={() => void handleClickShareChannel()}
-            aria-label="Share"
-            className="Channel-share-button"
-          >
-            <span className="material-symbols-outlined">share</span>
-          </button>
-        </div>
-      </div>
-      <span
-        className={`Channel-note ${
-          hasNote ? 'secondary-text' : 'instructions'
-        }`}
-      >
-        {hasNote ? channel.note : 'Extra details'}
-      </span>
+      <ChannelHeader channel={channel} />
+      <ChannelNote channel={channel} />
       {userIsChannelOwner ? (
         <button
           onClick={() => void handleClickItsOn()}

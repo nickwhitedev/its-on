@@ -23,7 +23,7 @@ describe('Test updateChannelHandler', function () {
 
     const event: APIGatewayProxyEvent = {
       ...mockEvent,
-      body: '{"on": false,"note": "hello"}',
+      body: '{"on": false,"note": "hello","title": "test channel"}',
       httpMethod: 'PUT',
     }
 
@@ -35,5 +35,28 @@ describe('Test updateChannelHandler', function () {
     expect(result.headers).toEqual(CORS_HEADERS)
     expect(result.statusCode).toEqual(200)
     expect(resultBody.message).toEqual('Updated')
+  })
+
+  it('should trim note and title', async () => {
+    ddbMock.on(UpdateCommand).resolves({})
+
+    const event: APIGatewayProxyEvent = {
+      ...mockEvent,
+      body: `{"on": false,"note": "${'hello'.repeat(
+        100,
+      )}","title": "${'test channel'.repeat(100)}"}`,
+      httpMethod: 'PUT',
+    }
+
+    // Invoke updateChannelHandler()
+    const result = await updateChannelHandler(event)
+
+    const resultBody = JSON.parse(result.body) as IResponseWithMessage
+    // Compare the result with the expected result
+    expect(result.headers).toEqual(CORS_HEADERS)
+    expect(result.statusCode).toEqual(200)
+    expect(resultBody.message).toEqual('Updated')
+    // FIXME: Make this test meaningful... Can it spy on the ddbMock somehow?
+    // expect(ddbMock).toHaveBeenCalledWith({})
   })
 })

@@ -22,7 +22,7 @@ export const updateChannelHandler = async (
 
   const channelID = event.pathParameters?.channelID
 
-  const { note, on } = JSON.parse(event.body ?? '') as IChannel
+  const { note, on, title } = JSON.parse(event.body ?? '') as IChannel
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
@@ -39,14 +39,16 @@ export const updateChannelHandler = async (
         },
         ReturnValues: 'ALL_NEW',
         TableName: DYNAMODB_TABLE_NAME,
-        UpdateExpression: 'SET #note = :note, #on = :on',
+        UpdateExpression: 'SET #note = :note, #on = :on, #title = :title',
         ExpressionAttributeNames: {
           '#note': 'note',
           '#on': 'on',
+          '#title': 'title',
         },
         ExpressionAttributeValues: {
-          ':note': note,
+          ':note': note.substring(0, 200),
           ':on': on,
+          ':title': title.substring(0, 40),
         },
       }),
     )
