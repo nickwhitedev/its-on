@@ -160,7 +160,7 @@ jobs:
               ParameterKey=SESDomainIdentityArn,ParameterValue=${AWS_SES_DOMAIN_IDENTITY_ARN}
 
       - name: Assume the testing pipeline user role
-        uses: aws-actions/configure-aws-credentials@v3.0.2
+        uses: aws-actions/configure-aws-credentials@v4.0.0
         with:
           aws-access-key-id: ${{ env.PIPELINE_USER_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
@@ -184,7 +184,7 @@ jobs:
           if-no-files-found: error
 
       - name: Assume the prod pipeline user role
-        uses: aws-actions/configure-aws-credentials@v3.0.2
+        uses: aws-actions/configure-aws-credentials@v4.0.0
         with:
           aws-access-key-id: ${{ env.PIPELINE_USER_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
@@ -231,7 +231,7 @@ jobs:
           path: backend
 
       - name: Assume the testing pipeline user role
-        uses: aws-actions/configure-aws-credentials@v3.0.2
+        uses: aws-actions/configure-aws-credentials@v4.0.0
         with:
           aws-access-key-id: ${{ env.PIPELINE_USER_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
@@ -297,7 +297,7 @@ jobs:
           path: backend
 
       - name: Assume the prod pipeline user role
-        uses: aws-actions/configure-aws-credentials@v3.0.2
+        uses: aws-actions/configure-aws-credentials@v4.0.0
         with:
           aws-access-key-id: ${{ env.PIPELINE_USER_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
@@ -365,7 +365,7 @@ jobs:
       - name: Build frontend
         run: CI=true yarn build
       - name: Assume the prod pipeline user role
-        uses: aws-actions/configure-aws-credentials@v3.0.2
+        uses: aws-actions/configure-aws-credentials@v4.0.0
         with:
           aws-access-key-id: ${{ env.PIPELINE_USER_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
