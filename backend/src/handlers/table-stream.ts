@@ -1,8 +1,8 @@
-import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb'
-
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb'
 import { DynamoDBStreamEvent } from 'aws-lambda'
 import { handleModifyEvent } from '../table-stream/modify'
+import { handleRemoveEvent } from '../table-stream/remove'
 
 const ddbDocClient = DynamoDBDocumentClient.from(new DynamoDBClient({}))
 

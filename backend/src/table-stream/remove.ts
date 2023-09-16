@@ -1,11 +1,13 @@
 import {
-  BatchWriteCommand,
+  DeleteCommand,
   DynamoDBDocumentClient,
-  PutCommand,
   QueryCommand,
+  QueryCommandOutput,
 } from '@aws-sdk/lib-dynamodb'
-import { DynamoDBRecord } from 'aws-lambda'
+
 import { DYNAMODB_TABLE_NAME } from '../utils/constants'
+import { DynamoDBRecord } from 'aws-lambda'
+import { batchWrite } from '../utils/dynamo'
 
 export const handleRemoveEvent = async (
   record: DynamoDBRecord,
@@ -17,97 +19,90 @@ export const handleRemoveEvent = async (
   ) {
     return
   }
-  let channelInfo: IDynamoChannelItem
 
-  // get channel partition
-  try {
-    channelInfo = {
-      note: record.dynamodb.NewImage.note.S ?? '',
-      on: record.dynamodb.NewImage.on.BOOL ?? false,
-      owner: record.dynamodb.NewImage.owner.S ?? '',
-      pk: record.dynamodb.NewImage.pk.S ?? '',
-      sk: record.dynamodb.NewImage.sk.S ?? '',
-      title: record.dynamodb.NewImage.title.S ?? '',
-    }
-  } catch (error) {
-    console.error('Unexpected error with fields: ', error)
-    return
-  }
+  const channelID = record.dynamodb.Keys.sk.S.substring(
+    record.dynamodb.Keys.sk.S.indexOf('#') + 1,
+  )
 
-  let items: IDynamoChannelItem[] | null
-  const channelID = channelInfo.sk.substring(channelInfo.sk.indexOf('#') + 1)
-
-  try {
-    const ddbResponse = await ddbDocClient.send(
-      new QueryCommand({
-        TableName: DYNAMODB_TABLE_NAME,
-        KeyConditionExpression: 'pk = :pkval',
-        ExpressionAttributeValues: { ':pkval': `channel#${channelID}` },
-      }),
-    )
-    items = ddbResponse.Items as IDynamoChannelItem[] | null
-    console.info('Get public channel and subscribers: ', ddbResponse)
-  } catch (err) {
-    console.error('Get public channel error', err)
-    return
-  }
-
-  if (items == null || items.length === 0) {
-    // Put a public channel if it doesn't already exist
-    try {
-      await ddbDocClient.send(
-        new PutCommand({
-          TableName: DYNAMODB_TABLE_NAME,
-          Item: {
-            ...channelInfo,
-            pk: `channel#${channelID}`,
-            sk: 'info',
-          },
-        }),
-      )
-      console.info('Successful batch write')
-    } catch (err) {
-      console.error('batch write failed: ', err)
-      return
-    }
-    return
-  }
-
-  // bulk write all channel copies
+  // Delete the public channel
   try {
     await ddbDocClient.send(
-      new BatchWriteCommand({
-        RequestItems: {
-          [DYNAMODB_TABLE_NAME]: items.map(item => {
-            const { pk: currentPK, sk: currentSK } = item
-            return {
-              PutRequest: {
-                Item: {
-                  ...channelInfo,
-                  pk:
-                    currentSK === 'info'
-                      ? currentPK
-                      : `user#${currentSK.substring(
-                          currentSK.indexOf('#') + 1,
-                        )}`,
-                  sk:
-                    currentSK === 'info'
-                      ? currentSK
-                      : `subscription#${currentPK.substring(
-                          currentPK.indexOf('#') + 1,
-                        )}`,
-                },
-              },
-            }
-          }),
+      new DeleteCommand({
+        TableName: DYNAMODB_TABLE_NAME,
+        Key: {
+          pk: `channel#${channelID}`,
+          sk: 'info',
         },
       }),
     )
-    console.info('Successful batch write')
+    console.info('Successful public channel delete')
   } catch (err) {
-    console.error('batch write failed: ', err)
-    return
+    console.error('public channel delete failed: ', err)
   }
 
-  // TODO: send notifications if it's on
+  let lastEvaluatedKey: Record<string, unknown> | undefined
+  do {
+    let subscribers: IDynamoChannelSubscriber[] | null
+
+    try {
+      const ddbResponse: QueryCommandOutput = await ddbDocClient.send(
+        new QueryCommand({
+          TableName: DYNAMODB_TABLE_NAME,
+          KeyConditionExpression: 'pk = :pkval',
+          ExpressionAttributeValues: { ':pkval': `channel#${channelID}` },
+          ...(lastEvaluatedKey != null
+            ? { ExclusiveStartKey: lastEvaluatedKey }
+            : {}),
+        }),
+      )
+      subscribers = ddbResponse.Items as IDynamoChannelSubscriber[] | null
+      lastEvaluatedKey = ddbResponse.LastEvaluatedKey
+      console.info('Get channel subscribers: ', ddbResponse)
+    } catch (err) {
+      console.error('Get public channel error', err)
+      return
+    }
+
+    // bulk delete all channel copies and subscribers
+    let batchCount = 0
+    while (subscribers != null && subscribers.length > 0) {
+      // Limiting to 12 to stay under batch write limit, which is 25 requests per batch write
+      const items = subscribers.slice(0, 12)
+      try {
+        await batchWrite({
+          batchWriteInput: {
+            RequestItems: {
+              [DYNAMODB_TABLE_NAME]: items.flatMap(({ pk, sk }) => {
+                return [
+                  {
+                    DeleteRequest: {
+                      Key: {
+                        pk,
+                        sk,
+                      },
+                    },
+                  },
+                  {
+                    DeleteRequest: {
+                      Key: {
+                        pk: `user#${sk.substring(sk.indexOf('#') + 1)}`,
+                        sk: `subscription#${pk.substring(pk.indexOf('#') + 1)}`,
+                      },
+                    },
+                  },
+                ]
+              }),
+            },
+          },
+          ddbDocClient,
+        })
+        console.info(`Successful batch delete - batch ${++batchCount}`)
+      } catch (err) {
+        console.error('batch delete failed: ', err)
+      }
+      console.info(`Batches of items deleted: ${batchCount}`)
+      // Next batch in the queue
+      subscribers.splice(0, 12)
+    }
+  } while (lastEvaluatedKey != null && Object.keys(lastEvaluatedKey).length > 0)
 }

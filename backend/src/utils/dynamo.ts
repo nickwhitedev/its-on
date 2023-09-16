@@ -1,7 +1,15 @@
-import { DynamoDBDocumentClient, GetCommand } from '@aws-sdk/lib-dynamodb'
-import { DYNAMODB_TABLE_NAME } from './constants'
+import {
+  BatchWriteCommand,
+  BatchWriteCommandInput,
+  BatchWriteCommandOutput,
+  DynamoDBDocumentClient,
+  GetCommand,
+} from '@aws-sdk/lib-dynamodb'
 
-interface Params {
+import { DYNAMODB_TABLE_NAME } from './constants'
+import wait from './wait'
+
+interface GetChannelParams {
   channelID: string
   ddbDocClient: DynamoDBDocumentClient
   userID?: string
@@ -11,7 +19,7 @@ export const getChannel = async ({
   channelID,
   ddbDocClient,
   userID,
-}: Params): Promise<IDynamoChannelItem | undefined> => {
+}: GetChannelParams): Promise<IDynamoChannelItem | undefined> => {
   let ddbResponse
   try {
     ddbResponse = await ddbDocClient.send(
@@ -34,4 +42,38 @@ export const getChannel = async ({
     )
   }
   return ddbResponse.Item as IDynamoChannelItem | undefined
+}
+
+interface BatchWriteParams {
+  batchWriteInput: BatchWriteCommandInput
+  ddbDocClient: DynamoDBDocumentClient
+  retryCount?: number
+}
+
+export const batchWrite = async ({
+  batchWriteInput,
+  ddbDocClient,
+  retryCount = 0,
+}: BatchWriteParams): Promise<BatchWriteCommandOutput> => {
+  const response = await ddbDocClient.send(
+    new BatchWriteCommand(batchWriteInput),
+  )
+
+  if (
+    response.UnprocessedItems &&
+    Object.keys(response.UnprocessedItems).length > 0
+  ) {
+    if (retryCount > 8) {
+      throw new Error('Unprocessed Items not processed')
+    }
+    await wait(2 ** retryCount * 10)
+
+    return await batchWrite({
+      batchWriteInput: { RequestItems: response.UnprocessedItems },
+      ddbDocClient,
+      retryCount: retryCount + 1,
+    })
+  }
+
+  return response
 }
