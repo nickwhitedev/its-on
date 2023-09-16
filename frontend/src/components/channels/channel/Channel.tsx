@@ -59,6 +59,20 @@ const Channel = ({ channel }: Props) => {
     }
   }
 
+  const handleClickDelete = async () => {
+    try {
+      await fetchApi(`/${channel.id}`, 'DELETE')
+      dispatchChannels({
+        type: ChannelsDispatchActionType.DELETED,
+        id: channel.id,
+      })
+    } catch (error) {
+      // TODO: Handle create channel error
+      // log error to backend
+      // display user friendly message
+    }
+  }
+
   const handleClickSubscribe = async () => {
     try {
       await fetchApi(`/${channel.id}/subscribe`, 'POST')
@@ -92,13 +106,22 @@ const Channel = ({ channel }: Props) => {
       <ChannelHeader channel={channel} />
       <ChannelNote channel={channel} />
       {userIsChannelOwner ? (
-        <button
-          onClick={() => void handleClickItsOn()}
-          className={`Channel-button ${channel.on ? 'on' : ''}`}
-          aria-label="Turn on channel"
-        >
-          <ItsOnIcon className="Channel-button-image" />
-        </button>
+        <>
+          <button
+            onClick={() => void handleClickItsOn()}
+            className={`Channel-button ${channel.on ? 'on' : ''}`}
+            aria-label="Turn on channel"
+          >
+            <ItsOnIcon className="Channel-button-image" />
+          </button>
+          <button
+            onClick={() => void handleClickDelete()}
+            className="Channel-button Channel-button-delete"
+            aria-label="Delete channel"
+          >
+            <span className="material-symbols-outlined">delete</span> Delete
+          </button>
+        </>
       ) : subscriptions.some(chan => chan.id === channel.id) ? (
         <button onClick={() => void handleClickUnsubscribe()}>
           Unsubscribe
