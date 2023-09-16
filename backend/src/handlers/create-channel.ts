@@ -110,6 +110,7 @@ export const createChannelHandler = async (
     statusCode = 201
     responseBody = {
       id: channelID,
+      subscribers: [],
       ...channelAttributes,
     }
     console.info('Success - item added or updated', ddbResponse)
