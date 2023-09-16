@@ -32,7 +32,7 @@ export const subscribeHandler = async (
   let privateChannel: IDynamoChannelItem | undefined
   // get private channel entry
   try {
-    privateChannel = await getChannel({channelID, ddbDocClient, userID})
+    privateChannel = await getChannel({ channelID, ddbDocClient, userID })
   } catch (_error) {
     return {
       statusCode: 400,
@@ -87,39 +87,39 @@ export const subscribeHandler = async (
     }
   }
 
-  const params = {
-    RequestItems: {
-      [DYNAMODB_TABLE_NAME]: [
-        {
-          PutRequest: {
-            Item: {
-              pk: `user#${userID}`,
-              sk: `subscription#${channelID}`,
-              ...channelAttributes,
-            },
-          },
-        },
-        {
-          PutRequest: {
-            Item: {
-              pk: `channel#${channelID}`,
-              sk: `subscriber#${userID}`,
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-              username:
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                event.requestContext.authorizer?.claims['cognito:username'],
-            },
-          },
-        },
-      ],
-    },
-  }
-
   let statusCode
   let responseBody
 
   try {
-    const ddbResponse = await ddbDocClient.send(new BatchWriteCommand(params))
+    const ddbResponse = await ddbDocClient.send(
+      new BatchWriteCommand({
+        RequestItems: {
+          [DYNAMODB_TABLE_NAME]: [
+            {
+              PutRequest: {
+                Item: {
+                  pk: `user#${userID}`,
+                  sk: `subscription#${channelID}`,
+                  ...channelAttributes,
+                },
+              },
+            },
+            {
+              PutRequest: {
+                Item: {
+                  pk: `channel#${channelID}`,
+                  sk: `subscriber#${userID}`,
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                  username:
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                    event.requestContext.authorizer?.claims['cognito:username'],
+                },
+              },
+            },
+          ],
+        },
+      }),
+    )
     statusCode = 200
     responseBody = { message: 'Subscribed' }
     console.info('Success - items added or updated', ddbResponse)
