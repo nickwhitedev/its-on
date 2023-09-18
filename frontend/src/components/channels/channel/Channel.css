@@ -26,6 +26,19 @@
   animation: pulsate 8s ease-out infinite;
 }
 
+.Channel-button-delete {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: min-content;
+  width: min-content;
+}
+
+.Channel-button-delete > span {
+  margin-bottom: 0.1em;
+  margin-right: 0.5em;
+}
+
 @keyframes pulsate {
   0% {
     box-shadow: 0 0 0 0 rgba(59, 132, 234, 0.3);

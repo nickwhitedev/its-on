@@ -45,7 +45,7 @@ Resources:
       Cors:
         AllowCredentials: false
         AllowHeaders: "'Authorization,*'"
-        AllowMethods: "'OPTIONS,POST,GET,PUT'"
+        AllowMethods: "'OPTIONS,POST,GET,PUT,DELETE'"
         AllowOrigin: "'*'"
         MaxAge: 600
       Auth:
@@ -220,6 +220,41 @@ Resources:
         Sourcemap: true
         EntryPoints:
           - src/handlers/update-channel.ts
+
+  # This is a Lambda function config associated with the source code: delete-item.mjs
+  deleteChannelFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/delete-channel.deleteChannelHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: Deletes a channel for a user
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          ITS_ON_TABLE: !Ref ItsOnTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ItsOnApi
+            Path: /{channelID}
+            Method: DELETE
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: 'es2022'
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/delete-channel.ts
 
   # This is a Lambda function config associated with the source code: subscribe.mjs
   subscribeFunction:
