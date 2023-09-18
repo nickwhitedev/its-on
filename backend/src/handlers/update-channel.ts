@@ -51,7 +51,7 @@ export const updateChannelHandler = async (
   }
   if (channelIsNotOwnedByUser) {
     return {
-      statusCode: 401,
+      statusCode: 403,
       headers: CORS_HEADERS,
       body: JSON.stringify({
         message: 'You may only update a channel you own',
