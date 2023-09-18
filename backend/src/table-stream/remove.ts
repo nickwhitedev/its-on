@@ -5,8 +5,8 @@ import {
   QueryCommandOutput,
 } from '@aws-sdk/lib-dynamodb'
 
-import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { DynamoDBRecord } from 'aws-lambda'
+import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { batchWrite } from '../utils/dynamo'
 
 export const handleRemoveEvent = async (
@@ -63,7 +63,7 @@ export const handleRemoveEvent = async (
       return
     }
 
-    // bulk delete all channel copies and subscribers
+    // bulk delete all channel copies and mark subscriber copies as deleted
     let batchCount = 0
     while (subscribers != null && subscribers.length > 0) {
       // Limiting to 12 to stay under batch write limit, which is 25 requests per batch write
@@ -83,11 +83,16 @@ export const handleRemoveEvent = async (
                     },
                   },
                   {
-                    DeleteRequest: {
-                      Key: {
+                    PutRequest: {
+                      Item: {
+                        deleted: true,
+                        note: '',
+                        on: false,
+                        owner: record.dynamodb?.OldImage?.owner?.S ?? '',
                         pk: `user#${sk.substring(sk.indexOf('#') + 1)}`,
                         sk: `subscription#${pk.substring(pk.indexOf('#') + 1)}`,
-                      },
+                        title: record.dynamodb?.OldImage?.title?.S ?? '',
+                      } as IDynamoChannelItem,
                     },
                   },
                 ]

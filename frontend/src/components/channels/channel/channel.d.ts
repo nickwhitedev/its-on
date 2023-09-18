@@ -1,4 +1,5 @@
 interface IChannel {
+  deleted?: boolean
   id: string
   note: string
   on: boolean

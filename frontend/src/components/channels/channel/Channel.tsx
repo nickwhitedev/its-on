@@ -127,7 +127,7 @@ const Channel = ({ channel }: Props) => {
           </button>
           <button
             aria-label='Delete channel'
-            className='Channel-button Channel-button-delete'
+            className='Channel-button Channel-button-delete red'
             disabled={isDeleting}
             onClick={() => void handleClickDelete()}
           >
