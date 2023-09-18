@@ -1,11 +1,15 @@
-import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
+import {
+  DynamoDBDocumentClient,
+  GetCommand,
+  UpdateCommand,
+} from '@aws-sdk/lib-dynamodb'
 
-import { APIGatewayProxyEvent } from 'aws-lambda'
-import { CORS_HEADERS } from '../../../src/utils/constants'
 import { jest } from '@jest/globals'
+import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
 import mockEvent from '../../../__mocks__/mock-event'
 import { updateChannelHandler } from '../../../src/handlers/update-channel'
+import { CORS_HEADERS } from '../../../src/utils/constants'
 
 // This includes all tests for updateChannelHandler()
 describe('Test updateChannelHandler', function () {
@@ -20,11 +24,15 @@ describe('Test updateChannelHandler', function () {
   it('should add id to the table', async () => {
     // Return the specified value whenever the spied put function is called
     ddbMock.on(UpdateCommand).resolves({})
+    ddbMock.on(GetCommand).resolves({ Item: {} })
 
     const event: APIGatewayProxyEvent = {
       ...mockEvent,
       body: '{"on": false,"note": "hello","title": "test channel"}',
       httpMethod: 'PUT',
+      pathParameters: {
+        channelID: 'someID',
+      },
     }
 
     // Invoke updateChannelHandler()
@@ -39,6 +47,7 @@ describe('Test updateChannelHandler', function () {
 
   it('should trim note and title', async () => {
     ddbMock.on(UpdateCommand).resolves({})
+    ddbMock.on(GetCommand).resolves({ Item: {} })
 
     const event: APIGatewayProxyEvent = {
       ...mockEvent,
@@ -46,6 +55,9 @@ describe('Test updateChannelHandler', function () {
         100,
       )}","title": "${'test channel'.repeat(100)}"}`,
       httpMethod: 'PUT',
+      pathParameters: {
+        channelID: 'someID',
+      },
     }
 
     // Invoke updateChannelHandler()

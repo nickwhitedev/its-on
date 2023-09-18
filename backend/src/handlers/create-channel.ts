@@ -1,14 +1,14 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
-  GetCommand,
 } from '@aws-sdk/lib-dynamodb'
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { alphanumeric } from 'nanoid-dictionary'
 import { customAlphabet } from 'nanoid'
+import { alphanumeric } from 'nanoid-dictionary'
+import { getChannel } from '../utils/dynamo'
 
 const nanoid = customAlphabet(alphanumeric, 11)
 
@@ -44,16 +44,7 @@ export const createChannelHandler = async (
 
   do {
     try {
-      const ddbResponse = await ddbDocClient.send(
-        new GetCommand({
-          TableName: DYNAMODB_TABLE_NAME,
-          Key: {
-            pk: `channel#${channelID}`,
-            sk: 'info',
-          },
-        }),
-      )
-      channelIDIsTaken = ddbResponse.Item != null
+      channelIDIsTaken = (await getChannel({ channelID, ddbDocClient })) != null
     } catch (error) {
       console.error(
         'Error',
