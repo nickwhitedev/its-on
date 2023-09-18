@@ -1,8 +1,9 @@
+import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants'
-import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { getChannel } from '../utils/dynamo'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -20,12 +21,45 @@ export const updateChannelHandler = async (
   }
   console.info('received:', event)
 
-  const channelID = event.pathParameters?.channelID
-
-  const { note, on, title } = JSON.parse(event.body ?? '') as IChannel
-
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
+
+  const channelID = event.pathParameters?.channelID
+
+  if (channelID == null) {
+    return {
+      statusCode: 400,
+      headers: CORS_HEADERS,
+      body: JSON.stringify({ message: 'Bad Request' }),
+    }
+  }
+
+  let channelIsNotOwnedByUser: boolean
+  try {
+    channelIsNotOwnedByUser =
+      (await getChannel({ channelID, ddbDocClient, userID })) == null
+  } catch (error) {
+    console.error(
+      'Error',
+      error instanceof Error ? error.stack : 'Unknown Type',
+    )
+    return {
+      statusCode: 400,
+      headers: CORS_HEADERS,
+      body: JSON.stringify({ message: 'Something went wrong' }),
+    }
+  }
+  if (channelIsNotOwnedByUser) {
+    return {
+      statusCode: 401,
+      headers: CORS_HEADERS,
+      body: JSON.stringify({
+        message: 'You may only update a channel you own',
+      }),
+    }
+  }
+
+  const { note, on, title } = JSON.parse(event.body ?? '') as IChannel
 
   let statusCode
   let responseBody

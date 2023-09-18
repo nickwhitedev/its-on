@@ -15,6 +15,9 @@ interface GetChannelParams {
   userID?: string
 }
 
+/**
+ * Gets a channel. If userID is given, the authoritative copy is returned
+ */
 export const getChannel = async ({
   channelID,
   ddbDocClient,
