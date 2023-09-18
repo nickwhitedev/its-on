@@ -49,5 +49,10 @@ export const fetchApi = async <T>(
     await refreshTokens(getTokens()?.refreshToken ?? '')
     return await fetchApi(uri, method, body, true)
   }
-  return (await response.json()) as T
+  // JSON.parse throws an error when the response is empty, so check for it
+  const responseString = await response.text()
+  const parsedResponse = (
+    responseString === '' ? {} : JSON.parse(responseString)
+  ) as T
+  return parsedResponse
 }
