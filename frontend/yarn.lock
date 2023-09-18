@@ -1813,10 +1813,10 @@
     "@typescript-eslint/types" "6.7.0"
     eslint-visitor-keys "^3.4.1"
 
-"@vite-pwa/assets-generator@^0.0.9":
-  version "0.0.9"
-  resolved "https://registry.yarnpkg.com/@vite-pwa/assets-generator/-/assets-generator-0.0.9.tgz#5d36a89317a24d27d1c188d15f10a30d66becfea"
-  integrity sha512-cMnSxzK0IAhQ088j6C1d2N+Orib/yE0BO9RBQx52LZZzEH5+vhsqTE/rwv5yf8mzD441/eOq5CbDmIOACjQD+w==
+"@vite-pwa/assets-generator@^0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@vite-pwa/assets-generator/-/assets-generator-0.0.10.tgz#3c9c3a21413b40f2e9f84c2441899c4074247511"
+  integrity sha512-Ya3iE0EWIV+0g0XFXIjqSU8ZnhpJeLi9/xx+VfbSyXThKjk168GUYqd1z+SOuRO03bSRFDeK8wGixtwWuedjqg==
   dependencies:
     cac "^6.7.14"
     colorette "^2.0.20"
