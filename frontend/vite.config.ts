@@ -49,6 +49,9 @@ export default defineConfig({
       },
       registerType: 'autoUpdate',
       strategies: 'injectManifest',
+      workbox: {
+        cleanupOutdatedCaches: true,
+      },
       // Promotional - not supported by vite types?
       // screenshots: [
       //   src: 'pwa-512x512.png',

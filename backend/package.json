@@ -5,8 +5,8 @@
   "private": true,
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.410.0",
-    "@aws-sdk/lib-dynamodb": "^3.410.0",
-    "esbuild": "^0.19.2",
+    "@aws-sdk/lib-dynamodb": "^3.415.0",
+    "esbuild": "^0.19.3",
     "nanoid": "^4.0.2",
     "nanoid-dictionary": "^4.3.0"
   },
@@ -15,9 +15,9 @@
     "@types/jest": "^29.5.4",
     "@types/nanoid": "^3.0.0",
     "@types/nanoid-dictionary": "^4.2.0",
-    "@types/node": "^20.6.0",
-    "@typescript-eslint/eslint-plugin": "^6.6.0",
-    "@typescript-eslint/parser": "^6.6.0",
+    "@types/node": "^20.6.2",
+    "@typescript-eslint/eslint-plugin": "^6.7.2",
+    "@typescript-eslint/parser": "^6.7.2",
     "aws-sdk-client-mock": "^3.0.0",
     "esbuild-jest": "^0.5.0",
     "eslint": "^8.49.0",
