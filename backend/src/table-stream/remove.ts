@@ -5,8 +5,8 @@ import {
   QueryCommandOutput,
 } from '@aws-sdk/lib-dynamodb'
 
-import { DynamoDBRecord } from 'aws-lambda'
 import { DYNAMODB_TABLE_NAME } from '../utils/constants'
+import { DynamoDBRecord } from 'aws-lambda'
 import { batchWrite } from '../utils/dynamo'
 
 export const handleRemoveEvent = async (
@@ -36,8 +36,8 @@ export const handleRemoveEvent = async (
       }),
     )
     console.info('Successful public channel delete')
-  } catch (err) {
-    console.error('public channel delete failed: ', err)
+  } catch (error) {
+    console.error('public channel delete failed: ', error)
   }
 
   let lastEvaluatedKey: Record<string, unknown> | undefined
@@ -58,8 +58,8 @@ export const handleRemoveEvent = async (
       subscribers = ddbResponse.Items as IDynamoChannelSubscriber[] | null
       lastEvaluatedKey = ddbResponse.LastEvaluatedKey
       console.info('Get channel subscribers: ', ddbResponse)
-    } catch (err) {
-      console.error('Get public channel error', err)
+    } catch (error) {
+      console.error('Get public channel error', error)
       return
     }
 
@@ -67,12 +67,12 @@ export const handleRemoveEvent = async (
     let batchCount = 0
     while (subscribers != null && subscribers.length > 0) {
       // Limiting to 12 to stay under batch write limit, which is 25 requests per batch write
-      const items = subscribers.slice(0, 12)
+      const subscriberChunk = subscribers.slice(0, 12)
       try {
         await batchWrite({
           batchWriteInput: {
             RequestItems: {
-              [DYNAMODB_TABLE_NAME]: items.flatMap(({ pk, sk }) => {
+              [DYNAMODB_TABLE_NAME]: subscriberChunk.flatMap(({ pk, sk }) => {
                 return [
                   {
                     DeleteRequest: {
@@ -101,11 +101,11 @@ export const handleRemoveEvent = async (
           },
           ddbDocClient,
         })
-        console.info(`Successful batch delete - batch ${++batchCount}`)
-      } catch (err) {
-        console.error('batch delete failed: ', err)
+        console.info(`Successful batch write/delete - batch ${++batchCount}`)
+      } catch (error) {
+        console.error('batch write/delete failed: ', error)
       }
-      console.info(`Batches of items deleted: ${batchCount}`)
+      console.info(`Batches of items written/deleted: ${batchCount}`)
       // Next batch in the queue
       subscribers.splice(0, 12)
     }
