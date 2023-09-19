@@ -1,6 +1,6 @@
-import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants'
+import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { getChannel } from '../utils/dynamo'
