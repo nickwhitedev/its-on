@@ -1,0 +1,78 @@
+name: Delete Branch or Tag
+
+on: delete
+
+env:
+  AWS_SNS_COGNITO_IAM_ARN: ${{ secrets.AWS_SNS_COGNITO_IAM_ARN }}
+  AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID: ${{ secrets.AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID }}
+  AWS_SES_DOMAIN_IDENTITY_ARN: ${{ secrets.AWS_SES_DOMAIN_IDENTITY_ARN }}
+  PIPELINE_USER_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  PIPELINE_USER_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  SAM_TEMPLATE: template.yml
+  TESTING_PIPELINE_EXECUTION_ROLE: arn:aws:iam::303579314896:role/aws-sam-cli-managed-dev-pipe-PipelineExecutionRole-1EXGMRU8M7PIU
+  TESTING_CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::303579314896:role/aws-sam-cli-managed-dev-p-CloudFormationExecutionR-13FN6CKHSS9UA
+  TESTING_ARTIFACTS_BUCKET: aws-sam-cli-managed-dev-pipeline-artifactsbucket-1awxr7qt59hmv
+  TESTING_REGION: us-east-1
+
+jobs:
+  destroy-frontend:
+    if: (startsWith(github.event.ref, 'feature') || startsWith(github.event.ref, 'release')) && github.event_name == 'delete' && github.event.ref_type == 'branch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Assume the testing pipeline user role
+        uses: aws-actions/configure-aws-credentials@v4.0.0
+        with:
+          aws-access-key-id: ${{ env.PIPELINE_USER_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.TESTING_REGION }}
+          role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
+          role-session-name: destroy-frontend
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
+      - name: echo ref
+        env:
+          BRANCH_NAME: ${{ github.event.ref }}
+        run: echo ${BRANCH_NAME##*/}
+      - name: Clear frontend bucket
+        env:
+          BRANCH_NAME: ${{ github.event.ref }}
+        run: |
+          aws s3 rm s3://$(echo ${BRANCH_NAME##*/} | tr -cd '[a-zA-Z0-9-]').itson.fyi --recursive
+      - name: Remove s3 bucket
+        env:
+          BRANCH_NAME: ${{ github.event.ref }}
+        run: |
+          aws s3 rb s3://$(echo ${BRANCH_NAME##*/} | tr -cd '[a-zA-Z0-9-]').itson.fyi
+
+  destroy-api:
+    if: (startsWith(github.event.ref, 'feature') || startsWith(github.event.ref, 'release')) && github.event_name == 'delete' && github.event.ref_type == 'branch'
+    needs: [destroy-frontend]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
+
+      - name: Assume the testing pipeline user role
+        uses: aws-actions/configure-aws-credentials@v4.0.0
+        with:
+          aws-access-key-id: ${{ env.PIPELINE_USER_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.TESTING_REGION }}
+          role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
+          role-session-name: destroy-api
+          role-duration-seconds: 3600
+          role-skip-session-tagging: true
+
+      - name: Delete api stack
+        env:
+          BRANCH_NAME: ${{ github.event.ref }}
+        run: |
+          sam delete \
+            --stack-name its-on-$(echo ${BRANCH_NAME##*/} | tr -cd '[a-zA-Z0-9-]') \
+            --region ${TESTING_REGION} \
+            --no-prompts

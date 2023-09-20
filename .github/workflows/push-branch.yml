@@ -1,11 +1,9 @@
-name: Release Branch
+name: Push Branch
 
 on:
   push:
     branches:
-      - 'release**'
-  delete:
-    branches:
+      - 'feature**'
       - 'release**'
 
 env:
@@ -111,12 +109,12 @@ jobs:
       - run: rm -rf node_modules && yarn install --frozen-lockfile
       - run: tsc
 
-  build-and-deploy-release-api:
-    # this stage is triggered only for release branches (release*),
+  build-and-deploy-branch-api:
+    # this stage is triggered only for feature or release branches (feature* or release*),
     # which will build the stack and deploy to a stack named with branch name.
     # https://github.com/actions/setup-python
     # https://github.com/aws-actions/configure-aws-credentials#notice-node12-deprecation-warning
-    if: startsWith(github.ref, 'refs/heads/release')
+    if: (startsWith(github.ref, 'refs/heads/feature') || startsWith(github.ref, 'refs/heads/release'))
     needs:
       [
         test-backend,
@@ -163,11 +161,11 @@ jobs:
           aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.TESTING_REGION }}
           role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
-          role-session-name: release-api-deployment
+          role-session-name: branch-api-deployment
           role-duration-seconds: 3600
           role-skip-session-tagging: true
 
-      - name: Deploy to release stack in the testing account
+      - name: Deploy to branch stack in the testing account
         shell: bash
         run: |
           sam deploy \
@@ -200,9 +198,9 @@ jobs:
                 echo $i >> "$GITHUB_OUTPUT"
               done
 
-  deploy-release-frontend:
-    if: startsWith(github.ref, 'refs/heads/release')
-    needs: [build-and-deploy-release-api]
+  deploy-feature-frontend:
+    if: (startsWith(github.ref, 'refs/heads/feature') || startsWith(github.ref, 'refs/heads/release'))
+    needs: [build-and-deploy-branch-api]
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -216,12 +214,12 @@ jobs:
       - name: Install dependencies
         run: rm -rf node_modules && yarn install --frozen-lockfile
       - name: Set environment variables
-        working-directory: frontend
+        shell: bash
         run: |
-          echo "VITE_COGNITO_CLIENT_ID=\"${{needs.build-and-deploy-release-api.outputs.cognito-client-id}}\"" >> .env.production
-          echo "VITE_BASE_URL=\"${{needs.build-and-deploy-release-api.outputs.web-endpoint}}\"" >> .env.production
-          echo "VITE_AUTH_URL=\"${{needs.build-and-deploy-release-api.outputs.auth-endpoint}}\"" >> .env.production
-          echo "VITE_API_URL=\"${{needs.build-and-deploy-release-api.outputs.api-endpoint}}\"" >> .env.production
+          echo "VITE_COGNITO_CLIENT_ID=\"${{needs.build-and-deploy-branch-api.outputs.cognito-client-id}}\"" >> .env.production
+          echo "VITE_BASE_URL=\"${{needs.build-and-deploy-branch-api.outputs.web-endpoint}}\"" >> .env.production
+          echo "VITE_AUTH_URL=\"${{needs.build-and-deploy-branch-api.outputs.auth-endpoint}}\"" >> .env.production
+          echo "VITE_API_URL=\"${{needs.build-and-deploy-branch-api.outputs.api-endpoint}}\"" >> .env.production
       - name: Build frontend
         run: CI=true yarn build
       - name: Assume the testing pipeline user role
@@ -231,7 +229,7 @@ jobs:
           aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.TESTING_REGION }}
           role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
-          role-session-name: release-frontend-deployment
+          role-session-name: branch-frontend-deployment
           role-duration-seconds: 3600
           role-skip-session-tagging: true
       - name: Clear frontend bucket
@@ -242,65 +240,3 @@ jobs:
           aws s3 cp dist \
             s3://$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]').itson.fyi \
             --recursive
-
-  destroy-release-frontend:
-    if: startsWith(github.event.ref, 'release') && github.event_name == 'delete'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Assume the testing pipeline user role
-        uses: aws-actions/configure-aws-credentials@v4.0.0
-        with:
-          aws-access-key-id: ${{ env.PIPELINE_USER_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.TESTING_REGION }}
-          role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
-          role-session-name: destroy-release-frontend
-          role-duration-seconds: 3600
-          role-skip-session-tagging: true
-      - name: echo ref
-        env:
-          RELEASE_BRANCH_NAME: ${{ github.event.ref }}
-        run: echo ${RELEASE_BRANCH_NAME##*/}
-      - name: Clear frontend bucket
-        env:
-          RELEASE_BRANCH_NAME: ${{ github.event.ref }}
-        run: |
-          aws s3 rm s3://$(echo ${RELEASE_BRANCH_NAME##*/} | tr -cd '[a-zA-Z0-9-]').itson.fyi --recursive
-      - name: Remove s3 bucket
-        env:
-          RELEASE_BRANCH_NAME: ${{ github.event.ref }}
-        run: |
-          aws s3 rb s3://$(echo ${RELEASE_BRANCH_NAME##*/} | tr -cd '[a-zA-Z0-9-]').itson.fyi
-
-  destroy-release-api:
-    if: startsWith(github.event.ref, 'release') && github.event_name == 'delete'
-    needs: [destroy-release-frontend]
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: backend
-    steps:
-      - uses: actions/checkout@v4
-      - uses: aws-actions/setup-sam@v2
-        with:
-          use-installer: true
-
-      - name: Assume the testing pipeline user role
-        uses: aws-actions/configure-aws-credentials@v4.0.0
-        with:
-          aws-access-key-id: ${{ env.PIPELINE_USER_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.TESTING_REGION }}
-          role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
-          role-session-name: destroy-release-api
-          role-duration-seconds: 3600
-          role-skip-session-tagging: true
-
-      - name: Delete release branch stack
-        env:
-          RELEASE_BRANCH_NAME: ${{ github.event.ref }}
-        run: |
-          sam delete \
-            --stack-name its-on-$(echo ${RELEASE_BRANCH_NAME##*/} | tr -cd '[a-zA-Z0-9-]') \
-            --region ${TESTING_REGION} \
-            --no-prompts
