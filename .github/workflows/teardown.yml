@@ -1,4 +1,4 @@
-name: Delete Branch or Tag
+name: Teardown
 
 on: delete
 
