@@ -7,6 +7,12 @@ interface IChannel {
   title: string
 }
 
+interface IPublicChannel {
+  id: string
+  owner: string
+  title: string
+}
+
 interface IChannelSubscriber {
   id: string
   username: string

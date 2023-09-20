@@ -1,8 +1,9 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 
+import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { createResponse } from '../utils/response'
 import { getChannel } from '../utils/dynamo'
 
 const client = new DynamoDBClient({})
@@ -21,17 +22,19 @@ export const updateChannelHandler = async (
   }
   console.info('received:', event)
 
+  const eventPath = event.path
+
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
 
   const channelID = event.pathParameters?.channelID
 
   if (channelID == null) {
-    return {
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Bad Request' },
       statusCode: 400,
-      headers: CORS_HEADERS,
-      body: JSON.stringify({ message: 'Bad Request' }),
-    }
+    })
   }
 
   let channelIsNotOwnedByUser: boolean
@@ -43,26 +46,23 @@ export const updateChannelHandler = async (
       'Error',
       error instanceof Error ? error.stack : 'Unknown Type',
     )
-    return {
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Something went wrong' },
       statusCode: 400,
-      headers: CORS_HEADERS,
-      body: JSON.stringify({ message: 'Something went wrong' }),
-    }
+    })
   }
   if (channelIsNotOwnedByUser) {
-    return {
-      statusCode: 403,
-      headers: CORS_HEADERS,
-      body: JSON.stringify({
+    return createResponse({
+      eventPath,
+      responseBody: {
         message: 'You may only update a channel you own',
-      }),
-    }
+      },
+      statusCode: 403,
+    })
   }
 
   const { note, on, title } = JSON.parse(event.body ?? '') as IChannel
-
-  let statusCode
-  let responseBody
 
   try {
     const ddbResponse = await ddbDocClient.send(
@@ -86,26 +86,22 @@ export const updateChannelHandler = async (
         },
       }),
     )
-    statusCode = 200
-    responseBody = { message: 'Updated' }
     console.info('Success - item updated', ddbResponse)
-  } catch (err) {
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Updated' },
+      statusCode: 200,
+    })
+  } catch (error) {
     // TODO: Error handling - make more robust
-    statusCode = 400
-    console.error('Error', err instanceof Error ? err.stack : 'Unknown Type')
-    responseBody = { message: 'Something went wrong' }
+    console.error(
+      'Error',
+      error instanceof Error ? error.stack : 'Unknown Type',
+    )
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Something went wrong' },
+      statusCode: 400,
+    })
   }
-
-  const response = {
-    statusCode,
-    headers: CORS_HEADERS,
-    body: JSON.stringify(responseBody),
-  }
-
-  console.info(`response from: ${event.path}: `, {
-    statusCode: response.statusCode,
-    body: responseBody,
-  })
-
-  return response
 }

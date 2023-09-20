@@ -1,8 +1,9 @@
-import { DeleteCommand, DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants'
+import { DeleteCommand, DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb'
 
+import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { createResponse } from '../utils/response'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -20,13 +21,11 @@ export const deleteChannelHandler = async (
   }
   console.info('received:', event)
 
+  const eventPath = event.path
   const channelID = event.pathParameters?.channelID
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
-
-  let statusCode
-  let responseBody
 
   try {
     const ddbResponse = await ddbDocClient.send(
@@ -38,26 +37,19 @@ export const deleteChannelHandler = async (
         TableName: DYNAMODB_TABLE_NAME,
       }),
     )
-    statusCode = 204
-    responseBody = { message: 'Deleted' }
     console.info('Success - item deleted', ddbResponse)
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Deleted' },
+      statusCode: 204,
+    })
   } catch (err) {
     // TODO: Error handling - make more robust
-    statusCode = 400
     console.error('Error', err instanceof Error ? err.stack : 'Unknown Type')
-    responseBody = { message: 'Something went wrong' }
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Something went wrong' },
+      statusCode: 400,
+    })
   }
-
-  const response = {
-    statusCode,
-    headers: CORS_HEADERS,
-    body: JSON.stringify(responseBody),
-  }
-
-  console.info(`response from: ${event.path}: `, {
-    statusCode: response.statusCode,
-    body: responseBody,
-  })
-
-  return response
 }

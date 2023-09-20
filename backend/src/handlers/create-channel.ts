@@ -1,13 +1,14 @@
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
 } from '@aws-sdk/lib-dynamodb'
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants'
 
+import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { customAlphabet } from 'nanoid'
 import { alphanumeric } from 'nanoid-dictionary'
+import { createResponse } from '../utils/response'
+import { customAlphabet } from 'nanoid'
 import { getChannel } from '../utils/dynamo'
 
 const nanoid = customAlphabet(alphanumeric, 11)
@@ -31,6 +32,7 @@ export const createChannelHandler = async (
     )
   }
   console.info('received:', event)
+  const eventPath = event.path
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
@@ -50,11 +52,11 @@ export const createChannelHandler = async (
         'Error',
         error instanceof Error ? error.stack : 'Unknown Type',
       )
-      return {
+      return createResponse({
+        eventPath,
+        responseBody: { message: 'Something went wrong' },
         statusCode: 400,
-        headers: CORS_HEADERS,
-        body: JSON.stringify({ message: 'Something went wrong' }),
-      }
+      })
     }
     if (channelIDIsTaken) {
       console.info(`Collision detected. Generating id #${++channelIDAttempt}`)
@@ -63,13 +65,9 @@ export const createChannelHandler = async (
   } while (channelIDIsTaken)
 
   const channelAttributes = {
-    note: '',
-    on: false,
     owner: username,
     title: (JSON.parse(event.body ?? '') as IPayload).title.substring(0, 40),
   }
-  let statusCode: number
-  let responseBody: IChannel | IResponseWithMessage
 
   try {
     const ddbResponse = await ddbDocClient.send(
@@ -81,8 +79,10 @@ export const createChannelHandler = async (
                 Item: {
                   pk: `user#${userID}`,
                   sk: `channel#${channelID}`,
+                  note: '',
+                  on: false,
                   ...channelAttributes,
-                },
+                } as IDynamoChannelItem,
               },
             },
             {
@@ -91,39 +91,34 @@ export const createChannelHandler = async (
                   pk: `channel#${channelID}`,
                   sk: 'info',
                   ...channelAttributes,
-                },
+                } as IDynamoPublicChannelItem,
               },
             },
           ],
         },
       }),
     )
-    statusCode = 201
-    responseBody = {
-      id: channelID,
-      subscribers: [],
-      ...channelAttributes,
-    }
     console.info('Success - item added or updated', ddbResponse)
+    return createResponse({
+      eventPath,
+      responseBody: {
+        id: channelID,
+        subscribers: [],
+        note: '',
+        on: false,
+        ...channelAttributes,
+      },
+      statusCode: 201,
+    })
   } catch (error) {
-    statusCode = 400
     console.error(
       'Error',
       error instanceof Error ? error.stack : 'Unknown Type',
     )
-    responseBody = { message: 'Something went wrong' }
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Something went wrong' },
+      statusCode: 400,
+    })
   }
-
-  const response = {
-    statusCode,
-    headers: CORS_HEADERS,
-    body: JSON.stringify(responseBody),
-  }
-
-  console.info(`response from: ${event.path}: `, {
-    statusCode: response.statusCode,
-    body: responseBody,
-  })
-
-  return response
 }

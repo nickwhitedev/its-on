@@ -1,12 +1,13 @@
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
   GetCommand,
 } from '@aws-sdk/lib-dynamodb'
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants'
 
+import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { createResponse } from '../utils/response'
 import { getChannel } from '../utils/dynamo'
 
 const client = new DynamoDBClient({})
@@ -25,6 +26,7 @@ export const subscribeHandler = async (
   }
   console.info('received:', event)
 
+  const eventPath = event.path
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
   const channelID = event.pathParameters?.channelID ?? '' // is composite id
@@ -33,22 +35,25 @@ export const subscribeHandler = async (
   // get private channel entry
   try {
     privateChannel = await getChannel({ channelID, ddbDocClient, userID })
-  } catch (_error) {
-    return {
+  } catch (error) {
+    console.error('Error getting private channel: ', error)
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Something went wrong' },
       statusCode: 400,
-      headers: CORS_HEADERS,
-      body: JSON.stringify({ message: 'Something went wrong' }),
-    }
+    })
   }
 
   if (privateChannel != null) {
     // Subscriptions should only be for public copies of channels
     console.info('User owns channel')
-    return {
+    return createResponse({
+      eventPath,
+      responseBody: {
+        message: 'You cannot subscribe to a channel you own',
+      },
       statusCode: 403,
-      headers: CORS_HEADERS,
-      body: JSON.stringify({ message: 'Forbidden' }),
-    }
+    })
   }
 
   let channelAttributes
@@ -65,11 +70,11 @@ export const subscribeHandler = async (
       }),
     )
     if (ddbResponse.Item == null) {
-      return {
+      return createResponse({
+        eventPath,
+        responseBody: { message: 'Not found' },
         statusCode: 404,
-        headers: CORS_HEADERS,
-        body: JSON.stringify({ message: 'Not found' }),
-      }
+      })
     }
     const {
       pk: _pk,
@@ -78,17 +83,14 @@ export const subscribeHandler = async (
     } = ddbResponse.Item as IDynamoChannelItem
     channelAttributes = channelInfo
     console.info('Get public channel info: ', ddbResponse)
-  } catch (err) {
-    console.error('Get public channel error', err)
-    return {
+  } catch (error) {
+    console.error('Get public channel error', error)
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Something went wrong' },
       statusCode: 400,
-      headers: CORS_HEADERS,
-      body: JSON.stringify({ message: 'Something went wrong' }),
-    }
+    })
   }
-
-  let statusCode
-  let responseBody
 
   try {
     const ddbResponse = await ddbDocClient.send(
@@ -120,25 +122,21 @@ export const subscribeHandler = async (
         },
       }),
     )
-    statusCode = 200
-    responseBody = { message: 'Subscribed' }
     console.info('Success - items added or updated', ddbResponse)
-  } catch (err) {
-    statusCode = 400
-    console.error('Error', err instanceof Error ? err.stack : 'Unknown Type')
-    responseBody = { message: 'Something went wrong' }
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Subscribed' },
+      statusCode: 200,
+    })
+  } catch (error) {
+    console.error(
+      'Batch Write Error',
+      error instanceof Error ? error.stack : 'Unknown Type',
+    )
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Something went wrong' },
+      statusCode: 400,
+    })
   }
-
-  const response = {
-    statusCode,
-    headers: CORS_HEADERS,
-    body: JSON.stringify(responseBody),
-  }
-
-  console.info(`response from: ${event.path}: `, {
-    statusCode: response.statusCode,
-    body: responseBody,
-  })
-
-  return response
 }
