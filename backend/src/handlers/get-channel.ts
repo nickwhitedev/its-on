@@ -1,11 +1,9 @@
-import {
-  DynamoDBDocumentClient,
-  QueryCommand
-} from '@aws-sdk/lib-dynamodb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants'
+import { DynamoDBDocumentClient, QueryCommand } from '@aws-sdk/lib-dynamodb'
 
+import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { createResponse } from '../utils/response'
 import { getChannel } from '../utils/dynamo'
 import { serializeQueryResponse } from '../utils/serialize'
 
@@ -26,118 +24,110 @@ export const getChannelHandler = async (
     )
   }
 
+  const eventPath = event.path
+
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
   const channelID = event.pathParameters?.channelID
 
   if (channelID == null) {
-    return {
+    console.error('No channelID given')
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Channel ID must be given' },
       statusCode: 400,
-      headers: CORS_HEADERS,
-      body: JSON.stringify({ message: 'Bad Request' }),
-    }
+    })
   }
-
-  let statusCode
-  let responseBody
 
   // get private channel entry
   let privateChannel: IDynamoChannelItem | undefined
   try {
-    privateChannel = await getChannel({channelID, ddbDocClient, userID})
-  } catch (_error) {
-    return {
+    privateChannel = await getChannel({ channelID, ddbDocClient, userID })
+  } catch (error) {
+    console.error('Private channel get error: ', error)
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Something went wrong' },
       statusCode: 400,
-      headers: CORS_HEADERS,
-      body: JSON.stringify({ message: 'Something went wrong' }),
-    }
+    })
   }
 
   if (privateChannel != null) {
-    const {
-      pk: _pk,
-      sk: _sk,
-      ...channelInfo
-    } = privateChannel
-    statusCode = 200
-    responseBody = {
-      id: channelID,
-      ...channelInfo,
-    }
+    const { pk: _pk, sk: _sk, ...channelInfo } = privateChannel
 
-    // query channel partition
+    // query channel partition for subscribers
+    let subscribers: IChannelSubscriber[]
     try {
       const ddbResponse = await ddbDocClient.send(
         new QueryCommand({
           TableName: DYNAMODB_TABLE_NAME,
-          KeyConditionExpression: '#pk = :channelID',
+          KeyConditionExpression:
+            '#pk = :pkvalue and begins_with(sk, :skprefix)',
           ExpressionAttributeNames: {
             '#pk': 'pk',
           },
           ExpressionAttributeValues: {
-            ':channelID': `channel#${channelID}`,
+            ':pkvalue': `channel#${channelID}`,
+            ':skprefix': 'subscriber',
           },
         }),
       )
-      responseBody = {
-        ...responseBody,
-        ...serializeQueryResponse(
-          ddbResponse.Items?.filter(item => item.sk !== 'info') ?? [],
-        ),
-      }
+      subscribers = (
+        serializeQueryResponse(ddbResponse.Items ?? []) as {
+          subscribers: IChannelSubscriber[]
+        }
+      ).subscribers
       console.info('Success - channel owner data: ', ddbResponse)
     } catch (error) {
       console.error('Dynamo Query Error', error)
-      return {
+      return createResponse({
+        eventPath,
+        responseBody: { message: 'Something went wrong' },
         statusCode: 400,
-        headers: CORS_HEADERS,
-        body: JSON.stringify({ message: 'Something went wrong' }),
-      }
+      })
     }
+
+    return createResponse({
+      eventPath,
+      statusCode: 200,
+      responseBody: {
+        id: channelID,
+        ...channelInfo,
+        subscribers,
+      },
+    })
   } else {
     // User doesn't own channel
     // get public channel info
     let publicChannel: IDynamoChannelItem | undefined
     try {
-      publicChannel = await getChannel({channelID, ddbDocClient})
-    } catch (_error) {
-      return {
+      publicChannel = await getChannel({ channelID, ddbDocClient })
+    } catch (error) {
+      console.error('Dynamo Get Error', error)
+      return createResponse({
+        eventPath,
+        responseBody: { message: 'Something went wrong' },
         statusCode: 400,
-        headers: CORS_HEADERS,
-        body: JSON.stringify({ message: 'Something went wrong' }),
-      }
+      })
     }
-    
+
     if (publicChannel == null) {
-      console.info('Channel not found')
-      return {
+      return createResponse({
+        eventPath,
+        responseBody: { message: 'Channel not found' },
         statusCode: 404,
-        headers: CORS_HEADERS,
-        body: JSON.stringify({ message: 'Not found' }),
-      }
+      })
     }
 
-    const {
-      pk,
-      sk: _sk,
-      ...channelInfo
-    } = publicChannel
+    const { pk, sk: _sk, ...channelInfo } = publicChannel
 
-    statusCode = 200
-    responseBody = {
-      id: pk.substring(pk.indexOf('#') + 1),
-      ...channelInfo,
-    }
-  }
-
-  console.info(`response from: ${event.path}: `, {
-    statusCode,
-    responseBody,
-  })
-
-  return {
-    statusCode: statusCode,
-    headers: CORS_HEADERS,
-    body: JSON.stringify(responseBody),
+    return createResponse({
+      eventPath,
+      responseBody: {
+        id: pk.substring(pk.indexOf('#') + 1),
+        ...channelInfo,
+      },
+      statusCode: 200,
+    })
   }
 }

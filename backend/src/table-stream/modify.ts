@@ -58,9 +58,13 @@ export const handleModifyEvent = async (
       const ddbResponse = await ddbDocClient.send(
         new QueryCommand({
           TableName: DYNAMODB_TABLE_NAME,
-          KeyConditionExpression: 'pk = :pkval and begins_with(sk, :skprefix',
+          KeyConditionExpression:
+            '#pk = :pkvalue and begins_with(sk, :skprefix)',
+          ExpressionAttributeNames: {
+            '#pk': 'pk',
+          },
           ExpressionAttributeValues: {
-            ':pkval': `channel#${channelID}`,
+            ':pkvalue': `channel#${channelID}`,
             ':skprefix': 'subscriber',
           },
           ...(lastEvaluatedKey != null

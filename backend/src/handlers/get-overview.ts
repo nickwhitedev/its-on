@@ -1,8 +1,9 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import { CORS_HEADERS, DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { DynamoDBDocumentClient, QueryCommand } from '@aws-sdk/lib-dynamodb'
 
+import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { createResponse } from '../utils/response'
 import { serializeQueryResponse } from '../utils/serialize'
 
 const client = new DynamoDBClient({})
@@ -23,42 +24,36 @@ export const getOverviewHandler = async (
   }
   console.info('received:', event)
 
-  const params = {
-    TableName: DYNAMODB_TABLE_NAME,
-    KeyConditionExpression: '#pk = :userID',
-    ExpressionAttributeNames: {
-      '#pk': 'pk',
-    },
-    ExpressionAttributeValues: {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      ':userID': `user#${event.requestContext.authorizer?.claims?.sub ?? ''}`,
-    },
-  }
-
-  let statusCode
-  let responseBody
+  const eventPath = event.path
 
   try {
-    const ddbResponse = await ddbDocClient.send(new QueryCommand(params))
-    statusCode = 200
-    responseBody = serializeQueryResponse(ddbResponse.Items ?? [])
+    const ddbResponse = await ddbDocClient.send(
+      new QueryCommand({
+        TableName: DYNAMODB_TABLE_NAME,
+        KeyConditionExpression: '#pk = :userID',
+        ExpressionAttributeNames: {
+          '#pk': 'pk',
+        },
+        ExpressionAttributeValues: {
+          ':userID': `user#${
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            event.requestContext.authorizer?.claims?.sub ?? ''
+          }`,
+        },
+      }),
+    )
     console.info('Success - data: ', ddbResponse)
-  } catch (err) {
-    statusCode = 400
-    responseBody = { message: 'Something went wrong' }
-    console.error('Error', err)
+    return createResponse({
+      eventPath,
+      responseBody: serializeQueryResponse(ddbResponse.Items ?? []),
+      statusCode: 200,
+    })
+  } catch (error) {
+    console.error('DynamoDB Query Error: ', error)
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Something went wrong' },
+      statusCode: 400,
+    })
   }
-
-  const response = {
-    statusCode: statusCode,
-    headers: CORS_HEADERS,
-    body: JSON.stringify(responseBody),
-  }
-
-  console.info(`response from: ${event.path}: `, {
-    statusCode,
-    responseBody,
-  })
-
-  return response
 }
