@@ -6,6 +6,7 @@ import {
   GetCommand,
 } from '@aws-sdk/lib-dynamodb'
 
+import { ChannelCopyTypeEnum } from './enums'
 import { DYNAMODB_TABLE_NAME } from './constants'
 import wait from './wait'
 
@@ -13,6 +14,7 @@ interface GetChannelParams {
   channelID: string
   ddbDocClient: DynamoDBDocumentClient
   userID?: string
+  copyType?: ChannelCopyTypeEnum
 }
 
 /**
@@ -22,6 +24,7 @@ export const getChannel = async ({
   channelID,
   ddbDocClient,
   userID,
+  copyType,
 }: GetChannelParams): Promise<IDynamoChannelItem | undefined> => {
   let ddbResponse
   try {
@@ -29,8 +32,16 @@ export const getChannel = async ({
       new GetCommand({
         TableName: DYNAMODB_TABLE_NAME,
         Key: {
-          pk: userID == null ? `channel#${channelID}` : `user#${userID}`,
-          sk: userID == null ? 'info' : `channel#${channelID}`,
+          pk:
+            userID == null || copyType === ChannelCopyTypeEnum.PUBLIC
+              ? `channel#${channelID}`
+              : `user#${userID}`,
+          sk:
+            userID == null || copyType === ChannelCopyTypeEnum.PUBLIC
+              ? 'info'
+              : copyType === ChannelCopyTypeEnum.SUBSCRIBER
+              ? `subscription#${channelID}`
+              : `channel#${channelID}`,
         },
       }),
     )

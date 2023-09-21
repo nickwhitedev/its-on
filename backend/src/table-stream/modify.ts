@@ -41,6 +41,8 @@ export const handleModifyEvent = async (
           ...channelInfo,
           pk: `channel#${channelID}`,
           sk: 'info',
+          note: '',
+          on: false,
         } as IDynamoChannelItem,
       }),
     )
@@ -51,7 +53,10 @@ export const handleModifyEvent = async (
   }
 
   let lastEvaluatedKey: Record<string, unknown> | undefined
+  let queryBatchCount = 0
   do {
+    console.info(`Start Query batch ${++queryBatchCount}`)
+
     let subscribers: IDynamoChannelSubscriber[] | null
 
     try {
@@ -120,6 +125,7 @@ export const handleModifyEvent = async (
       subscribers.splice(0, 12)
     }
   } while (lastEvaluatedKey != null && Object.keys(lastEvaluatedKey).length > 0)
+  console.info('Finished updating items successfully')
 
   // TODO: send notifications if it's on
 }
