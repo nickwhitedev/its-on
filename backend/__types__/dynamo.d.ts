@@ -5,6 +5,9 @@
  * - User's copy (private and source of truth)
  *   - pk = 'user#<userID>'
  *   - sk = 'channel#<channelID>'
+ * - Public copy
+ *   - pk = 'channel#<channelID>'
+ *   - sk = 'info'\
  * - Subscriber copy (distributed copy for performance)
  *   - pk = 'user#<userID>'
  *   - sk = 'subscription#<channelID>'
@@ -26,33 +29,6 @@ interface IDynamoStreamChannelImage {
   on: {
     BOOL: boolean
   }
-  owner: {
-    S: string
-  }
-  pk: {
-    S: string
-  }
-  sk: {
-    S: string
-  }
-  title: {
-    S: string
-  }
-}
-
-/**
- * - Public copy
- *   - pk = 'channel#<channelID>'
- *   - sk = 'info'
- */
-interface IDynamoPublicChannelItem {
-  owner: string
-  pk: string
-  sk: string
-  title: string
-}
-
-interface IDynamoStreamChannelImage {
   owner: {
     S: string
   }

@@ -45,6 +45,7 @@ describe('Test getChannelHandler', () => {
       headers: CORS_HEADERS,
       body: JSON.stringify({
         id: 'someID',
+        subscribers: [],
         note: '',
         on: false,
         title: 'test-channel',

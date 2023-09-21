@@ -1,6 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import { DynamoDBDocumentClient, QueryCommand } from '@aws-sdk/lib-dynamodb'
 
+import { ChannelCopyTypeEnum } from '../utils/enums'
 import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { createResponse } from '../utils/response'
@@ -39,7 +40,7 @@ export const getChannelHandler = async (
     })
   }
 
-  // get private channel entry
+  // get owner channel copy
   let privateChannel: IDynamoChannelItem | undefined
   try {
     privateChannel = await getChannel({ channelID, ddbDocClient, userID })
@@ -96,38 +97,71 @@ export const getChannelHandler = async (
         subscribers,
       },
     })
-  } else {
-    // User doesn't own channel
-    // get public channel info
-    let publicChannel: IDynamoChannelItem | undefined
-    try {
-      publicChannel = await getChannel({ channelID, ddbDocClient })
-    } catch (error) {
-      console.error('Dynamo Get Error', error)
-      return createResponse({
-        eventPath,
-        responseBody: { message: 'Something went wrong' },
-        statusCode: 400,
-      })
-    }
+  }
 
-    if (publicChannel == null) {
-      return createResponse({
-        eventPath,
-        responseBody: { message: 'Channel not found' },
-        statusCode: 404,
-      })
-    }
+  // get subscriber channel copy
+  let subscriberChannel: IDynamoChannelItem | undefined
+  try {
+    subscriberChannel = await getChannel({
+      channelID,
+      ddbDocClient,
+      userID,
+      copyType: ChannelCopyTypeEnum.SUBSCRIBER,
+    })
+  } catch (error) {
+    console.error('Subscriber channel get error: ', error)
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Something went wrong' },
+      statusCode: 400,
+    })
+  }
 
-    const { pk, sk: _sk, ...channelInfo } = publicChannel
+  if (subscriberChannel != null) {
+    const { pk: _pk, sk: _sk, ...channelInfo } = subscriberChannel
 
     return createResponse({
       eventPath,
+      statusCode: 200,
       responseBody: {
-        id: pk.substring(pk.indexOf('#') + 1),
+        id: channelID,
+        subscribers: [],
         ...channelInfo,
       },
-      statusCode: 200,
     })
   }
+
+  // User doesn't own channel
+  // get public channel info
+  let publicChannel: IDynamoChannelItem | undefined
+  try {
+    publicChannel = await getChannel({ channelID, ddbDocClient })
+  } catch (error) {
+    console.error('Dynamo Get Error', error)
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Something went wrong' },
+      statusCode: 400,
+    })
+  }
+
+  if (publicChannel == null) {
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Channel not found' },
+      statusCode: 404,
+    })
+  }
+
+  const { pk, sk: _sk, ...channelInfo } = publicChannel
+
+  return createResponse({
+    eventPath,
+    responseBody: {
+      id: pk.substring(pk.indexOf('#') + 1),
+      subscribers: [],
+      ...channelInfo,
+    } as IChannel,
+    statusCode: 200,
+  })
 }

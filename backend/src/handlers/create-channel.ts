@@ -65,6 +65,8 @@ export const createChannelHandler = async (
   } while (channelIDIsTaken)
 
   const channelAttributes = {
+    note: '',
+    on: false,
     owner: username,
     title: (JSON.parse(event.body ?? '') as IPayload).title.substring(0, 40),
   }
@@ -79,8 +81,6 @@ export const createChannelHandler = async (
                 Item: {
                   pk: `user#${userID}`,
                   sk: `channel#${channelID}`,
-                  note: '',
-                  on: false,
                   ...channelAttributes,
                 } as IDynamoChannelItem,
               },
@@ -91,7 +91,7 @@ export const createChannelHandler = async (
                   pk: `channel#${channelID}`,
                   sk: 'info',
                   ...channelAttributes,
-                } as IDynamoPublicChannelItem,
+                } as IDynamoChannelItem,
               },
             },
           ],
@@ -104,8 +104,6 @@ export const createChannelHandler = async (
       responseBody: {
         id: channelID,
         subscribers: [],
-        note: '',
-        on: false,
         ...channelAttributes,
       },
       statusCode: 201,
