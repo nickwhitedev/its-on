@@ -112,26 +112,32 @@ const Channel = ({ channel }: Props) => {
   }
 
   return (
-    <div className='Channel'>
-      <ChannelHeader channel={channel} />
-      <ChannelNote channel={channel} />
+    <div className="Channel">
+      <ChannelHeader
+        channel={channel}
+        userIsChannelOwner={userIsChannelOwner}
+      />
+      <ChannelNote
+        channel={channel}
+        userIsChannelOwner={userIsChannelOwner}
+      />
       {userIsChannelOwner ? (
         <>
           <button
-            aria-label='Turn on channel'
+            aria-label="Turn on channel"
             className={`Channel-button ${channel.on ? 'on' : ''}`}
             disabled={isTurningOn}
             onClick={() => void handleClickItsOn()}
           >
-            <ItsOnIcon className='Channel-button-image' />
+            <ItsOnIcon className="Channel-button-image" />
           </button>
           <button
-            aria-label='Delete channel'
-            className='Channel-button Channel-button-delete red'
+            aria-label="Delete channel"
+            className="Channel-button Channel-button-delete red"
             disabled={isDeleting}
             onClick={() => void handleClickDelete()}
           >
-            <span className='material-symbols-outlined'>delete</span> Delete
+            <span className="material-symbols-outlined">delete</span> Delete
           </button>
         </>
       ) : subscriptions.some(chan => chan.id === channel.id) ? (
