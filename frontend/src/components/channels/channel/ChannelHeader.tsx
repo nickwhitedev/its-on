@@ -8,9 +8,10 @@ import { useState } from 'react'
 
 interface Props {
   channel: IChannel
+  userIsChannelOwner: boolean
 }
 
-const ChannelHeader = ({ channel }: Props) => {
+const ChannelHeader = ({ channel, userIsChannelOwner }: Props) => {
   const dispatchChannels = useChannelsDispatch()
 
   const [isUpdating, setIsUpdating] = useState<boolean>(false)
@@ -67,7 +68,7 @@ const ChannelHeader = ({ channel }: Props) => {
   return (
     <div className="ChannelHeader">
       <div className="ChannelHeader-title-actions">
-        {isUpdating ? null : (
+        {isUpdating || !userIsChannelOwner ? null : (
           <button
             className={'ChannelHeader-button'}
             onClick={() => {
@@ -79,7 +80,7 @@ const ChannelHeader = ({ channel }: Props) => {
         )}
       </div>
 
-      {isUpdating ? (
+      {isUpdating && userIsChannelOwner ? (
         <textarea
           className={'ChannelHeader-input'}
           autoFocus={true}
@@ -94,7 +95,7 @@ const ChannelHeader = ({ channel }: Props) => {
         <h2 className="ChannelHeader-title">{channel.title}</h2>
       )}
       <div className="ChannelHeader-share">
-        {isUpdating ? (
+        {isUpdating && userIsChannelOwner ? (
           <>
             <button
               className="ChannelHeader-button"

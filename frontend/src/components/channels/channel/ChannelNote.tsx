@@ -7,9 +7,10 @@ import { useState } from 'react'
 
 interface Props {
   channel: IChannel
+  userIsChannelOwner: boolean
 }
 
-const ChannelNote = ({ channel }: Props) => {
+const ChannelNote = ({ channel, userIsChannelOwner }: Props) => {
   const dispatchChannels = useChannelsDispatch()
 
   const [isUpdating, setIsUpdating] = useState<boolean>(false)
@@ -53,7 +54,7 @@ const ChannelNote = ({ channel }: Props) => {
   return (
     <div className="ChannelNote">
       <div className="ChannelNote-edit">
-        {isUpdating ? null : (
+        {isUpdating || !userIsChannelOwner ? null : (
           <button
             className={'ChannelNote-edit-button'}
             onClick={() => {
@@ -64,12 +65,13 @@ const ChannelNote = ({ channel }: Props) => {
           </button>
         )}
       </div>
-      {isUpdating ? (
+      {isUpdating && userIsChannelOwner ? (
         <textarea
           className={'ChannelNote-input'}
           autoFocus={true}
           disabled={isSubmitting}
           maxLength={200}
+          placeholder="Let's meet at my place"
           value={newNote}
           onChange={event => {
             setNewNote(event.target.value)
@@ -81,10 +83,12 @@ const ChannelNote = ({ channel }: Props) => {
             hasNote ? 'secondary-text' : 'instructions'
           }`}
         >
-          {hasNote ? channel.note : 'Add a note for your subscribers'}
+          {hasNote || !userIsChannelOwner
+            ? channel.note
+            : 'Add a note for your subscribers'}
         </span>
       )}
-      {isUpdating ? (
+      {isUpdating && userIsChannelOwner ? (
         <div className="ChannelNote-form-buttons">
           <button
             className="ChannelNote-button"
