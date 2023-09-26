@@ -17,7 +17,7 @@ const ddbDocClient = DynamoDBDocumentClient.from(client)
 export const getChannelHandler = async (
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
-  console.info('received:', event)
+  console.debug('received:', event)
 
   if (event.httpMethod !== 'GET') {
     throw new Error(

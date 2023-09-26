@@ -22,7 +22,7 @@ export const getOverviewHandler = async (
       `getOverview only accept GET method, you tried: ${event.httpMethod}`,
     )
   }
-  console.info('received:', event)
+  console.debug('received:', event)
 
   const eventPath = event.path
 

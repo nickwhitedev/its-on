@@ -6,6 +6,7 @@ import {
 
 import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { DynamoDBRecord } from 'aws-lambda'
+import { MS_IN_HOUR } from '../utils/time'
 import { batchWrite } from '../utils/dynamo'
 
 export const handleModifyEvent = async (
@@ -24,8 +25,12 @@ export const handleModifyEvent = async (
 
   // get channel partition
   const channelInfo: IDynamoChannelItem = {
+    duration: parseInt(
+      record.dynamodb?.NewImage?.duration?.N ?? MS_IN_HOUR.toString(),
+    ),
+    lastOn: parseInt(record.dynamodb?.NewImage?.lastOn?.N ?? '0'),
+    lastUpdated: parseInt(record.dynamodb?.NewImage?.lastUpdated?.N ?? '0'),
     note: record.dynamodb?.NewImage?.note?.S ?? '',
-    on: record.dynamodb?.NewImage?.on?.BOOL ?? false,
     owner: record.dynamodb?.NewImage?.owner?.S ?? '',
     pk,
     sk,
@@ -41,8 +46,8 @@ export const handleModifyEvent = async (
           ...channelInfo,
           pk: `channel#${channelID}`,
           sk: 'info',
+          lastOn: 0,
           note: '',
-          on: false,
         } as IDynamoChannelItem,
       }),
     )

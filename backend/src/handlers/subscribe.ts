@@ -24,12 +24,12 @@ export const subscribeHandler = async (
       `postMethod only accepts POST method, you tried: ${event.httpMethod} method.`,
     )
   }
-  console.info('received:', event)
+  console.debug('received:', event)
 
   const eventPath = event.path
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
-  const channelID = event.pathParameters?.channelID ?? '' // is composite id
+  const channelID = event.pathParameters?.channelID ?? ''
 
   let privateChannel: IDynamoChannelItem | undefined
   // get private channel entry
@@ -126,7 +126,7 @@ export const subscribeHandler = async (
     return createResponse({
       eventPath,
       responseBody: { message: 'Subscribed' },
-      statusCode: 200,
+      statusCode: 204,
     })
   } catch (error) {
     console.error(

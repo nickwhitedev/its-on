@@ -4,19 +4,20 @@ import {
   useChannels,
   useChannelsDispatch,
 } from '../../../contexts/channels/channelsContext'
+import { useEffect, useState } from 'react'
 import {
   useSubscriptions,
   useSubscriptionsDispatch,
 } from '../../../contexts/subscriptions/subscriptionsContext'
 
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
-import { SubscriptionsDispatchActionType } from '../../../contexts/subscriptions/subscriptionsReducer'
-import { fetchApi } from '../../../utils/api'
-import ItsOnIcon from '../../icons/ItsOnIcon'
 import ChannelHeader from './ChannelHeader'
 import ChannelNote from './ChannelNote'
+import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
+import ItsOnIcon from '../../icons/ItsOnIcon'
+import { SubscriptionsDispatchActionType } from '../../../contexts/subscriptions/subscriptionsReducer'
+import { fetchApi } from '../../../utils/api'
+import { isChannelOn } from './channelUtils'
+import { useNavigate } from 'react-router-dom'
 
 interface Props {
   channel: IChannel
@@ -46,8 +47,8 @@ const Channel = ({ channel }: Props) => {
     setIsTurningOn(true)
     try {
       const channelUpdates = {
+        duration: channel.duration,
         note: channel.note,
-        on: !channel.on,
         title: channel.title,
       }
       await fetchApi(`/${channel.id}`, 'PUT', channelUpdates)
@@ -125,7 +126,7 @@ const Channel = ({ channel }: Props) => {
         <>
           <button
             aria-label="Turn on channel"
-            className={`Channel-button ${channel.on ? 'on' : ''}`}
+            className={`Channel-button ${isChannelOn(channel) ? 'on' : ''}`}
             disabled={isTurningOn}
             onClick={() => void handleClickItsOn()}
           >

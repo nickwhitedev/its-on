@@ -6,6 +6,7 @@ import {
 
 import { APIGatewayProxyEvent } from 'aws-lambda'
 import { CORS_HEADERS } from '../../../src/utils/constants'
+import { MS_IN_HOUR } from '../../../src/utils/time'
 import { createChannelHandler } from '../../../src/handlers/create-channel'
 import { jest } from '@jest/globals'
 import { mockClient } from 'aws-sdk-client-mock'
@@ -46,13 +47,15 @@ describe('Test createChannelHandler', function () {
     expect(Object.keys(resultBody)).toEqual([
       'id',
       'subscribers',
+      'duration',
+      'lastOn',
       'note',
-      'on',
       'owner',
       'title',
     ])
+    expect(resultBody.duration).toEqual(MS_IN_HOUR)
+    expect(resultBody.lastOn).toEqual(0)
     expect(resultBody.note).toEqual('')
-    expect(resultBody.on).toEqual(false)
     expect(resultBody.owner).toEqual('test_user')
     expect(resultBody.subscribers).toEqual([])
     expect(resultBody.title).toEqual('Super Channel')
@@ -82,13 +85,15 @@ describe('Test createChannelHandler', function () {
     expect(Object.keys(resultBody)).toEqual([
       'id',
       'subscribers',
+      'duration',
+      'lastOn',
       'note',
-      'on',
       'owner',
       'title',
     ])
+    expect(resultBody.duration).toEqual(MS_IN_HOUR)
+    expect(resultBody.lastOn).toEqual(0)
     expect(resultBody.note).toEqual('')
-    expect(resultBody.on).toEqual(false)
     expect(resultBody.owner).toEqual('test_user')
     expect(resultBody.subscribers).toEqual([])
     expect(resultBody.title).toHaveLength(40)
@@ -121,13 +126,15 @@ describe('Test createChannelHandler', function () {
     expect(Object.keys(resultBody)).toEqual([
       'id',
       'subscribers',
+      'duration',
+      'lastOn',
       'note',
-      'on',
       'owner',
       'title',
     ])
+    expect(resultBody.duration).toEqual(MS_IN_HOUR)
+    expect(resultBody.lastOn).toEqual(0)
     expect(resultBody.note).toEqual('')
-    expect(resultBody.on).toEqual(false)
     expect(resultBody.owner).toEqual('test_user')
     expect(resultBody.subscribers).toEqual([])
     expect(resultBody.title).toEqual('Super Channel')

@@ -29,8 +29,8 @@ const ChannelHeader = ({ channel, userIsChannelOwner }: Props) => {
 
     try {
       const channelUpdates = {
+        duration: channel.duration,
         note: channel.note,
-        on: channel.on,
         title: newTitle,
       }
       await fetchApi(`/${channel.id}`, 'PUT', channelUpdates)

@@ -6,6 +6,7 @@ import {
 
 import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { MS_IN_HOUR } from '../utils/time'
 import { alphanumeric } from 'nanoid-dictionary'
 import { createResponse } from '../utils/response'
 import { customAlphabet } from 'nanoid'
@@ -31,7 +32,7 @@ export const createChannelHandler = async (
       `postMethod only accepts POST method, you tried: ${event.httpMethod} method.`,
     )
   }
-  console.info('received:', event)
+  console.debug('received:', event)
   const eventPath = event.path
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
@@ -64,11 +65,12 @@ export const createChannelHandler = async (
     }
   } while (channelIDIsTaken)
 
-  const channelAttributes = {
+  const channelAttributes: Partial<IDynamoChannelItem> = {
+    duration: MS_IN_HOUR,
+    lastOn: 0,
     note: '',
-    on: false,
     owner: username,
-    title: (JSON.parse(event.body ?? '') as IPayload).title.substring(0, 40),
+    title: (JSON.parse(event.body ?? '{}') as IPayload).title.substring(0, 40),
   }
 
   try {
@@ -81,6 +83,7 @@ export const createChannelHandler = async (
                 Item: {
                   pk: `user#${userID}`,
                   sk: `channel#${channelID}`,
+                  lastUpdated: event.requestContext.requestTimeEpoch,
                   ...channelAttributes,
                 } as IDynamoChannelItem,
               },
@@ -90,6 +93,7 @@ export const createChannelHandler = async (
                 Item: {
                   pk: `channel#${channelID}`,
                   sk: 'info',
+                  lastUpdated: 0,
                   ...channelAttributes,
                 } as IDynamoChannelItem,
               },

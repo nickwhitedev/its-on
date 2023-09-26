@@ -10,7 +10,7 @@ const ddbDocClient = DynamoDBDocumentClient.from(new DynamoDBClient({}))
  * Handles updates to the dynamo table
  */
 export const tableStreamHandler = async (event: DynamoDBStreamEvent) => {
-  console.log('Received event:', JSON.stringify(event, null, 2))
+  console.debug('Received event:', JSON.stringify(event, null, 2))
   for (const record of event.Records) {
     switch (record.eventName) {
       case 'MODIFY': {
