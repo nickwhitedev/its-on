@@ -82,7 +82,6 @@ export const updateChannelHandler = async (
           '#title': 'title',
         },
         ExpressionAttributeValues: {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           ':duration': duration,
           ':lastUpdated': event.requestContext.requestTimeEpoch,
           ':note': note.substring(0, 200),

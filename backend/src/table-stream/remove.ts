@@ -86,8 +86,9 @@ export const handleRemoveEvent = async (
                     PutRequest: {
                       Item: {
                         deleted: true,
+                        duration: 0,
                         note: '',
-                        on: false,
+                        lastOn: 0,
                         owner: record.dynamodb?.OldImage?.owner?.S ?? '',
                         pk: `user#${sk.substring(sk.indexOf('#') + 1)}`,
                         sk: `subscription#${pk.substring(pk.indexOf('#') + 1)}`,

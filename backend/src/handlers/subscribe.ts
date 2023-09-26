@@ -126,7 +126,7 @@ export const subscribeHandler = async (
     return createResponse({
       eventPath,
       responseBody: { message: 'Subscribed' },
-      statusCode: 204,
+      statusCode: 200,
     })
   } catch (error) {
     console.error(

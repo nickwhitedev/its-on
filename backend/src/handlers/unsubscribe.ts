@@ -59,7 +59,7 @@ export const unsubscribeHandler = async (
     return createResponse({
       eventPath,
       responseBody: { message: 'Unsubscribed' },
-      statusCode: 204,
+      statusCode: 200,
     })
   } catch (error) {
     console.error(
