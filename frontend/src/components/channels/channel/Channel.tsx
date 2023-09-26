@@ -46,17 +46,12 @@ const Channel = ({ channel }: Props) => {
   const handleClickItsOn = async () => {
     setIsTurningOn(true)
     try {
-      const channelUpdates = {
-        duration: channel.duration,
-        note: channel.note,
-        title: channel.title,
-      }
-      await fetchApi(`/${channel.id}`, 'PUT', channelUpdates)
+      await fetchApi(`/${channel.id}/its-on`, 'POST')
       dispatchChannels({
         type: ChannelsDispatchActionType.CHANGED,
         channel: {
           ...channel,
-          ...channelUpdates,
+          lastOn: Date.now(),
         },
       })
     } catch (error) {
