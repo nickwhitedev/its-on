@@ -1,7 +1,15 @@
-export const isChannelOn = (
-  lastOn: number,
-  duration: number,
-  requestTime: number,
-): boolean => {
-  return lastOn + duration > requestTime
+interface isChannelOnParams {
+  canceled: boolean
+  duration: number
+  lastOn: number
+  requestTime: number
+}
+
+export const isChannelOn = ({
+  canceled,
+  duration,
+  lastOn,
+  requestTime,
+}: isChannelOnParams): boolean => {
+  return !canceled && lastOn + duration > requestTime
 }

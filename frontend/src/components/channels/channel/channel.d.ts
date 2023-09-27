@@ -6,6 +6,7 @@
  * DynamoDB guarantees nothing but keys.
  */
 interface IChannel {
+  canceled?: boolean
   deleted?: boolean
   duration?: number
   id: string

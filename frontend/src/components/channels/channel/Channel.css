@@ -26,6 +26,14 @@
   animation: pulsate 8s ease-out infinite;
 }
 
+.Channel-button-call-off {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: min-content;
+  width: max-content;
+}
+
 .Channel-button-delete {
   display: flex;
   justify-content: center;
