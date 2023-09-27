@@ -17,6 +17,7 @@
  * DynamoDB guarantees nothing but keys.
  */
 interface IDynamoChannelItem {
+  canceled?: boolean
   deleted?: boolean
   duration?: number
   lastOn?: number
@@ -36,6 +37,12 @@ interface IDynamoChannelItem {
  * DynamoDB guarantees nothing but keys.
  */
 interface IDynamoStreamChannelImage {
+  canceled?: {
+    BOOL?: boolean
+  }
+  deleted?: {
+    BOOL?: boolean
+  }
   duration?: {
     N?: number
   }

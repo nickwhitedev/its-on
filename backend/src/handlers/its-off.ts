@@ -10,9 +10,9 @@ const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
 
 /**
- * Handler for a user declaring that it is on
+ * Handler for a user declaring that it is off
  */
-export const itsOnHandler = async (
+export const itsOffHandler = async (
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
   if (event.httpMethod !== 'POST') {
@@ -63,15 +63,13 @@ export const itsOnHandler = async (
         ReturnValues: 'ALL_NEW',
         TableName: DYNAMODB_TABLE_NAME,
         UpdateExpression:
-          'SET #canceled = :canceled, #lastOn = :lastOn, #lastUpdated = :lastUpdated',
+          'SET #canceled = :canceled, #lastUpdated = :lastUpdated',
         ExpressionAttributeNames: {
           '#canceled': 'canceled',
-          '#lastOn': 'lastOn',
           '#lastUpdated': 'lastUpdated',
         },
         ExpressionAttributeValues: {
-          ':canceled': false,
-          ':lastOn': requestTime,
+          ':canceled': true,
           ':lastUpdated': requestTime,
         },
       }),
@@ -79,7 +77,7 @@ export const itsOnHandler = async (
     console.info('Success - item updated', ddbResponse)
     return createResponse({
       eventPath,
-      responseBody: { message: "It's On!" },
+      responseBody: { message: "It's Off" },
       statusCode: 200,
     })
   } catch (error) {
