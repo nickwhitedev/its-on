@@ -1,16 +1,16 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
 } from '@aws-sdk/lib-dynamodb'
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
-import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { MS_IN_HOUR } from '../utils/time'
-import { alphanumeric } from 'nanoid-dictionary'
-import { createResponse } from '../utils/response'
 import { customAlphabet } from 'nanoid'
+import { alphanumeric } from 'nanoid-dictionary'
+import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { getChannel } from '../utils/dynamo'
+import { createResponse } from '../utils/response'
+import { MS_IN_HOUR } from '../utils/time'
 
 const nanoid = customAlphabet(alphanumeric, 11)
 
@@ -109,7 +109,7 @@ export const createChannelHandler = async (
         id: channelID,
         subscribers: [],
         ...channelAttributes,
-      },
+      } as IChannel,
       statusCode: 201,
     })
   } catch (error) {

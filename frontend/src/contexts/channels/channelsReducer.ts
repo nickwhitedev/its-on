@@ -1,5 +1,5 @@
-import { ChannelsDispatchAction } from './channelsContextTypes'
 import { isChannelOn } from '../../components/channels/channel/channelUtils'
+import { ChannelsDispatchAction } from './channelsContextTypes'
 
 export enum ChannelsDispatchActionType {
   ADDED = 'ADDED',
@@ -14,7 +14,7 @@ const channelsSorter = (channelA: IChannel, channelB: IChannel): number => {
   if (isChannelAOn !== isChannelBOn) {
     return isChannelAOn ? -1 : 1
   }
-  return channelB.lastUpdated - channelA.lastUpdated
+  return (channelB.lastUpdated ?? 0) - (channelA.lastUpdated ?? 0)
 }
 
 export default function channelsReducer(

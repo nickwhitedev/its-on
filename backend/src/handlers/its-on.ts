@@ -1,11 +1,10 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
-import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { createResponse } from '../utils/response'
+import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { getChannel } from '../utils/dynamo'
-import { isChannelOn } from '../utils/channel'
+import { createResponse } from '../utils/response'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -54,16 +53,6 @@ export const itsOnHandler = async (
   }
 
   const requestTime = event.requestContext.requestTimeEpoch
-  if (
-    isChannelOn(privateChannel.lastOn, privateChannel.duration, requestTime)
-  ) {
-    console.info('Channel already on - no updates made.')
-    return createResponse({
-      eventPath,
-      responseBody: { message: "It's On!" },
-      statusCode: 200,
-    })
-  }
   try {
     const ddbResponse = await ddbDocClient.send(
       new UpdateCommand({

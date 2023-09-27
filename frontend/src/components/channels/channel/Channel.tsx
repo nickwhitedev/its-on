@@ -1,23 +1,23 @@
 import './Channel.css'
 
+import { useEffect, useState } from 'react'
 import {
   useChannels,
   useChannelsDispatch,
 } from '../../../contexts/channels/channelsContext'
-import { useEffect, useState } from 'react'
 import {
   useSubscriptions,
   useSubscriptionsDispatch,
 } from '../../../contexts/subscriptions/subscriptionsContext'
 
-import ChannelHeader from './ChannelHeader'
-import ChannelNote from './ChannelNote'
+import { useNavigate } from 'react-router-dom'
 import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
-import ItsOnIcon from '../../icons/ItsOnIcon'
 import { SubscriptionsDispatchActionType } from '../../../contexts/subscriptions/subscriptionsReducer'
 import { fetchApi } from '../../../utils/api'
+import ItsOnIcon from '../../icons/ItsOnIcon'
+import ChannelHeader from './ChannelHeader'
+import ChannelNote from './ChannelNote'
 import { isChannelOn } from './channelUtils'
-import { useNavigate } from 'react-router-dom'
 
 interface Props {
   channel: IChannel
@@ -37,7 +37,7 @@ const Channel = ({ channel }: Props) => {
   const [isTurningOn, setIsTurningOn] = useState<boolean>(false)
 
   useEffect(() => {
-    document.title = channel.title
+    document.title = channel.title ?? "It's On"
     return () => {
       document.title = "It's On"
     }
@@ -108,7 +108,7 @@ const Channel = ({ channel }: Props) => {
   }
 
   return (
-    <div className="Channel">
+    <div className='Channel'>
       <ChannelHeader
         channel={channel}
         userIsChannelOwner={userIsChannelOwner}
@@ -120,20 +120,20 @@ const Channel = ({ channel }: Props) => {
       {userIsChannelOwner ? (
         <>
           <button
-            aria-label="Turn on channel"
+            aria-label='Turn on channel'
             className={`Channel-button ${isChannelOn(channel) ? 'on' : ''}`}
             disabled={isTurningOn}
             onClick={() => void handleClickItsOn()}
           >
-            <ItsOnIcon className="Channel-button-image" />
+            <ItsOnIcon className='Channel-button-image' />
           </button>
           <button
-            aria-label="Delete channel"
-            className="Channel-button Channel-button-delete red"
+            aria-label='Delete channel'
+            className='Channel-button Channel-button-delete red'
             disabled={isDeleting}
             onClick={() => void handleClickDelete()}
           >
-            <span className="material-symbols-outlined">delete</span> Delete
+            <span className='material-symbols-outlined'>delete</span> Delete
           </button>
         </>
       ) : subscriptions.some(chan => chan.id === channel.id) ? (
