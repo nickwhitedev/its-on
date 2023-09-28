@@ -68,6 +68,7 @@ export const createChannelHandler = async (
   const channelAttributes: Partial<IDynamoChannelItem> = {
     duration: MS_IN_HOUR,
     lastOn: 0,
+    lastOnDuration: MS_IN_HOUR,
     note: '',
     owner: username,
     title: (JSON.parse(event.body ?? '{}') as IPayload).title.substring(0, 40),

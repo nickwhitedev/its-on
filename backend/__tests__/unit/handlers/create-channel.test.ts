@@ -4,13 +4,13 @@ import {
   PutCommand,
 } from '@aws-sdk/lib-dynamodb'
 
-import { APIGatewayProxyEvent } from 'aws-lambda'
-import { CORS_HEADERS } from '../../../src/utils/constants'
-import { MS_IN_HOUR } from '../../../src/utils/time'
-import { createChannelHandler } from '../../../src/handlers/create-channel'
 import { jest } from '@jest/globals'
+import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
 import mockEvent from '../../../__mocks__/mock-event'
+import { createChannelHandler } from '../../../src/handlers/create-channel'
+import { CORS_HEADERS } from '../../../src/utils/constants'
+import { MS_IN_HOUR } from '../../../src/utils/time'
 
 // This includes all tests for createChannelHandler()
 describe('Test createChannelHandler', function () {
@@ -49,12 +49,14 @@ describe('Test createChannelHandler', function () {
       'subscribers',
       'duration',
       'lastOn',
+      'lastOnDuration',
       'note',
       'owner',
       'title',
     ])
     expect(resultBody.duration).toEqual(MS_IN_HOUR)
     expect(resultBody.lastOn).toEqual(0)
+    expect(resultBody.lastOnDuration).toEqual(MS_IN_HOUR)
     expect(resultBody.note).toEqual('')
     expect(resultBody.owner).toEqual('test_user')
     expect(resultBody.subscribers).toEqual([])
@@ -87,12 +89,14 @@ describe('Test createChannelHandler', function () {
       'subscribers',
       'duration',
       'lastOn',
+      'lastOnDuration',
       'note',
       'owner',
       'title',
     ])
     expect(resultBody.duration).toEqual(MS_IN_HOUR)
     expect(resultBody.lastOn).toEqual(0)
+    expect(resultBody.lastOnDuration).toEqual(MS_IN_HOUR)
     expect(resultBody.note).toEqual('')
     expect(resultBody.owner).toEqual('test_user')
     expect(resultBody.subscribers).toEqual([])
@@ -128,12 +132,14 @@ describe('Test createChannelHandler', function () {
       'subscribers',
       'duration',
       'lastOn',
+      'lastOnDuration',
       'note',
       'owner',
       'title',
     ])
     expect(resultBody.duration).toEqual(MS_IN_HOUR)
     expect(resultBody.lastOn).toEqual(0)
+    expect(resultBody.lastOnDuration).toEqual(MS_IN_HOUR)
     expect(resultBody.note).toEqual('')
     expect(resultBody.owner).toEqual('test_user')
     expect(resultBody.subscribers).toEqual([])

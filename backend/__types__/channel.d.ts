@@ -11,6 +11,7 @@ interface IChannel {
   duration?: number
   id: string
   lastOn?: number
+  lastOnDuration?: number
   lastUpdated?: number
   note?: string
   owner?: string

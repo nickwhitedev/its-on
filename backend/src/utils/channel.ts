@@ -1,15 +1,15 @@
 interface isChannelOnParams {
   canceled: boolean
-  duration: number
   lastOn: number
+  lastOnDuration: number
   requestTime: number
 }
 
 export const isChannelOn = ({
   canceled,
-  duration,
   lastOn,
+  lastOnDuration,
   requestTime,
 }: isChannelOnParams): boolean => {
-  return !canceled && lastOn + duration > requestTime
+  return !canceled && lastOn + lastOnDuration > requestTime
 }

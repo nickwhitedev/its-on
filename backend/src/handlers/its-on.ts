@@ -5,6 +5,7 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { getChannel } from '../utils/dynamo'
 import { createResponse } from '../utils/response'
+import { MS_IN_HOUR } from '../utils/time'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -63,15 +64,17 @@ export const itsOnHandler = async (
         ReturnValues: 'ALL_NEW',
         TableName: DYNAMODB_TABLE_NAME,
         UpdateExpression:
-          'SET #canceled = :canceled, #lastOn = :lastOn, #lastUpdated = :lastUpdated',
+          'SET #canceled = :canceled, #lastOn = :lastOn, #lastOnDuration = :lastOnDuration, #lastUpdated = :lastUpdated',
         ExpressionAttributeNames: {
           '#canceled': 'canceled',
           '#lastOn': 'lastOn',
+          '#lastOnDuration': 'lastOnDuration',
           '#lastUpdated': 'lastUpdated',
         },
         ExpressionAttributeValues: {
           ':canceled': false,
           ':lastOn': requestTime,
+          ':lastOnDuration': privateChannel.lastOnDuration ?? MS_IN_HOUR,
           ':lastUpdated': requestTime,
         },
       }),

@@ -21,6 +21,7 @@ interface IDynamoChannelItem {
   deleted?: boolean
   duration?: number
   lastOn?: number
+  lastOnDuration?: number
   lastUpdated?: number
   note?: string
   owner?: string
@@ -47,6 +48,9 @@ interface IDynamoStreamChannelImage {
     N?: number
   }
   lastOn?: {
+    N?: number
+  }
+  lastOnDuration?: {
     N?: number
   }
   lastUpdated?: {
