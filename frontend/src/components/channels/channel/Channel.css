@@ -9,7 +9,7 @@
   background-color: transparent;
   border-radius: 50%;
   padding: 0;
-  margin: 1.8em 0;
+  margin: 1.8rem 0;
   font: inherit;
   outline: inherit;
   height: 60vh;
@@ -43,8 +43,8 @@
 }
 
 .Channel-button-delete > span {
-  margin-bottom: 0.1em;
-  margin-right: 0.5em;
+  margin-bottom: 0.1rem;
+  margin-right: 0.5rem;
 }
 
 @keyframes pulsate {
@@ -82,6 +82,10 @@
   width: 60vh;
   max-height: 80vw;
   max-width: 80vw;
+}
+
+.Channel-select {
+  margin-top: 1.8rem;
 }
 
 .Channel-select,

@@ -1,11 +1,11 @@
-import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DYNAMODB_TABLE_NAME } from '../utils/constants'
-import { getChannel } from '../utils/dynamo'
-import { createResponse } from '../utils/response'
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { MS_IN_HOUR } from '../utils/time'
+import { createResponse } from '../utils/response'
+import { getChannel } from '../utils/dynamo'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -74,7 +74,7 @@ export const itsOnHandler = async (
         ExpressionAttributeValues: {
           ':canceled': false,
           ':lastOn': requestTime,
-          ':lastOnDuration': privateChannel.lastOnDuration ?? MS_IN_HOUR,
+          ':lastOnDuration': privateChannel.duration ?? MS_IN_HOUR,
           ':lastUpdated': requestTime,
         },
       }),

@@ -1,20 +1,26 @@
 import './ChannelNote.css'
 
-import { useState } from 'react'
-import { useChannelsDispatch } from '../../../contexts/channels/channelsContext'
 import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
 import { fetchApi } from '../../../utils/api'
+import { useChannelsDispatch } from '../../../contexts/channels/channelsContext'
+import { useState } from 'react'
 
 interface Props {
   channel: IChannel
+  isLoading: boolean
   userIsChannelOwner: boolean
+  setIsLoading: (newValue: boolean) => void
 }
 
-const ChannelNote = ({ channel, userIsChannelOwner }: Props) => {
+const ChannelNote = ({
+  channel,
+  isLoading,
+  userIsChannelOwner,
+  setIsLoading,
+}: Props) => {
   const dispatchChannels = useChannelsDispatch()
 
   const [isUpdating, setIsUpdating] = useState<boolean>(false)
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [newNote, setNewNote] = useState<string>(channel.note ?? '')
 
   const hasNote = (channel.note?.length ?? 0) > 0
@@ -25,7 +31,7 @@ const ChannelNote = ({ channel, userIsChannelOwner }: Props) => {
       return
     }
 
-    setIsSubmitting(true)
+    setIsLoading(true)
 
     try {
       const channelUpdates = {
@@ -48,12 +54,12 @@ const ChannelNote = ({ channel, userIsChannelOwner }: Props) => {
       // display user friendly message
     }
 
-    setIsSubmitting(false)
+    setIsLoading(false)
   }
 
   return (
-    <div className='ChannelNote'>
-      <div className='ChannelNote-edit'>
+    <div className="ChannelNote">
+      <div className="ChannelNote-edit">
         {isUpdating || !userIsChannelOwner ? null : (
           <button
             className={'ChannelNote-edit-button'}
@@ -61,7 +67,7 @@ const ChannelNote = ({ channel, userIsChannelOwner }: Props) => {
               setIsUpdating(true)
             }}
           >
-            <span className='material-symbols-outlined'>edit</span>
+            <span className="material-symbols-outlined">edit</span>
           </button>
         )}
       </div>
@@ -69,7 +75,7 @@ const ChannelNote = ({ channel, userIsChannelOwner }: Props) => {
         <textarea
           className={'ChannelNote-input'}
           autoFocus={true}
-          disabled={isSubmitting}
+          disabled={isLoading}
           maxLength={200}
           placeholder="Let's meet at my place"
           value={newNote}
@@ -89,23 +95,23 @@ const ChannelNote = ({ channel, userIsChannelOwner }: Props) => {
         </span>
       )}
       {isUpdating && userIsChannelOwner ? (
-        <div className='ChannelNote-form-buttons'>
+        <div className="ChannelNote-form-buttons">
           <button
-            className='ChannelNote-button'
-            disabled={isSubmitting}
+            className="ChannelNote-button"
+            disabled={isLoading}
             onClick={() => void handleSubmit()}
           >
-            <span className='material-symbols-outlined'>done</span>
+            <span className="material-symbols-outlined">done</span>
           </button>
           <button
             className={'ChannelNote-button'}
-            disabled={isSubmitting}
+            disabled={isLoading}
             onClick={() => {
               setIsUpdating(false)
               setNewNote(channel.note ?? '')
             }}
           >
-            <span className='material-symbols-outlined'>close</span>
+            <span className="material-symbols-outlined">close</span>
           </button>
         </div>
       ) : null}

@@ -35,10 +35,7 @@ const Channel = ({ channel }: Props) => {
   const dispatchChannels = useChannelsDispatch()
   const dispatchSubscriptions = useSubscriptionsDispatch()
 
-  const [isDeleting, setIsDeleting] = useState<boolean>(false)
-  const [isTurningOn, setIsTurningOn] = useState<boolean>(false)
-  const [isUpdating, setIsUpdating] = useState<boolean>(false)
-  const [isCallingOff, setIsCallingOff] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const isOn = isChannelOn(channel)
 
@@ -50,7 +47,7 @@ const Channel = ({ channel }: Props) => {
   }, [channel])
 
   const handleClickItsOn = async () => {
-    setIsTurningOn(true)
+    setIsLoading(true)
     try {
       await fetchApi(`/${channel.id}/its-on`, 'POST')
       dispatchChannels({
@@ -59,6 +56,7 @@ const Channel = ({ channel }: Props) => {
           ...channel,
           canceled: false,
           lastOn: Date.now(),
+          lastOnDuration: channel.duration,
           lastUpdated: Date.now(),
         },
       })
@@ -67,7 +65,7 @@ const Channel = ({ channel }: Props) => {
       // log error to backend
       // display user friendly message
     }
-    setIsTurningOn(false)
+    setIsLoading(false)
   }
 
   const handleChangeDuration = async (event: Event) => {
@@ -75,7 +73,7 @@ const Channel = ({ channel }: Props) => {
       (event.target as EventTarget & HTMLSelectElement).value,
     )
     if (isNaN(newDuration)) return
-    setIsUpdating(true)
+    setIsLoading(true)
 
     try {
       const channelUpdates = {
@@ -91,19 +89,17 @@ const Channel = ({ channel }: Props) => {
           ...channelUpdates,
         },
       })
-      setIsUpdating(false)
     } catch (error) {
       // TODO: Handle update channel error
       // log error to backend
       // display user friendly message
     }
 
-    setIsUpdating(false)
-    setIsCallingOff(false)
+    setIsLoading(false)
   }
 
   const handleClickCallOff = async () => {
-    setIsCallingOff(true)
+    setIsLoading(true)
     try {
       await fetchApi(`/${channel.id}/its-off`, 'POST')
       dispatchChannels({
@@ -119,11 +115,11 @@ const Channel = ({ channel }: Props) => {
       // log error to backend
       // display user friendly message
     }
-    setIsCallingOff(false)
+    setIsLoading(false)
   }
 
   const handleClickDelete = async () => {
-    setIsDeleting(true)
+    setIsLoading(true)
     try {
       await fetchApi(`/${channel.id}`, 'DELETE')
       dispatchChannels({
@@ -136,10 +132,11 @@ const Channel = ({ channel }: Props) => {
       // log error to backend
       // display user friendly message
     }
-    setIsDeleting(false)
+    setIsLoading(false)
   }
 
   const handleClickSubscribe = async () => {
+    setIsLoading(true)
     try {
       await fetchApi(`/${channel.id}/subscribe`, 'POST')
       dispatchSubscriptions({
@@ -151,9 +148,11 @@ const Channel = ({ channel }: Props) => {
       // log error to backend
       // display user friendly message
     }
+    setIsLoading(false)
   }
 
   const handleClickUnsubscribe = async () => {
+    setIsLoading(true)
     try {
       await fetchApi(`/${channel.id}/unsubscribe`, 'POST')
       dispatchSubscriptions({
@@ -165,31 +164,28 @@ const Channel = ({ channel }: Props) => {
       // log error to backend
       // display user friendly message
     }
+    setIsLoading(false)
   }
 
   return (
     <div className="Channel">
       <ChannelHeader
         channel={channel}
+        isLoading={isLoading}
         userIsChannelOwner={userIsChannelOwner}
+        setIsLoading={setIsLoading}
       />
       <ChannelNote
         channel={channel}
+        isLoading={isLoading}
         userIsChannelOwner={userIsChannelOwner}
+        setIsLoading={setIsLoading}
       />
       {userIsChannelOwner ? (
         <>
-          <button
-            aria-label="Turn on channel"
-            className={`Channel-button ${isOn ? 'on' : ''}`}
-            disabled={isTurningOn}
-            onClick={() => void handleClickItsOn()}
-          >
-            <ItsOnIcon className="Channel-button-image" />
-          </button>
           <MDOutlinedSelect
             className="Channel-select"
-            disabled={isUpdating}
+            disabled={isLoading}
             value={`${channel.duration}`}
             onChange={event => void handleChangeDuration(event)}
           >
@@ -203,31 +199,41 @@ const Channel = ({ channel }: Props) => {
               </MDSelectOption>
             ))}
           </MDOutlinedSelect>
-          {isOn ? (
-            <button
-              aria-label="Call it off"
-              className="Channel-button Channel-button-call-off"
-              disabled={isCallingOff}
-              onClick={() => void handleClickCallOff()}
-            >
-              Call it off
-            </button>
-          ) : null}
+          <button
+            aria-label={isOn ? 'Turn off channel' : 'Turn on channel'}
+            className={`Channel-button ${isOn ? 'on' : ''}`}
+            disabled={isLoading}
+            onClick={
+              isOn
+                ? () => void handleClickCallOff()
+                : () => void handleClickItsOn()
+            }
+          >
+            <ItsOnIcon className="Channel-button-image" />
+          </button>
           <button
             aria-label="Delete channel"
             className="Channel-button Channel-button-delete red"
-            disabled={isDeleting}
+            disabled={isLoading}
             onClick={() => void handleClickDelete()}
           >
             <span className="material-symbols-outlined">delete</span> Delete
           </button>
         </>
       ) : subscriptions.some(chan => chan.id === channel.id) ? (
-        <button onClick={() => void handleClickUnsubscribe()}>
+        <button
+          disabled={isLoading}
+          onClick={() => void handleClickUnsubscribe()}
+        >
           Unsubscribe
         </button>
       ) : (
-        <button onClick={() => void handleClickSubscribe()}>Subscribe</button>
+        <button
+          disabled={isLoading}
+          onClick={() => void handleClickSubscribe()}
+        >
+          Subscribe
+        </button>
       )}
     </div>
   )

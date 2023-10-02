@@ -27,12 +27,12 @@
 .App-settings {
   display: flex;
   grid-area: settings;
-  margin: 1em;
+  margin: 1rem;
   place-self: start end;
 }
 
 .App-settings-icon {
-  font-size: 2em;
+  font-size: 2rem;
 }
 
 .App-nav {
@@ -41,7 +41,7 @@
 }
 
 .App-nav-item {
-  width: 8em;
+  width: 8rem;
 }
 
 .App-content {
