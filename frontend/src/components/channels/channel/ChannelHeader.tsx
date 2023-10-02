@@ -1,10 +1,10 @@
 import './ChannelHeader.css'
 
-import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
-import { baseUrl } from '../../../utils/urls'
-import { fetchApi } from '../../../utils/api'
-import { useChannelsDispatch } from '../../../contexts/channels/channelsContext'
 import { useState } from 'react'
+import { useChannelsDispatch } from '../../../contexts/channels/channelsContext'
+import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
+import { fetchApi } from '../../../utils/api'
+import { baseUrl } from '../../../utils/urls'
 
 interface Props {
   channel: IChannel
@@ -16,7 +16,7 @@ const ChannelHeader = ({ channel, userIsChannelOwner }: Props) => {
 
   const [isUpdating, setIsUpdating] = useState<boolean>(false)
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
-  const [newTitle, setNewTitle] = useState<string>(channel.title)
+  const [newTitle, setNewTitle] = useState<string>(channel.title ?? 'Untitled')
   const [channelCopied, setChannelCopied] = useState<boolean>(false)
 
   const handleSubmit = async () => {
@@ -66,8 +66,8 @@ const ChannelHeader = ({ channel, userIsChannelOwner }: Props) => {
   }
 
   return (
-    <div className="ChannelHeader">
-      <div className="ChannelHeader-title-actions">
+    <div className='ChannelHeader'>
+      <div className='ChannelHeader-title-actions'>
         {isUpdating || !userIsChannelOwner ? null : (
           <button
             className={'ChannelHeader-button'}
@@ -75,7 +75,7 @@ const ChannelHeader = ({ channel, userIsChannelOwner }: Props) => {
               setIsUpdating(true)
             }}
           >
-            <span className="material-symbols-outlined">edit</span>
+            <span className='material-symbols-outlined'>edit</span>
           </button>
         )}
       </div>
@@ -92,40 +92,40 @@ const ChannelHeader = ({ channel, userIsChannelOwner }: Props) => {
           }}
         />
       ) : (
-        <h2 className="ChannelHeader-title">{channel.title}</h2>
+        <h2 className='ChannelHeader-title'>{channel.title}</h2>
       )}
-      <div className="ChannelHeader-share">
+      <div className='ChannelHeader-share'>
         {isUpdating && userIsChannelOwner ? (
           <>
             <button
-              className="ChannelHeader-button"
+              className='ChannelHeader-button'
               disabled={newTitle === '' || isSubmitting}
               onClick={() => void handleSubmit()}
             >
-              <span className="material-symbols-outlined">done</span>
+              <span className='material-symbols-outlined'>done</span>
             </button>
             <button
               className={'ChannelHeader-button'}
               disabled={isSubmitting}
               onClick={() => {
                 setIsUpdating(false)
-                setNewTitle(channel.title)
+                setNewTitle(channel.title ?? 'Untitled')
               }}
             >
-              <span className="material-symbols-outlined">close</span>
+              <span className='material-symbols-outlined'>close</span>
             </button>
           </>
         ) : (
-          <div className="ChannelHeader-share-wrapper">
+          <div className='ChannelHeader-share-wrapper'>
             <button
               onClick={() => void handleClickShareChannel()}
               onBlur={() => {
                 setChannelCopied(false)
               }}
-              aria-label="Share"
-              className="ChannelHeader-share-button"
+              aria-label='Share'
+              className='ChannelHeader-share-button'
             >
-              <span className="material-symbols-outlined">share</span>
+              <span className='material-symbols-outlined'>share</span>
             </button>
             <span
               className={`ChannelHeader-copied secondary-text ${

@@ -38,9 +38,12 @@ const Channel = ({ channel }: Props) => {
   const [isDeleting, setIsDeleting] = useState<boolean>(false)
   const [isTurningOn, setIsTurningOn] = useState<boolean>(false)
   const [isUpdating, setIsUpdating] = useState<boolean>(false)
+  const [isCallingOff, setIsCallingOff] = useState<boolean>(false)
+
+  const isOn = isChannelOn(channel)
 
   useEffect(() => {
-    document.title = channel.title
+    document.title = channel.title ?? "It's On"
     return () => {
       document.title = "It's On"
     }
@@ -54,7 +57,9 @@ const Channel = ({ channel }: Props) => {
         type: ChannelsDispatchActionType.CHANGED,
         channel: {
           ...channel,
+          canceled: false,
           lastOn: Date.now(),
+          lastUpdated: Date.now(),
         },
       })
     } catch (error) {
@@ -94,6 +99,27 @@ const Channel = ({ channel }: Props) => {
     }
 
     setIsUpdating(false)
+    setIsCallingOff(false)
+  }
+
+  const handleClickCallOff = async () => {
+    setIsCallingOff(true)
+    try {
+      await fetchApi(`/${channel.id}/its-off`, 'POST')
+      dispatchChannels({
+        type: ChannelsDispatchActionType.CHANGED,
+        channel: {
+          ...channel,
+          canceled: true,
+          lastUpdated: Date.now(),
+        },
+      })
+    } catch (error) {
+      // TODO: Handle update channel error
+      // log error to backend
+      // display user friendly message
+    }
+    setIsCallingOff(false)
   }
 
   const handleClickDelete = async () => {
@@ -155,7 +181,7 @@ const Channel = ({ channel }: Props) => {
         <>
           <button
             aria-label="Turn on channel"
-            className={`Channel-button ${isChannelOn(channel) ? 'on' : ''}`}
+            className={`Channel-button ${isOn ? 'on' : ''}`}
             disabled={isTurningOn}
             onClick={() => void handleClickItsOn()}
           >
@@ -177,6 +203,16 @@ const Channel = ({ channel }: Props) => {
               </MDSelectOption>
             ))}
           </MDOutlinedSelect>
+          {isOn ? (
+            <button
+              aria-label="Call it off"
+              className="Channel-button Channel-button-call-off"
+              disabled={isCallingOff}
+              onClick={() => void handleClickCallOff()}
+            >
+              Call it off
+            </button>
+          ) : null}
           <button
             aria-label="Delete channel"
             className="Channel-button Channel-button-delete red"

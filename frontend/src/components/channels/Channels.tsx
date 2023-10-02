@@ -1,7 +1,7 @@
-import CreateChannel from './CreateChannel'
 import { Link } from 'react-router-dom'
-import { isChannelOn } from './channel/channelUtils'
 import { useChannels } from '../../contexts/channels/channelsContext'
+import CreateChannel from './CreateChannel'
+import { isChannelOn } from './channel/channelUtils'
 
 const Channels = () => {
   const channels = useChannels()
@@ -12,9 +12,11 @@ const Channels = () => {
       <CreateChannel />
       {channels.map((channel, index) => (
         <div key={index}>
-          <Link to={`/${channel.id}`}>{channel.title || 'Unnamed'}</Link> -{' '}
-          {isChannelOn(channel) ? 'on' : 'off'}
-          {channel.note.length > 0 ? ` - ${channel.note}` : ''}
+          <Link to={`/${channel.id}`}>
+            {(channel.title?.length ?? 0) > 0 ? channel.title : 'Untitled'}
+          </Link>{' '}
+          - {isChannelOn(channel) ? 'on' : 'off'}
+          {(channel.note?.length ?? 0) > 0 ? ` - ${channel.note}` : ''}
         </div>
       ))}
     </div>

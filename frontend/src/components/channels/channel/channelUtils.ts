@@ -11,5 +11,8 @@ export const durationOptions: IDurationOptions[] = [
 ]
 
 export const isChannelOn = (channel: IChannel): boolean => {
-  return channel.lastOn + channel.duration > Date.now()
+  return (
+    !channel.canceled &&
+    (channel.lastOn ?? 0) + (channel.lastOnDuration ?? MS_IN_HOUR) > Date.now()
+  )
 }

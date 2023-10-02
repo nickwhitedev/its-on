@@ -1,11 +1,11 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
-import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { createResponse } from '../utils/response'
+import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { getChannel } from '../utils/dynamo'
-import { isChannelOn } from '../utils/channel'
+import { createResponse } from '../utils/response'
+import { MS_IN_HOUR } from '../utils/time'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -54,16 +54,6 @@ export const itsOnHandler = async (
   }
 
   const requestTime = event.requestContext.requestTimeEpoch
-  if (
-    isChannelOn(privateChannel.lastOn, privateChannel.duration, requestTime)
-  ) {
-    console.info('Channel already on - no updates made.')
-    return createResponse({
-      eventPath,
-      responseBody: { message: "It's On!" },
-      statusCode: 200,
-    })
-  }
   try {
     const ddbResponse = await ddbDocClient.send(
       new UpdateCommand({
@@ -73,13 +63,18 @@ export const itsOnHandler = async (
         },
         ReturnValues: 'ALL_NEW',
         TableName: DYNAMODB_TABLE_NAME,
-        UpdateExpression: 'SET #lastOn = :lastOn, #lastUpdated = :lastUpdated',
+        UpdateExpression:
+          'SET #canceled = :canceled, #lastOn = :lastOn, #lastOnDuration = :lastOnDuration, #lastUpdated = :lastUpdated',
         ExpressionAttributeNames: {
+          '#canceled': 'canceled',
           '#lastOn': 'lastOn',
+          '#lastOnDuration': 'lastOnDuration',
           '#lastUpdated': 'lastUpdated',
         },
         ExpressionAttributeValues: {
+          ':canceled': false,
           ':lastOn': requestTime,
+          ':lastOnDuration': privateChannel.lastOnDuration ?? MS_IN_HOUR,
           ':lastUpdated': requestTime,
         },
       }),

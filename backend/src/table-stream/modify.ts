@@ -4,10 +4,10 @@ import {
   QueryCommand,
 } from '@aws-sdk/lib-dynamodb'
 
-import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { DynamoDBRecord } from 'aws-lambda'
-import { MS_IN_HOUR } from '../utils/time'
+import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { batchWrite } from '../utils/dynamo'
+import { MS_IN_HOUR } from '../utils/time'
 
 export const handleModifyEvent = async (
   record: DynamoDBRecord,
@@ -23,12 +23,15 @@ export const handleModifyEvent = async (
 
   const channelID = sk.substring(sk.indexOf('#') + 1)
 
-  // get channel partition
   const channelInfo: IDynamoChannelItem = {
+    canceled: record.dynamodb?.NewImage?.canceled?.BOOL ?? false,
     duration: parseInt(
       record.dynamodb?.NewImage?.duration?.N ?? MS_IN_HOUR.toString(),
     ),
     lastOn: parseInt(record.dynamodb?.NewImage?.lastOn?.N ?? '0'),
+    lastOnDuration: parseInt(
+      record.dynamodb?.NewImage?.lastOnDuration?.N ?? MS_IN_HOUR.toString(),
+    ),
     lastUpdated: parseInt(record.dynamodb?.NewImage?.lastUpdated?.N ?? '0'),
     note: record.dynamodb?.NewImage?.note?.S ?? '',
     owner: record.dynamodb?.NewImage?.owner?.S ?? '',
@@ -44,9 +47,12 @@ export const handleModifyEvent = async (
         TableName: DYNAMODB_TABLE_NAME,
         Item: {
           ...channelInfo,
+          canceled: false,
           pk: `channel#${channelID}`,
           sk: 'info',
+          duration: 0,
           lastOn: 0,
+          lastOnDuration: 0,
           note: '',
         } as IDynamoChannelItem,
       }),
