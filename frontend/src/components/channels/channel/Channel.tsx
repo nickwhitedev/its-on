@@ -17,6 +17,7 @@ import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsR
 import ItsOnIcon from '../../icons/ItsOnIcon'
 import MDOutlinedSelect from '../../material/MDOutlinedSelect'
 import MDSelectOption from '../../material/MDSelectOption'
+import { MS_IN_HOUR } from '../../../utils/time'
 import { SubscriptionsDispatchActionType } from '../../../contexts/subscriptions/subscriptionsReducer'
 import { fetchApi } from '../../../utils/api'
 import { useNavigate } from 'react-router-dom'
@@ -186,7 +187,7 @@ const Channel = ({ channel }: Props) => {
           <MDOutlinedSelect
             className="Channel-select"
             disabled={isLoading}
-            value={`${channel.duration}`}
+            value={`${channel.duration ?? MS_IN_HOUR}`}
             onChange={event => void handleChangeDuration(event)}
           >
             {durationOptions.map(durationOption => (
