@@ -14,3 +14,8 @@ interface IChannelSubscriber {
   id: string
   username: string
 }
+
+interface IDurationOptions {
+  displayName: string
+  value: number
+}

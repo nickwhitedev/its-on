@@ -75,3 +75,8 @@
   max-height: 80vw;
   max-width: 80vw;
 }
+
+.Channel-select,
+.Channel-select md-select-option {
+  min-width: 10rem;
+}

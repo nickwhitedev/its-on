@@ -12,6 +12,9 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@lit-labs/react": "^2.1.0",
+    "@material/web": "^1.0.0",
+    "lit": "^2.8.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.16.0"

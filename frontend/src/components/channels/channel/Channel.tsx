@@ -1,5 +1,6 @@
 import './Channel.css'
 
+import { durationOptions, isChannelOn } from './channelUtils'
 import {
   useChannels,
   useChannelsDispatch,
@@ -14,9 +15,10 @@ import ChannelHeader from './ChannelHeader'
 import ChannelNote from './ChannelNote'
 import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
 import ItsOnIcon from '../../icons/ItsOnIcon'
+import MDOutlinedSelect from '../../material/MDOutlinedSelect'
+import MDSelectOption from '../../material/MDSelectOption'
 import { SubscriptionsDispatchActionType } from '../../../contexts/subscriptions/subscriptionsReducer'
 import { fetchApi } from '../../../utils/api'
-import { isChannelOn } from './channelUtils'
 import { useNavigate } from 'react-router-dom'
 
 interface Props {
@@ -35,6 +37,7 @@ const Channel = ({ channel }: Props) => {
 
   const [isDeleting, setIsDeleting] = useState<boolean>(false)
   const [isTurningOn, setIsTurningOn] = useState<boolean>(false)
+  const [isUpdating, setIsUpdating] = useState<boolean>(false)
 
   useEffect(() => {
     document.title = channel.title
@@ -60,6 +63,37 @@ const Channel = ({ channel }: Props) => {
       // display user friendly message
     }
     setIsTurningOn(false)
+  }
+
+  const handleChangeDuration = async (event: Event) => {
+    const newDuration = Number(
+      (event.target as EventTarget & HTMLSelectElement).value,
+    )
+    if (isNaN(newDuration)) return
+    setIsUpdating(true)
+
+    try {
+      const channelUpdates = {
+        duration: newDuration,
+        note: channel.note,
+        title: channel.title,
+      }
+      await fetchApi(`/${channel.id}`, 'PUT', channelUpdates)
+      dispatchChannels({
+        type: ChannelsDispatchActionType.CHANGED,
+        channel: {
+          ...channel,
+          ...channelUpdates,
+        },
+      })
+      setIsUpdating(false)
+    } catch (error) {
+      // TODO: Handle update channel error
+      // log error to backend
+      // display user friendly message
+    }
+
+    setIsUpdating(false)
   }
 
   const handleClickDelete = async () => {
@@ -127,6 +161,22 @@ const Channel = ({ channel }: Props) => {
           >
             <ItsOnIcon className="Channel-button-image" />
           </button>
+          <MDOutlinedSelect
+            className="Channel-select"
+            disabled={isUpdating}
+            value={`${channel.duration}`}
+            onChange={event => void handleChangeDuration(event)}
+          >
+            {durationOptions.map(durationOption => (
+              <MDSelectOption
+                key={durationOption.value}
+                selected={durationOption.value === channel.duration}
+                value={`${durationOption.value}`}
+              >
+                <div slot="headline">{durationOption.displayName}</div>
+              </MDSelectOption>
+            ))}
+          </MDOutlinedSelect>
           <button
             aria-label="Delete channel"
             className="Channel-button Channel-button-delete red"
