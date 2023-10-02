@@ -1,5 +1,5 @@
 /**
- * Represents a channel
+ * Represents a channel item that has been parsed from DynamoDB
  *
  * Could be one of these versions:
  * - User's copy (private and source of truth)
@@ -11,26 +11,56 @@
  * - Subscriber copy (distributed copy for performance)
  *   - pk = 'user#<userID>'
  *   - sk = 'subscription#<channelID>'
+ *
+ * Make attributes required to check for code completeness.
+ * Leave attributes optional for null-safety.
+ * DynamoDB guarantees nothing but keys.
  */
 interface IDynamoChannelItem {
+  canceled?: boolean
   deleted?: boolean
-  note: string
-  on: boolean
-  owner: string
+  duration?: number
+  lastOn?: number
+  lastOnDuration?: number
+  lastUpdated?: number
+  note?: string
+  owner?: string
   pk: string
   sk: string
-  title: string
+  title?: string
 }
 
+/**
+ * Represents a channel item in raw DynamoDB form
+ *
+ * Make attributes required to check for code completeness.
+ * Leave attributes optional for null-safety.
+ * DynamoDB guarantees nothing but keys.
+ */
 interface IDynamoStreamChannelImage {
-  note: {
-    S: string
+  canceled?: {
+    BOOL?: boolean
   }
-  on: {
-    BOOL: boolean
+  deleted?: {
+    BOOL?: boolean
   }
-  owner: {
-    S: string
+  duration?: {
+    N?: number
+  }
+  lastOn?: {
+    N?: number
+  }
+  lastOnDuration?: {
+    N?: number
+  }
+  lastUpdated?: {
+    N?: number
+  }
+  note?: {
+    S?: string
+  }
+  owner?: {
+    S?: string
   }
   pk: {
     S: string
@@ -38,23 +68,37 @@ interface IDynamoStreamChannelImage {
   sk: {
     S: string
   }
-  title: {
-    S: string
+  title?: {
+    S?: string
   }
 }
 
 /**
- * Represents a channel's subscriber
+ * Represents a channel's subscriber parsed from DynamoDB
  *
  * - pk = 'channel#<channelID>'
  * - sk = 'subscriber#<userID>'
+ *
+ * Make attributes required to check for code completeness.
+ * Leave attributes optional for null-safety.
+ * DynamoDB guarantees nothing but keys.
  */
 interface IDynamoChannelSubscriber {
   pk: string
   sk: string
-  username: string
+  username?: string
 }
 
+/**
+ * Represents a channel's subscriber in raw DynamoDB form
+ *
+ * - pk = 'channel#<channelID>'
+ * - sk = 'subscriber#<userID>'
+ *
+ * Make attributes required to check for code completeness.
+ * Leave attributes optional for null-safety.
+ * DynamoDB guarantees nothing but keys.
+ */
 interface IDynamoStreamChannelSubscriberImage {
   pk: {
     S: string
@@ -62,7 +106,7 @@ interface IDynamoStreamChannelSubscriberImage {
   sk: {
     S: string
   }
-  username: {
-    S: string
+  username?: {
+    S?: string
   }
 }

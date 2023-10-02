@@ -19,7 +19,7 @@ export const deleteChannelHandler = async (
       `Delete method only accepts DELETE method, you tried: ${event.httpMethod} method.`,
     )
   }
-  console.info('received:', event)
+  console.debug('received:', event)
 
   const eventPath = event.path
   const channelID = event.pathParameters?.channelID

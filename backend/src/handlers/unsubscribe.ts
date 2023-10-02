@@ -22,11 +22,11 @@ export const unsubscribeHandler = async (
       `postMethod only accepts POST method, you tried: ${event.httpMethod} method.`,
     )
   }
-  console.info('received:', event)
+  console.debug('received:', event)
 
   const eventPath = event.path
 
-  const channelID = event.pathParameters?.channelID ?? '' // is composite id
+  const channelID = event.pathParameters?.channelID ?? ''
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
 

@@ -7,17 +7,23 @@ import { useState } from 'react'
 
 interface Props {
   channel: IChannel
+  isLoading: boolean
   userIsChannelOwner: boolean
+  setIsLoading: (newValue: boolean) => void
 }
 
-const ChannelNote = ({ channel, userIsChannelOwner }: Props) => {
+const ChannelNote = ({
+  channel,
+  isLoading,
+  userIsChannelOwner,
+  setIsLoading,
+}: Props) => {
   const dispatchChannels = useChannelsDispatch()
 
   const [isUpdating, setIsUpdating] = useState<boolean>(false)
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
-  const [newNote, setNewNote] = useState<string>(channel.note)
+  const [newNote, setNewNote] = useState<string>(channel.note ?? '')
 
-  const hasNote = channel.note.length > 0
+  const hasNote = (channel.note?.length ?? 0) > 0
 
   const handleSubmit = async () => {
     if (newNote === channel.note) {
@@ -25,12 +31,12 @@ const ChannelNote = ({ channel, userIsChannelOwner }: Props) => {
       return
     }
 
-    setIsSubmitting(true)
+    setIsLoading(true)
 
     try {
       const channelUpdates = {
+        duration: channel.duration,
         note: newNote,
-        on: channel.on,
         title: channel.title,
       }
       await fetchApi(`/${channel.id}`, 'PUT', channelUpdates)
@@ -48,7 +54,7 @@ const ChannelNote = ({ channel, userIsChannelOwner }: Props) => {
       // display user friendly message
     }
 
-    setIsSubmitting(false)
+    setIsLoading(false)
   }
 
   return (
@@ -69,7 +75,7 @@ const ChannelNote = ({ channel, userIsChannelOwner }: Props) => {
         <textarea
           className={'ChannelNote-input'}
           autoFocus={true}
-          disabled={isSubmitting}
+          disabled={isLoading}
           maxLength={200}
           placeholder="Let's meet at my place"
           value={newNote}
@@ -92,17 +98,17 @@ const ChannelNote = ({ channel, userIsChannelOwner }: Props) => {
         <div className="ChannelNote-form-buttons">
           <button
             className="ChannelNote-button"
-            disabled={isSubmitting}
+            disabled={isLoading}
             onClick={() => void handleSubmit()}
           >
             <span className="material-symbols-outlined">done</span>
           </button>
           <button
             className={'ChannelNote-button'}
-            disabled={isSubmitting}
+            disabled={isLoading}
             onClick={() => {
               setIsUpdating(false)
-              setNewNote(channel.note)
+              setNewNote(channel.note ?? '')
             }}
           >
             <span className="material-symbols-outlined">close</span>

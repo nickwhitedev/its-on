@@ -1,11 +1,11 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import { DynamoDBDocumentClient, QueryCommand } from '@aws-sdk/lib-dynamodb'
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
-import { ChannelCopyTypeEnum } from '../utils/enums'
-import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { createResponse } from '../utils/response'
+import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { getChannel } from '../utils/dynamo'
+import { ChannelCopyTypeEnum } from '../utils/enums'
+import { createResponse } from '../utils/response'
 import { serializeQueryResponse } from '../utils/serialize'
 
 const client = new DynamoDBClient({})
@@ -17,7 +17,7 @@ const ddbDocClient = DynamoDBDocumentClient.from(client)
 export const getChannelHandler = async (
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
-  console.info('received:', event)
+  console.debug('received:', event)
 
   if (event.httpMethod !== 'GET') {
     throw new Error(
@@ -95,7 +95,7 @@ export const getChannelHandler = async (
         id: channelID,
         ...channelInfo,
         subscribers,
-      },
+      } as IChannel,
     })
   }
 
@@ -127,7 +127,7 @@ export const getChannelHandler = async (
         id: channelID,
         subscribers: [],
         ...channelInfo,
-      },
+      } as IChannel,
     })
   }
 

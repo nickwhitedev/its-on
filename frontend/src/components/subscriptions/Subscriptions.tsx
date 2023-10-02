@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useSubscriptions } from '../../contexts/subscriptions/subscriptionsContext'
+import { isChannelOn } from '../channels/channel/channelUtils'
 import ExpiredSubscription from './ExpiredSubscription'
 
 const Subscriptions = () => {
@@ -15,8 +16,8 @@ const Subscriptions = () => {
           ) : (
             <div>
               <Link to={`/${channel.id}`}>{channel.title}</Link> -{' '}
-              {channel.owner} - {channel.on ? 'on' : 'off'}
-              {channel.note.length > 0 ? ` - ${channel.note}` : ''}
+              {channel.owner} - {isChannelOn(channel) ? 'on' : 'off'}
+              {(channel.note?.length ?? 0) > 0 ? ` - ${channel.note}` : ''}
             </div>
           )}
         </div>

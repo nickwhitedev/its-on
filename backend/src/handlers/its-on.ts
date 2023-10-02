@@ -1,70 +1,59 @@
-import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DYNAMODB_TABLE_NAME } from '../utils/constants'
-import { getChannel } from '../utils/dynamo'
-import { createResponse } from '../utils/response'
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { MS_IN_HOUR } from '../utils/time'
+import { createResponse } from '../utils/response'
+import { getChannel } from '../utils/dynamo'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
 
 /**
- * Updates a channel for the authenticated user
+ * Handler for a user declaring that it is on
  */
-export const updateChannelHandler = async (
+export const itsOnHandler = async (
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
-  if (event.httpMethod !== 'PUT') {
+  if (event.httpMethod !== 'POST') {
     throw new Error(
-      `putMethod only accepts PUT method, you tried: ${event.httpMethod} method.`,
+      `postMethod only accepts POST method, you tried: ${event.httpMethod} method.`,
     )
   }
   console.debug('received:', event)
 
   const eventPath = event.path
-
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
+  const channelID = event.pathParameters?.channelID ?? ''
 
-  const channelID = event.pathParameters?.channelID
-
-  if (channelID == null) {
-    return createResponse({
-      eventPath,
-      responseBody: { message: 'Bad Request' },
-      statusCode: 400,
-    })
-  }
-
-  let channelIsNotOwnedByUser: boolean
+  let privateChannel: IDynamoChannelItem | undefined
+  // get private channel entry
   try {
-    channelIsNotOwnedByUser =
-      (await getChannel({ channelID, ddbDocClient, userID })) == null
+    privateChannel = await getChannel({ channelID, ddbDocClient, userID })
   } catch (error) {
-    console.error(
-      'Error',
-      error instanceof Error ? error.stack : 'Unknown Type',
-    )
+    console.error('Error getting private channel: ', error)
     return createResponse({
       eventPath,
       responseBody: { message: 'Something went wrong' },
       statusCode: 400,
     })
   }
-  if (channelIsNotOwnedByUser) {
+
+  if (privateChannel == null) {
+    // Only the user that owns a channel can say it's on
+    console.info('User does not own channel')
     return createResponse({
       eventPath,
       responseBody: {
-        message: 'You may only update a channel you own',
+        message: 'You do not own this channel',
       },
       statusCode: 403,
     })
   }
 
-  const { note, duration, title } = JSON.parse(event.body ?? '{}') as IChannel
-
+  const requestTime = event.requestContext.requestTimeEpoch
   try {
     const ddbResponse = await ddbDocClient.send(
       new UpdateCommand({
@@ -75,25 +64,25 @@ export const updateChannelHandler = async (
         ReturnValues: 'ALL_NEW',
         TableName: DYNAMODB_TABLE_NAME,
         UpdateExpression:
-          'SET #duration = :duration, #lastUpdated = :lastUpdated, #note = :note, #title = :title',
+          'SET #canceled = :canceled, #lastOn = :lastOn, #lastOnDuration = :lastOnDuration, #lastUpdated = :lastUpdated',
         ExpressionAttributeNames: {
-          '#duration': 'duration',
+          '#canceled': 'canceled',
+          '#lastOn': 'lastOn',
+          '#lastOnDuration': 'lastOnDuration',
           '#lastUpdated': 'lastUpdated',
-          '#note': 'note',
-          '#title': 'title',
         },
         ExpressionAttributeValues: {
-          ':duration': duration ?? MS_IN_HOUR,
-          ':lastUpdated': event.requestContext.requestTimeEpoch,
-          ':note': note?.substring(0, 200) ?? '',
-          ':title': title?.substring(0, 40) ?? 'Untitled',
+          ':canceled': false,
+          ':lastOn': requestTime,
+          ':lastOnDuration': privateChannel.duration ?? MS_IN_HOUR,
+          ':lastUpdated': requestTime,
         },
       }),
     )
     console.info('Success - item updated', ddbResponse)
     return createResponse({
       eventPath,
-      responseBody: { message: 'Updated' },
+      responseBody: { message: "It's On!" },
       statusCode: 200,
     })
   } catch (error) {

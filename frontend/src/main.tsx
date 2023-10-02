@@ -1,8 +1,9 @@
+import './index.css'
+
+import AppContextProvider from './contexts/AppContextProvider'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { RouterProvider } from 'react-router-dom'
-import AppContextProvider from './contexts/AppContextProvider'
-import './index.css'
 import router from './routes/router'
 
 const rootElement = document.getElementById('root')

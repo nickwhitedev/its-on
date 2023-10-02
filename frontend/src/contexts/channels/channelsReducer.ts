@@ -1,3 +1,4 @@
+import { isChannelOn } from '../../components/channels/channel/channelUtils'
 import { ChannelsDispatchAction } from './channelsContextTypes'
 
 export enum ChannelsDispatchActionType {
@@ -7,6 +8,15 @@ export enum ChannelsDispatchActionType {
   SYNCED = 'SYNCED',
 }
 
+const channelsSorter = (channelA: IChannel, channelB: IChannel): number => {
+  const isChannelAOn = isChannelOn(channelA)
+  const isChannelBOn = isChannelOn(channelB)
+  if (isChannelAOn !== isChannelBOn) {
+    return isChannelAOn ? -1 : 1
+  }
+  return (channelB.lastUpdated ?? 0) - (channelA.lastUpdated ?? 0)
+}
+
 export default function channelsReducer(
   channels: IChannel[],
   action: ChannelsDispatchAction,
@@ -14,7 +24,7 @@ export default function channelsReducer(
   switch (action.type) {
     case ChannelsDispatchActionType.ADDED: {
       if (action.channel == null) return channels
-      return [action.channel, ...channels]
+      return [action.channel, ...channels].sort(channelsSorter)
     }
     case ChannelsDispatchActionType.CHANGED: {
       return channels.map((channel: IChannel) => {

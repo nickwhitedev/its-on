@@ -8,15 +8,21 @@ import { useState } from 'react'
 
 interface Props {
   channel: IChannel
+  isLoading: boolean
   userIsChannelOwner: boolean
+  setIsLoading: (newValue: boolean) => void
 }
 
-const ChannelHeader = ({ channel, userIsChannelOwner }: Props) => {
+const ChannelHeader = ({
+  channel,
+  isLoading,
+  userIsChannelOwner,
+  setIsLoading,
+}: Props) => {
   const dispatchChannels = useChannelsDispatch()
 
   const [isUpdating, setIsUpdating] = useState<boolean>(false)
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
-  const [newTitle, setNewTitle] = useState<string>(channel.title)
+  const [newTitle, setNewTitle] = useState<string>(channel.title ?? 'Untitled')
   const [channelCopied, setChannelCopied] = useState<boolean>(false)
 
   const handleSubmit = async () => {
@@ -25,12 +31,12 @@ const ChannelHeader = ({ channel, userIsChannelOwner }: Props) => {
       return
     }
 
-    setIsSubmitting(true)
+    setIsLoading(true)
 
     try {
       const channelUpdates = {
+        duration: channel.duration,
         note: channel.note,
-        on: channel.on,
         title: newTitle,
       }
       await fetchApi(`/${channel.id}`, 'PUT', channelUpdates)
@@ -48,7 +54,7 @@ const ChannelHeader = ({ channel, userIsChannelOwner }: Props) => {
       // display user friendly message
     }
 
-    setIsSubmitting(false)
+    setIsLoading(false)
   }
 
   const handleClickShareChannel = async () => {
@@ -84,7 +90,7 @@ const ChannelHeader = ({ channel, userIsChannelOwner }: Props) => {
         <textarea
           className={'ChannelHeader-input'}
           autoFocus={true}
-          disabled={isSubmitting}
+          disabled={isLoading}
           maxLength={40}
           value={newTitle}
           onChange={event => {
@@ -99,17 +105,17 @@ const ChannelHeader = ({ channel, userIsChannelOwner }: Props) => {
           <>
             <button
               className="ChannelHeader-button"
-              disabled={newTitle === '' || isSubmitting}
+              disabled={newTitle === '' || isLoading}
               onClick={() => void handleSubmit()}
             >
               <span className="material-symbols-outlined">done</span>
             </button>
             <button
               className={'ChannelHeader-button'}
-              disabled={isSubmitting}
+              disabled={isLoading}
               onClick={() => {
                 setIsUpdating(false)
-                setNewTitle(channel.title)
+                setNewTitle(channel.title ?? 'Untitled')
               }}
             >
               <span className="material-symbols-outlined">close</span>

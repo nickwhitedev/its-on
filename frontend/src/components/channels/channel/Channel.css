@@ -9,7 +9,7 @@
   background-color: transparent;
   border-radius: 50%;
   padding: 0;
-  margin: 1.8em 0;
+  margin: 1.8rem 0;
   font: inherit;
   outline: inherit;
   height: 60vh;
@@ -26,6 +26,14 @@
   animation: pulsate 8s ease-out infinite;
 }
 
+.Channel-button-call-off {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: min-content;
+  width: max-content;
+}
+
 .Channel-button-delete {
   display: flex;
   justify-content: center;
@@ -35,8 +43,8 @@
 }
 
 .Channel-button-delete > span {
-  margin-bottom: 0.1em;
-  margin-right: 0.5em;
+  margin-bottom: 0.1rem;
+  margin-right: 0.5rem;
 }
 
 @keyframes pulsate {
@@ -74,4 +82,13 @@
   width: 60vh;
   max-height: 80vw;
   max-width: 80vw;
+}
+
+.Channel-select {
+  margin-top: 1.8rem;
+}
+
+.Channel-select,
+.Channel-select md-select-option {
+  min-width: 10rem;
 }

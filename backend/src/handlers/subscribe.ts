@@ -1,14 +1,14 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
   GetCommand,
 } from '@aws-sdk/lib-dynamodb'
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
-import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { createResponse } from '../utils/response'
+import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { getChannel } from '../utils/dynamo'
+import { createResponse } from '../utils/response'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -24,12 +24,12 @@ export const subscribeHandler = async (
       `postMethod only accepts POST method, you tried: ${event.httpMethod} method.`,
     )
   }
-  console.info('received:', event)
+  console.debug('received:', event)
 
   const eventPath = event.path
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
-  const channelID = event.pathParameters?.channelID ?? '' // is composite id
+  const channelID = event.pathParameters?.channelID ?? ''
 
   let privateChannel: IDynamoChannelItem | undefined
   // get private channel entry
@@ -103,7 +103,7 @@ export const subscribeHandler = async (
                   pk: `user#${userID}`,
                   sk: `subscription#${channelID}`,
                   ...channelAttributes,
-                },
+                } as IDynamoChannelItem,
               },
             },
             {
@@ -115,7 +115,7 @@ export const subscribeHandler = async (
                   username:
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                     event.requestContext.authorizer?.claims['cognito:username'],
-                },
+                } as IDynamoChannelSubscriber,
               },
             },
           ],
