@@ -11,7 +11,7 @@
     "nanoid-dictionary": "^4.3.0"
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.119",
+    "@types/aws-lambda": "^8.10.122",
     "@types/jest": "^29.5.5",
     "@types/nanoid": "^3.0.0",
     "@types/nanoid-dictionary": "^4.2.0",
