@@ -8,6 +8,7 @@ import { SubscriptionsDispatchActionType } from '../../contexts/subscriptions/su
 import { fetchApi } from '../../utils/api'
 import { isChannelOn } from '../channels/channel/channelUtils'
 import ItsOnIcon from '../icons/ItsOnIcon'
+import MDDivider from '../material/MDDivider'
 import MDIcon from '../material/MDIcon'
 import MDList from '../material/MDList'
 import MDListItem from '../material/MDListItem'
@@ -39,55 +40,62 @@ const Subscriptions = () => {
   return (
     <div className={'Subscriptions'}>
       <MDList>
-        {subscriptions.map((channel, index) => {
-          return channel.deleted ? (
-            <MDListItem
-              className='Subscriptions-list-item'
-              disabled={isLoading}
-              key={index}
-              type='button'
-              onClick={() => void handleClickUnsubscribe(channel.id)}
-            >
-              <MDIcon
-                className='red'
-                slot='start'
+        {subscriptions.map((channel, index) => (
+          <>
+            {index > 0 ? <MDDivider></MDDivider> : null}
+            {channel.deleted ? (
+              <MDListItem
+                className='Subscriptions-list-item'
+                disabled={isLoading}
+                key={index}
+                type='button'
+                onClick={() => void handleClickUnsubscribe(channel.id)}
               >
-                delete
-              </MDIcon>
-              <div slot='headline'>
-                {(channel.title?.length ?? 0) > 0 ? channel.title : 'Untitled'}
-              </div>
-              <div slot='supporting-text'>
-                This channel is no longer available
-              </div>
-            </MDListItem>
-          ) : (
-            <MDListItem
-              className='Subscriptions-list-item'
-              disabled={isLoading}
-              key={index}
-              type='link'
-              onClick={() => {
-                navigate(`/${channel.id}`)
-              }}
-            >
-              <MDIcon
-                className={
-                  isChannelOn(channel)
-                    ? 'Subscriptions-list-item-on'
-                    : 'Subscriptions-list-item-off'
-                }
-                slot='start'
+                <MDIcon
+                  className='red'
+                  slot='start'
+                >
+                  delete
+                </MDIcon>
+                <div slot='headline'>
+                  {(channel.title?.length ?? 0) > 0
+                    ? channel.title
+                    : 'Untitled'}
+                </div>
+                <div slot='supporting-text'>
+                  This channel is no longer available
+                </div>
+              </MDListItem>
+            ) : (
+              <MDListItem
+                className='Subscriptions-list-item'
+                disabled={isLoading}
+                key={index}
+                type='link'
+                onClick={() => {
+                  navigate(`/${channel.id}`)
+                }}
               >
-                <ItsOnIcon />
-              </MDIcon>
-              <div slot='headline'>
-                {(channel.title?.length ?? 0) > 0 ? channel.title : 'Untitled'}
-              </div>
-              <div slot='supporting-text'>{channel.owner}</div>
-            </MDListItem>
-          )
-        })}
+                <MDIcon
+                  className={
+                    isChannelOn(channel)
+                      ? 'Subscriptions-list-item-on'
+                      : 'Subscriptions-list-item-off'
+                  }
+                  slot='start'
+                >
+                  <ItsOnIcon />
+                </MDIcon>
+                <div slot='headline'>
+                  {(channel.title?.length ?? 0) > 0
+                    ? channel.title
+                    : 'Untitled'}
+                </div>
+                <div slot='supporting-text'>{channel.owner}</div>
+              </MDListItem>
+            )}
+          </>
+        ))}
       </MDList>
     </div>
   )
