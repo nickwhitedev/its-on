@@ -1,7 +1,6 @@
 .Channels {
-  width: 15rem;
   max-width: 90%;
-  min-width: 30%;
+  min-width: 50%;
 }
 
 .Channels-list-item {
