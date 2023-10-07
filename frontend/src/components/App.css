@@ -38,6 +38,7 @@
 .App-nav {
   display: flex;
   justify-content: center;
+  margin-bottom: 2rem;
 }
 
 .App-nav-item {
@@ -45,8 +46,12 @@
 }
 
 .App-content {
+  display: flex;
   flex: 1 1 auto;
+  flex-flow: column nowrap;
+  align-items: center;
   height: 100%;
+  width: 100%;
 }
 
 .App-main {
