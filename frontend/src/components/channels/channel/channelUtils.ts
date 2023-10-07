@@ -16,3 +16,15 @@ export const isChannelOn = (channel: IChannel): boolean => {
     (channel.lastOn ?? 0) + (channel.lastOnDuration ?? MS_IN_HOUR) > Date.now()
   )
 }
+
+export const channelsSorter = (
+  channelA: IChannel,
+  channelB: IChannel,
+): number => {
+  const isChannelAOn = isChannelOn(channelA)
+  const isChannelBOn = isChannelOn(channelB)
+  if (isChannelAOn !== isChannelBOn) {
+    return isChannelAOn ? -1 : 1
+  }
+  return (channelB.lastUpdated ?? 0) - (channelA.lastUpdated ?? 0)
+}
