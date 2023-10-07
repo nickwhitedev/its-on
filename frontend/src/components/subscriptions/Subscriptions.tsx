@@ -42,7 +42,7 @@ const Subscriptions = () => {
       <MDList>
         {subscriptions.map((channel, index) => (
           <>
-            {index > 0 ? <MDDivider></MDDivider> : null}
+            {index > 0 ? <MDDivider inset></MDDivider> : null}
             {channel.deleted ? (
               <MDListItem
                 className='Subscriptions-list-item'

@@ -58,7 +58,7 @@ const Channels = () => {
         </MDListItem>
         {channels.map(channel => (
           <>
-            <MDDivider></MDDivider>
+            <MDDivider inset></MDDivider>
             <MDListItem
               className={'Channels-list-item'}
               type='link'
