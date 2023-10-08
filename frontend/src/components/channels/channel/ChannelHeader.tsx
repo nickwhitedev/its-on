@@ -7,7 +7,7 @@ import { fetchApi } from '../../../utils/api'
 import { baseUrl } from '../../../utils/urls'
 import MDIcon from '../../material/MDIcon'
 import MDFilledTonalIconButton from '../../material/icon-button/MDFilledTonalIconButton'
-import MDIconButton from '../../material/icon-button/MDIconButton'
+import MDOutlinedIconButton from '../../material/icon-button/MDOutlinedIconButton'
 import MDOutlinedTextField from '../../material/text-field/MDOutlinedTextField'
 
 interface Props {
@@ -34,6 +34,8 @@ const ChannelHeader = ({
     channel.title === '' || channel.title == null ? 'Untitled' : channel.title
 
   const handleSubmit = async () => {
+    if (!isUpdating) return
+
     setIsLoading(true)
 
     try {
@@ -75,12 +77,10 @@ const ChannelHeader = ({
 
   return (
     <div className='ChannelHeader'>
-      <div className='ChannelHeader-title-actions'></div>
+      <div></div>
       {userIsChannelOwner ? (
         <MDOutlinedTextField
           className={'ChannelHeader-input'}
-          autoFocus={true}
-          disabled={isLoading}
           label='Title'
           maxLength={40}
           rows={1}
@@ -96,31 +96,23 @@ const ChannelHeader = ({
       <div className='ChannelHeader-actions'>
         {isUpdating && userIsChannelOwner ? (
           <div className='ChannelHeader-edit-actions-wrapper'>
-            <MDIconButton
+            <MDOutlinedIconButton
               className='ChannelHeader-button'
               disabled={newTitle === '' || isLoading}
               onClick={() => void handleSubmit()}
             >
               <MDIcon>done</MDIcon>
-            </MDIconButton>
-            <MDIconButton
-              className={'ChannelHeader-button'}
-              disabled={isLoading}
-              onClick={() => {
-                setNewTitle(channel.title ?? '')
-              }}
-            >
-              <MDIcon>close</MDIcon>
-            </MDIconButton>
+            </MDOutlinedIconButton>
           </div>
         ) : (
           <div className='ChannelHeader-share-wrapper'>
             <MDFilledTonalIconButton
+              aria-label='Share'
+              disabled={isLoading}
               onClick={() => void handleClickShareChannel()}
               onBlur={() => {
                 setChannelCopied(false)
               }}
-              aria-label='Share'
             >
               <MDIcon>share</MDIcon>
             </MDFilledTonalIconButton>

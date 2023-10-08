@@ -1,16 +1,10 @@
 .ChannelNote {
+  column-gap: 1rem;
   display: grid;
   grid:
-    [row-start] 'note-edit note note-form-buttons' [row-end]
-    / 5rem auto 5rem;
-  align-items: center;
-  justify-content: center;
-}
-
-.ChannelNote-edit {
-  grid-area: note-edit;
-  display: flex;
-  justify-content: center;
+    [row-start] '. note actions' [row-end]
+    / 2rem auto 2rem;
+  width: 100%;
 }
 
 .ChannelNote-note {
@@ -18,15 +12,19 @@
 }
 
 .ChannelNote-input {
-  font-size: 1rem;
-  width: 50vw;
-  height: 9rem;
+  resize: both;
   text-align: left;
 }
 
-.ChannelNote-form-buttons {
-  grid-area: note-form-buttons;
+.ChannelNote-actions {
+  grid-area: actions;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: start;
+  padding: 2.6rem 0;
+}
+
+.ChannelNote-actions-wrapper {
+  display: flex;
+  justify-content: space-between;
 }
