@@ -35,16 +35,6 @@
   font-size: 2rem;
 }
 
-.App-nav {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 1rem;
-}
-
-.App-nav-item {
-  width: 8rem;
-}
-
 .App-content {
   display: flex;
   flex: 1 1 auto;
