@@ -285,12 +285,12 @@
     mnemonist "0.38.3"
     tslib "^2.5.0"
 
-"@aws-sdk/lib-dynamodb@^3.418.0":
-  version "3.418.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/lib-dynamodb/-/lib-dynamodb-3.418.0.tgz#f892867394d59404c913c3dc3e86691efb4851d5"
-  integrity sha512-XHY4HeedF8g1q46c9fiknj2iBEEH0SE9gAJIOojQaWzmLLgVs2Rlpr7SfuHWBt5stqDjxphhQYKORSBMhbxauA==
+"@aws-sdk/lib-dynamodb@^3.421.0":
+  version "3.421.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/lib-dynamodb/-/lib-dynamodb-3.421.0.tgz#52a7103b91c199bff3315c881ec95e476d946efb"
+  integrity sha512-S76WsVMoYyUu4LRcEhC+GD8sEqJqrpgAhb06SMqZ1pfLGzezpESUg0xytXHMgHOaR2A38LNR+ARFeTCf9vNmoA==
   dependencies:
-    "@aws-sdk/util-dynamodb" "3.418.0"
+    "@aws-sdk/util-dynamodb" "3.421.0"
     tslib "^2.5.0"
 
 "@aws-sdk/middleware-endpoint-discovery@3.418.0":
@@ -428,10 +428,10 @@
     "@smithy/types" "^2.3.3"
     tslib "^2.5.0"
 
-"@aws-sdk/util-dynamodb@3.418.0":
-  version "3.418.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/util-dynamodb/-/util-dynamodb-3.418.0.tgz#b2cadb5234ebc333ac6841a7528a338b28e97d01"
-  integrity sha512-5DI0m9ipb6yPfWm9DmXCPJrXttLeioWpHQMGbE+MmvAsNy2AmUJZ4kzmmUEE6YazseL78OtNmA7Pm4Bqs5T/lg==
+"@aws-sdk/util-dynamodb@3.421.0":
+  version "3.421.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/util-dynamodb/-/util-dynamodb-3.421.0.tgz#fcb5b2ff282f443f0c93bf5838948ab9ad40eb64"
+  integrity sha512-fCoBv8bX9ruvbxQMH0Flws3cqCjpgUQp8So0J2wwPaLEu6JoXlP1enppYEbjas4nuav9vCocORr+s+kdePw5Kg==
   dependencies:
     tslib "^2.5.0"
 
@@ -1880,15 +1880,15 @@
     semver "^7.5.4"
     ts-api-utils "^1.0.1"
 
-"@typescript-eslint/parser@^6.7.2":
-  version "6.7.2"
-  resolved "https://registry.yarnpkg.com/@typescript-eslint/parser/-/parser-6.7.2.tgz#e0ae93771441b9518e67d0660c79e3a105497af4"
-  integrity sha512-KA3E4ox0ws+SPyxQf9iSI25R6b4Ne78ORhNHeVKrPQnoYsb9UhieoiRoJgrzgEeKGOXhcY1i8YtOeCHHTDa6Fw==
+"@typescript-eslint/parser@^6.7.3":
+  version "6.7.3"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/parser/-/parser-6.7.3.tgz#aaf40092a32877439e5957e18f2d6a91c82cc2fd"
+  integrity sha512-TlutE+iep2o7R8Lf+yoer3zU6/0EAUc8QIBB3GYBc1KGz4c4TRm83xwXUZVPlZ6YCLss4r77jbu6j3sendJoiQ==
   dependencies:
-    "@typescript-eslint/scope-manager" "6.7.2"
-    "@typescript-eslint/types" "6.7.2"
-    "@typescript-eslint/typescript-estree" "6.7.2"
-    "@typescript-eslint/visitor-keys" "6.7.2"
+    "@typescript-eslint/scope-manager" "6.7.3"
+    "@typescript-eslint/types" "6.7.3"
+    "@typescript-eslint/typescript-estree" "6.7.3"
+    "@typescript-eslint/visitor-keys" "6.7.3"
     debug "^4.3.4"
 
 "@typescript-eslint/scope-manager@6.7.2":
@@ -1952,6 +1952,7 @@
     is-glob "^4.0.3"
     semver "^7.5.4"
     ts-api-utils "^1.0.1"
+
 
 "@typescript-eslint/utils@6.7.3":
   version "6.7.3"
