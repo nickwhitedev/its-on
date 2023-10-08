@@ -5,6 +5,7 @@ import { useChannelsDispatch } from '../../../contexts/channels/channelsContext'
 import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
 import { fetchApi } from '../../../utils/api'
 import { baseUrl } from '../../../utils/urls'
+import MDOutlinedTextField from '../../material/text-field/MDOutlinedTextField'
 
 interface Props {
   channel: IChannel
@@ -21,19 +22,15 @@ const ChannelHeader = ({
 }: Props) => {
   const dispatchChannels = useChannelsDispatch()
 
-  const [isUpdating, setIsUpdating] = useState<boolean>(false)
-  const [newTitle, setNewTitle] = useState<string>(channel.title ?? 'Untitled')
+  const [newTitle, setNewTitle] = useState<string>(channel.title ?? '')
   const [channelCopied, setChannelCopied] = useState<boolean>(false)
+
+  const isUpdating = newTitle !== channel.title
 
   const channelTitle =
     channel.title === '' || channel.title == null ? 'Untitled' : channel.title
 
   const handleSubmit = async () => {
-    if (newTitle === channel.title) {
-      setIsUpdating(false)
-      return
-    }
-
     setIsLoading(true)
 
     try {
@@ -50,7 +47,6 @@ const ChannelHeader = ({
           ...channelUpdates,
         },
       })
-      setIsUpdating(false)
     } catch (error) {
       // TODO: Handle update channel error
       // log error to backend
@@ -76,28 +72,19 @@ const ChannelHeader = ({
 
   return (
     <div className='ChannelHeader'>
-      <div className='ChannelHeader-title-actions'>
-        {isUpdating || !userIsChannelOwner ? null : (
-          <button
-            className={'ChannelHeader-button'}
-            onClick={() => {
-              setIsUpdating(true)
-            }}
-          >
-            <span className='material-symbols-outlined'>edit</span>
-          </button>
-        )}
-      </div>
-
-      {isUpdating && userIsChannelOwner ? (
-        <textarea
+      <div className='ChannelHeader-title-actions'></div>
+      {userIsChannelOwner ? (
+        <MDOutlinedTextField
           className={'ChannelHeader-input'}
           autoFocus={true}
           disabled={isLoading}
+          label='Title'
           maxLength={40}
+          rows={1}
+          type='textarea'
           value={newTitle}
-          onChange={event => {
-            setNewTitle(event.target.value)
+          onInput={event => {
+            setNewTitle((event.target as unknown as { value: string }).value)
           }}
         />
       ) : (
@@ -117,8 +104,7 @@ const ChannelHeader = ({
               className={'ChannelHeader-button'}
               disabled={isLoading}
               onClick={() => {
-                setIsUpdating(false)
-                setNewTitle(channelTitle)
+                setNewTitle(channel.title ?? '')
               }}
             >
               <span className='material-symbols-outlined'>close</span>

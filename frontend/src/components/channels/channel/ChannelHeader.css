@@ -1,14 +1,8 @@
 .ChannelHeader {
   display: grid;
   grid:
-    [row-start] 'title-actions title share' [row-end]
+    [row-start] '. title share' [row-end]
     / 5rem auto 5rem;
-}
-
-.ChannelHeader-title-actions {
-  grid-area: title-actions;
-  display: flex;
-  justify-content: center;
 }
 
 .ChannelHeader-title {
@@ -16,11 +10,9 @@
 }
 
 .ChannelHeader-input {
-  font-size: 1.5rem;
-  font-weight: bold;
-  line-height: 1.39;
-  margin: 0.83rem 0;
-  text-align: center;
+  margin: 1rem 0;
+  resize: vertical;
+  text-align: left;
 }
 
 .ChannelHeader-share {
