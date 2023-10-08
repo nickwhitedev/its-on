@@ -18,10 +18,14 @@ import { fetchApi } from '../../../utils/api'
 import { MS_IN_HOUR } from '../../../utils/time'
 import ItsOnIcon from '../../icons/ItsOnIcon'
 import MDDivider from '../../material/MDDivider'
-import MDOutlinedSelect from '../../material/MDOutlinedSelect'
-import MDSelectOption from '../../material/MDSelectOption'
+import MDIcon from '../../material/MDIcon'
+import MDFilledButton from '../../material/button/MDFilledButton'
+import MDFilledTonalButton from '../../material/button/MDFilledTonalButton'
+import MDTextButton from '../../material/button/MDTextButton'
 import MDList from '../../material/list/MDList'
 import MDListItem from '../../material/list/MDListItem'
+import MDOutlinedSelect from '../../material/select/MDOutlinedSelect'
+import MDSelectOption from '../../material/select/MDSelectOption'
 import ChannelHeader from './ChannelHeader'
 import ChannelNote from './ChannelNote'
 
@@ -235,29 +239,30 @@ const Channel = ({ channel }: Props) => {
               )}
             </MDList>
           </div>
-          <button
+          <MDTextButton
             aria-label='Delete channel'
-            className='Channel-button Channel-button-delete red'
+            className='Channel-button-delete'
             disabled={isLoading}
+            hasIcon
             onClick={() => void handleClickDelete()}
           >
-            <span className='material-symbols-outlined'>delete</span> Delete
-          </button>
+            <MDIcon slot='icon'>delete</MDIcon> Delete
+          </MDTextButton>
         </>
       ) : subscriptions.some(chan => chan.id === channel.id) ? (
-        <button
+        <MDFilledTonalButton
           disabled={isLoading}
           onClick={() => void handleClickUnsubscribe()}
         >
           Unsubscribe
-        </button>
+        </MDFilledTonalButton>
       ) : (
-        <button
+        <MDFilledButton
           disabled={isLoading}
           onClick={() => void handleClickSubscribe()}
         >
           Subscribe
-        </button>
+        </MDFilledButton>
       )}
     </div>
   )
