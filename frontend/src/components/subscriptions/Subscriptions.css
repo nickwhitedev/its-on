@@ -1,6 +1,12 @@
 .Subscriptions {
+  border-radius: 12px;
   max-width: 90%;
   min-width: 50%;
+  position: relative;
+}
+
+.Subscriptions-list {
+  border-radius: 12px;
 }
 
 .Subscriptions-list-item {

@@ -1,6 +1,12 @@
 .Channels {
+  border-radius: 12px;
   max-width: 90%;
   min-width: 50%;
+  position: relative;
+}
+
+.Channels-list {
+  border-radius: 12px;
 }
 
 .Channels-list-item {

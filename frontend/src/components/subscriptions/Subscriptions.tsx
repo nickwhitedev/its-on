@@ -9,6 +9,7 @@ import { fetchApi } from '../../utils/api'
 import { isChannelOn } from '../channels/channel/channelUtils'
 import ItsOnIcon from '../icons/ItsOnIcon'
 import MDDivider from '../material/MDDivider'
+import MDElevation from '../material/MDElevation'
 import MDIcon from '../material/MDIcon'
 import MDList from '../material/MDList'
 import MDListItem from '../material/MDListItem'
@@ -38,11 +39,12 @@ const Subscriptions = () => {
   }
 
   return (
-    <div className={'Subscriptions'}>
-      <MDList>
+    <div className='Subscriptions'>
+      <MDElevation />
+      <MDList className='Subscriptions-list'>
         {subscriptions.map((channel, index) => (
           <>
-            {index > 0 ? <MDDivider inset></MDDivider> : null}
+            {index > 0 ? <MDDivider inset /> : null}
             {channel.deleted ? (
               <MDListItem
                 className='Subscriptions-list-item'

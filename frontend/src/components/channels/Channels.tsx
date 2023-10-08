@@ -10,6 +10,7 @@ import { ChannelsDispatchActionType } from '../../contexts/channels/channelsRedu
 import { fetchApi } from '../../utils/api'
 import ItsOnIcon from '../icons/ItsOnIcon'
 import MDDivider from '../material/MDDivider'
+import MDElevation from '../material/MDElevation'
 import MDIcon from '../material/MDIcon'
 import MDList from '../material/MDList'
 import MDListItem from '../material/MDListItem'
@@ -45,10 +46,11 @@ const Channels = () => {
   }
 
   return (
-    <div className={'Channels'}>
-      <MDList>
+    <div className='Channels'>
+      <MDElevation />
+      <MDList className='Channels-list'>
         <MDListItem
-          className={'Channels-list-item'}
+          className='Channels-list-item'
           disabled={isCreating}
           type='button'
           onClick={() => void handleCreateChannel()}
@@ -58,9 +60,9 @@ const Channels = () => {
         </MDListItem>
         {channels.map(channel => (
           <>
-            <MDDivider inset></MDDivider>
+            <MDDivider inset />
             <MDListItem
-              className={'Channels-list-item'}
+              className='Channels-list-item'
               type='link'
               onClick={() => {
                 navigate(`/${channel.id}`)
