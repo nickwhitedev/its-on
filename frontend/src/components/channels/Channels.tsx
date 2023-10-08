@@ -1,6 +1,6 @@
 import './Channels.css'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   useChannels,
@@ -10,10 +10,9 @@ import { ChannelsDispatchActionType } from '../../contexts/channels/channelsRedu
 import { fetchApi } from '../../utils/api'
 import ItsOnIcon from '../icons/ItsOnIcon'
 import MDDivider from '../material/MDDivider'
-import MDElevation from '../material/MDElevation'
 import MDIcon from '../material/MDIcon'
-import MDList from '../material/MDList'
-import MDListItem from '../material/MDListItem'
+import MDList from '../material/list/MDList'
+import MDListItem from '../material/list/MDListItem'
 import { isChannelOn } from './channel/channelUtils'
 
 const Channels = () => {
@@ -47,7 +46,6 @@ const Channels = () => {
 
   return (
     <div className='Channels'>
-      <MDElevation />
       <MDList className='Channels-list'>
         <MDListItem
           className='Channels-list-item'
@@ -59,7 +57,7 @@ const Channels = () => {
           <div slot='headline'>Create Channel</div>
         </MDListItem>
         {channels.map(channel => (
-          <>
+          <React.Fragment key={channel.id}>
             <MDDivider inset />
             <MDListItem
               className='Channels-list-item'
@@ -85,7 +83,7 @@ const Channels = () => {
                 <div slot='supporting-text'>{channel.note}</div>
               ) : null}
             </MDListItem>
-          </>
+          </React.Fragment>
         ))}
       </MDList>
     </div>
