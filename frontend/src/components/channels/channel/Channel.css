@@ -37,16 +37,7 @@
 }
 
 .Channel-button-delete {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: min-content;
-  width: min-content;
-}
-
-.Channel-button-delete > span {
-  margin-bottom: 0.1rem;
-  margin-right: 0.5rem;
+  --md-sys-color-primary: var(--md-sys-color-error);
 }
 
 @keyframes pulsate {
