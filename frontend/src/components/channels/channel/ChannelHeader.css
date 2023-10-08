@@ -1,7 +1,8 @@
 .ChannelHeader {
+  column-gap: 0.5rem;
   display: grid;
   grid:
-    [row-start] '. title share' [row-end]
+    [row-start] '. title actions' [row-end]
     / 5rem auto 5rem;
 }
 
@@ -15,11 +16,21 @@
   text-align: left;
 }
 
-.ChannelHeader-share {
-  grid-area: share;
+.ChannelHeader-actions {
+  grid-area: actions;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: start;
+  padding: 1.5rem;
+}
+
+.ChannelHeader-button {
+  margin-right: 0.5rem;
+}
+
+.ChannelHeader-edit-actions-wrapper {
+  display: flex;
+  justify-content: space-between;
 }
 
 .ChannelHeader-share-wrapper {
@@ -27,15 +38,11 @@
   flex-flow: column nowrap;
 }
 
-.ChannelHeader-share-button {
-  display: flex;
-  padding-top: 1.05rem;
-}
-
 .ChannelHeader-copied {
-  font-size: 0.5rem;
-  transition: all 0.2s ease-in-out;
   cursor: default;
+  font-size: 0.7rem;
+  margin-top: 0.2rem;
+  transition: all 0.2s ease-in-out;
   user-select: none;
 }
 .ChannelHeader-copied.hidden {

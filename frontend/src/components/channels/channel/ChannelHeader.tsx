@@ -5,6 +5,9 @@ import { useChannelsDispatch } from '../../../contexts/channels/channelsContext'
 import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
 import { fetchApi } from '../../../utils/api'
 import { baseUrl } from '../../../utils/urls'
+import MDIcon from '../../material/MDIcon'
+import MDFilledTonalIconButton from '../../material/icon-button/MDFilledTonalIconButton'
+import MDIconButton from '../../material/icon-button/MDIconButton'
 import MDOutlinedTextField from '../../material/text-field/MDOutlinedTextField'
 
 interface Props {
@@ -90,38 +93,37 @@ const ChannelHeader = ({
       ) : (
         <h2 className='ChannelHeader-title'>{channelTitle}</h2>
       )}
-      <div className='ChannelHeader-share'>
+      <div className='ChannelHeader-actions'>
         {isUpdating && userIsChannelOwner ? (
-          <>
-            <button
+          <div className='ChannelHeader-edit-actions-wrapper'>
+            <MDIconButton
               className='ChannelHeader-button'
               disabled={newTitle === '' || isLoading}
               onClick={() => void handleSubmit()}
             >
-              <span className='material-symbols-outlined'>done</span>
-            </button>
-            <button
+              <MDIcon>done</MDIcon>
+            </MDIconButton>
+            <MDIconButton
               className={'ChannelHeader-button'}
               disabled={isLoading}
               onClick={() => {
                 setNewTitle(channel.title ?? '')
               }}
             >
-              <span className='material-symbols-outlined'>close</span>
-            </button>
-          </>
+              <MDIcon>close</MDIcon>
+            </MDIconButton>
+          </div>
         ) : (
           <div className='ChannelHeader-share-wrapper'>
-            <button
+            <MDFilledTonalIconButton
               onClick={() => void handleClickShareChannel()}
               onBlur={() => {
                 setChannelCopied(false)
               }}
               aria-label='Share'
-              className='ChannelHeader-share-button'
             >
-              <span className='material-symbols-outlined'>share</span>
-            </button>
+              <MDIcon>share</MDIcon>
+            </MDFilledTonalIconButton>
             <span
               className={`ChannelHeader-copied secondary-text ${
                 channelCopied ? '' : 'hidden'
