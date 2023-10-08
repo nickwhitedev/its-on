@@ -117,6 +117,10 @@ button:disabled {
   color: red;
 }
 
+md-list-item {
+  border-radius: 6px;
+}
+
 @media (prefers-color-scheme: light) {
   a {
     color: rgba(0, 0, 0, 0.6);

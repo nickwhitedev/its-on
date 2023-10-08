@@ -1,14 +1,18 @@
 import './App.css'
 
-import { Link, NavLink, Outlet } from 'react-router-dom'
-import { getFullLoginUrl, getTokens, login } from '../utils/auth'
 import { useCallback, useEffect, useState } from 'react'
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { getFullLoginUrl, getTokens, login } from '../utils/auth'
 
+import { useChannelsDispatch } from '../contexts/channels/channelsContext'
 import { ChannelsDispatchActionType } from '../contexts/channels/channelsReducer'
+import { useSubscriptionsDispatch } from '../contexts/subscriptions/subscriptionsContext'
 import { SubscriptionsDispatchActionType } from '../contexts/subscriptions/subscriptionsReducer'
 import { fetchApi } from '../utils/api'
-import { useChannelsDispatch } from '../contexts/channels/channelsContext'
-import { useSubscriptionsDispatch } from '../contexts/subscriptions/subscriptionsContext'
+import ItsOnIcon from './icons/ItsOnIcon'
+import MDIcon from './material/MDIcon'
+import MDPrimaryTab from './material/tabs/MDPrimaryTab'
+import MDTabs from './material/tabs/MDTabs'
 
 interface OverviewData {
   channels: IChannel[]
@@ -20,6 +24,7 @@ const params = new URL(document.location.toString()).searchParams
 const code = params.get('code')
 const state = params.get('state')
 const tokens = getTokens()
+
 const App = () => {
   const [authenticated, setAuthenticated] = useState(tokens !== null)
   const [authenticating, setAuthenticating] = useState(code !== null)
@@ -27,6 +32,11 @@ const App = () => {
 
   const dispatchChannels = useChannelsDispatch()
   const dispatchSubscriptions = useSubscriptionsDispatch()
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  const isChannelsRoute = location.pathname.startsWith('/channels')
+  const isSubscriptionsRoute = location.pathname.startsWith('/subscriptions')
 
   const syncOverview = useCallback(async () => {
     try {
@@ -80,21 +90,36 @@ const App = () => {
     }
     return (
       <>
-        <nav className="App-nav">
-          <NavLink
-            to={'/channels'}
-            className="App-nav-item"
+        <MDTabs
+          className='App-nav'
+          onChange={event => {
+            const activeTabIndex = (
+              event.target as { activeTabIndex: number } | null
+            )?.activeTabIndex
+            navigate(
+              activeTabIndex === 0
+                ? '/channels'
+                : activeTabIndex === 1
+                ? '/'
+                : '/subscriptions',
+            )
+          }}
+        >
+          <MDPrimaryTab active={isChannelsRoute}>Channels</MDPrimaryTab>
+          <MDPrimaryTab
+            active={!isChannelsRoute && !isSubscriptionsRoute}
+            iconOnly
+            aria-label={'Home'}
           >
-            Channels
-          </NavLink>
-          <NavLink
-            to={'/subscriptions'}
-            className="App-nav-item"
-          >
+            <MDIcon>
+              <ItsOnIcon />
+            </MDIcon>
+          </MDPrimaryTab>
+          <MDPrimaryTab active={isSubscriptionsRoute}>
             Subscriptions
-          </NavLink>
-        </nav>
-        <div className="App-content">
+          </MDPrimaryTab>
+        </MDTabs>
+        <div className='App-content'>
           <Outlet />
         </div>
       </>
@@ -102,22 +127,22 @@ const App = () => {
   }
 
   return (
-    <div className="App">
-      <header className="App-header">
+    <div className='App'>
+      <header className='App-header'>
         <h1>It&apos;s On</h1>
         {!authenticating && authenticated && loginUrl !== '' ? (
           <Link
             to={'/profile'}
-            className="App-settings icon"
-            aria-label="Account Settings"
+            className='App-settings icon'
+            aria-label='Account Settings'
           >
-            <span className="material-symbols-outlined App-settings-icon">
+            <span className='material-symbols-outlined App-settings-icon'>
               account_circle
             </span>
           </Link>
         ) : null}
       </header>
-      <main className="App-main">{getContent()}</main>
+      <main className='App-main'>{getContent()}</main>
     </div>
   )
 }

@@ -1,6 +1,6 @@
 import './Channel.css'
 
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   useChannels,
   useChannelsDispatch,
@@ -18,11 +18,10 @@ import { fetchApi } from '../../../utils/api'
 import { MS_IN_HOUR } from '../../../utils/time'
 import ItsOnIcon from '../../icons/ItsOnIcon'
 import MDDivider from '../../material/MDDivider'
-import MDElevation from '../../material/MDElevation'
-import MDList from '../../material/MDList'
-import MDListItem from '../../material/MDListItem'
 import MDOutlinedSelect from '../../material/MDOutlinedSelect'
 import MDSelectOption from '../../material/MDSelectOption'
+import MDList from '../../material/list/MDList'
+import MDListItem from '../../material/list/MDListItem'
 import ChannelHeader from './ChannelHeader'
 import ChannelNote from './ChannelNote'
 
@@ -217,18 +216,17 @@ const Channel = ({ channel }: Props) => {
             <ItsOnIcon className='Channel-button-image' />
           </button>
           <div className='Channel-subscribers'>
-            <MDElevation />
             <MDList className='Channel-subscribers-list'>
               <MDListItem>
                 <div slot='headline'>Subscribers</div>
               </MDListItem>
               {channel.subscribers?.map(subscriber => (
-                <>
+                <React.Fragment key={subscriber.id}>
                   <MDDivider inset />
                   <MDListItem>
                     <div slot='supporting-text'>{subscriber.username}</div>
                   </MDListItem>
-                </>
+                </React.Fragment>
               )) ?? (
                 <>
                   <MDDivider inset />

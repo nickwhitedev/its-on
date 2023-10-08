@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   useSubscriptions,
@@ -9,10 +9,9 @@ import { fetchApi } from '../../utils/api'
 import { isChannelOn } from '../channels/channel/channelUtils'
 import ItsOnIcon from '../icons/ItsOnIcon'
 import MDDivider from '../material/MDDivider'
-import MDElevation from '../material/MDElevation'
 import MDIcon from '../material/MDIcon'
-import MDList from '../material/MDList'
-import MDListItem from '../material/MDListItem'
+import MDList from '../material/list/MDList'
+import MDListItem from '../material/list/MDListItem'
 import './Subscriptions.css'
 
 const Subscriptions = () => {
@@ -40,10 +39,9 @@ const Subscriptions = () => {
 
   return (
     <div className='Subscriptions'>
-      <MDElevation />
       <MDList className='Subscriptions-list'>
         {subscriptions.map((channel, index) => (
-          <>
+          <React.Fragment key={channel.id}>
             {index > 0 ? <MDDivider inset /> : null}
             {channel.deleted ? (
               <MDListItem
@@ -96,7 +94,7 @@ const Subscriptions = () => {
                 <div slot='supporting-text'>{channel.owner}</div>
               </MDListItem>
             )}
-          </>
+          </React.Fragment>
         ))}
       </MDList>
     </div>

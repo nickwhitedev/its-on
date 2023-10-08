@@ -1,10 +1,12 @@
 import { render, screen } from '@testing-library/react'
 
-import App from '../App'
 import { BrowserRouter } from 'react-router-dom'
 import { vi } from 'vitest'
+import App from '../App'
 
 vi.mock('../channels/Channels')
+
+// FIXME: Seems like vitest may be having some issues with testing the lit components
 
 describe('App.tsx', () => {
   it('renders channels link', () => {
