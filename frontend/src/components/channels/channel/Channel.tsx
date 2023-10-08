@@ -1,26 +1,30 @@
 import './Channel.css'
 
-import { durationOptions, isChannelOn } from './channelUtils'
+import { useEffect, useState } from 'react'
 import {
   useChannels,
   useChannelsDispatch,
 } from '../../../contexts/channels/channelsContext'
-import { useEffect, useState } from 'react'
 import {
   useSubscriptions,
   useSubscriptionsDispatch,
 } from '../../../contexts/subscriptions/subscriptionsContext'
+import { durationOptions, isChannelOn } from './channelUtils'
 
-import ChannelHeader from './ChannelHeader'
-import ChannelNote from './ChannelNote'
+import { useNavigate } from 'react-router-dom'
 import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
-import ItsOnIcon from '../../icons/ItsOnIcon'
-import MDOutlinedSelect from '../../material/MDOutlinedSelect'
-import MDSelectOption from '../../material/MDSelectOption'
-import { MS_IN_HOUR } from '../../../utils/time'
 import { SubscriptionsDispatchActionType } from '../../../contexts/subscriptions/subscriptionsReducer'
 import { fetchApi } from '../../../utils/api'
-import { useNavigate } from 'react-router-dom'
+import { MS_IN_HOUR } from '../../../utils/time'
+import ItsOnIcon from '../../icons/ItsOnIcon'
+import MDDivider from '../../material/MDDivider'
+import MDElevation from '../../material/MDElevation'
+import MDList from '../../material/MDList'
+import MDListItem from '../../material/MDListItem'
+import MDOutlinedSelect from '../../material/MDOutlinedSelect'
+import MDSelectOption from '../../material/MDSelectOption'
+import ChannelHeader from './ChannelHeader'
+import ChannelNote from './ChannelNote'
 
 interface Props {
   channel: IChannel
@@ -169,7 +173,7 @@ const Channel = ({ channel }: Props) => {
   }
 
   return (
-    <div className="Channel">
+    <div className='Channel'>
       <ChannelHeader
         channel={channel}
         isLoading={isLoading}
@@ -185,7 +189,7 @@ const Channel = ({ channel }: Props) => {
       {userIsChannelOwner ? (
         <>
           <MDOutlinedSelect
-            className="Channel-select"
+            className='Channel-select'
             disabled={isLoading}
             value={`${channel.duration ?? MS_IN_HOUR}`}
             onChange={event => void handleChangeDuration(event)}
@@ -196,7 +200,7 @@ const Channel = ({ channel }: Props) => {
                 selected={durationOption.value === channel.duration}
                 value={`${durationOption.value}`}
               >
-                <div slot="headline">{durationOption.displayName}</div>
+                <div slot='headline'>{durationOption.displayName}</div>
               </MDSelectOption>
             ))}
           </MDOutlinedSelect>
@@ -210,15 +214,36 @@ const Channel = ({ channel }: Props) => {
                 : () => void handleClickItsOn()
             }
           >
-            <ItsOnIcon className="Channel-button-image" />
+            <ItsOnIcon className='Channel-button-image' />
           </button>
+          <div className='Channel-subscribers'>
+            <MDElevation />
+            <MDList className='Channel-subscribers-list'>
+              <MDListItem>
+                <div slot='headline'>Subscribers</div>
+              </MDListItem>
+              {channel.subscribers?.map(subscriber => (
+                <>
+                  <MDDivider inset />
+                  <MDListItem>
+                    <div slot='supporting-text'>{subscriber.username}</div>
+                  </MDListItem>
+                </>
+              )) ?? (
+                <>
+                  <MDDivider inset />
+                  <MDListItem>Share your channel to get subscribers</MDListItem>
+                </>
+              )}
+            </MDList>
+          </div>
           <button
-            aria-label="Delete channel"
-            className="Channel-button Channel-button-delete red"
+            aria-label='Delete channel'
+            className='Channel-button Channel-button-delete red'
             disabled={isLoading}
             onClick={() => void handleClickDelete()}
           >
-            <span className="material-symbols-outlined">delete</span> Delete
+            <span className='material-symbols-outlined'>delete</span> Delete
           </button>
         </>
       ) : subscriptions.some(chan => chan.id === channel.id) ? (

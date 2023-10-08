@@ -3,6 +3,8 @@
   flex-flow: column nowrap;
   justify-content: center;
   align-items: center;
+  max-width: 90%;
+  min-width: 50%;
 }
 
 .Channel-button {
@@ -91,4 +93,16 @@
 .Channel-select,
 .Channel-select md-select-option {
   min-width: 10rem;
+}
+
+.Channel-subscribers {
+  border-radius: 12px;
+  position: relative;
+  min-width: 50%;
+  max-width: 100%;
+  text-align: left;
+}
+
+.Channel-subscribers-list {
+  border-radius: 12px;
 }
