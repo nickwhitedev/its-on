@@ -6,8 +6,11 @@
     / 2rem auto 2rem;
   width: 100%;
   margin-top: 0.5rem;
-  min-height: 8rem;
   align-items: center;
+}
+
+.ChannelHeader.editable {
+  min-height: 8rem;
 }
 
 .ChannelHeader-title {

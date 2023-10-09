@@ -79,7 +79,7 @@ const ChannelHeader = ({
   }
 
   return (
-    <div className="ChannelHeader">
+    <div className={`ChannelHeader ${userIsChannelOwner ? 'editable' : ''}`}>
       <div className="ChannelHeader-edit">
         {userIsChannelOwner ? (
           <div className="ChannelHeader-save-wrapper">
@@ -122,7 +122,12 @@ const ChannelHeader = ({
           }}
         />
       ) : (
-        <h2 className="ChannelHeader-title">{channelTitle}</h2>
+        <div className="ChannelHeader-title">
+          <h2 className="ChannelHeader-title">{channelTitle}</h2>
+          {userIsChannelOwner ? null : (
+            <span className="secondary-text">by {channel.owner}</span>
+          )}
+        </div>
       )}
       <div className="ChannelHeader-share">
         {isUpdating && userIsChannelOwner ? (
