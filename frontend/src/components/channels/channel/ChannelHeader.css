@@ -6,12 +6,13 @@
     / 2rem auto 2rem;
   width: 100%;
   margin-top: 0.5rem;
-  min-height: 6rem;
+  min-height: 8rem;
+  align-items: center;
 }
 
 .ChannelHeader-title {
   grid-area: title;
-  margin-block-start: 0.78em;
+  margin: 0;
 }
 
 .ChannelHeader-input {
@@ -52,6 +53,7 @@
   display: flex;
   justify-content: center;
   flex-flow: column nowrap;
+  position: relative;
 }
 
 .ChannelHeader-copied {
@@ -60,6 +62,8 @@
   margin-top: 0.2rem;
   transition: all 0.2s ease-in-out;
   user-select: none;
+  position: absolute;
+  top: 40px;
 }
 .ChannelHeader-copied.hidden {
   color: rgba(0, 0, 0, 0);

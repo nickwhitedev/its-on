@@ -1,9 +1,8 @@
 import './ChannelHeader.css'
 
 import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
-import MDFilledTonalIconButton from '../../material/icon-button/MDFilledTonalIconButton'
 import MDIcon from '../../material/MDIcon'
-import MDOutlinedIconButton from '../../material/icon-button/MDOutlinedIconButton'
+import MDIconButton from '../../material/icon-button/MDIconButton'
 import MDOutlinedTextField from '../../material/text-field/MDOutlinedTextField'
 import { baseUrl } from '../../../utils/urls'
 import { fetchApi } from '../../../utils/api'
@@ -85,7 +84,7 @@ const ChannelHeader = ({
         {userIsChannelOwner ? (
           <div className="ChannelHeader-save-wrapper">
             {isUpdating ? (
-              <MDOutlinedIconButton
+              <MDIconButton
                 className="ChannelHeader-button"
                 disabled={!channel.title || isLoading}
                 onClick={() => {
@@ -94,16 +93,17 @@ const ChannelHeader = ({
                 }}
               >
                 <MDIcon>close</MDIcon>
-              </MDOutlinedIconButton>
+              </MDIconButton>
             ) : (
-              <MDOutlinedIconButton
+              <MDIconButton
                 className="ChannelHeader-button"
+                disabled={false}
                 onClick={() => {
                   setIsUpdating(true)
                 }}
               >
                 <MDIcon>edit</MDIcon>
-              </MDOutlinedIconButton>
+              </MDIconButton>
             )}
           </div>
         ) : null}
@@ -127,17 +127,17 @@ const ChannelHeader = ({
       <div className="ChannelHeader-share">
         {isUpdating && userIsChannelOwner ? (
           <div className="ChannelHeader-save-wrapper">
-            <MDOutlinedIconButton
+            <MDIconButton
               className="ChannelHeader-button"
               disabled={newTitle === '' || isLoading}
               onClick={() => void handleSubmit()}
             >
               <MDIcon>done</MDIcon>
-            </MDOutlinedIconButton>
+            </MDIconButton>
           </div>
         ) : (
           <div className="ChannelHeader-share-wrapper">
-            <MDFilledTonalIconButton
+            <MDIconButton
               aria-label="Share"
               disabled={isLoading}
               onClick={() => void handleClickShareChannel()}
@@ -146,7 +146,7 @@ const ChannelHeader = ({
               }}
             >
               <MDIcon>share</MDIcon>
-            </MDFilledTonalIconButton>
+            </MDIconButton>
             <span
               className={`ChannelHeader-copied secondary-text ${
                 channelCopied ? '' : 'hidden'
