@@ -1,7 +1,7 @@
 import './Channel.css'
 
 import React, { useEffect, useState } from 'react'
-import { durationOptions, isChannelOn } from './channelUtils'
+import { channelOnProgress, durationOptions, isChannelOn } from './channelUtils'
 import {
   useChannels,
   useChannelsDispatch,
@@ -19,6 +19,7 @@ import MDDivider from '../../material/MDDivider'
 import MDFilledButton from '../../material/button/MDFilledButton'
 import MDFilledTonalButton from '../../material/button/MDFilledTonalButton'
 import MDIcon from '../../material/MDIcon'
+import MDLinearProgress from '../../material/progress/MDLinearProgress'
 import MDList from '../../material/list/MDList'
 import MDListItem from '../../material/list/MDListItem'
 import MDOutlinedSelect from '../../material/select/MDOutlinedSelect'
@@ -46,6 +47,7 @@ const Channel = ({ channel }: Props) => {
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const isOn = isChannelOn(channel)
+  const onProgress = channelOnProgress(channel)
 
   useEffect(() => {
     document.title = channel.title ?? "It's On"
@@ -205,6 +207,12 @@ const Channel = ({ channel }: Props) => {
           >
             <ItsOnIcon className="Channel-button-image" />
           </button>
+          {isOn ? (
+            <MDLinearProgress
+              className="Channel-progress"
+              value={onProgress}
+            />
+          ) : null}
           <MDOutlinedSelect
             className="Channel-select"
             value={`${channel.duration ?? MS_IN_HOUR}`}
@@ -271,6 +279,12 @@ const Channel = ({ channel }: Props) => {
           >
             <ItsOnIcon className="Channel-button-image" />
           </div>
+          {isOn ? (
+            <MDLinearProgress
+              className="Channel-progress"
+              value={onProgress}
+            />
+          ) : null}
           <MDFilledTonalButton
             className="Channel-subscribe-button"
             disabled={isLoading}
