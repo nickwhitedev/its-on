@@ -231,6 +231,10 @@ const Channel = ({ channel }: Props) => {
             <MDList className="Channel-subscribers-list">
               <MDListItem>
                 <div slot="headline">Subscribers</div>
+                <div slot="trailing-supporting-text">
+                  {channel.subscribers?.length}
+                  {/* TODO: Add denominator when limit is added */}
+                </div>
               </MDListItem>
               {channel.subscribers?.map(subscriber => (
                 <React.Fragment key={subscriber.id}>
@@ -260,14 +264,24 @@ const Channel = ({ channel }: Props) => {
           </MDTextButton>
         </>
       ) : subscriptions.some(chan => chan.id === channel.id) ? (
-        <MDFilledTonalButton
-          disabled={isLoading}
-          onClick={() => void handleClickUnsubscribe()}
-        >
-          Unsubscribe
-        </MDFilledTonalButton>
+        <>
+          <div
+            aria-label={isOn ? "It's On" : "It's Off"}
+            className={`Channel-signal ${isOn ? 'on' : ''}`}
+          >
+            <ItsOnIcon className="Channel-button-image" />
+          </div>
+          <MDFilledTonalButton
+            className="Channel-subscribe-button"
+            disabled={isLoading}
+            onClick={() => void handleClickUnsubscribe()}
+          >
+            Unsubscribe
+          </MDFilledTonalButton>
+        </>
       ) : (
         <MDFilledButton
+          className="Channel-subscribe-button"
           disabled={isLoading}
           onClick={() => void handleClickSubscribe()}
         >

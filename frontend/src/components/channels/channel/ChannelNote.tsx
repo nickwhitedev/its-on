@@ -27,8 +27,6 @@ const ChannelNote = ({
 
   const isUpdating = newNote !== channel.note
 
-  const hasNote = (channel.note?.length ?? 0) > 0
-
   const handleSubmit = async () => {
     if (!isUpdating) return
 
@@ -57,7 +55,7 @@ const ChannelNote = ({
     setIsLoading(false)
   }
 
-  return (
+  return userIsChannelOwner || (channel.note?.length ?? 0) > 0 ? (
     <div className="ChannelNote">
       <div></div>
       {userIsChannelOwner ? (
@@ -74,13 +72,7 @@ const ChannelNote = ({
           }}
         />
       ) : (
-        <span
-          className={`ChannelNote-note ${
-            hasNote ? 'secondary-text' : 'instructions'
-          }`}
-        >
-          {hasNote ? channel.note : 'Add a note for your subscribers'}
-        </span>
+        <span className="ChannelNote-note">{channel.note}</span>
       )}
       <div className="ChannelNote-actions">
         {isUpdating && userIsChannelOwner ? (
@@ -96,7 +88,7 @@ const ChannelNote = ({
         ) : null}
       </div>
     </div>
-  )
+  ) : null
 }
 
 export default ChannelNote

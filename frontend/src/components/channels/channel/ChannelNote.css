@@ -9,9 +9,11 @@
 
 .ChannelNote-note {
   grid-area: note;
+  margin-top: 1.8rem;
 }
 
 .ChannelNote-input {
+  grid-area: note;
   resize: both;
   text-align: left;
 }
@@ -21,10 +23,10 @@
   display: flex;
   justify-content: center;
   align-items: start;
-  padding: 2.6rem 0;
 }
 
 .ChannelNote-actions-wrapper {
   display: flex;
   justify-content: space-between;
+  padding: 2.6rem 0;
 }

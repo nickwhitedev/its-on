@@ -1,19 +1,20 @@
 import './Channels.css'
 
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import {
   useChannels,
   useChannelsDispatch,
 } from '../../contexts/channels/channelsContext'
+
 import { ChannelsDispatchActionType } from '../../contexts/channels/channelsReducer'
-import { fetchApi } from '../../utils/api'
 import ItsOnIcon from '../icons/ItsOnIcon'
 import MDDivider from '../material/MDDivider'
 import MDIcon from '../material/MDIcon'
 import MDList from '../material/list/MDList'
 import MDListItem from '../material/list/MDListItem'
+import { fetchApi } from '../../utils/api'
 import { isChannelOn } from './channel/channelUtils'
+import { useNavigate } from 'react-router-dom'
 
 const Channels = () => {
   const channels = useChannels()
@@ -45,23 +46,23 @@ const Channels = () => {
   }
 
   return (
-    <div className='Channels'>
-      <MDList className='Channels-list'>
+    <div className="Channels">
+      <MDList className="Channels-list">
         <MDListItem
-          className='Channels-list-item'
+          className="Channels-list-item"
           disabled={isCreating}
-          type='button'
+          type="button"
           onClick={() => void handleCreateChannel()}
         >
-          <MDIcon slot='start'>add</MDIcon>
-          <div slot='headline'>Create Channel</div>
+          <MDIcon slot="start">add</MDIcon>
+          <div slot="headline">New Channel</div>
         </MDListItem>
         {channels.map(channel => (
           <React.Fragment key={channel.id}>
             <MDDivider inset />
             <MDListItem
-              className='Channels-list-item'
-              type='link'
+              className="Channels-list-item"
+              type="link"
               onClick={() => {
                 navigate(`/${channel.id}`)
               }}
@@ -72,15 +73,15 @@ const Channels = () => {
                     ? 'Channels-list-item-on'
                     : 'Channels-list-item-off'
                 }
-                slot='start'
+                slot="start"
               >
                 <ItsOnIcon />
               </MDIcon>
-              <div slot='headline'>
+              <div slot="headline">
                 {(channel.title?.length ?? 0) > 0 ? channel.title : 'Untitled'}
               </div>
               {(channel.note?.length ?? 0) > 0 ? (
-                <div slot='supporting-text'>{channel.note}</div>
+                <div slot="supporting-text">{channel.note}</div>
               ) : null}
             </MDListItem>
           </React.Fragment>
