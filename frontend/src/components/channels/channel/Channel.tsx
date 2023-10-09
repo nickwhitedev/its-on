@@ -183,30 +183,16 @@ const Channel = ({ channel }: Props) => {
         userIsChannelOwner={userIsChannelOwner}
         setIsLoading={setIsLoading}
       />
-      <ChannelNote
-        channel={channel}
-        isLoading={isLoading}
-        userIsChannelOwner={userIsChannelOwner}
-        setIsLoading={setIsLoading}
-      />
+      {!userIsChannelOwner ? (
+        <ChannelNote
+          channel={channel}
+          isLoading={isLoading}
+          userIsChannelOwner={userIsChannelOwner}
+          setIsLoading={setIsLoading}
+        />
+      ) : null}
       {userIsChannelOwner ? (
         <>
-          <MDOutlinedSelect
-            className='Channel-select'
-            disabled={isLoading}
-            value={`${channel.duration ?? MS_IN_HOUR}`}
-            onChange={event => void handleChangeDuration(event)}
-          >
-            {durationOptions.map(durationOption => (
-              <MDSelectOption
-                key={durationOption.value}
-                selected={durationOption.value === channel.duration}
-                value={`${durationOption.value}`}
-              >
-                <div slot='headline'>{durationOption.displayName}</div>
-              </MDSelectOption>
-            ))}
-          </MDOutlinedSelect>
           <button
             aria-label={isOn ? 'Turn off channel' : 'Turn on channel'}
             className={`Channel-button ${isOn ? 'on' : ''}`}
@@ -219,6 +205,28 @@ const Channel = ({ channel }: Props) => {
           >
             <ItsOnIcon className='Channel-button-image' />
           </button>
+          <MDOutlinedSelect
+            className='Channel-select'
+            value={`${channel.duration ?? MS_IN_HOUR}`}
+            onChange={event => void handleChangeDuration(event)}
+          >
+            {durationOptions.map(durationOption => (
+              <MDSelectOption
+                disabled={isLoading}
+                key={durationOption.value}
+                selected={durationOption.value === channel.duration}
+                value={`${durationOption.value}`}
+              >
+                <div slot='headline'>{durationOption.displayName}</div>
+              </MDSelectOption>
+            ))}
+          </MDOutlinedSelect>
+          <ChannelNote
+            channel={channel}
+            isLoading={isLoading}
+            userIsChannelOwner={userIsChannelOwner}
+            setIsLoading={setIsLoading}
+          />
           <div className='Channel-subscribers'>
             <MDList className='Channel-subscribers-list'>
               <MDListItem>
@@ -234,7 +242,9 @@ const Channel = ({ channel }: Props) => {
               )) ?? (
                 <>
                   <MDDivider inset />
-                  <MDListItem>Share your channel to get subscribers</MDListItem>
+                  <MDListItem>
+                    Share your channel to let people know it&apos;s on!
+                  </MDListItem>
                 </>
               )}
             </MDList>
