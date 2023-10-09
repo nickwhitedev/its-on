@@ -1,14 +1,14 @@
 import './ChannelHeader.css'
 
-import { useState } from 'react'
-import { useChannelsDispatch } from '../../../contexts/channels/channelsContext'
 import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
-import { fetchApi } from '../../../utils/api'
-import { baseUrl } from '../../../utils/urls'
-import MDIcon from '../../material/MDIcon'
 import MDFilledTonalIconButton from '../../material/icon-button/MDFilledTonalIconButton'
+import MDIcon from '../../material/MDIcon'
 import MDOutlinedIconButton from '../../material/icon-button/MDOutlinedIconButton'
 import MDOutlinedTextField from '../../material/text-field/MDOutlinedTextField'
+import { baseUrl } from '../../../utils/urls'
+import { fetchApi } from '../../../utils/api'
+import { useChannelsDispatch } from '../../../contexts/channels/channelsContext'
+import { useState } from 'react'
 
 interface Props {
   channel: IChannel
@@ -25,17 +25,20 @@ const ChannelHeader = ({
 }: Props) => {
   const dispatchChannels = useChannelsDispatch()
 
+  const [isUpdating, setIsUpdating] = useState<boolean>(
+    userIsChannelOwner && !channel.title,
+  )
   const [newTitle, setNewTitle] = useState<string>(channel.title ?? '')
   const [channelCopied, setChannelCopied] = useState<boolean>(false)
-
-  const isUpdating = newTitle !== channel.title
 
   const channelTitle =
     channel.title === '' || channel.title == null ? 'Untitled' : channel.title
 
   const handleSubmit = async () => {
-    if (!isUpdating) return
-
+    if (newTitle === channel.title) {
+      setIsUpdating(false)
+      return
+    }
     setIsLoading(true)
 
     try {
@@ -52,6 +55,7 @@ const ChannelHeader = ({
           ...channelUpdates,
         },
       })
+      setIsUpdating(false)
     } catch (error) {
       // TODO: Handle update channel error
       // log error to backend
@@ -76,28 +80,54 @@ const ChannelHeader = ({
   }
 
   return (
-    <div className='ChannelHeader'>
-      <div></div>
-      {userIsChannelOwner ? (
+    <div className="ChannelHeader">
+      <div className="ChannelHeader-edit">
+        {userIsChannelOwner ? (
+          <div className="ChannelHeader-save-wrapper">
+            {isUpdating ? (
+              <MDOutlinedIconButton
+                className="ChannelHeader-button"
+                disabled={!channel.title || isLoading}
+                onClick={() => {
+                  setIsUpdating(false)
+                  setNewTitle(channel.title ?? '')
+                }}
+              >
+                <MDIcon>close</MDIcon>
+              </MDOutlinedIconButton>
+            ) : (
+              <MDOutlinedIconButton
+                className="ChannelHeader-button"
+                onClick={() => {
+                  setIsUpdating(true)
+                }}
+              >
+                <MDIcon>edit</MDIcon>
+              </MDOutlinedIconButton>
+            )}
+          </div>
+        ) : null}
+      </div>
+      {userIsChannelOwner && isUpdating ? (
         <MDOutlinedTextField
           className={'ChannelHeader-input'}
-          label='Title'
+          label="Title"
           maxLength={40}
           rows={1}
-          type='textarea'
+          type="textarea"
           value={newTitle}
           onInput={event => {
             setNewTitle((event.target as unknown as { value: string }).value)
           }}
         />
       ) : (
-        <h2 className='ChannelHeader-title'>{channelTitle}</h2>
+        <h2 className="ChannelHeader-title">{channelTitle}</h2>
       )}
-      <div className='ChannelHeader-actions'>
+      <div className="ChannelHeader-share">
         {isUpdating && userIsChannelOwner ? (
-          <div className='ChannelHeader-edit-actions-wrapper'>
+          <div className="ChannelHeader-save-wrapper">
             <MDOutlinedIconButton
-              className='ChannelHeader-button'
+              className="ChannelHeader-button"
               disabled={newTitle === '' || isLoading}
               onClick={() => void handleSubmit()}
             >
@@ -105,9 +135,9 @@ const ChannelHeader = ({
             </MDOutlinedIconButton>
           </div>
         ) : (
-          <div className='ChannelHeader-share-wrapper'>
+          <div className="ChannelHeader-share-wrapper">
             <MDFilledTonalIconButton
-              aria-label='Share'
+              aria-label="Share"
               disabled={isLoading}
               onClick={() => void handleClickShareChannel()}
               onBlur={() => {
