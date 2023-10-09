@@ -1,6 +1,7 @@
 import './Channel.css'
 
 import React, { useEffect, useState } from 'react'
+import { durationOptions, isChannelOn } from './channelUtils'
 import {
   useChannels,
   useChannelsDispatch,
@@ -9,25 +10,24 @@ import {
   useSubscriptions,
   useSubscriptionsDispatch,
 } from '../../../contexts/subscriptions/subscriptionsContext'
-import { durationOptions, isChannelOn } from './channelUtils'
 
-import { useNavigate } from 'react-router-dom'
+import ChannelHeader from './ChannelHeader'
+import ChannelNote from './ChannelNote'
 import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
-import { SubscriptionsDispatchActionType } from '../../../contexts/subscriptions/subscriptionsReducer'
-import { fetchApi } from '../../../utils/api'
-import { MS_IN_HOUR } from '../../../utils/time'
 import ItsOnIcon from '../../icons/ItsOnIcon'
 import MDDivider from '../../material/MDDivider'
-import MDIcon from '../../material/MDIcon'
 import MDFilledButton from '../../material/button/MDFilledButton'
 import MDFilledTonalButton from '../../material/button/MDFilledTonalButton'
-import MDTextButton from '../../material/button/MDTextButton'
+import MDIcon from '../../material/MDIcon'
 import MDList from '../../material/list/MDList'
 import MDListItem from '../../material/list/MDListItem'
 import MDOutlinedSelect from '../../material/select/MDOutlinedSelect'
 import MDSelectOption from '../../material/select/MDSelectOption'
-import ChannelHeader from './ChannelHeader'
-import ChannelNote from './ChannelNote'
+import MDTextButton from '../../material/button/MDTextButton'
+import { MS_IN_HOUR } from '../../../utils/time'
+import { SubscriptionsDispatchActionType } from '../../../contexts/subscriptions/subscriptionsReducer'
+import { fetchApi } from '../../../utils/api'
+import { useNavigate } from 'react-router-dom'
 
 interface Props {
   channel: IChannel
@@ -176,7 +176,7 @@ const Channel = ({ channel }: Props) => {
   }
 
   return (
-    <div className='Channel'>
+    <div className="Channel">
       <ChannelHeader
         channel={channel}
         isLoading={isLoading}
@@ -203,10 +203,10 @@ const Channel = ({ channel }: Props) => {
                 : () => void handleClickItsOn()
             }
           >
-            <ItsOnIcon className='Channel-button-image' />
+            <ItsOnIcon className="Channel-button-image" />
           </button>
           <MDOutlinedSelect
-            className='Channel-select'
+            className="Channel-select"
             value={`${channel.duration ?? MS_IN_HOUR}`}
             onChange={event => void handleChangeDuration(event)}
           >
@@ -217,7 +217,7 @@ const Channel = ({ channel }: Props) => {
                 selected={durationOption.value === channel.duration}
                 value={`${durationOption.value}`}
               >
-                <div slot='headline'>{durationOption.displayName}</div>
+                <div slot="headline">{durationOption.displayName}</div>
               </MDSelectOption>
             ))}
           </MDOutlinedSelect>
@@ -227,16 +227,16 @@ const Channel = ({ channel }: Props) => {
             userIsChannelOwner={userIsChannelOwner}
             setIsLoading={setIsLoading}
           />
-          <div className='Channel-subscribers'>
-            <MDList className='Channel-subscribers-list'>
+          <div className="Channel-subscribers">
+            <MDList className="Channel-subscribers-list">
               <MDListItem>
-                <div slot='headline'>Subscribers</div>
+                <div slot="headline">Subscribers</div>
               </MDListItem>
               {channel.subscribers?.map(subscriber => (
                 <React.Fragment key={subscriber.id}>
                   <MDDivider inset />
                   <MDListItem>
-                    <div slot='supporting-text'>{subscriber.username}</div>
+                    <div slot="supporting-text">{subscriber.username}</div>
                   </MDListItem>
                 </React.Fragment>
               )) ?? (
@@ -250,13 +250,13 @@ const Channel = ({ channel }: Props) => {
             </MDList>
           </div>
           <MDTextButton
-            aria-label='Delete channel'
-            className='Channel-button-delete'
+            aria-label="Delete channel"
+            className="Channel-button-delete"
             disabled={isLoading}
             hasIcon
             onClick={() => void handleClickDelete()}
           >
-            <MDIcon slot='icon'>delete</MDIcon> Delete
+            <MDIcon slot="icon">delete</MDIcon> Delete
           </MDTextButton>
         </>
       ) : subscriptions.some(chan => chan.id === channel.id) ? (

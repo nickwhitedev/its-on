@@ -1,12 +1,12 @@
 import './ChannelNote.css'
 
-import { useState } from 'react'
-import { useChannelsDispatch } from '../../../contexts/channels/channelsContext'
 import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
-import { fetchApi } from '../../../utils/api'
 import MDIcon from '../../material/MDIcon'
-import MDOutlinedIconButton from '../../material/icon-button/MDOutlinedIconButton'
+import MDIconButton from '../../material/icon-button/MDIconButton'
 import MDOutlinedTextField from '../../material/text-field/MDOutlinedTextField'
+import { fetchApi } from '../../../utils/api'
+import { useChannelsDispatch } from '../../../contexts/channels/channelsContext'
+import { useState } from 'react'
 
 interface Props {
   channel: IChannel
@@ -58,16 +58,16 @@ const ChannelNote = ({
   }
 
   return (
-    <div className='ChannelNote'>
+    <div className="ChannelNote">
       <div></div>
       {userIsChannelOwner ? (
         <MDOutlinedTextField
           className={'ChannelNote-input'}
-          label='Note'
+          label="Note"
           maxLength={200}
           placeholder="Let's meet at my place"
           rows={4}
-          type='textarea'
+          type="textarea"
           value={newNote}
           onInput={event => {
             setNewNote((event.target as unknown as { value: string }).value)
@@ -82,16 +82,16 @@ const ChannelNote = ({
           {hasNote ? channel.note : 'Add a note for your subscribers'}
         </span>
       )}
-      <div className='ChannelNote-actions'>
+      <div className="ChannelNote-actions">
         {isUpdating && userIsChannelOwner ? (
-          <div className='ChannelNote-actions-wrapper'>
-            <MDOutlinedIconButton
-              className='ChannelNote-button'
+          <div className="ChannelNote-actions-wrapper">
+            <MDIconButton
+              className="ChannelNote-button"
               disabled={isLoading}
               onClick={() => void handleSubmit()}
             >
               <MDIcon>done</MDIcon>
-            </MDOutlinedIconButton>
+            </MDIconButton>
           </div>
         ) : null}
       </div>
