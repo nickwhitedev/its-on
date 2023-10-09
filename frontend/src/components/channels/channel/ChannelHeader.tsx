@@ -110,6 +110,7 @@ const ChannelHeader = ({
       </div>
       {userIsChannelOwner && isUpdating ? (
         <MDOutlinedTextField
+          // TODO: Implement autoFocus with ref
           className={'ChannelHeader-input'}
           label="Title"
           maxLength={40}
