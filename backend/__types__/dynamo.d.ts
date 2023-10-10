@@ -18,6 +18,7 @@
  */
 interface IDynamoChannelItem {
   canceled?: boolean
+  capacity?: number
   deleted?: boolean
   duration?: number
   lastOn?: number
@@ -40,6 +41,9 @@ interface IDynamoChannelItem {
 interface IDynamoStreamChannelImage {
   canceled?: {
     BOOL?: boolean
+  }
+  capacity?: {
+    N?: number
   }
   deleted?: {
     BOOL?: boolean

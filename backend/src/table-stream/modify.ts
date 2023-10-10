@@ -4,10 +4,10 @@ import {
   QueryCommand,
 } from '@aws-sdk/lib-dynamodb'
 
-import { DynamoDBRecord } from 'aws-lambda'
 import { DYNAMODB_TABLE_NAME } from '../utils/constants'
-import { batchWrite } from '../utils/dynamo'
+import { DynamoDBRecord } from 'aws-lambda'
 import { MS_IN_HOUR } from '../utils/time'
+import { batchWrite } from '../utils/dynamo'
 
 export const handleModifyEvent = async (
   record: DynamoDBRecord,
@@ -25,6 +25,7 @@ export const handleModifyEvent = async (
 
   const channelInfo: IDynamoChannelItem = {
     canceled: record.dynamodb?.NewImage?.canceled?.BOOL ?? false,
+    capacity: parseInt(record.dynamodb?.NewImage?.capacity?.N ?? '5'),
     duration: parseInt(
       record.dynamodb?.NewImage?.duration?.N ?? MS_IN_HOUR.toString(),
     ),

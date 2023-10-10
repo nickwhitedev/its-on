@@ -4,13 +4,13 @@ import {
   PutCommand,
 } from '@aws-sdk/lib-dynamodb'
 
-import { jest } from '@jest/globals'
 import { APIGatewayProxyEvent } from 'aws-lambda'
-import { mockClient } from 'aws-sdk-client-mock'
-import mockEvent from '../../../__mocks__/mock-event'
-import { createChannelHandler } from '../../../src/handlers/create-channel'
 import { CORS_HEADERS } from '../../../src/utils/constants'
 import { MS_IN_HOUR } from '../../../src/utils/time'
+import { createChannelHandler } from '../../../src/handlers/create-channel'
+import { jest } from '@jest/globals'
+import { mockClient } from 'aws-sdk-client-mock'
+import mockEvent from '../../../__mocks__/mock-event'
 
 // This includes all tests for createChannelHandler()
 describe('Test createChannelHandler', function () {
@@ -47,6 +47,7 @@ describe('Test createChannelHandler', function () {
     expect(Object.keys(resultBody)).toEqual([
       'id',
       'subscribers',
+      'capacity',
       'duration',
       'lastOn',
       'lastOnDuration',
@@ -54,6 +55,7 @@ describe('Test createChannelHandler', function () {
       'owner',
       'title',
     ])
+    expect(resultBody.capacity).toEqual(5)
     expect(resultBody.duration).toEqual(MS_IN_HOUR)
     expect(resultBody.lastOn).toEqual(0)
     expect(resultBody.lastOnDuration).toEqual(MS_IN_HOUR)
@@ -87,6 +89,7 @@ describe('Test createChannelHandler', function () {
     expect(Object.keys(resultBody)).toEqual([
       'id',
       'subscribers',
+      'capacity',
       'duration',
       'lastOn',
       'lastOnDuration',
@@ -94,6 +97,7 @@ describe('Test createChannelHandler', function () {
       'owner',
       'title',
     ])
+    expect(resultBody.capacity).toEqual(5)
     expect(resultBody.duration).toEqual(MS_IN_HOUR)
     expect(resultBody.lastOn).toEqual(0)
     expect(resultBody.lastOnDuration).toEqual(MS_IN_HOUR)
@@ -130,6 +134,7 @@ describe('Test createChannelHandler', function () {
     expect(Object.keys(resultBody)).toEqual([
       'id',
       'subscribers',
+      'capacity',
       'duration',
       'lastOn',
       'lastOnDuration',
@@ -137,6 +142,7 @@ describe('Test createChannelHandler', function () {
       'owner',
       'title',
     ])
+    expect(resultBody.capacity).toEqual(5)
     expect(resultBody.duration).toEqual(MS_IN_HOUR)
     expect(resultBody.lastOn).toEqual(0)
     expect(resultBody.lastOnDuration).toEqual(MS_IN_HOUR)

@@ -7,6 +7,7 @@
  */
 interface IChannel {
   canceled?: boolean
+  capacity?: number
   deleted?: boolean
   duration?: number
   id: string

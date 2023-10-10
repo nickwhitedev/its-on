@@ -240,8 +240,8 @@ const Channel = ({ channel }: Props) => {
               <MDListItem>
                 <div slot="headline">Subscribers</div>
                 <div slot="trailing-supporting-text">
-                  {channel.subscribers?.length}
-                  {/* TODO: Add denominator when limit is added */}
+                  {channel.subscribers?.length ?? 0}
+                  {channel.capacity == null ? null : ` / ${channel.capacity}`}
                 </div>
               </MDListItem>
               {channel.subscribers?.map(subscriber => (

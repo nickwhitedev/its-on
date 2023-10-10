@@ -1,11 +1,11 @@
-import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DYNAMODB_TABLE_NAME } from '../utils/constants'
-import { getChannel } from '../utils/dynamo'
-import { createResponse } from '../utils/response'
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { MS_IN_HOUR } from '../utils/time'
+import { createResponse } from '../utils/response'
+import { getChannel } from '../utils/dynamo'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -63,7 +63,9 @@ export const updateChannelHandler = async (
     })
   }
 
-  const { note, duration, title } = JSON.parse(event.body ?? '{}') as IChannel
+  const { capacity, duration, note, title } = JSON.parse(
+    event.body ?? '{}',
+  ) as IChannel
 
   try {
     const ddbResponse = await ddbDocClient.send(
@@ -75,14 +77,16 @@ export const updateChannelHandler = async (
         ReturnValues: 'ALL_NEW',
         TableName: DYNAMODB_TABLE_NAME,
         UpdateExpression:
-          'SET #duration = :duration, #lastUpdated = :lastUpdated, #note = :note, #title = :title',
+          'SET #capacity = :capacity, #duration = :duration, #lastUpdated = :lastUpdated, #note = :note, #title = :title',
         ExpressionAttributeNames: {
+          '#capacity': 'capacity',
           '#duration': 'duration',
           '#lastUpdated': 'lastUpdated',
           '#note': 'note',
           '#title': 'title',
         },
         ExpressionAttributeValues: {
+          ':capacity': capacity ?? 5,
           ':duration': duration ?? MS_IN_HOUR,
           ':lastUpdated': event.requestContext.requestTimeEpoch,
           ':note': note?.substring(0, 200) ?? '',
