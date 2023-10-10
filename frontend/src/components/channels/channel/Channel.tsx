@@ -23,6 +23,7 @@ import MDLinearProgress from '../../material/progress/MDLinearProgress'
 import MDList from '../../material/list/MDList'
 import MDListItem from '../../material/list/MDListItem'
 import MDOutlinedSelect from '../../material/select/MDOutlinedSelect'
+import MDOutlinedTextField from '../../material/text-field/MDOutlinedTextField'
 import MDSelectOption from '../../material/select/MDSelectOption'
 import MDTextButton from '../../material/button/MDTextButton'
 import { MS_IN_HOUR } from '../../../utils/time'
@@ -45,9 +46,14 @@ const Channel = ({ channel }: Props) => {
   const dispatchSubscriptions = useSubscriptionsDispatch()
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [newCapacity, setNewCapacity] = useState<string>(
+    `${channel.capacity ?? 5}`,
+  )
 
   const isOn = isChannelOn(channel)
   const onProgress = channelOnProgress(channel)
+
+  const subscriberCount = channel.subscribers?.length ?? 0
 
   useEffect(() => {
     document.title = channel.title ?? "It's On"
@@ -87,7 +93,44 @@ const Channel = ({ channel }: Props) => {
 
     try {
       const channelUpdates = {
+        capacity: channel.capacity,
         duration: newDuration,
+        note: channel.note,
+        title: channel.title,
+      }
+      await fetchApi(`/${channel.id}`, 'PUT', channelUpdates)
+      dispatchChannels({
+        type: ChannelsDispatchActionType.CHANGED,
+        channel: {
+          ...channel,
+          ...channelUpdates,
+        },
+      })
+    } catch (error) {
+      // TODO: Handle update channel error
+      // log error to backend
+      // display user friendly message
+    }
+
+    setIsLoading(false)
+  }
+
+  const handleChangeCapacity = async () => {
+    const targetCapacity = Number(newCapacity)
+
+    // TODO: Implement dynamic limit
+    if (
+      isNaN(targetCapacity) ||
+      targetCapacity > 5 ||
+      targetCapacity === channel.capacity
+    )
+      return
+    setIsLoading(true)
+
+    try {
+      const channelUpdates = {
+        capacity: targetCapacity,
+        duration: channel.duration,
         note: channel.note,
         title: channel.title,
       }
@@ -240,8 +283,29 @@ const Channel = ({ channel }: Props) => {
               <MDListItem>
                 <div slot="headline">Subscribers</div>
                 <div slot="trailing-supporting-text">
-                  {channel.subscribers?.length ?? 0}
-                  {channel.capacity == null ? null : ` / ${channel.capacity}`}
+                  {subscriberCount}
+                  {channel.capacity == null ? null : (
+                    <>
+                      {' '}
+                      /{' '}
+                      <MDOutlinedTextField
+                        className={'Channel-subscribers-capacity-input'}
+                        error={Number(newCapacity) > 5}
+                        max="5" // TODO: Implement dynamic limit
+                        min={`${subscriberCount}`}
+                        step="1"
+                        type="number"
+                        value={newCapacity}
+                        onInput={event => {
+                          setNewCapacity(
+                            (event.target as EventTarget & HTMLSelectElement)
+                              .value,
+                          )
+                        }}
+                        onChange={() => void handleChangeCapacity()}
+                      />
+                    </>
+                  )}
                 </div>
               </MDListItem>
               {channel.subscribers?.map(subscriber => (

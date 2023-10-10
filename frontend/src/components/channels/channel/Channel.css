@@ -126,6 +126,14 @@
   margin-bottom: 1.8rem;
 }
 
+.Channel-subscribers-capacity-input {
+  --md-outlined-text-field-leading-space: 7px;
+  --md-outlined-text-field-top-space: 4px;
+  --md-outlined-text-field-bottom-space: 4px;
+  --md-outlined-text-field-trailing-space: 4px;
+  --md-outlined-text-field-input-text-size: 0.6875rem;
+}
+
 .Channel-subscribers-list {
   border-radius: 12px;
 }

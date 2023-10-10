@@ -34,6 +34,7 @@ const ChannelNote = ({
 
     try {
       const channelUpdates = {
+        capacity: channel.capacity,
         duration: channel.duration,
         note: newNote,
         title: channel.title,

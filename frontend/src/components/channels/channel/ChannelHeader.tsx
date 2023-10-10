@@ -42,6 +42,7 @@ const ChannelHeader = ({
 
     try {
       const channelUpdates = {
+        capacity: channel.capacity,
         duration: channel.duration,
         note: channel.note,
         title: newTitle,

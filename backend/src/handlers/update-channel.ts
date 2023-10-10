@@ -63,9 +63,12 @@ export const updateChannelHandler = async (
     })
   }
 
-  const { capacity, duration, note, title } = JSON.parse(
-    event.body ?? '{}',
-  ) as IChannel
+  const {
+    capacity = 5, // TODO: Implement dynamic limit
+    duration = MS_IN_HOUR,
+    note = '',
+    title = '',
+  } = JSON.parse(event.body ?? '{}') as IChannel
 
   try {
     const ddbResponse = await ddbDocClient.send(
@@ -86,11 +89,11 @@ export const updateChannelHandler = async (
           '#title': 'title',
         },
         ExpressionAttributeValues: {
-          ':capacity': capacity ?? 5,
-          ':duration': duration ?? MS_IN_HOUR,
+          ':capacity': capacity > 5 ? 5 : capacity, // TODO: Implement dynamic limit
+          ':duration': duration,
           ':lastUpdated': event.requestContext.requestTimeEpoch,
-          ':note': note?.substring(0, 200) ?? '',
-          ':title': title?.substring(0, 40) ?? 'Untitled',
+          ':note': note.substring(0, 200),
+          ':title': title.substring(0, 40),
         },
       }),
     )

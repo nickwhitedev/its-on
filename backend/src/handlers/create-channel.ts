@@ -66,7 +66,7 @@ export const createChannelHandler = async (
   } while (channelIDIsTaken)
 
   const channelAttributes: Partial<IDynamoChannelItem> = {
-    capacity: 5,
+    capacity: 5, // TODO: Implement dynamic limit
     duration: MS_IN_HOUR,
     lastOn: 0,
     lastOnDuration: MS_IN_HOUR,
