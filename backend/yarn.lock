@@ -1814,10 +1814,10 @@
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.12.tgz#d70faba7039d5fca54c83c7dbab41051d2b6f6cb"
   integrity sha512-Hr5Jfhc9eYOQNPYO5WLDq/n4jqijdHNlDXjuAQkkt+mWdQR+XJToOHrsD4cPaMXpn6KO7y2+wM8AZEs8VpBLVA==
 
-"@types/nanoid-dictionary@^4.2.0":
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/@types/nanoid-dictionary/-/nanoid-dictionary-4.2.0.tgz#5a3ae86d7c0db2d3ecf5b1233fc27f5874903f77"
-  integrity sha512-DyQddKC2AYsInXBMqKSwhom4gpouV8SF1smsCPSzR8hp20vZJ5o5Yxg7qXThCHwr/H6VMq01UArEGbF0q2FXig==
+"@types/nanoid-dictionary@^4.2.1":
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/@types/nanoid-dictionary/-/nanoid-dictionary-4.2.1.tgz#cf4619b957566fd5bdef9df6bd505491a8b2eba7"
+  integrity sha512-6kXceLICZPZBOCB/NiADUh+kmYdEgzaVK9y+RidxGKH2qr7GDA3MWVxCFDIMGHWy32X/EWZDa4GSJjnxpit9yA==
 
 "@types/nanoid@^3.0.0":
   version "3.0.0"
