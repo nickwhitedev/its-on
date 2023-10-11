@@ -89,7 +89,7 @@ export const updateChannelHandler = async (
           '#title': 'title',
         },
         ExpressionAttributeValues: {
-          ':capacity': capacity > 5 ? 5 : capacity, // TODO: Implement dynamic limit
+          ':capacity': capacity > 5 ? 5 : Math.floor(capacity), // TODO: Implement dynamic limit
           ':duration': duration,
           ':lastUpdated': event.requestContext.requestTimeEpoch,
           ':note': note.substring(0, 200),

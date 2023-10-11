@@ -298,8 +298,14 @@ const Channel = ({ channel }: Props) => {
                         value={newCapacity}
                         onInput={event => {
                           setNewCapacity(
-                            (event.target as EventTarget & HTMLSelectElement)
-                              .value,
+                            `${Math.floor(
+                              Number(
+                                (
+                                  event.target as EventTarget &
+                                    HTMLSelectElement
+                                ).value,
+                              ),
+                            )}`,
                           )
                         }}
                         onChange={() => void handleChangeCapacity()}
