@@ -51,6 +51,7 @@ describe('Test createChannelHandler', function () {
       'duration',
       'lastOn',
       'lastOnDuration',
+      'lastUpdated',
       'note',
       'owner',
       'title',
@@ -59,6 +60,9 @@ describe('Test createChannelHandler', function () {
     expect(resultBody.duration).toEqual(MS_IN_HOUR)
     expect(resultBody.lastOn).toEqual(0)
     expect(resultBody.lastOnDuration).toEqual(MS_IN_HOUR)
+    expect(resultBody.lastUpdated).toEqual(
+      mockEvent.requestContext.requestTimeEpoch,
+    )
     expect(resultBody.note).toEqual('')
     expect(resultBody.owner).toEqual('test_user')
     expect(resultBody.subscribers).toEqual([])
@@ -93,6 +97,7 @@ describe('Test createChannelHandler', function () {
       'duration',
       'lastOn',
       'lastOnDuration',
+      'lastUpdated',
       'note',
       'owner',
       'title',
@@ -101,6 +106,9 @@ describe('Test createChannelHandler', function () {
     expect(resultBody.duration).toEqual(MS_IN_HOUR)
     expect(resultBody.lastOn).toEqual(0)
     expect(resultBody.lastOnDuration).toEqual(MS_IN_HOUR)
+    expect(resultBody.lastUpdated).toEqual(
+      mockEvent.requestContext.requestTimeEpoch,
+    )
     expect(resultBody.note).toEqual('')
     expect(resultBody.owner).toEqual('test_user')
     expect(resultBody.subscribers).toEqual([])
@@ -138,6 +146,7 @@ describe('Test createChannelHandler', function () {
       'duration',
       'lastOn',
       'lastOnDuration',
+      'lastUpdated',
       'note',
       'owner',
       'title',
@@ -146,6 +155,9 @@ describe('Test createChannelHandler', function () {
     expect(resultBody.duration).toEqual(MS_IN_HOUR)
     expect(resultBody.lastOn).toEqual(0)
     expect(resultBody.lastOnDuration).toEqual(MS_IN_HOUR)
+    expect(resultBody.lastUpdated).toEqual(
+      mockEvent.requestContext.requestTimeEpoch,
+    )
     expect(resultBody.note).toEqual('')
     expect(resultBody.owner).toEqual('test_user')
     expect(resultBody.subscribers).toEqual([])

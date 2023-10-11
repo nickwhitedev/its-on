@@ -45,6 +45,9 @@ const Channel = ({ channel }: Props) => {
   const dispatchChannels = useChannelsDispatch()
   const dispatchSubscriptions = useSubscriptionsDispatch()
 
+  const [isEditing, setIsEditing] = useState<boolean>(
+    userIsChannelOwner && !channel.title,
+  )
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [newCapacity, setNewCapacity] = useState<string>(
     `${channel.capacity ?? 5}`,
@@ -224,13 +227,16 @@ const Channel = ({ channel }: Props) => {
     <div className="Channel">
       <ChannelHeader
         channel={channel}
+        isEditing={isEditing}
         isLoading={isLoading}
         userIsChannelOwner={userIsChannelOwner}
+        setIsEditing={setIsEditing}
         setIsLoading={setIsLoading}
       />
       {!userIsChannelOwner ? (
         <ChannelNote
           channel={channel}
+          isEditing={isEditing}
           isLoading={isLoading}
           userIsChannelOwner={userIsChannelOwner}
           setIsLoading={setIsLoading}
@@ -256,24 +262,33 @@ const Channel = ({ channel }: Props) => {
               value={onProgress}
             />
           ) : null}
-          <MDOutlinedSelect
-            className="Channel-select"
-            value={`${channel.duration ?? MS_IN_HOUR}`}
-            onChange={event => void handleChangeDuration(event)}
-          >
-            {durationOptions.map(durationOption => (
-              <MDSelectOption
-                disabled={isLoading}
-                key={durationOption.value}
-                selected={durationOption.value === channel.duration}
-                value={`${durationOption.value}`}
-              >
-                <div slot="headline">{durationOption.displayName}</div>
-              </MDSelectOption>
-            ))}
-          </MDOutlinedSelect>
+          {isEditing ? (
+            <MDOutlinedSelect
+              className="Channel-select"
+              value={`${channel.duration ?? MS_IN_HOUR}`}
+              onChange={event => void handleChangeDuration(event)}
+            >
+              {durationOptions.map(durationOption => (
+                <MDSelectOption
+                  disabled={isLoading}
+                  key={durationOption.value}
+                  selected={durationOption.value === channel.duration}
+                  value={`${durationOption.value}`}
+                >
+                  <div slot="headline">{durationOption.displayName}</div>
+                </MDSelectOption>
+              ))}
+            </MDOutlinedSelect>
+          ) : (
+            <div className="Channel-duration-display">
+              {durationOptions.find(
+                durationOption => durationOption.value === channel.duration,
+              )?.displayName ?? '1 Hour'}
+            </div>
+          )}
           <ChannelNote
             channel={channel}
+            isEditing={isEditing}
             isLoading={isLoading}
             userIsChannelOwner={userIsChannelOwner}
             setIsLoading={setIsLoading}
@@ -288,28 +303,32 @@ const Channel = ({ channel }: Props) => {
                     <>
                       {' '}
                       /{' '}
-                      <MDOutlinedTextField
-                        className={'Channel-subscribers-capacity-input'}
-                        error={Number(newCapacity) > 5}
-                        max="5" // TODO: Implement dynamic limit
-                        min={`${subscriberCount}`}
-                        step="1"
-                        type="number"
-                        value={newCapacity}
-                        onInput={event => {
-                          setNewCapacity(
-                            `${Math.floor(
-                              Number(
-                                (
-                                  event.target as EventTarget &
-                                    HTMLSelectElement
-                                ).value,
-                              ),
-                            )}`,
-                          )
-                        }}
-                        onChange={() => void handleChangeCapacity()}
-                      />
+                      {isEditing ? (
+                        <MDOutlinedTextField
+                          className={'Channel-subscribers-capacity-input'}
+                          error={Number(newCapacity) > 5}
+                          max="5" // TODO: Implement dynamic limit
+                          min={`${subscriberCount}`}
+                          step="1"
+                          type="number"
+                          value={newCapacity}
+                          onInput={event => {
+                            setNewCapacity(
+                              `${Math.floor(
+                                Number(
+                                  (
+                                    event.target as EventTarget &
+                                      HTMLSelectElement
+                                  ).value,
+                                ),
+                              )}`,
+                            )
+                          }}
+                          onChange={() => void handleChangeCapacity()}
+                        />
+                      ) : (
+                        channel.capacity
+                      )}
                     </>
                   )}
                 </div>

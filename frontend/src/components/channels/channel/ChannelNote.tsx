@@ -10,6 +10,7 @@ import { useState } from 'react'
 
 interface Props {
   channel: IChannel
+  isEditing: boolean
   isLoading: boolean
   userIsChannelOwner: boolean
   setIsLoading: (newValue: boolean) => void
@@ -18,6 +19,7 @@ interface Props {
 const ChannelNote = ({
   channel,
   isLoading,
+  isEditing,
   userIsChannelOwner,
   setIsLoading,
 }: Props) => {
@@ -59,7 +61,7 @@ const ChannelNote = ({
   return userIsChannelOwner || (channel.note?.length ?? 0) > 0 ? (
     <div className="ChannelNote">
       <div></div>
-      {userIsChannelOwner ? (
+      {userIsChannelOwner && isEditing ? (
         <MDOutlinedTextField
           className={'ChannelNote-input'}
           label="Note"

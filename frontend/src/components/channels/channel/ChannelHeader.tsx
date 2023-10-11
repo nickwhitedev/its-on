@@ -11,33 +11,32 @@ import { useState } from 'react'
 
 interface Props {
   channel: IChannel
+  isEditing: boolean
   isLoading: boolean
   userIsChannelOwner: boolean
+  setIsEditing: (newValue: boolean) => void
   setIsLoading: (newValue: boolean) => void
 }
 
 const ChannelHeader = ({
   channel,
+  isEditing,
   isLoading,
   userIsChannelOwner,
+  setIsEditing,
   setIsLoading,
 }: Props) => {
   const dispatchChannels = useChannelsDispatch()
 
-  const [isUpdating, setIsUpdating] = useState<boolean>(
-    userIsChannelOwner && !channel.title,
-  )
   const [newTitle, setNewTitle] = useState<string>(channel.title ?? '')
   const [channelCopied, setChannelCopied] = useState<boolean>(false)
 
-  const channelTitle =
+  const isUpdating = newTitle !== channel.title
+
+  const channelDisplayTitle =
     channel.title === '' || channel.title == null ? 'Untitled' : channel.title
 
   const handleSubmit = async () => {
-    if (newTitle === channel.title) {
-      setIsUpdating(false)
-      return
-    }
     setIsLoading(true)
 
     try {
@@ -55,7 +54,6 @@ const ChannelHeader = ({
           ...channelUpdates,
         },
       })
-      setIsUpdating(false)
     } catch (error) {
       // TODO: Handle update channel error
       // log error to backend
@@ -69,8 +67,8 @@ const ChannelHeader = ({
     const channelURL = `${baseUrl}/${channel.id}`
     try {
       await navigator.share({
-        title: `It's On - ${channelTitle}`,
-        text: `Check out the channel, ${channelTitle} by ${channel.owner}`,
+        title: `It's On - ${channelDisplayTitle}`,
+        text: `Check out the channel, ${channelDisplayTitle} by ${channel.owner}`,
         url: channelURL,
       })
     } catch (error) {
@@ -84,12 +82,12 @@ const ChannelHeader = ({
       <div className="ChannelHeader-edit">
         {userIsChannelOwner ? (
           <div className="ChannelHeader-save-wrapper">
-            {isUpdating ? (
+            {isEditing ? (
               <MDIconButton
                 className="ChannelHeader-button"
                 disabled={!channel.title || isLoading}
                 onClick={() => {
-                  setIsUpdating(false)
+                  setIsEditing(false)
                   setNewTitle(channel.title ?? '')
                 }}
               >
@@ -100,7 +98,7 @@ const ChannelHeader = ({
                 className="ChannelHeader-button"
                 disabled={false}
                 onClick={() => {
-                  setIsUpdating(true)
+                  setIsEditing(true)
                 }}
               >
                 <MDIcon>edit</MDIcon>
@@ -109,7 +107,7 @@ const ChannelHeader = ({
           </div>
         ) : null}
       </div>
-      {userIsChannelOwner && isUpdating ? (
+      {isEditing ? (
         <MDOutlinedTextField
           // TODO: Implement autoFocus with ref
           className={'ChannelHeader-input'}
@@ -124,14 +122,15 @@ const ChannelHeader = ({
         />
       ) : (
         <div className="ChannelHeader-title">
-          <h2 className="ChannelHeader-title">{channelTitle}</h2>
+          <h2 className="ChannelHeader-title">{channelDisplayTitle}</h2>
           {userIsChannelOwner ? null : (
             <span className="secondary-text">by {channel.owner}</span>
           )}
         </div>
       )}
       <div className="ChannelHeader-share">
-        {isUpdating && userIsChannelOwner ? (
+        {(isUpdating && userIsChannelOwner) ||
+        (isEditing && newTitle === '') ? (
           <div className="ChannelHeader-save-wrapper">
             <MDIconButton
               className="ChannelHeader-button"

@@ -33,7 +33,7 @@
   background-color: transparent;
   border-radius: 50%;
   padding: 0;
-  margin: 1.8rem 0;
+  margin-bottom: 1.8rem;
   font: inherit;
   outline: inherit;
   height: 60vh;
@@ -116,6 +116,10 @@
 .Channel-select,
 .Channel-select md-select-option {
   min-width: 10rem;
+}
+
+.Channel-duration-display {
+  margin-bottom: 1.8rem;
 }
 
 .Channel-subscribers {

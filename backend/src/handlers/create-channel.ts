@@ -70,6 +70,7 @@ export const createChannelHandler = async (
     duration: MS_IN_HOUR,
     lastOn: 0,
     lastOnDuration: MS_IN_HOUR,
+    lastUpdated: event.requestContext.requestTimeEpoch,
     note: '',
     owner: username,
     title: (JSON.parse(event.body ?? '{}') as IPayload).title.substring(0, 40),
@@ -85,7 +86,6 @@ export const createChannelHandler = async (
                 Item: {
                   pk: `user#${userID}`,
                   sk: `channel#${channelID}`,
-                  lastUpdated: event.requestContext.requestTimeEpoch,
                   ...channelAttributes,
                 } as IDynamoChannelItem,
               },
@@ -95,8 +95,8 @@ export const createChannelHandler = async (
                 Item: {
                   pk: `channel#${channelID}`,
                   sk: 'info',
-                  lastUpdated: 0,
                   ...channelAttributes,
+                  lastUpdated: 0,
                 } as IDynamoChannelItem,
               },
             },
