@@ -30,20 +30,23 @@ import { MS_IN_HOUR } from '../../../utils/time'
 import { SubscriptionsDispatchActionType } from '../../../contexts/subscriptions/subscriptionsReducer'
 import { fetchApi } from '../../../utils/api'
 import { useNavigate } from 'react-router-dom'
+import { useUser } from '../../../contexts/user/userContext'
 
 interface Props {
   channel: IChannel
 }
 
 const Channel = ({ channel }: Props) => {
-  const channels = useChannels()
-  const userIsChannelOwner = channels.some(ch => ch.id === channel.id)
-
-  const subscriptions = useSubscriptions()
   const navigate = useNavigate()
+
+  const channels = useChannels()
+  const subscriptions = useSubscriptions()
+  const user = useUser()
 
   const dispatchChannels = useChannelsDispatch()
   const dispatchSubscriptions = useSubscriptionsDispatch()
+
+  const userIsChannelOwner = channels.some(ch => ch.id === channel.id)
 
   const [isEditing, setIsEditing] = useState<boolean>(
     userIsChannelOwner && !channel.title,
@@ -57,6 +60,8 @@ const Channel = ({ channel }: Props) => {
   const onProgress = channelOnProgress(channel)
 
   const subscriberCount = channel.subscribers?.length ?? 0
+
+  const userTier = user?.tier ?? 5
 
   useEffect(() => {
     document.title = channel.title ?? "It's On"
@@ -121,10 +126,9 @@ const Channel = ({ channel }: Props) => {
   const handleChangeCapacity = async () => {
     const targetCapacity = Number(newCapacity)
 
-    // TODO: Implement dynamic limit
     if (
       isNaN(targetCapacity) ||
-      targetCapacity > 5 ||
+      targetCapacity > userTier ||
       targetCapacity === channel.capacity
     )
       return
@@ -307,7 +311,7 @@ const Channel = ({ channel }: Props) => {
                         <MDOutlinedTextField
                           className={'Channel-subscribers-capacity-input'}
                           error={Number(newCapacity) > 5}
-                          max="5" // TODO: Implement dynamic limit
+                          max={`${userTier}`}
                           min={`${subscriberCount}`}
                           step="1"
                           type="number"

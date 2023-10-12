@@ -10,9 +10,11 @@ import MDIcon from './material/MDIcon'
 import MDPrimaryTab from './material/tabs/MDPrimaryTab'
 import MDTabs from './material/tabs/MDTabs'
 import { SubscriptionsDispatchActionType } from '../contexts/subscriptions/subscriptionsReducer'
+import { UserDispatchActionType } from '../contexts/user/userReducer'
 import { fetchApi } from '../utils/api'
 import { useChannelsDispatch } from '../contexts/channels/channelsContext'
 import { useSubscriptionsDispatch } from '../contexts/subscriptions/subscriptionsContext'
+import { useUserDispatch } from '../contexts/user/userContext'
 
 interface OverviewData {
   channels: IChannel[]
@@ -32,6 +34,8 @@ const App = () => {
 
   const dispatchChannels = useChannelsDispatch()
   const dispatchSubscriptions = useSubscriptionsDispatch()
+  const dispatchUser = useUserDispatch()
+
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -50,12 +54,16 @@ const App = () => {
         type: SubscriptionsDispatchActionType.SYNCED,
         channels: response.subscriptions,
       })
+      dispatchUser({
+        type: UserDispatchActionType.SYNCED,
+        user: response.profile,
+      })
     } catch (error) {
       // TODO: handle overview fetch error
       // Log error to backend
       // Show user-friendly message
     }
-  }, [dispatchChannels, dispatchSubscriptions])
+  }, [dispatchChannels, dispatchSubscriptions, dispatchUser])
 
   useEffect(() => {
     const setFullLoginUrl = async () => {
@@ -91,7 +99,7 @@ const App = () => {
     return (
       <>
         <MDTabs
-          className='App-nav'
+          className="App-nav"
           onChange={event => {
             const activeTabIndex = (
               event.target as { activeTabIndex: number } | null
@@ -119,7 +127,7 @@ const App = () => {
             Subscriptions
           </MDPrimaryTab>
         </MDTabs>
-        <div className='App-content'>
+        <div className="App-content">
           <Outlet />
         </div>
       </>
@@ -127,22 +135,22 @@ const App = () => {
   }
 
   return (
-    <div className='App'>
-      <header className='App-header'>
+    <div className="App">
+      <header className="App-header">
         <h1>It&apos;s On</h1>
         {!authenticating && authenticated && loginUrl !== '' ? (
           <Link
             to={'/profile'}
-            className='App-settings icon'
-            aria-label='Account Settings'
+            className="App-settings icon"
+            aria-label="Account Settings"
           >
-            <span className='material-symbols-outlined App-settings-icon'>
+            <span className="material-symbols-outlined App-settings-icon">
               account_circle
             </span>
           </Link>
         ) : null}
       </header>
-      <main className='App-main'>{getContent()}</main>
+      <main className="App-main">{getContent()}</main>
     </div>
   )
 }
