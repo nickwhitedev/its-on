@@ -1,22 +1,22 @@
 import './App.css'
 
-import { useCallback, useEffect, useState } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { getFullLoginUrl, getTokens, login } from '../utils/auth'
+import { useCallback, useEffect, useState } from 'react'
 
-import { useChannelsDispatch } from '../contexts/channels/channelsContext'
 import { ChannelsDispatchActionType } from '../contexts/channels/channelsReducer'
-import { useSubscriptionsDispatch } from '../contexts/subscriptions/subscriptionsContext'
-import { SubscriptionsDispatchActionType } from '../contexts/subscriptions/subscriptionsReducer'
-import { fetchApi } from '../utils/api'
 import ItsOnIcon from './icons/ItsOnIcon'
 import MDIcon from './material/MDIcon'
 import MDPrimaryTab from './material/tabs/MDPrimaryTab'
 import MDTabs from './material/tabs/MDTabs'
+import { SubscriptionsDispatchActionType } from '../contexts/subscriptions/subscriptionsReducer'
+import { fetchApi } from '../utils/api'
+import { useChannelsDispatch } from '../contexts/channels/channelsContext'
+import { useSubscriptionsDispatch } from '../contexts/subscriptions/subscriptionsContext'
 
 interface OverviewData {
   channels: IChannel[]
-  profile: object
+  profile: IUser
   subscriptions: IChannel[]
 }
 
