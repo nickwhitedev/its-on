@@ -27,7 +27,10 @@ describe('Test createChannelHandler', function () {
 
   it('should add id to the table', async () => {
     // Return the specified value whenever the spied put function is called
-    ddbMock.on(GetCommand).resolves({})
+    ddbMock
+      .on(GetCommand)
+      .resolvesOnce({ Item: { tier: 5, username: 'test_user' } })
+      .resolves({})
     ddbMock.on(PutCommand).resolves({})
 
     const event: APIGatewayProxyEvent = {
@@ -71,7 +74,10 @@ describe('Test createChannelHandler', function () {
 
   it('should trim long title', async () => {
     // Return the specified value whenever the spied put function is called
-    ddbMock.on(GetCommand).resolves({})
+    ddbMock
+      .on(GetCommand)
+      .resolvesOnce({ Item: { tier: 5, username: 'test_user' } })
+      .resolves({})
     ddbMock.on(PutCommand).resolves({})
 
     const testLongTitle = 'Super Channel'.repeat(100)
@@ -120,9 +126,10 @@ describe('Test createChannelHandler', function () {
     // Return the specified value whenever the spied put function is called
     ddbMock
       .on(GetCommand)
+      .resolvesOnce({ Item: { tier: 5, username: 'test_user' } })
       .resolvesOnce({ Item: { id: 'taken' } })
       .resolvesOnce({ Item: { id: 'taken' } })
-      .resolvesOnce({})
+      .resolves({})
     ddbMock.on(PutCommand).resolves({})
 
     const event: APIGatewayProxyEvent = {

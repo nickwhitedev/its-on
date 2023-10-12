@@ -3,6 +3,7 @@ import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
 } from '@aws-sdk/lib-dynamodb'
+import { getChannel, getUserInfo } from '../utils/dynamo'
 
 import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
@@ -10,7 +11,6 @@ import { MS_IN_HOUR } from '../utils/time'
 import { alphanumeric } from 'nanoid-dictionary'
 import { createResponse } from '../utils/response'
 import { customAlphabet } from 'nanoid'
-import { getChannel } from '../utils/dynamo'
 
 const nanoid = customAlphabet(alphanumeric, 11)
 
@@ -37,10 +37,11 @@ export const createChannelHandler = async (
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const username: string =
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    event.requestContext.authorizer?.claims['cognito:username'] ?? ''
+   
+  const userInfo = await getUserInfo({ ddbDocClient, userID })
+  const userTier = userInfo?.tier ?? 5
+  const username = userInfo?.username ?? ''
+
   let channelID = nanoid()
   let channelIDIsTaken: boolean
   let channelIDAttempt = 1
@@ -66,7 +67,7 @@ export const createChannelHandler = async (
   } while (channelIDIsTaken)
 
   const channelAttributes: Partial<IDynamoChannelItem> = {
-    capacity: 5, // TODO: Implement dynamic limit
+    capacity: userTier,
     duration: MS_IN_HOUR,
     lastOn: 0,
     lastOnDuration: MS_IN_HOUR,
