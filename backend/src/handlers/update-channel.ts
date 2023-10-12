@@ -1,11 +1,11 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
+import { getChannel, getUserInfo } from '../utils/dynamo'
 
 import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { MS_IN_HOUR } from '../utils/time'
 import { createResponse } from '../utils/response'
-import { getChannel } from '../utils/dynamo'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -27,6 +27,8 @@ export const updateChannelHandler = async (
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
+  const userInfo = await getUserInfo({ ddbDocClient, userID })
+  const userTier = userInfo?.tier ?? 5
 
   const channelID = event.pathParameters?.channelID
 
@@ -64,7 +66,7 @@ export const updateChannelHandler = async (
   }
 
   const {
-    capacity = 5, // TODO: Implement dynamic limit
+    capacity = userTier,
     duration = MS_IN_HOUR,
     note = '',
     title = '',
@@ -89,7 +91,7 @@ export const updateChannelHandler = async (
           '#title': 'title',
         },
         ExpressionAttributeValues: {
-          ':capacity': capacity > 5 ? 5 : Math.floor(capacity), // TODO: Implement dynamic limit
+          ':capacity': capacity > userTier ? userTier : Math.floor(capacity),
           ':duration': duration,
           ':lastUpdated': event.requestContext.requestTimeEpoch,
           ':note': note.substring(0, 200),
