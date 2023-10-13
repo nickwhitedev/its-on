@@ -61,9 +61,11 @@ const Channel = ({ channel }: Props) => {
   const isOn = isChannelOn(channel)
   const onProgress = channelOnProgress(channel)
 
-  const subscriberCount = channel.subscribers?.length ?? 0
+  const subscriberCount = channel.subscriberCount ?? 0
+  const isChannelFull = subscriberCount >= (channel.capacity ?? 5)
 
   const userTier = user?.tier ?? 5
+  const userHasMaxSubscriptions = (user?.subscriptionCount ?? 0) >= userTier
 
   useEffect(() => {
     document.title = channel.title ?? "It's On"
@@ -398,13 +400,21 @@ const Channel = ({ channel }: Props) => {
           </MDFilledTonalButton>
         </>
       ) : (
-        <MDFilledButton
-          className='Channel-subscribe-button'
-          disabled={isLoading}
-          onClick={() => void handleClickSubscribe()}
-        >
-          Subscribe
-        </MDFilledButton>
+        <>
+          <MDFilledButton
+            className='Channel-subscribe-button'
+            disabled={isLoading || isChannelFull || userHasMaxSubscriptions}
+            onClick={() => void handleClickSubscribe()}
+          >
+            {isChannelFull ? 'Channel Full' : 'Subscribe'}
+          </MDFilledButton>
+          {userHasMaxSubscriptions ? (
+            <>
+              <p>Subscription limit reached.</p>
+              <p>Unsubscribe from another channel to subscribe to a new one.</p>
+            </>
+          ) : null}
+        </>
       )}
     </div>
   )
