@@ -1,11 +1,11 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import { getChannel, getUserInfo } from '../utils/dynamo'
 
-import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { MS_IN_HOUR } from '../utils/time'
+import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { createResponse } from '../utils/response'
+import { MS_IN_HOUR } from '../utils/time'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -25,11 +25,6 @@ export const updateChannelHandler = async (
 
   const eventPath = event.path
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-  const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
-  const userInfo = await getUserInfo({ ddbDocClient, userID })
-  const userTier = userInfo?.tier ?? 5
-
   const channelID = event.pathParameters?.channelID
 
   if (channelID == null) {
@@ -39,6 +34,24 @@ export const updateChannelHandler = async (
       statusCode: 400,
     })
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+  const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
+  let userInfo
+  try {
+    userInfo = await getUserInfo({ ddbDocClient, userID })
+  } catch (error) {
+    console.error(
+      'Get User Info Error',
+      error instanceof Error ? error.stack : 'Unknown Type',
+    )
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Something went wrong' },
+      statusCode: 400,
+    })
+  }
+  const userTier = userInfo?.tier ?? 5
 
   let channelIsNotOwnedByUser: boolean
   try {

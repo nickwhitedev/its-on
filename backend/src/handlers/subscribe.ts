@@ -7,7 +7,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DYNAMODB_TABLE_NAME } from '../utils/constants'
-import { getChannel } from '../utils/dynamo'
+import { getChannel, getUserInfo } from '../utils/dynamo'
 import { createResponse } from '../utils/response'
 
 const client = new DynamoDBClient({})
@@ -27,9 +27,39 @@ export const subscribeHandler = async (
   console.debug('received:', event)
 
   const eventPath = event.path
+  const channelID = event.pathParameters?.channelID
+  if (channelID == null) {
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Bad Request' },
+      statusCode: 400,
+    })
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
-  const channelID = event.pathParameters?.channelID ?? ''
+  let userInfo
+  try {
+    userInfo = await getUserInfo({ ddbDocClient, userID })
+  } catch (error) {
+    console.error(
+      'Get User Info Error',
+      error instanceof Error ? error.stack : 'Unknown Type',
+    )
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Something went wrong' },
+      statusCode: 400,
+    })
+  }
+
+  if ((userInfo?.subscriptionCount ?? 0) >= (userInfo?.tier ?? 5)) {
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Upgrade to subscribe to more channels' },
+      statusCode: 403,
+    })
+  }
 
   let privateChannel: IDynamoChannelItem | undefined
   // get private channel entry
@@ -76,6 +106,17 @@ export const subscribeHandler = async (
       eventPath,
       responseBody: { message: 'Something went wrong' },
       statusCode: 400,
+    })
+  }
+
+  if (
+    (channelAttributes.subscriberCount ?? 0) >=
+    (channelAttributes.capacity ?? 5)
+  ) {
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Channel is full' },
+      statusCode: 403,
     })
   }
 
