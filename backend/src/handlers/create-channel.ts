@@ -138,7 +138,7 @@ export const createChannelHandler = async (
         },
         ReturnValues: 'ALL_NEW',
         TableName: DYNAMODB_TABLE_NAME,
-        UpdateExpression: 'ADD #channelCount = :channelCount',
+        UpdateExpression: 'ADD #channelCount :channelCount',
         ExpressionAttributeNames: {
           '#channelCount': 'channelCount',
         },

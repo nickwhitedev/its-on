@@ -103,7 +103,7 @@ export const unsubscribeHandler = async (
         },
         ReturnValues: 'ALL_NEW',
         TableName: DYNAMODB_TABLE_NAME,
-        UpdateExpression: 'ADD #subscriberCount = :subscriberCount',
+        UpdateExpression: 'ADD #subscriberCount :subscriberCount',
         ExpressionAttributeNames: {
           '#subscriberCount': 'subscriberCount',
         },
@@ -134,7 +134,7 @@ export const unsubscribeHandler = async (
         },
         ReturnValues: 'ALL_NEW',
         TableName: DYNAMODB_TABLE_NAME,
-        UpdateExpression: 'ADD #subscriptionCount = :subscriptionCount',
+        UpdateExpression: 'ADD #subscriptionCount :subscriptionCount',
         ExpressionAttributeNames: {
           '#subscriptionCount': 'subscriptionCount',
         },

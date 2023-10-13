@@ -410,8 +410,8 @@ const Channel = ({ channel }: Props) => {
           </MDFilledButton>
           {userHasMaxSubscriptions ? (
             <>
-              <p>Subscription limit reached.</p>
-              <p>Unsubscribe from another channel to subscribe to a new one.</p>
+              <p>Subscription limit reached</p>
+              <p>Unsubscribe from another channel to subscribe to a new one</p>
             </>
           ) : null}
         </>
