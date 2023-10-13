@@ -1,6 +1,7 @@
 import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
+  UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import { getChannel, getUserInfo } from '../utils/dynamo'
@@ -108,15 +109,6 @@ export const createChannelHandler = async (
       }),
     )
     console.info('Success - item added or updated', ddbResponse)
-    return createResponse({
-      eventPath,
-      responseBody: {
-        id: channelID,
-        subscribers: [],
-        ...channelAttributes,
-      } as IChannel,
-      statusCode: 201,
-    })
   } catch (error) {
     console.error(
       'Error',
@@ -128,4 +120,45 @@ export const createChannelHandler = async (
       statusCode: 400,
     })
   }
+
+  try {
+    const ddbResponse = await ddbDocClient.send(
+      new UpdateCommand({
+        Key: {
+          pk: `user#${userID}`,
+          sk: `profile`,
+        },
+        ReturnValues: 'ALL_NEW',
+        TableName: DYNAMODB_TABLE_NAME,
+        UpdateExpression: 'ADD #channelCount = :channelCount',
+        ExpressionAttributeNames: {
+          '#channelCount': 'channelCount',
+        },
+        ExpressionAttributeValues: {
+          ':channelCount': 1,
+        },
+      }),
+    )
+    console.info('Success - channel count updated', ddbResponse)
+  } catch (error) {
+    console.error(
+      'Update Error',
+      error instanceof Error ? error.stack : 'Unknown Type',
+    )
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Something went wrong' },
+      statusCode: 400,
+    })
+  }
+
+  return createResponse({
+    eventPath,
+    responseBody: {
+      id: channelID,
+      subscribers: [],
+      ...channelAttributes,
+    } as IChannel,
+    statusCode: 201,
+  })
 }

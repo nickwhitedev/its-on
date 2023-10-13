@@ -1,8 +1,12 @@
+import {
+  DeleteCommand,
+  DynamoDBDocumentClient,
+  UpdateCommand,
+} from '@aws-sdk/lib-dynamodb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import { DeleteCommand, DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb'
 
-import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { createResponse } from '../utils/response'
 
 const client = new DynamoDBClient({})
@@ -38,11 +42,6 @@ export const deleteChannelHandler = async (
       }),
     )
     console.info('Success - item deleted', ddbResponse)
-    return createResponse({
-      eventPath,
-      responseBody: { message: 'Deleted' },
-      statusCode: 204,
-    })
   } catch (err) {
     // TODO: Error handling - make more robust
     console.error('Error', err instanceof Error ? err.stack : 'Unknown Type')
@@ -52,4 +51,41 @@ export const deleteChannelHandler = async (
       statusCode: 400,
     })
   }
+
+  try {
+    const ddbResponse = await ddbDocClient.send(
+      new UpdateCommand({
+        Key: {
+          pk: `user#${userID}`,
+          sk: `profile`,
+        },
+        ReturnValues: 'ALL_NEW',
+        TableName: DYNAMODB_TABLE_NAME,
+        UpdateExpression: 'ADD #channelCount = :channelCount',
+        ExpressionAttributeNames: {
+          '#channelCount': 'channelCount',
+        },
+        ExpressionAttributeValues: {
+          ':channelCount': -1,
+        },
+      }),
+    )
+    console.info('Success - channel count updated', ddbResponse)
+  } catch (error) {
+    console.error(
+      'Update Error',
+      error instanceof Error ? error.stack : 'Unknown Type',
+    )
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Something went wrong' },
+      statusCode: 400,
+    })
+  }
+
+  return createResponse({
+    eventPath,
+    responseBody: { message: 'Deleted' },
+    statusCode: 204,
+  })
 }

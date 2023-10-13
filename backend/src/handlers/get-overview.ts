@@ -54,6 +54,7 @@ export const getOverviewHandler = async (
 
     if (!('profile' in data)) {
       const userAttributes = {
+        channelCount: 0,
         subscriptionCount: 0,
         tier: 5,
         username:

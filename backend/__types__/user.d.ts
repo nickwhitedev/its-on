@@ -6,6 +6,7 @@
  * DynamoDB guarantees nothing but keys.
  */
 interface IUser {
+  channelCount: number
   subscriptionCount: number
   tier: number
   username: string
@@ -19,6 +20,7 @@ interface IUser {
  * DynamoDB guarantees nothing but keys.
  */
 interface IDynamoUserItem {
+  channelCount: number
   pk: string
   sk: string
   subscriptionCount: number
@@ -34,6 +36,9 @@ interface IDynamoUserItem {
  * DynamoDB guarantees nothing but keys.
  */
 interface IDynamoStreamUserImage {
+  channelCount: {
+    N: number
+  }
   pk: {
     S: string
   }

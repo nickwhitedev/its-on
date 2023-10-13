@@ -34,6 +34,7 @@ describe('Test getOverviewHandler', () => {
         title: 'test-channel-2',
       },
       {
+        channelCount: 3,
         sk: 'profile',
         pk: `user#userID`,
         subscriptionCount: 2,
@@ -76,6 +77,7 @@ describe('Test getOverviewHandler', () => {
           },
         ],
         profile: {
+          channelCount: 3,
           subscriptionCount: 2,
           tier: 10,
           username: 'testie',
@@ -87,25 +89,8 @@ describe('Test getOverviewHandler', () => {
   })
 
   it("should create the profile item if it doesn't exist", async () => {
-    const items = [
-      {
-        on: false,
-        note: '',
-        sk: 'channel#someID',
-        pk: 'user#userID',
-        title: 'test-channel',
-      },
-      {
-        on: true,
-        note: 'test note',
-        sk: 'subscription#someID2',
-        pk: `user#userID2`,
-        title: 'test-channel-2',
-      },
-    ]
-
     ddbMock.on(QueryCommand).resolves({
-      Items: items,
+      Items: [],
     })
 
     ddbMock.on(PutCommand).resolves({})
@@ -121,23 +106,8 @@ describe('Test getOverviewHandler', () => {
       statusCode: 200,
       headers: CORS_HEADERS,
       body: JSON.stringify({
-        channels: [
-          {
-            id: 'someID',
-            on: false,
-            note: '',
-            title: 'test-channel',
-          },
-        ],
-        subscriptions: [
-          {
-            id: 'someID2',
-            on: true,
-            note: 'test note',
-            title: 'test-channel-2',
-          },
-        ],
         profile: {
+          channelCount: 0,
           subscriptionCount: 0,
           tier: 5,
           username: 'test_user',
