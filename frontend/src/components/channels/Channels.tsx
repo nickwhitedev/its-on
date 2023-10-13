@@ -8,7 +8,7 @@ import {
 
 import { useNavigate } from 'react-router-dom'
 import { ChannelsDispatchActionType } from '../../contexts/channels/channelsReducer'
-import { useUserDispatch } from '../../contexts/user/userContext'
+import { useUser, useUserDispatch } from '../../contexts/user/userContext'
 import { UserDispatchActionType } from '../../contexts/user/userReducer'
 import { fetchApi } from '../../utils/api'
 import ItsOnIcon from '../icons/ItsOnIcon'
@@ -20,12 +20,15 @@ import { isChannelOn } from './channel/channelUtils'
 
 const Channels = () => {
   const channels = useChannels()
+  const user = useUser()
   const dispatchChannels = useChannelsDispatch()
   const dispatchUser = useUserDispatch()
 
   const navigate = useNavigate()
 
   const [isCreating, setIsCreating] = useState<boolean>(false)
+
+  const userHasMaxChannels = (user?.channelCount ?? 0) >= (user?.tier ?? 5)
 
   const handleCreateChannel = async () => {
     setIsCreating(true)
@@ -56,12 +59,19 @@ const Channels = () => {
       <MDList className='Channels-list'>
         <MDListItem
           className='Channels-list-item'
-          disabled={isCreating}
+          disabled={isCreating || userHasMaxChannels}
           type='button'
           onClick={() => void handleCreateChannel()}
         >
           <MDIcon slot='start'>add</MDIcon>
-          <div slot='headline'>New Channel</div>
+          <div slot='headline'>
+            {userHasMaxChannels ? 'Subscription limit reached' : 'New Channel'}
+          </div>
+          {userHasMaxChannels ? (
+            <div slot='supporting-text'>
+              Delete a channel to create a new one
+            </div>
+          ) : null}
         </MDListItem>
         {channels.map(channel => (
           <React.Fragment key={channel.id}>
