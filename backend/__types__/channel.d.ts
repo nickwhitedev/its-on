@@ -17,6 +17,7 @@ interface IChannel {
   note?: string
   owner?: string
   ownerID?: string
+  subscriberCount?: number
   subscribers?: IChannelSubscriber[]
   title?: string
 }
@@ -52,6 +53,7 @@ interface IDynamoChannelItem {
   ownerID?: string
   pk: string
   sk: string
+  subscriberCount?: number
   title?: string
 }
 
@@ -98,6 +100,9 @@ interface IDynamoStreamChannelImage {
   }
   sk: {
     S: string
+  }
+  subscriberCount?: {
+    N?: number
   }
   title?: {
     S?: string

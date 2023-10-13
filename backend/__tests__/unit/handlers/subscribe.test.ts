@@ -2,6 +2,7 @@ import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
   GetCommand,
+  UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
 
 import { jest } from '@jest/globals'
@@ -21,10 +22,11 @@ describe('Test subscribeHandler', function () {
   })
 
   // This test invokes createChannelHandler() and compare the result
-  it('should add id to the table', async () => {
+  it('should subscribe user to channel', async () => {
     const testChannel = {
       note: '',
       on: false,
+      ownerID: 'nanouserid1',
       pk: 'channel#someID',
       sk: 'info',
       title: 'test-channel',
@@ -33,9 +35,8 @@ describe('Test subscribeHandler', function () {
     ddbMock.on(GetCommand).resolvesOnce({}).resolvesOnce({
       Item: testChannel,
     })
-
-    // Return the specified value whenever the spied put function is called
     ddbMock.on(BatchWriteCommand).resolves({})
+    ddbMock.on(UpdateCommand).resolves({})
 
     const event: APIGatewayProxyEvent = {
       ...mockEvent,

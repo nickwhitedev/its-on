@@ -75,6 +75,7 @@ export const createChannelHandler = async (
     note: '',
     owner: username,
     ownerID: userID,
+    subscriberCount: 0,
     title: (JSON.parse(event.body ?? '{}') as IPayload).title.substring(0, 40),
   }
 

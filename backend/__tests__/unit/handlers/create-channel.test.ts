@@ -58,6 +58,7 @@ describe('Test createChannelHandler', function () {
       'note',
       'owner',
       'ownerID',
+      'subscriberCount',
       'title',
     ])
     expect(resultBody.capacity).toEqual(5)
@@ -70,6 +71,7 @@ describe('Test createChannelHandler', function () {
     expect(resultBody.note).toEqual('')
     expect(resultBody.owner).toEqual('test_user')
     expect(resultBody.ownerID).toEqual('nanouserid1')
+    expect(resultBody.subscriberCount).toEqual(0)
     expect(resultBody.subscribers).toEqual([])
     expect(resultBody.title).toEqual('Super Channel')
   })
@@ -109,6 +111,7 @@ describe('Test createChannelHandler', function () {
       'note',
       'owner',
       'ownerID',
+      'subscriberCount',
       'title',
     ])
     expect(resultBody.capacity).toEqual(5)
@@ -121,6 +124,7 @@ describe('Test createChannelHandler', function () {
     expect(resultBody.note).toEqual('')
     expect(resultBody.owner).toEqual('test_user')
     expect(resultBody.ownerID).toEqual('nanouserid1')
+    expect(resultBody.subscriberCount).toEqual(0)
     expect(resultBody.subscribers).toEqual([])
     expect(resultBody.title).toHaveLength(40)
     expect(resultBody.title).toEqual(testLongTitle.substring(0, 40))
@@ -161,6 +165,7 @@ describe('Test createChannelHandler', function () {
       'note',
       'owner',
       'ownerID',
+      'subscriberCount',
       'title',
     ])
     expect(resultBody.capacity).toEqual(5)
@@ -173,6 +178,7 @@ describe('Test createChannelHandler', function () {
     expect(resultBody.note).toEqual('')
     expect(resultBody.owner).toEqual('test_user')
     expect(resultBody.ownerID).toEqual('nanouserid1')
+    expect(resultBody.subscriberCount).toEqual(0)
     expect(resultBody.subscribers).toEqual([])
     expect(resultBody.title).toEqual('Super Channel')
   })

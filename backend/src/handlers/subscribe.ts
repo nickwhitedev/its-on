@@ -1,7 +1,7 @@
 import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
-  GetCommand,
+  UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
@@ -56,33 +56,20 @@ export const subscribeHandler = async (
     })
   }
 
-  let channelAttributes
-
   // get public channel info
+  let channelAttributes
   try {
-    const ddbResponse = await ddbDocClient.send(
-      new GetCommand({
-        TableName: DYNAMODB_TABLE_NAME,
-        Key: {
-          pk: `channel#${channelID}`,
-          sk: 'info',
-        },
-      }),
-    )
-    if (ddbResponse.Item == null) {
+    const publicChannel = await getChannel({ channelID, ddbDocClient })
+    if (publicChannel == null) {
       return createResponse({
         eventPath,
         responseBody: { message: 'Not found' },
         statusCode: 404,
       })
     }
-    const {
-      pk: _pk,
-      sk: _sk,
-      ...channelInfo
-    } = ddbResponse.Item as IDynamoChannelItem
+    const { pk: _pk, sk: _sk, ...channelInfo } = publicChannel
     channelAttributes = channelInfo
-    console.info('Get public channel info: ', ddbResponse)
+    console.info('Get public channel info: ', publicChannel)
   } catch (error) {
     console.error('Get public channel error', error)
     return createResponse({
@@ -123,11 +110,6 @@ export const subscribeHandler = async (
       }),
     )
     console.info('Success - items added or updated', ddbResponse)
-    return createResponse({
-      eventPath,
-      responseBody: { message: 'Subscribed' },
-      statusCode: 200,
-    })
   } catch (error) {
     console.error(
       'Batch Write Error',
@@ -139,4 +121,42 @@ export const subscribeHandler = async (
       statusCode: 400,
     })
   }
+
+  updateSubscriberCount: try {
+    if (channelAttributes.ownerID == null) break updateSubscriberCount
+    const ddbResponse = await ddbDocClient.send(
+      new UpdateCommand({
+        Key: {
+          pk: `user#${channelAttributes.ownerID}`,
+          sk: `channel#${channelID}`,
+        },
+        ReturnValues: 'ALL_NEW',
+        TableName: DYNAMODB_TABLE_NAME,
+        UpdateExpression: 'ADD #subscriberCount = :subscriberCount',
+        ExpressionAttributeNames: {
+          '#subscriberCount': 'subscriberCount',
+        },
+        ExpressionAttributeValues: {
+          ':subscriberCount': 1,
+        },
+      }),
+    )
+    console.info('Success - subscriber count updated', ddbResponse)
+  } catch (error) {
+    console.error(
+      'Update Error',
+      error instanceof Error ? error.stack : 'Unknown Type',
+    )
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Something went wrong' },
+      statusCode: 400,
+    })
+  }
+
+  return createResponse({
+    eventPath,
+    responseBody: { message: 'Subscribed' },
+    statusCode: 200,
+  })
 }

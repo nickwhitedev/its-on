@@ -39,6 +39,9 @@ export const handleModifyEvent = async (
     ownerID: record.dynamodb?.NewImage?.ownerID?.S ?? '',
     pk,
     sk,
+    subscriberCount: parseInt(
+      record.dynamodb?.NewImage?.subscriberCount?.N ?? '0',
+    ),
     title: record.dynamodb?.NewImage?.title?.S ?? '',
   }
 
