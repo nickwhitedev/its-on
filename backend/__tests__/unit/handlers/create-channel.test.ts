@@ -182,4 +182,32 @@ describe('Test createChannelHandler', function () {
     expect(resultBody.subscribers).toEqual([])
     expect(resultBody.title).toEqual('Super Channel')
   })
+
+  it('should retry nanoid when there is an id collision', async () => {
+    // Return the specified value whenever the spied put function is called
+    ddbMock
+      .on(GetCommand)
+      .resolvesOnce({
+        Item: { channelCount: 5, tier: 5, username: 'test_user' },
+      })
+      .resolvesOnce({ Item: { id: 'taken' } })
+      .resolvesOnce({ Item: { id: 'taken' } })
+      .resolves({})
+    ddbMock.on(PutCommand).resolves({})
+
+    const event: APIGatewayProxyEvent = {
+      ...mockEvent,
+      body: '{"title": "Super Channel"}',
+      httpMethod: 'POST',
+    }
+
+    // Invoke createChannelHandler()
+    const result = await createChannelHandler(event)
+
+    const resultBody = JSON.parse(result.body) as IResponseWithMessage
+    // Compare the result with the expected result
+    expect(result.headers).toEqual(CORS_HEADERS)
+    expect(result.statusCode).toEqual(403)
+    expect(resultBody.message).toEqual('Upgrade to create more channels')
+  })
 })

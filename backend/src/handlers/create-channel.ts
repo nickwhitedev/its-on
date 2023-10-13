@@ -43,6 +43,14 @@ export const createChannelHandler = async (
   const userTier = userInfo?.tier ?? 5
   const username = userInfo?.username ?? ''
 
+  if ((userInfo?.channelCount ?? 0) >= userTier) {
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Upgrade to create more channels' },
+      statusCode: 403,
+    })
+  }
+
   let channelID = nanoid()
   let channelIDIsTaken: boolean
   let channelIDAttempt = 1
