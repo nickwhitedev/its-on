@@ -1,16 +1,16 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
 } from '@aws-sdk/lib-dynamodb'
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import { getChannel, getUserInfo } from '../utils/dynamo'
 
-import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { MS_IN_HOUR } from '../utils/time'
-import { alphanumeric } from 'nanoid-dictionary'
-import { createResponse } from '../utils/response'
 import { customAlphabet } from 'nanoid'
+import { alphanumeric } from 'nanoid-dictionary'
+import { DYNAMODB_TABLE_NAME } from '../utils/constants'
+import { createResponse } from '../utils/response'
+import { MS_IN_HOUR } from '../utils/time'
 
 const nanoid = customAlphabet(alphanumeric, 11)
 
@@ -37,7 +37,7 @@ export const createChannelHandler = async (
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
-   
+
   const userInfo = await getUserInfo({ ddbDocClient, userID })
   const userTier = userInfo?.tier ?? 5
   const username = userInfo?.username ?? ''
@@ -74,6 +74,7 @@ export const createChannelHandler = async (
     lastUpdated: event.requestContext.requestTimeEpoch,
     note: '',
     owner: username,
+    ownerID: userID,
     title: (JSON.parse(event.body ?? '{}') as IPayload).title.substring(0, 40),
   }
 

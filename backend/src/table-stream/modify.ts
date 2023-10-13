@@ -4,10 +4,10 @@ import {
   QueryCommand,
 } from '@aws-sdk/lib-dynamodb'
 
-import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { DynamoDBRecord } from 'aws-lambda'
-import { MS_IN_HOUR } from '../utils/time'
+import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { batchWrite } from '../utils/dynamo'
+import { MS_IN_HOUR } from '../utils/time'
 
 export const handleModifyEvent = async (
   record: DynamoDBRecord,
@@ -36,6 +36,7 @@ export const handleModifyEvent = async (
     lastUpdated: parseInt(record.dynamodb?.NewImage?.lastUpdated?.N ?? '0'),
     note: record.dynamodb?.NewImage?.note?.S ?? '',
     owner: record.dynamodb?.NewImage?.owner?.S ?? '',
+    ownerID: record.dynamodb?.NewImage?.ownerID?.S ?? '',
     pk,
     sk,
     title: record.dynamodb?.NewImage?.title?.S ?? '',

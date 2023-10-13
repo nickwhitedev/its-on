@@ -4,13 +4,13 @@ import {
   PutCommand,
 } from '@aws-sdk/lib-dynamodb'
 
-import { APIGatewayProxyEvent } from 'aws-lambda'
-import { CORS_HEADERS } from '../../../src/utils/constants'
-import { MS_IN_HOUR } from '../../../src/utils/time'
-import { createChannelHandler } from '../../../src/handlers/create-channel'
 import { jest } from '@jest/globals'
+import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
 import mockEvent from '../../../__mocks__/mock-event'
+import { createChannelHandler } from '../../../src/handlers/create-channel'
+import { CORS_HEADERS } from '../../../src/utils/constants'
+import { MS_IN_HOUR } from '../../../src/utils/time'
 
 // This includes all tests for createChannelHandler()
 describe('Test createChannelHandler', function () {
@@ -57,6 +57,7 @@ describe('Test createChannelHandler', function () {
       'lastUpdated',
       'note',
       'owner',
+      'ownerID',
       'title',
     ])
     expect(resultBody.capacity).toEqual(5)
@@ -68,6 +69,7 @@ describe('Test createChannelHandler', function () {
     )
     expect(resultBody.note).toEqual('')
     expect(resultBody.owner).toEqual('test_user')
+    expect(resultBody.ownerID).toEqual('nanouserid1')
     expect(resultBody.subscribers).toEqual([])
     expect(resultBody.title).toEqual('Super Channel')
   })
@@ -106,6 +108,7 @@ describe('Test createChannelHandler', function () {
       'lastUpdated',
       'note',
       'owner',
+      'ownerID',
       'title',
     ])
     expect(resultBody.capacity).toEqual(5)
@@ -117,6 +120,7 @@ describe('Test createChannelHandler', function () {
     )
     expect(resultBody.note).toEqual('')
     expect(resultBody.owner).toEqual('test_user')
+    expect(resultBody.ownerID).toEqual('nanouserid1')
     expect(resultBody.subscribers).toEqual([])
     expect(resultBody.title).toHaveLength(40)
     expect(resultBody.title).toEqual(testLongTitle.substring(0, 40))
@@ -156,6 +160,7 @@ describe('Test createChannelHandler', function () {
       'lastUpdated',
       'note',
       'owner',
+      'ownerID',
       'title',
     ])
     expect(resultBody.capacity).toEqual(5)
@@ -167,6 +172,7 @@ describe('Test createChannelHandler', function () {
     )
     expect(resultBody.note).toEqual('')
     expect(resultBody.owner).toEqual('test_user')
+    expect(resultBody.ownerID).toEqual('nanouserid1')
     expect(resultBody.subscribers).toEqual([])
     expect(resultBody.title).toEqual('Super Channel')
   })

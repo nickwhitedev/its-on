@@ -16,6 +16,7 @@ interface IChannel {
   lastUpdated?: number
   note?: string
   owner?: string
+  ownerID?: string
   subscribers?: IChannelSubscriber[]
   title?: string
 }
