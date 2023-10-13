@@ -17,7 +17,7 @@ interface IChannel {
   note?: string
   owner?: string
   ownerID?: string
-  subscriberCount: number
+  subscriberCount?: number
   subscribers?: IChannelSubscriber[]
   title?: string
 }

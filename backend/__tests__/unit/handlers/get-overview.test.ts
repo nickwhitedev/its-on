@@ -5,10 +5,10 @@ import {
 } from '@aws-sdk/lib-dynamodb'
 
 import { APIGatewayProxyEvent } from 'aws-lambda'
-import { CORS_HEADERS } from '../../../src/utils/constants'
-import { getOverviewHandler } from '../../../src/handlers/get-overview'
 import { mockClient } from 'aws-sdk-client-mock'
 import mockEvent from '../../../__mocks__/mock-event'
+import { getOverviewHandler } from '../../../src/handlers/get-overview'
+import { CORS_HEADERS } from '../../../src/utils/constants'
 
 describe('Test getOverviewHandler', () => {
   const ddbMock = mockClient(DynamoDBDocumentClient)
@@ -36,6 +36,7 @@ describe('Test getOverviewHandler', () => {
       {
         sk: 'profile',
         pk: `user#userID`,
+        subscriptionCount: 2,
         tier: 10,
         username: 'testie',
       },
@@ -75,6 +76,7 @@ describe('Test getOverviewHandler', () => {
           },
         ],
         profile: {
+          subscriptionCount: 2,
           tier: 10,
           username: 'testie',
         },
@@ -136,6 +138,7 @@ describe('Test getOverviewHandler', () => {
           },
         ],
         profile: {
+          subscriptionCount: 0,
           tier: 5,
           username: 'test_user',
         },

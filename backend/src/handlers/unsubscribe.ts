@@ -125,6 +125,37 @@ export const unsubscribeHandler = async (
     })
   }
 
+  try {
+    const ddbResponse = await ddbDocClient.send(
+      new UpdateCommand({
+        Key: {
+          pk: `user#${userID}`,
+          sk: `profile`,
+        },
+        ReturnValues: 'ALL_NEW',
+        TableName: DYNAMODB_TABLE_NAME,
+        UpdateExpression: 'ADD #subscriptionCount = :subscriptionCount',
+        ExpressionAttributeNames: {
+          '#subscriptionCount': 'subscriptionCount',
+        },
+        ExpressionAttributeValues: {
+          ':subscriptionCount': -1,
+        },
+      }),
+    )
+    console.info('Success - subscription count updated', ddbResponse)
+  } catch (error) {
+    console.error(
+      'Update Error',
+      error instanceof Error ? error.stack : 'Unknown Type',
+    )
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Something went wrong' },
+      statusCode: 400,
+    })
+  }
+
   return createResponse({
     eventPath,
     responseBody: { message: 'Unsubscribed' },
