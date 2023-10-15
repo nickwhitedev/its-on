@@ -1,4 +1,8 @@
-import { DynamoDBDocumentClient, QueryCommand } from '@aws-sdk/lib-dynamodb'
+import {
+  DynamoDBDocumentClient,
+  PutCommand,
+  QueryCommand,
+} from '@aws-sdk/lib-dynamodb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
@@ -25,6 +29,9 @@ export const getOverviewHandler = async (
   console.debug('received:', event)
 
   const eventPath = event.path
+  const userID =
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    (event.requestContext.authorizer?.claims?.sub as string | null) ?? ''
 
   try {
     const ddbResponse = await ddbDocClient.send(
@@ -35,17 +42,54 @@ export const getOverviewHandler = async (
           '#pk': 'pk',
         },
         ExpressionAttributeValues: {
-          ':userID': `user#${
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            event.requestContext.authorizer?.claims?.sub ?? ''
-          }`,
+          ':userID': `user#${userID}`,
         },
       }),
     )
-    console.info('Success - data: ', ddbResponse)
+    console.info('Successful user partition query - data: ', ddbResponse)
+
+    const data = serializeQueryResponse(
+      ddbResponse.Items ?? [],
+    ) as IOverviewResponse
+
+    if (!('profile' in data)) {
+      const userAttributes = {
+        channelCount: 0,
+        subscriptionCount: 0,
+        tier: 5,
+        username:
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          (event.requestContext.authorizer?.claims['cognito:username'] ??
+            '') as string,
+      }
+      // Put a user profile item
+      try {
+        await ddbDocClient.send(
+          new PutCommand({
+            TableName: DYNAMODB_TABLE_NAME,
+            Item: {
+              pk: `user#${userID}`,
+              sk: 'profile',
+              ...userAttributes,
+            } as IDynamoUserItem,
+          }),
+        )
+        console.info('Successful user profile write')
+
+        data.profile = userAttributes
+      } catch (error) {
+        console.error('write user profile failed: ', error)
+        return createResponse({
+          eventPath,
+          responseBody: { message: 'Something went wrong' },
+          statusCode: 400,
+        })
+      }
+    }
+
     return createResponse({
       eventPath,
-      responseBody: serializeQueryResponse(ddbResponse.Items ?? []),
+      responseBody: data,
       statusCode: 200,
     })
   } catch (error) {

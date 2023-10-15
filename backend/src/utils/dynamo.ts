@@ -10,6 +10,42 @@ import { ChannelCopyTypeEnum } from './enums'
 import { DYNAMODB_TABLE_NAME } from './constants'
 import wait from './wait'
 
+interface GetUserInfoParams {
+  ddbDocClient: DynamoDBDocumentClient
+  userID: string
+}
+
+/**
+ * Gets the logged in user's info.
+ */
+export const getUserInfo = async ({
+  ddbDocClient,
+  userID,
+}: GetUserInfoParams): Promise<IDynamoUserItem | undefined> => {
+  let ddbResponse
+  try {
+    ddbResponse = await ddbDocClient.send(
+      new GetCommand({
+        TableName: DYNAMODB_TABLE_NAME,
+        Key: {
+          pk: `user#${userID}`,
+          sk: 'profile',
+        },
+      }),
+    )
+  } catch (error) {
+    console.error(
+      'Dynamo get error',
+      error instanceof Error ? error.stack : 'Unknown Type',
+    )
+    throw new Error(
+      'Dynamo Get Error',
+      error instanceof Error ? error : undefined,
+    )
+  }
+  return ddbResponse.Item as IDynamoUserItem | undefined
+}
+
 interface GetChannelParams {
   channelID: string
   ddbDocClient: DynamoDBDocumentClient

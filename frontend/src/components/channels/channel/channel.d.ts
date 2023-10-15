@@ -7,6 +7,7 @@
  */
 interface IChannel {
   canceled?: boolean
+  capacity?: number
   deleted?: boolean
   duration?: number
   id: string
@@ -15,6 +16,8 @@ interface IChannel {
   lastUpdated?: number
   note?: string
   owner?: string
+  ownerID?: string
+  subscriberCount?: number
   subscribers?: IChannelSubscriber[]
   title?: string
 }

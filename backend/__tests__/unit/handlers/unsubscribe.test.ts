@@ -1,6 +1,8 @@
 import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
+  GetCommand,
+  UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
 
 import { jest } from '@jest/globals'
@@ -14,15 +16,27 @@ import { CORS_HEADERS } from '../../../src/utils/constants'
 describe('Test unsubscribeHandler', function () {
   const ddbMock = mockClient(DynamoDBDocumentClient)
   jest.useFakeTimers().setSystemTime(new Date('2020-01-01'))
-  
+
   beforeEach(() => {
     ddbMock.reset()
   })
 
   // This test invokes createChannelHandler() and compare the result
-  it('should add id to the table', async () => {
-    // Return the specified value whenever the spied put function is called
+  it('should unsubscribe user from channel', async () => {
+    const testChannel = {
+      note: '',
+      on: false,
+      ownerID: 'nanouserid1',
+      pk: 'channel#someID',
+      sk: 'info',
+      title: 'test-channel',
+    }
+
+    ddbMock.on(GetCommand).resolves({
+      Item: testChannel,
+    })
     ddbMock.on(BatchWriteCommand).resolves({})
+    ddbMock.on(UpdateCommand).resolves({})
 
     const event: APIGatewayProxyEvent = {
       ...mockEvent,

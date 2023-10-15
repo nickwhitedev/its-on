@@ -5,12 +5,9 @@
     [row-start] 'edit title share' [row-end]
     / 2rem auto 2rem;
   width: 100%;
-  margin-top: 0.5rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
   align-items: center;
-}
-
-.ChannelHeader.editable {
-  min-height: 8rem;
 }
 
 .ChannelHeader-title {
@@ -19,7 +16,6 @@
 }
 
 .ChannelHeader-input {
-  margin: 1rem 0;
   resize: both;
   text-align: left;
   height: min-content;
@@ -30,7 +26,6 @@
   display: flex;
   justify-content: center;
   align-items: start;
-  padding: 1.5rem 0;
 }
 
 .ChannelHeader-edit-wrapper {

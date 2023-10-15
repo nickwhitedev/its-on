@@ -25,6 +25,7 @@ export const handleModifyEvent = async (
 
   const channelInfo: IDynamoChannelItem = {
     canceled: record.dynamodb?.NewImage?.canceled?.BOOL ?? false,
+    capacity: parseInt(record.dynamodb?.NewImage?.capacity?.N ?? '5'),
     duration: parseInt(
       record.dynamodb?.NewImage?.duration?.N ?? MS_IN_HOUR.toString(),
     ),
@@ -35,8 +36,12 @@ export const handleModifyEvent = async (
     lastUpdated: parseInt(record.dynamodb?.NewImage?.lastUpdated?.N ?? '0'),
     note: record.dynamodb?.NewImage?.note?.S ?? '',
     owner: record.dynamodb?.NewImage?.owner?.S ?? '',
+    ownerID: record.dynamodb?.NewImage?.ownerID?.S ?? '',
     pk,
     sk,
+    subscriberCount: parseInt(
+      record.dynamodb?.NewImage?.subscriberCount?.N ?? '0',
+    ),
     title: record.dynamodb?.NewImage?.title?.S ?? '',
   }
 

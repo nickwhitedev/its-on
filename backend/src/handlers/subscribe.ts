@@ -1,14 +1,14 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
-  GetCommand,
+  UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
-import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { DYNAMODB_TABLE_NAME } from '../utils/constants'
+import { getChannel, getUserInfo } from '../utils/dynamo'
 import { createResponse } from '../utils/response'
-import { getChannel } from '../utils/dynamo'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -27,9 +27,39 @@ export const subscribeHandler = async (
   console.debug('received:', event)
 
   const eventPath = event.path
+  const channelID = event.pathParameters?.channelID
+  if (channelID == null) {
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Bad Request' },
+      statusCode: 400,
+    })
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
-  const channelID = event.pathParameters?.channelID ?? ''
+  let userInfo
+  try {
+    userInfo = await getUserInfo({ ddbDocClient, userID })
+  } catch (error) {
+    console.error(
+      'Get User Info Error',
+      error instanceof Error ? error.stack : 'Unknown Type',
+    )
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Something went wrong' },
+      statusCode: 400,
+    })
+  }
+
+  if ((userInfo?.subscriptionCount ?? 0) >= (userInfo?.tier ?? 5)) {
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Upgrade to subscribe to more channels' },
+      statusCode: 403,
+    })
+  }
 
   let privateChannel: IDynamoChannelItem | undefined
   // get private channel entry
@@ -56,39 +86,37 @@ export const subscribeHandler = async (
     })
   }
 
-  let channelAttributes
-
   // get public channel info
+  let channelAttributes
   try {
-    const ddbResponse = await ddbDocClient.send(
-      new GetCommand({
-        TableName: DYNAMODB_TABLE_NAME,
-        Key: {
-          pk: `channel#${channelID}`,
-          sk: 'info',
-        },
-      }),
-    )
-    if (ddbResponse.Item == null) {
+    const publicChannel = await getChannel({ channelID, ddbDocClient })
+    if (publicChannel == null) {
       return createResponse({
         eventPath,
         responseBody: { message: 'Not found' },
         statusCode: 404,
       })
     }
-    const {
-      pk: _pk,
-      sk: _sk,
-      ...channelInfo
-    } = ddbResponse.Item as IDynamoChannelItem
+    const { pk: _pk, sk: _sk, ...channelInfo } = publicChannel
     channelAttributes = channelInfo
-    console.info('Get public channel info: ', ddbResponse)
+    console.info('Get public channel info: ', publicChannel)
   } catch (error) {
     console.error('Get public channel error', error)
     return createResponse({
       eventPath,
       responseBody: { message: 'Something went wrong' },
       statusCode: 400,
+    })
+  }
+
+  if (
+    (channelAttributes.subscriberCount ?? 0) >=
+    (channelAttributes.capacity ?? 5)
+  ) {
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Channel is full' },
+      statusCode: 403,
     })
   }
 
@@ -123,11 +151,6 @@ export const subscribeHandler = async (
       }),
     )
     console.info('Success - items added or updated', ddbResponse)
-    return createResponse({
-      eventPath,
-      responseBody: { message: 'Subscribed' },
-      statusCode: 200,
-    })
   } catch (error) {
     console.error(
       'Batch Write Error',
@@ -139,4 +162,73 @@ export const subscribeHandler = async (
       statusCode: 400,
     })
   }
+
+  updateSubscriberCount: try {
+    if (channelAttributes.ownerID == null) break updateSubscriberCount
+    const ddbResponse = await ddbDocClient.send(
+      new UpdateCommand({
+        Key: {
+          pk: `user#${channelAttributes.ownerID}`,
+          sk: `channel#${channelID}`,
+        },
+        ReturnValues: 'ALL_NEW',
+        TableName: DYNAMODB_TABLE_NAME,
+        UpdateExpression: 'ADD #subscriberCount :subscriberCount',
+        ExpressionAttributeNames: {
+          '#subscriberCount': 'subscriberCount',
+        },
+        ExpressionAttributeValues: {
+          ':subscriberCount': 1,
+        },
+      }),
+    )
+    console.info('Success - subscriber count updated', ddbResponse)
+  } catch (error) {
+    console.error(
+      'Update Error',
+      error instanceof Error ? error.stack : 'Unknown Type',
+    )
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Something went wrong' },
+      statusCode: 400,
+    })
+  }
+
+  try {
+    const ddbResponse = await ddbDocClient.send(
+      new UpdateCommand({
+        Key: {
+          pk: `user#${userID}`,
+          sk: `profile`,
+        },
+        ReturnValues: 'ALL_NEW',
+        TableName: DYNAMODB_TABLE_NAME,
+        UpdateExpression: 'ADD #subscriptionCount :subscriptionCount',
+        ExpressionAttributeNames: {
+          '#subscriptionCount': 'subscriptionCount',
+        },
+        ExpressionAttributeValues: {
+          ':subscriptionCount': 1,
+        },
+      }),
+    )
+    console.info('Success - subscription count updated', ddbResponse)
+  } catch (error) {
+    console.error(
+      'Update Error',
+      error instanceof Error ? error.stack : 'Unknown Type',
+    )
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Something went wrong' },
+      statusCode: 400,
+    })
+  }
+
+  return createResponse({
+    eventPath,
+    responseBody: { message: 'Subscribed' },
+    statusCode: 200,
+  })
 }

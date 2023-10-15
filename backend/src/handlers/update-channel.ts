@@ -1,9 +1,9 @@
 import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import { getChannel, getUserInfo } from '../utils/dynamo'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DYNAMODB_TABLE_NAME } from '../utils/constants'
-import { getChannel } from '../utils/dynamo'
 import { createResponse } from '../utils/response'
 import { MS_IN_HOUR } from '../utils/time'
 
@@ -25,9 +25,6 @@ export const updateChannelHandler = async (
 
   const eventPath = event.path
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-  const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
-
   const channelID = event.pathParameters?.channelID
 
   if (channelID == null) {
@@ -37,6 +34,24 @@ export const updateChannelHandler = async (
       statusCode: 400,
     })
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+  const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
+  let userInfo
+  try {
+    userInfo = await getUserInfo({ ddbDocClient, userID })
+  } catch (error) {
+    console.error(
+      'Get User Info Error',
+      error instanceof Error ? error.stack : 'Unknown Type',
+    )
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Something went wrong' },
+      statusCode: 400,
+    })
+  }
+  const userTier = userInfo?.tier ?? 5
 
   let channelIsNotOwnedByUser: boolean
   try {
@@ -63,7 +78,12 @@ export const updateChannelHandler = async (
     })
   }
 
-  const { note, duration, title } = JSON.parse(event.body ?? '{}') as IChannel
+  const {
+    capacity = userTier,
+    duration = MS_IN_HOUR,
+    note = '',
+    title = '',
+  } = JSON.parse(event.body ?? '{}') as IChannel
 
   try {
     const ddbResponse = await ddbDocClient.send(
@@ -75,18 +95,20 @@ export const updateChannelHandler = async (
         ReturnValues: 'ALL_NEW',
         TableName: DYNAMODB_TABLE_NAME,
         UpdateExpression:
-          'SET #duration = :duration, #lastUpdated = :lastUpdated, #note = :note, #title = :title',
+          'SET #capacity = :capacity, #duration = :duration, #lastUpdated = :lastUpdated, #note = :note, #title = :title',
         ExpressionAttributeNames: {
+          '#capacity': 'capacity',
           '#duration': 'duration',
           '#lastUpdated': 'lastUpdated',
           '#note': 'note',
           '#title': 'title',
         },
         ExpressionAttributeValues: {
-          ':duration': duration ?? MS_IN_HOUR,
+          ':capacity': capacity > userTier ? userTier : Math.floor(capacity),
+          ':duration': duration,
           ':lastUpdated': event.requestContext.requestTimeEpoch,
-          ':note': note?.substring(0, 200) ?? '',
-          ':title': title?.substring(0, 40) ?? 'Untitled',
+          ':note': note.substring(0, 200),
+          ':title': title.substring(0, 40),
         },
       }),
     )

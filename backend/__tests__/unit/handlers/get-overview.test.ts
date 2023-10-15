@@ -1,4 +1,8 @@
-import { DynamoDBDocumentClient, QueryCommand } from '@aws-sdk/lib-dynamodb'
+import {
+  DynamoDBDocumentClient,
+  PutCommand,
+  QueryCommand,
+} from '@aws-sdk/lib-dynamodb'
 
 import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
@@ -30,14 +34,20 @@ describe('Test getOverviewHandler', () => {
         title: 'test-channel-2',
       },
       {
+        channelCount: 3,
         sk: 'profile',
         pk: `user#userID`,
+        subscriptionCount: 2,
+        tier: 10,
+        username: 'testie',
       },
     ]
 
     ddbMock.on(QueryCommand).resolves({
       Items: items,
     })
+
+    ddbMock.on(PutCommand).resolves({})
 
     const event: APIGatewayProxyEvent = {
       ...mockEvent,
@@ -66,7 +76,42 @@ describe('Test getOverviewHandler', () => {
             title: 'test-channel-2',
           },
         ],
-        profile: {},
+        profile: {
+          channelCount: 3,
+          subscriptionCount: 2,
+          tier: 10,
+          username: 'testie',
+        },
+      }),
+    }
+
+    expect(result).toEqual(expectedResult)
+  })
+
+  it("should create the profile item if it doesn't exist", async () => {
+    ddbMock.on(QueryCommand).resolves({
+      Items: [],
+    })
+
+    ddbMock.on(PutCommand).resolves({})
+
+    const event: APIGatewayProxyEvent = {
+      ...mockEvent,
+      httpMethod: 'GET',
+    }
+
+    const result = await getOverviewHandler(event)
+
+    const expectedResult = {
+      statusCode: 200,
+      headers: CORS_HEADERS,
+      body: JSON.stringify({
+        profile: {
+          channelCount: 0,
+          subscriptionCount: 0,
+          tier: 5,
+          username: 'test_user',
+        },
       }),
     }
 

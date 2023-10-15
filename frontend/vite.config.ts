@@ -19,8 +19,8 @@ export default defineConfig({
         description: "Always know when it's on",
         display: 'standalone',
         start_url: '/',
-        theme_color: '#0e1118',
-        background_color: '#0e1118',
+        theme_color: '#131313',
+        background_color: '#131313',
         orientation: 'portrait-primary',
         icons: [
           {

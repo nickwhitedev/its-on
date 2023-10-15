@@ -33,7 +33,7 @@
   background-color: transparent;
   border-radius: 50%;
   padding: 0;
-  margin: 1.8rem 0;
+  margin-bottom: 1.8rem;
   font: inherit;
   outline: inherit;
   height: 60vh;
@@ -118,12 +118,24 @@
   min-width: 10rem;
 }
 
+.Channel-duration-display {
+  margin-bottom: 1.8rem;
+}
+
 .Channel-subscribers {
   border-radius: 12px;
   position: relative;
   width: 100%;
   text-align: left;
   margin-bottom: 1.8rem;
+}
+
+.Channel-subscribers-capacity-input {
+  --md-outlined-text-field-leading-space: 7px;
+  --md-outlined-text-field-top-space: 4px;
+  --md-outlined-text-field-bottom-space: 4px;
+  --md-outlined-text-field-trailing-space: 4px;
+  --md-outlined-text-field-input-text-size: 0.6875rem;
 }
 
 .Channel-subscribers-list {

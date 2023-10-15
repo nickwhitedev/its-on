@@ -1,14 +1,15 @@
 import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
+  UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import { getChannel, getUserInfo } from '../utils/dynamo'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { customAlphabet } from 'nanoid'
 import { alphanumeric } from 'nanoid-dictionary'
 import { DYNAMODB_TABLE_NAME } from '../utils/constants'
-import { getChannel } from '../utils/dynamo'
 import { createResponse } from '../utils/response'
 import { MS_IN_HOUR } from '../utils/time'
 
@@ -37,10 +38,19 @@ export const createChannelHandler = async (
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const username: string =
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    event.requestContext.authorizer?.claims['cognito:username'] ?? ''
+
+  const userInfo = await getUserInfo({ ddbDocClient, userID })
+  const userTier = userInfo?.tier ?? 5
+  const username = userInfo?.username ?? ''
+
+  if ((userInfo?.channelCount ?? 0) >= userTier) {
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Upgrade to create more channels' },
+      statusCode: 403,
+    })
+  }
+
   let channelID = nanoid()
   let channelIDIsTaken: boolean
   let channelIDAttempt = 1
@@ -66,11 +76,15 @@ export const createChannelHandler = async (
   } while (channelIDIsTaken)
 
   const channelAttributes: Partial<IDynamoChannelItem> = {
+    capacity: userTier,
     duration: MS_IN_HOUR,
     lastOn: 0,
     lastOnDuration: MS_IN_HOUR,
+    lastUpdated: event.requestContext.requestTimeEpoch,
     note: '',
     owner: username,
+    ownerID: userID,
+    subscriberCount: 0,
     title: (JSON.parse(event.body ?? '{}') as IPayload).title.substring(0, 40),
   }
 
@@ -84,7 +98,6 @@ export const createChannelHandler = async (
                 Item: {
                   pk: `user#${userID}`,
                   sk: `channel#${channelID}`,
-                  lastUpdated: event.requestContext.requestTimeEpoch,
                   ...channelAttributes,
                 } as IDynamoChannelItem,
               },
@@ -94,8 +107,8 @@ export const createChannelHandler = async (
                 Item: {
                   pk: `channel#${channelID}`,
                   sk: 'info',
-                  lastUpdated: 0,
                   ...channelAttributes,
+                  lastUpdated: 0,
                 } as IDynamoChannelItem,
               },
             },
@@ -104,15 +117,6 @@ export const createChannelHandler = async (
       }),
     )
     console.info('Success - item added or updated', ddbResponse)
-    return createResponse({
-      eventPath,
-      responseBody: {
-        id: channelID,
-        subscribers: [],
-        ...channelAttributes,
-      } as IChannel,
-      statusCode: 201,
-    })
   } catch (error) {
     console.error(
       'Error',
@@ -124,4 +128,45 @@ export const createChannelHandler = async (
       statusCode: 400,
     })
   }
+
+  try {
+    const ddbResponse = await ddbDocClient.send(
+      new UpdateCommand({
+        Key: {
+          pk: `user#${userID}`,
+          sk: `profile`,
+        },
+        ReturnValues: 'ALL_NEW',
+        TableName: DYNAMODB_TABLE_NAME,
+        UpdateExpression: 'ADD #channelCount :channelCount',
+        ExpressionAttributeNames: {
+          '#channelCount': 'channelCount',
+        },
+        ExpressionAttributeValues: {
+          ':channelCount': 1,
+        },
+      }),
+    )
+    console.info('Success - channel count updated', ddbResponse)
+  } catch (error) {
+    console.error(
+      'Update Error',
+      error instanceof Error ? error.stack : 'Unknown Type',
+    )
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Something went wrong' },
+      statusCode: 400,
+    })
+  }
+
+  return createResponse({
+    eventPath,
+    responseBody: {
+      id: channelID,
+      subscribers: [],
+      ...channelAttributes,
+    } as IChannel,
+    statusCode: 201,
+  })
 }

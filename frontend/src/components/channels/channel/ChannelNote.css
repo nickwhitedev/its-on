@@ -4,12 +4,12 @@
   grid:
     [row-start] '. note actions' [row-end]
     / 2rem auto 2rem;
+  margin-bottom: 1.8rem;
   width: 100%;
 }
 
 .ChannelNote-note {
   grid-area: note;
-  margin-top: 1.8rem;
 }
 
 .ChannelNote-input {

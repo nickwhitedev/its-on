@@ -3,7 +3,7 @@ interface IResponseWithMessage {
 }
 
 interface IOverviewResponse {
-  channels: IChannel[]
-  profile: object
-  subscriptions: IChannel[]
+  channels?: IChannel[]
+  profile?: IUser
+  subscriptions?: IChannel[]
 }
