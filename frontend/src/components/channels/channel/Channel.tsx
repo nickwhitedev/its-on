@@ -19,6 +19,7 @@ import { UserDispatchActionType } from '../../../contexts/user/userReducer'
 import { fetchApi } from '../../../utils/api'
 import { MS_IN_HOUR } from '../../../utils/time'
 import ItsOnIcon from '../../icons/ItsOnIcon'
+import MDDialog from '../../material/MDDialog'
 import MDDivider from '../../material/MDDivider'
 import MDIcon from '../../material/MDIcon'
 import MDFilledButton from '../../material/button/MDFilledButton'
@@ -54,6 +55,7 @@ const Channel = ({ channel }: Props) => {
     userIsChannelOwner && !channel.title,
   )
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState<boolean>(false)
   const [newCapacity, setNewCapacity] = useState<string>(
     `${channel.capacity ?? 5}`,
   )
@@ -182,7 +184,11 @@ const Channel = ({ channel }: Props) => {
     setIsLoading(false)
   }
 
-  const handleClickDelete = async () => {
+  const handleClickDelete = () => {
+    setIsConfirmingDelete(true)
+  }
+
+  const handleConfirmDelete = async () => {
     setIsLoading(true)
     try {
       await fetchApi(`/${channel.id}`, 'DELETE')
@@ -199,6 +205,7 @@ const Channel = ({ channel }: Props) => {
       // log error to backend
       // display user friendly message
     }
+    setIsConfirmingDelete(false)
     setIsLoading(false)
   }
 
@@ -367,15 +374,50 @@ const Channel = ({ channel }: Props) => {
               )}
             </MDList>
           </div>
-          <MDTextButton
-            aria-label='Delete channel'
-            className='Channel-button-delete'
-            disabled={isLoading}
-            hasIcon
-            onClick={() => void handleClickDelete()}
-          >
-            <MDIcon slot='icon'>delete</MDIcon> Delete
-          </MDTextButton>
+
+          <div className='Channel-delete-section'>
+            <MDTextButton
+              aria-label='Delete channel'
+              className='Channel-button-delete'
+              disabled={isLoading}
+              hasIcon
+              onClick={() => {
+                handleClickDelete()
+              }}
+            >
+              <MDIcon slot='icon'>delete</MDIcon> Delete
+            </MDTextButton>
+            <MDDialog open={isConfirmingDelete}>
+              <div slot='headline'>Delete Channel</div>
+              <div
+                className='Channel-delete-confirmation-content'
+                slot='content'
+              >
+                This channel
+                {channel.title === '' || channel.title == null
+                  ? ' '
+                  : `, ${channel.title}, `}
+                will be deleted forever. Are you sure?
+              </div>
+              <div slot='actions'>
+                <MDTextButton
+                  disabled={isLoading}
+                  onClick={() => {
+                    setIsConfirmingDelete(false)
+                  }}
+                >
+                  Cancel
+                </MDTextButton>
+                <MDTextButton
+                  className='Channel-button-delete'
+                  disabled={isLoading}
+                  onClick={() => void handleConfirmDelete()}
+                >
+                  Delete
+                </MDTextButton>
+              </div>
+            </MDDialog>
+          </div>
         </>
       ) : subscriptions.some(chan => chan.id === channel.id) ? (
         <>
