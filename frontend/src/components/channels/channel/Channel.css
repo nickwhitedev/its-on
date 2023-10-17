@@ -63,9 +63,16 @@
   width: 75%;
 }
 
+.Channel-delete-section {
+  margin-bottom: 1.8rem;
+}
+
 .Channel-button-delete {
   --md-sys-color-primary: var(--md-sys-color-error);
-  margin-bottom: 1.8rem;
+}
+
+.Channel-delete-confirmation-content {
+  text-align: left;
 }
 
 .Channel-subscribe-button {
