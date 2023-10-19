@@ -1,5 +1,7 @@
 import { MS_IN_HOUR, MS_IN_MINUTE } from '../../../utils/time'
 
+export const DEFAULT_USER_TIER = 5
+
 export const durationOptions: IDurationOptions[] = [
   { displayName: '30 Minutes', value: MS_IN_MINUTE * 30 },
   { displayName: '1 Hour', value: MS_IN_HOUR },
