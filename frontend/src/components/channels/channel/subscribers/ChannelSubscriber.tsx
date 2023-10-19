@@ -44,6 +44,7 @@ const ChannelSubscriber = ({ channel, subscriber, setIsLoading }: Props) => {
 
   const handleClickRemove = async () => {
     setIsLoading(true)
+    setIsMenuOpen(false)
     try {
       await fetchApi(`/${channel.id}/subscribers/${subscriber.id}`, 'DELETE')
       dispatchChannels({

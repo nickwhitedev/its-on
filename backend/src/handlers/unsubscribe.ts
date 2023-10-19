@@ -8,6 +8,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { getChannel } from '../utils/dynamo'
+import { ChannelCopyTypeEnum } from '../utils/enums'
 import { createResponse } from '../utils/response'
 
 const client = new DynamoDBClient({})
@@ -31,6 +32,28 @@ export const unsubscribeHandler = async (
   const channelID = event.pathParameters?.channelID ?? ''
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
+
+  // get channel ownerID
+  let channelOwnerID
+  let channelIsDeleted
+  try {
+    const subscriberChannelCopy = await getChannel({
+      channelID,
+      ddbDocClient,
+      userID,
+      copyType: ChannelCopyTypeEnum.SUBSCRIBER,
+    })
+    channelOwnerID = subscriberChannelCopy?.ownerID
+    channelIsDeleted = subscriberChannelCopy?.deleted
+    console.info("Get subscriber's channel copy: ", subscriberChannelCopy)
+  } catch (error) {
+    console.error('Get public channel error', error)
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Something went wrong' },
+      statusCode: 400,
+    })
+  }
 
   try {
     const ddbResponse = await ddbDocClient.send(
@@ -70,31 +93,9 @@ export const unsubscribeHandler = async (
     })
   }
 
-  // get channel ownerID
-  let channelOwnerID
-  try {
-    const publicChannel = await getChannel({ channelID, ddbDocClient })
-    if (publicChannel == null) {
-      return createResponse({
-        eventPath,
-        responseBody: { message: 'Not found' },
-        statusCode: 404,
-      })
-    }
-    const { ownerID } = publicChannel
-    channelOwnerID = ownerID
-    console.info('Get public channel info: ', publicChannel)
-  } catch (error) {
-    console.error('Get public channel error', error)
-    return createResponse({
-      eventPath,
-      responseBody: { message: 'Something went wrong' },
-      statusCode: 400,
-    })
-  }
-
   updateSubscriberCount: try {
-    if (channelOwnerID == null) break updateSubscriberCount
+    if (channelOwnerID == null || channelIsDeleted === true)
+      break updateSubscriberCount
     const ddbResponse = await ddbDocClient.send(
       new UpdateCommand({
         Key: {
