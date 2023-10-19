@@ -1,6 +1,6 @@
 import './Channel.css'
 
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   useChannels,
   useChannelsDispatch,
@@ -9,7 +9,12 @@ import {
   useSubscriptions,
   useSubscriptionsDispatch,
 } from '../../../contexts/subscriptions/subscriptionsContext'
-import { channelOnProgress, durationOptions, isChannelOn } from './channelUtils'
+import {
+  DEFAULT_USER_TIER,
+  channelOnProgress,
+  durationOptions,
+  isChannelOn,
+} from './channelUtils'
 
 import { useNavigate } from 'react-router-dom'
 import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
@@ -20,19 +25,16 @@ import { fetchApi } from '../../../utils/api'
 import { MS_IN_HOUR } from '../../../utils/time'
 import ItsOnIcon from '../../icons/ItsOnIcon'
 import MDDialog from '../../material/MDDialog'
-import MDDivider from '../../material/MDDivider'
 import MDIcon from '../../material/MDIcon'
 import MDFilledButton from '../../material/button/MDFilledButton'
 import MDFilledTonalButton from '../../material/button/MDFilledTonalButton'
 import MDTextButton from '../../material/button/MDTextButton'
-import MDList from '../../material/list/MDList'
-import MDListItem from '../../material/list/MDListItem'
 import MDLinearProgress from '../../material/progress/MDLinearProgress'
 import MDOutlinedSelect from '../../material/select/MDOutlinedSelect'
 import MDSelectOption from '../../material/select/MDSelectOption'
-import MDOutlinedTextField from '../../material/text-field/MDOutlinedTextField'
 import ChannelHeader from './ChannelHeader'
 import ChannelNote from './ChannelNote'
+import ChannelSubscribers from './subscribers/ChannelSubscribers'
 
 interface Props {
   channel: IChannel
@@ -56,18 +58,15 @@ const Channel = ({ channel }: Props) => {
   )
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [isConfirmingDelete, setIsConfirmingDelete] = useState<boolean>(false)
-  const [newCapacity, setNewCapacity] = useState<string>(
-    `${channel.capacity ?? 5}`,
-  )
 
   const isOn = isChannelOn(channel)
   const onProgress = channelOnProgress(channel)
 
-  const subscriberCount = channel.subscriberCount ?? 0
-  const isChannelFull = subscriberCount >= (channel.capacity ?? 5)
+  const isChannelFull =
+    (channel.subscriberCount ?? 0) >= (channel.capacity ?? DEFAULT_USER_TIER)
 
-  const userTier = user?.tier ?? 5
-  const userHasMaxSubscriptions = (user?.subscriptionCount ?? 0) >= userTier
+  const userHasMaxSubscriptions =
+    (user?.subscriptionCount ?? 0) >= (user?.tier ?? DEFAULT_USER_TIER)
 
   useEffect(() => {
     document.title = channel.title ?? "It's On"
@@ -109,41 +108,6 @@ const Channel = ({ channel }: Props) => {
       const channelUpdates = {
         capacity: channel.capacity,
         duration: newDuration,
-        note: channel.note,
-        title: channel.title,
-      }
-      await fetchApi(`/${channel.id}`, 'PUT', channelUpdates)
-      dispatchChannels({
-        type: ChannelsDispatchActionType.CHANGED,
-        channel: {
-          ...channel,
-          ...channelUpdates,
-        },
-      })
-    } catch (error) {
-      // TODO: Handle update channel error
-      // log error to backend
-      // display user friendly message
-    }
-
-    setIsLoading(false)
-  }
-
-  const handleChangeCapacity = async () => {
-    const targetCapacity = Number(newCapacity)
-
-    if (
-      isNaN(targetCapacity) ||
-      targetCapacity > userTier ||
-      targetCapacity === channel.capacity
-    )
-      return
-    setIsLoading(true)
-
-    try {
-      const channelUpdates = {
-        capacity: targetCapacity,
-        duration: channel.duration,
         note: channel.note,
         title: channel.title,
       }
@@ -317,64 +281,11 @@ const Channel = ({ channel }: Props) => {
             userIsChannelOwner={userIsChannelOwner}
             setIsLoading={setIsLoading}
           />
-          <div className='Channel-subscribers'>
-            <MDList className='Channel-subscribers-list'>
-              <MDListItem>
-                <div slot='headline'>Subscribers</div>
-                <div slot='trailing-supporting-text'>
-                  {subscriberCount}
-                  {channel.capacity == null ? null : (
-                    <>
-                      {' '}
-                      /{' '}
-                      {isEditing ? (
-                        <MDOutlinedTextField
-                          className={'Channel-subscribers-capacity-input'}
-                          error={Number(newCapacity) > 5}
-                          max={`${userTier}`}
-                          min={`${subscriberCount}`}
-                          step='1'
-                          type='number'
-                          value={newCapacity}
-                          onInput={event => {
-                            setNewCapacity(
-                              `${Math.floor(
-                                Number(
-                                  (
-                                    event.target as EventTarget &
-                                      HTMLSelectElement
-                                  ).value,
-                                ),
-                              )}`,
-                            )
-                          }}
-                          onChange={() => void handleChangeCapacity()}
-                        />
-                      ) : (
-                        channel.capacity
-                      )}
-                    </>
-                  )}
-                </div>
-              </MDListItem>
-              {channel.subscribers?.map(subscriber => (
-                <React.Fragment key={subscriber.id}>
-                  <MDDivider inset />
-                  <MDListItem>
-                    <div slot='supporting-text'>{subscriber.username}</div>
-                  </MDListItem>
-                </React.Fragment>
-              )) ?? (
-                <>
-                  <MDDivider inset />
-                  <MDListItem>
-                    Share your channel to let people know it&apos;s on!
-                  </MDListItem>
-                </>
-              )}
-            </MDList>
-          </div>
-
+          <ChannelSubscribers
+            channel={channel}
+            isEditing={isEditing}
+            setIsLoading={setIsLoading}
+          />
           <div className='Channel-delete-section'>
             <MDTextButton
               aria-label='Delete channel'

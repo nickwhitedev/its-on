@@ -1,12 +1,12 @@
 import './ChannelNote.css'
 
+import { useState } from 'react'
+import { useChannelsDispatch } from '../../../contexts/channels/channelsContext'
 import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
+import { fetchApi } from '../../../utils/api'
 import MDIcon from '../../material/MDIcon'
 import MDIconButton from '../../material/icon-button/MDIconButton'
 import MDOutlinedTextField from '../../material/text-field/MDOutlinedTextField'
-import { fetchApi } from '../../../utils/api'
-import { useChannelsDispatch } from '../../../contexts/channels/channelsContext'
-import { useState } from 'react'
 
 interface Props {
   channel: IChannel
@@ -59,29 +59,29 @@ const ChannelNote = ({
   }
 
   return userIsChannelOwner || (channel.note?.length ?? 0) > 0 ? (
-    <div className="ChannelNote">
+    <div className='ChannelNote'>
       <div></div>
       {userIsChannelOwner && isEditing ? (
         <MDOutlinedTextField
           className={'ChannelNote-input'}
-          label="Note"
+          label='Channel Note'
           maxLength={200}
           placeholder="Let's meet at my place"
           rows={4}
-          type="textarea"
+          type='textarea'
           value={newNote}
           onInput={event => {
             setNewNote((event.target as unknown as { value: string }).value)
           }}
         />
       ) : (
-        <span className="ChannelNote-note">{channel.note}</span>
+        <span className='ChannelNote-note'>{channel.note}</span>
       )}
-      <div className="ChannelNote-actions">
+      <div className='ChannelNote-actions'>
         {isUpdating && userIsChannelOwner ? (
-          <div className="ChannelNote-actions-wrapper">
+          <div className='ChannelNote-actions-wrapper'>
             <MDIconButton
-              className="ChannelNote-button"
+              className='ChannelNote-button'
               disabled={isLoading}
               onClick={() => void handleSubmit()}
             >

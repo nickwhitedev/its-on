@@ -326,6 +326,41 @@ Resources:
         EntryPoints:
           - src/handlers/delete-channel.ts
 
+  # This is a Lambda function config associated with the source code: delete-item.ts
+  removeChannelSubscriberFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/remove-channel-subscriber.removeChannelSubscriberHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: Removes a channel's subscriber for a user
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          ITS_ON_TABLE: !Ref ItsOnTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ItsOnApi
+            Path: /{channelID}/subscribers/{subscriberID}
+            Method: DELETE
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: 'es2022'
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/remove-channel-subscriber.ts
+
   # This is a Lambda function config associated with the source code: subscribe.ts
   subscribeFunction:
     Type: AWS::Serverless::Function
