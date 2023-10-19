@@ -1,13 +1,13 @@
 import './ChannelHeader.css'
 
+import { useState } from 'react'
+import { useChannelsDispatch } from '../../../contexts/channels/channelsContext'
 import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
+import { fetchApi } from '../../../utils/api'
+import { baseUrl } from '../../../utils/urls'
 import MDIcon from '../../material/MDIcon'
 import MDIconButton from '../../material/icon-button/MDIconButton'
 import MDOutlinedTextField from '../../material/text-field/MDOutlinedTextField'
-import { baseUrl } from '../../../utils/urls'
-import { fetchApi } from '../../../utils/api'
-import { useChannelsDispatch } from '../../../contexts/channels/channelsContext'
-import { useState } from 'react'
 
 interface Props {
   channel: IChannel
@@ -79,12 +79,12 @@ const ChannelHeader = ({
 
   return (
     <div className={`ChannelHeader ${userIsChannelOwner ? 'editable' : ''}`}>
-      <div className="ChannelHeader-edit">
+      <div className='ChannelHeader-edit'>
         {userIsChannelOwner ? (
-          <div className="ChannelHeader-save-wrapper">
+          <div className='ChannelHeader-save-wrapper'>
             {isEditing ? (
               <MDIconButton
-                className="ChannelHeader-button"
+                className='ChannelHeader-button'
                 disabled={!channel.title || isLoading}
                 onClick={() => {
                   setIsEditing(false)
@@ -95,7 +95,7 @@ const ChannelHeader = ({
               </MDIconButton>
             ) : (
               <MDIconButton
-                className="ChannelHeader-button"
+                className='ChannelHeader-button'
                 disabled={false}
                 onClick={() => {
                   setIsEditing(true)
@@ -111,29 +111,29 @@ const ChannelHeader = ({
         <MDOutlinedTextField
           // TODO: Implement autoFocus with ref
           className={'ChannelHeader-input'}
-          label="Title"
+          label='Channel Title'
           maxLength={40}
           rows={1}
-          type="textarea"
+          type='textarea'
           value={newTitle}
           onInput={event => {
             setNewTitle((event.target as unknown as { value: string }).value)
           }}
         />
       ) : (
-        <div className="ChannelHeader-title">
-          <h2 className="ChannelHeader-title">{channelDisplayTitle}</h2>
+        <div className='ChannelHeader-title'>
+          <h2 className='ChannelHeader-title'>{channelDisplayTitle}</h2>
           {userIsChannelOwner ? null : (
-            <span className="secondary-text">by {channel.owner}</span>
+            <span className='secondary-text'>by {channel.owner}</span>
           )}
         </div>
       )}
-      <div className="ChannelHeader-share">
+      <div className='ChannelHeader-share'>
         {(isUpdating && userIsChannelOwner) ||
         (isEditing && newTitle === '') ? (
-          <div className="ChannelHeader-save-wrapper">
+          <div className='ChannelHeader-save-wrapper'>
             <MDIconButton
-              className="ChannelHeader-button"
+              className='ChannelHeader-button'
               disabled={newTitle === '' || isLoading}
               onClick={() => void handleSubmit()}
             >
@@ -141,9 +141,9 @@ const ChannelHeader = ({
             </MDIconButton>
           </div>
         ) : (
-          <div className="ChannelHeader-share-wrapper">
+          <div className='ChannelHeader-share-wrapper'>
             <MDIconButton
-              aria-label="Share"
+              aria-label='Share'
               disabled={isLoading}
               onClick={() => void handleClickShareChannel()}
               onBlur={() => {
