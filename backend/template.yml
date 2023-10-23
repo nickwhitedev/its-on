@@ -25,6 +25,10 @@ Parameters:
     Type: String
   SESDomainIdentityArn:
     Type: String
+  PushNotificationPublicKey:
+    Type: String
+  PushNotificationPrivateKey:
+    Type: String
 
 Conditions:
   IsProdEnv: !Equals [!Ref Env, prod]
@@ -430,6 +434,36 @@ Resources:
         Sourcemap: true
         EntryPoints:
           - src/handlers/unsubscribe.ts
+
+  # This is a Lambda function config associated with the source code: getNotificationKey.ts
+  getNotificationKeyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/getNotificationKey.getNotificationKeyHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: Gets the public VAPID key to use for notifications
+      Environment:
+        Variables:
+          PUSH_NOTIFICATION_PUBLIC_KEY: !Ref PushNotificationPublicKey
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ItsOnApi
+            Path: /notificationKey
+            Method: GET
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: 'es2022'
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/getNotificationKey.ts
 
   tableStreamFunction:
     Type: AWS::Serverless::Function
