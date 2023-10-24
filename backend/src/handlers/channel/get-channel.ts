@@ -2,11 +2,11 @@ import { DynamoDBDocumentClient, QueryCommand } from '@aws-sdk/lib-dynamodb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DYNAMODB_TABLE_NAME } from '../utils/constants'
-import { getChannel } from '../utils/dynamo'
-import { ChannelCopyTypeEnum } from '../utils/enums'
-import { createResponse } from '../utils/response'
-import { serializeQueryResponse } from '../utils/serialize'
+import { DYNAMODB_TABLE_NAME } from '../../utils/constants'
+import { getChannel } from '../../utils/dynamo'
+import { ChannelCopyTypeEnum } from '../../utils/enums'
+import { createResponse } from '../../utils/response'
+import { serializeQueryResponse } from '../../utils/serialize'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)

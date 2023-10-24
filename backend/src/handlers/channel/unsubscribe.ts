@@ -6,17 +6,18 @@ import {
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DYNAMODB_TABLE_NAME } from '../utils/constants'
-import { getChannel, getUserInfo } from '../utils/dynamo'
-import { createResponse } from '../utils/response'
+import { DYNAMODB_TABLE_NAME } from '../../utils/constants'
+import { getChannel } from '../../utils/dynamo'
+import { ChannelCopyTypeEnum } from '../../utils/enums'
+import { createResponse } from '../../utils/response'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
 
 /**
- * Subscribes the authenticated user to a channel
+ * Unsubscribes the authenticated user to a channel
  */
-export const subscribeHandler = async (
+export const unsubscribeHandler = async (
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
   if (event.httpMethod !== 'POST') {
@@ -27,79 +28,24 @@ export const subscribeHandler = async (
   console.debug('received:', event)
 
   const eventPath = event.path
-  const channelID = event.pathParameters?.channelID
-  if (channelID == null) {
-    return createResponse({
-      eventPath,
-      responseBody: { message: 'Bad Request' },
-      statusCode: 400,
-    })
-  }
 
+  const channelID = event.pathParameters?.channelID ?? ''
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
-  let userInfo
+
+  // get channel ownerID
+  let channelOwnerID
+  let channelIsDeleted
   try {
-    userInfo = await getUserInfo({ ddbDocClient, userID })
-  } catch (error) {
-    console.error(
-      'Get User Info Error',
-      error instanceof Error ? error.stack : 'Unknown Type',
-    )
-    return createResponse({
-      eventPath,
-      responseBody: { message: 'Something went wrong' },
-      statusCode: 400,
+    const subscriberChannelCopy = await getChannel({
+      channelID,
+      ddbDocClient,
+      userID,
+      copyType: ChannelCopyTypeEnum.SUBSCRIBER,
     })
-  }
-
-  if ((userInfo?.subscriptionCount ?? 0) >= (userInfo?.tier ?? 5)) {
-    return createResponse({
-      eventPath,
-      responseBody: { message: 'Upgrade to subscribe to more channels' },
-      statusCode: 403,
-    })
-  }
-
-  let privateChannel: IDynamoChannelItem | undefined
-  // get private channel entry
-  try {
-    privateChannel = await getChannel({ channelID, ddbDocClient, userID })
-  } catch (error) {
-    console.error('Error getting private channel: ', error)
-    return createResponse({
-      eventPath,
-      responseBody: { message: 'Something went wrong' },
-      statusCode: 400,
-    })
-  }
-
-  if (privateChannel != null) {
-    // Subscriptions should only be for public copies of channels
-    console.info('User owns channel')
-    return createResponse({
-      eventPath,
-      responseBody: {
-        message: 'You cannot subscribe to a channel you own',
-      },
-      statusCode: 403,
-    })
-  }
-
-  // get public channel info
-  let channelAttributes
-  try {
-    const publicChannel = await getChannel({ channelID, ddbDocClient })
-    if (publicChannel == null) {
-      return createResponse({
-        eventPath,
-        responseBody: { message: 'Not found' },
-        statusCode: 404,
-      })
-    }
-    const { pk: _pk, sk: _sk, ...channelInfo } = publicChannel
-    channelAttributes = channelInfo
-    console.info('Get public channel info: ', publicChannel)
+    channelOwnerID = subscriberChannelCopy?.ownerID
+    channelIsDeleted = subscriberChannelCopy?.deleted
+    console.info("Get subscriber's channel copy: ", subscriberChannelCopy)
   } catch (error) {
     console.error('Get public channel error', error)
     return createResponse({
@@ -109,41 +55,25 @@ export const subscribeHandler = async (
     })
   }
 
-  if (
-    (channelAttributes.subscriberCount ?? 0) >=
-    (channelAttributes.capacity ?? 5)
-  ) {
-    return createResponse({
-      eventPath,
-      responseBody: { message: 'Channel is full' },
-      statusCode: 403,
-    })
-  }
-
   try {
     const ddbResponse = await ddbDocClient.send(
       new BatchWriteCommand({
         RequestItems: {
           [DYNAMODB_TABLE_NAME]: [
             {
-              PutRequest: {
-                Item: {
+              DeleteRequest: {
+                Key: {
                   pk: `user#${userID}`,
                   sk: `subscription#${channelID}`,
-                  ...channelAttributes,
-                } as IDynamoChannelItem,
+                },
               },
             },
             {
-              PutRequest: {
-                Item: {
+              DeleteRequest: {
+                Key: {
                   pk: `channel#${channelID}`,
                   sk: `subscriber#${userID}`,
-                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                  username:
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                    event.requestContext.authorizer?.claims['cognito:username'],
-                } as IDynamoChannelSubscriber,
+                },
               },
             },
           ],
@@ -153,7 +83,7 @@ export const subscribeHandler = async (
     console.info('Success - items added or updated', ddbResponse)
   } catch (error) {
     console.error(
-      'Batch Write Error',
+      'Error',
       error instanceof Error ? error.stack : 'Unknown Type',
     )
     return createResponse({
@@ -164,11 +94,12 @@ export const subscribeHandler = async (
   }
 
   updateSubscriberCount: try {
-    if (channelAttributes.ownerID == null) break updateSubscriberCount
+    if (channelOwnerID == null || channelIsDeleted === true)
+      break updateSubscriberCount
     const ddbResponse = await ddbDocClient.send(
       new UpdateCommand({
         Key: {
-          pk: `user#${channelAttributes.ownerID}`,
+          pk: `user#${channelOwnerID}`,
           sk: `channel#${channelID}`,
         },
         ReturnValues: 'ALL_NEW',
@@ -178,7 +109,7 @@ export const subscribeHandler = async (
           '#subscriberCount': 'subscriberCount',
         },
         ExpressionAttributeValues: {
-          ':subscriberCount': 1,
+          ':subscriberCount': -1,
         },
       }),
     )
@@ -209,7 +140,7 @@ export const subscribeHandler = async (
           '#subscriptionCount': 'subscriptionCount',
         },
         ExpressionAttributeValues: {
-          ':subscriptionCount': 1,
+          ':subscriptionCount': -1,
         },
       }),
     )
@@ -228,7 +159,7 @@ export const subscribeHandler = async (
 
   return createResponse({
     eventPath,
-    responseBody: { message: 'Subscribed' },
+    responseBody: { message: 'Unsubscribed' },
     statusCode: 200,
   })
 }

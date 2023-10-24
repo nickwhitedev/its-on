@@ -2,17 +2,18 @@ import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DYNAMODB_TABLE_NAME } from '../utils/constants'
-import { getChannel } from '../utils/dynamo'
-import { createResponse } from '../utils/response'
+import { DYNAMODB_TABLE_NAME } from '../../utils/constants'
+import { getChannel } from '../../utils/dynamo'
+import { createResponse } from '../../utils/response'
+import { MS_IN_HOUR } from '../../utils/time'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
 
 /**
- * Handler for a user declaring that it is off
+ * Handler for a user declaring that it is on
  */
-export const itsOffHandler = async (
+export const itsOnHandler = async (
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
   if (event.httpMethod !== 'POST') {
@@ -63,13 +64,17 @@ export const itsOffHandler = async (
         ReturnValues: 'ALL_NEW',
         TableName: DYNAMODB_TABLE_NAME,
         UpdateExpression:
-          'SET #canceled = :canceled, #lastUpdated = :lastUpdated',
+          'SET #canceled = :canceled, #lastOn = :lastOn, #lastOnDuration = :lastOnDuration, #lastUpdated = :lastUpdated',
         ExpressionAttributeNames: {
           '#canceled': 'canceled',
+          '#lastOn': 'lastOn',
+          '#lastOnDuration': 'lastOnDuration',
           '#lastUpdated': 'lastUpdated',
         },
         ExpressionAttributeValues: {
-          ':canceled': true,
+          ':canceled': false,
+          ':lastOn': requestTime,
+          ':lastOnDuration': privateChannel.duration ?? MS_IN_HOUR,
           ':lastUpdated': requestTime,
         },
       }),
@@ -77,7 +82,7 @@ export const itsOffHandler = async (
     console.info('Success - item updated', ddbResponse)
     return createResponse({
       eventPath,
-      responseBody: { message: "It's Off" },
+      responseBody: { message: "It's On!" },
       statusCode: 200,
     })
   } catch (error) {

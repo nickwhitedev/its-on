@@ -2,18 +2,14 @@ import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DYNAMODB_TABLE_NAME } from '../utils/constants'
-import { createResponse } from '../utils/response'
+import { DYNAMODB_TABLE_NAME } from '../../utils/constants'
+import { createResponse } from '../../utils/response'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
 
-interface IPayload {
-  notificationSubscription: string
-}
-
 /**
- * Adds a user's notification subscription to their profile in Dynamo DB
+ * Enables notifications for a user
  */
 export const enableNotificationsHandler = async (
   event: APIGatewayProxyEvent,
@@ -30,21 +26,6 @@ export const enableNotificationsHandler = async (
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
 
-  if (event.body == null) {
-    return createResponse({
-      eventPath,
-      responseBody: {
-        message:
-          'Request body must contain notificationSubscription as an instance of PushSubscription',
-      },
-      statusCode: 400,
-    })
-  }
-
-  const notificationSubscription = JSON.parse(
-    (JSON.parse(event.body) as IPayload).notificationSubscription,
-  ) as PushSubscription
-
   try {
     const ddbResponse = await ddbDocClient.send(
       new UpdateCommand({
@@ -54,14 +35,12 @@ export const enableNotificationsHandler = async (
         },
         ReturnValues: 'ALL_NEW',
         TableName: DYNAMODB_TABLE_NAME,
-        UpdateExpression:
-          'SET #notificationSubscription.#notificationSubscriptionID = :notificationSubscription',
+        UpdateExpression: 'SET #notificationsEnabled = :notificationsEnabled',
         ExpressionAttributeNames: {
-          '#notificationSubscription': 'notificationSubscription',
-          '#notificationSubscriptionID': notificationSubscription.endpoint,
+          '#notificationsEnabled': 'notificationsEnabled',
         },
         ExpressionAttributeValues: {
-          ':notificationSubscription': JSON.stringify(notificationSubscription),
+          ':notificationsEnabled': true,
         },
       }),
     )
@@ -80,7 +59,7 @@ export const enableNotificationsHandler = async (
 
   return createResponse({
     eventPath,
-    responseBody: { message: 'Notifications Enabled' },
+    responseBody: { message: 'Notifications enabled' },
     statusCode: 200,
   })
 }

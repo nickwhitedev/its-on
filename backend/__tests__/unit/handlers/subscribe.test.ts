@@ -9,7 +9,7 @@ import { jest } from '@jest/globals'
 import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
 import mockEvent from '../../../__mocks__/mock-event'
-import { subscribeHandler } from '../../../src/handlers/subscribe'
+import { subscribeHandler } from '../../../src/handlers/channel/subscribe'
 import { CORS_HEADERS } from '../../../src/utils/constants'
 
 // This includes all tests for subscribeHandler()

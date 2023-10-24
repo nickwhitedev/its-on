@@ -4,14 +4,14 @@ import {
   UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import { getChannel, getUserInfo } from '../utils/dynamo'
+import { getChannel, getUserInfo } from '../../utils/dynamo'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { customAlphabet } from 'nanoid'
 import { alphanumeric } from 'nanoid-dictionary'
-import { DYNAMODB_TABLE_NAME } from '../utils/constants'
-import { createResponse } from '../utils/response'
-import { MS_IN_HOUR } from '../utils/time'
+import { DYNAMODB_TABLE_NAME } from '../../utils/constants'
+import { createResponse } from '../../utils/response'
+import { MS_IN_HOUR } from '../../utils/time'
 
 const nanoid = customAlphabet(alphanumeric, 11)
 

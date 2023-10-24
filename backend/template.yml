@@ -122,7 +122,7 @@ Resources:
   getChannelFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/get-channel.getChannelHandler
+      Handler: src/handlers/channel/get-channel.getChannelHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -151,7 +151,7 @@ Resources:
         Target: 'es2022'
         Sourcemap: true
         EntryPoints:
-          - src/handlers/get-channel.ts
+          - src/handlers/channel/get-channel.ts
   # Each Lambda function is defined by properties:
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
 
@@ -159,7 +159,7 @@ Resources:
   createChannelFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/create-channel.createChannelHandler
+      Handler: src/handlers/channel/create-channel.createChannelHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -188,13 +188,13 @@ Resources:
         Target: 'es2022'
         Sourcemap: true
         EntryPoints:
-          - src/handlers/create-channel.ts
+          - src/handlers/channel/create-channel.ts
 
   # This is a Lambda function config associated with the source code: update-item.ts
   updateChannelFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/update-channel.updateChannelHandler
+      Handler: src/handlers/channel/update-channel.updateChannelHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -223,13 +223,13 @@ Resources:
         Target: 'es2022'
         Sourcemap: true
         EntryPoints:
-          - src/handlers/update-channel.ts
+          - src/handlers/channel/update-channel.ts
 
   # This is a Lambda function config associated with the source code: its-on.ts
   itsOnFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/its-on.itsOnHandler
+      Handler: src/handlers/channel/its-on.itsOnHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -258,13 +258,13 @@ Resources:
         Target: 'es2022'
         Sourcemap: true
         EntryPoints:
-          - src/handlers/its-on.ts
+          - src/handlers/channel/its-on.ts
 
   # This is a Lambda function config associated with the source code: its-off.ts
   itsOffFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/its-off.itsOffHandler
+      Handler: src/handlers/channel/its-off.itsOffHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -293,13 +293,13 @@ Resources:
         Target: 'es2022'
         Sourcemap: true
         EntryPoints:
-          - src/handlers/its-off.ts
+          - src/handlers/channel/its-off.ts
 
   # This is a Lambda function config associated with the source code: delete-item.ts
   deleteChannelFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/delete-channel.deleteChannelHandler
+      Handler: src/handlers/channel/delete-channel.deleteChannelHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -328,13 +328,13 @@ Resources:
         Target: 'es2022'
         Sourcemap: true
         EntryPoints:
-          - src/handlers/delete-channel.ts
+          - src/handlers/channel/delete-channel.ts
 
   # This is a Lambda function config associated with the source code: delete-item.ts
   removeChannelSubscriberFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/remove-channel-subscriber.removeChannelSubscriberHandler
+      Handler: src/handlers/channel/remove-channel-subscriber.removeChannelSubscriberHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -363,13 +363,13 @@ Resources:
         Target: 'es2022'
         Sourcemap: true
         EntryPoints:
-          - src/handlers/remove-channel-subscriber.ts
+          - src/handlers/channel/remove-channel-subscriber.ts
 
   # This is a Lambda function config associated with the source code: subscribe.ts
   subscribeFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/subscribe.subscribeHandler
+      Handler: src/handlers/channel/subscribe.subscribeHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -398,13 +398,13 @@ Resources:
         Target: 'es2022'
         Sourcemap: true
         EntryPoints:
-          - src/handlers/subscribe.ts
+          - src/handlers/channel/subscribe.ts
 
   # This is a Lambda function config associated with the source code: unsubscribe.ts
   unsubscribeFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/unsubscribe.unsubscribeHandler
+      Handler: src/handlers/channel/unsubscribe.unsubscribeHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -433,13 +433,13 @@ Resources:
         Target: 'es2022'
         Sourcemap: true
         EntryPoints:
-          - src/handlers/unsubscribe.ts
+          - src/handlers/channel/unsubscribe.ts
 
-  # This is a Lambda function config associated with the source code: getNotificationKey.ts
+  # This is a Lambda function config associated with the source code: get-notificationKey.ts
   getNotificationKeyFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/getNotificationKey.getNotificationKeyHandler
+      Handler: src/handlers/notifications/get-notification-key.getNotificationKeyHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
@@ -454,7 +454,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref ItsOnApi
-            Path: /notificationKey
+            Path: /notification-key
             Method: GET
     Metadata:
       BuildMethod: esbuild
@@ -463,20 +463,20 @@ Resources:
         Target: 'es2022'
         Sourcemap: true
         EntryPoints:
-          - src/handlers/getNotificationKey.ts
+          - src/handlers/notifications/get-notification-key.ts
 
   
-  # This is a Lambda function config associated with the source code: enableNotifications.ts
+  # This is a Lambda function config associated with the source code: enable-notifications.ts
   enableNotificationsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/enableNotifications.enableNotificationsHandler
+      Handler: src/handlers/notifications/enable-notifications.enableNotificationsHandler
       Runtime: nodejs18.x
       Architectures:
         - x86_64
       MemorySize: 128
       Timeout: 100
-      Description: Registers a user's notification subscription
+      Description: Enables notifications for a user
       Policies:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
@@ -490,7 +490,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref ItsOnApi
-            Path: /enableNotifications
+            Path: /enable-notifications
             Method: POST
     Metadata:
       BuildMethod: esbuild
@@ -499,7 +499,115 @@ Resources:
         Target: 'es2022'
         Sourcemap: true
         EntryPoints:
-          - src/handlers/enableNotifications.ts
+          - src/handlers/notifications/enable-notifications.ts
+
+  
+  # This is a Lambda function config associated with the source code: disable-notifications.ts
+  disableNotificationsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/notifications/disable-notifications.disableNotificationsHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: Disables notifications for a user
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          ITS_ON_TABLE: !Ref ItsOnTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ItsOnApi
+            Path: /disable-notifications
+            Method: POST
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: 'es2022'
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/notifications/disable-notifications.ts
+
+  
+  # This is a Lambda function config associated with the source code: subscribe-notifications.ts
+  subscribeNotificationsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/notifications/subscribe-notifications.subscribeNotificationsHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: Register a user's notification subscription
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          ITS_ON_TABLE: !Ref ItsOnTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ItsOnApi
+            Path: /subscribe-notifications
+            Method: POST
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: 'es2022'
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/notifications/subscribe-notifications.ts
+
+  
+  # This is a Lambda function config associated with the source code: unsubscribe-notifications.ts
+  unsubscribeNotificationsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/notifications/unsubscribe-notifications.unsubscribeNotificationsHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 100
+      Description: Unregister a user's notification subscription
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+      Environment:
+        Variables:
+          # Make table name accessible as environment variable from function code during execution
+          ITS_ON_TABLE: !Ref ItsOnTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ItsOnApi
+            Path: /unsubscribe-notifications
+            Method: POST
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: 'es2022'
+        Sourcemap: true
+        EntryPoints:
+          - src/handlers/notifications/unsubscribe-notifications.ts
 
   tableStreamFunction:
     Type: AWS::Serverless::Function

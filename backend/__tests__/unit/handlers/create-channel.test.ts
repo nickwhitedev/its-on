@@ -8,7 +8,7 @@ import { jest } from '@jest/globals'
 import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
 import mockEvent from '../../../__mocks__/mock-event'
-import { createChannelHandler } from '../../../src/handlers/create-channel'
+import { createChannelHandler } from '../../../src/handlers/channel/create-channel'
 import { CORS_HEADERS } from '../../../src/utils/constants'
 import { MS_IN_HOUR } from '../../../src/utils/time'
 

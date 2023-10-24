@@ -1,7 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
-import { PUSH_NOTIFICATION_PUBLIC_KEY } from '../utils/constants'
-import { createResponse } from '../utils/response'
+import { PUSH_NOTIFICATION_PUBLIC_KEY } from '../../utils/constants'
+import { createResponse } from '../../utils/response'
 
 /**
  * Handler for getting the VAPID public key used for notification encryption

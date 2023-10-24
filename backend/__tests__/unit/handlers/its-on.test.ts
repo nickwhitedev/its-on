@@ -4,12 +4,12 @@ import {
   UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
 
-import { APIGatewayProxyEvent } from 'aws-lambda'
-import { CORS_HEADERS } from '../../../src/utils/constants'
-import { itsOnHandler } from '../../../src/handlers/its-on'
 import { jest } from '@jest/globals'
+import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
 import mockEvent from '../../../__mocks__/mock-event'
+import { itsOnHandler } from '../../../src/handlers/channel/its-on'
+import { CORS_HEADERS } from '../../../src/utils/constants'
 
 describe('Test itsOnHandler', function () {
   const ddbMock = mockClient(DynamoDBDocumentClient)
