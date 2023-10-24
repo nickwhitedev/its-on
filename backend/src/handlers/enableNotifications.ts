@@ -30,6 +30,21 @@ export const enableNotificationsHandler = async (
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
 
+  if (event.body == null) {
+    return createResponse({
+      eventPath,
+      responseBody: {
+        message:
+          'Request body must contain notificationSubscription as an instance of PushSubscription',
+      },
+      statusCode: 400,
+    })
+  }
+
+  const notificationSubscription = JSON.parse(
+    (JSON.parse(event.body) as IPayload).notificationSubscription,
+  ) as PushSubscription
+
   try {
     const ddbResponse = await ddbDocClient.send(
       new UpdateCommand({
@@ -40,16 +55,13 @@ export const enableNotificationsHandler = async (
         ReturnValues: 'ALL_NEW',
         TableName: DYNAMODB_TABLE_NAME,
         UpdateExpression:
-          'SET #notificationSubscription = :notificationSubscription',
+          'SET #notificationSubscription.#notificationSubscriptionID = :notificationSubscription',
         ExpressionAttributeNames: {
           '#notificationSubscription': 'notificationSubscription',
+          '#notificationSubscriptionID': notificationSubscription.endpoint,
         },
         ExpressionAttributeValues: {
-          ':notificationSubscription': (
-            JSON.parse(
-              event.body ?? JSON.stringify({ subscription: '' }),
-            ) as IPayload
-          ).notificationSubscription,
+          ':notificationSubscription': JSON.stringify(notificationSubscription),
         },
       }),
     )
