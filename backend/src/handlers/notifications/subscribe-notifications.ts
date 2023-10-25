@@ -9,7 +9,7 @@ const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
 
 interface IPayload {
-  notificationSubscription: string
+  subscription: string
 }
 
 /**
@@ -35,14 +35,14 @@ export const subscribeNotificationsHandler = async (
       eventPath,
       responseBody: {
         message:
-          'Request body must contain notificationSubscription as an instance of PushSubscription',
+          'Request body must contain subscription as an instance of PushSubscription',
       },
       statusCode: 400,
     })
   }
 
-  const notificationSubscription = JSON.parse(
-    (JSON.parse(event.body) as IPayload).notificationSubscription,
+  const subscription = JSON.parse(
+    (JSON.parse(event.body) as IPayload).subscription,
   ) as PushSubscription
 
   try {
@@ -50,18 +50,17 @@ export const subscribeNotificationsHandler = async (
       new UpdateCommand({
         Key: {
           pk: `user#${userID}`,
-          sk: `profile`,
+          sk: 'notificationSubscriptions',
         },
         ReturnValues: 'ALL_NEW',
         TableName: DYNAMODB_TABLE_NAME,
-        UpdateExpression:
-          'SET #notificationSubscription.#notificationSubscriptionID = :notificationSubscription',
+        UpdateExpression: 'SET #subscriptions.#subscriptionID = :subscription',
         ExpressionAttributeNames: {
-          '#notificationSubscription': 'notificationSubscription',
-          '#notificationSubscriptionID': notificationSubscription.endpoint,
+          '#subscriptions': 'subscriptions',
+          '#subscriptionID': subscription.endpoint,
         },
         ExpressionAttributeValues: {
-          ':notificationSubscription': JSON.stringify(notificationSubscription),
+          ':subscription': JSON.stringify(subscription),
         },
       }),
     )

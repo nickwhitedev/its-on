@@ -8,9 +8,9 @@ import {
 import { jest } from '@jest/globals'
 import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
-import mockEvent from '../../../__mocks__/mock-event'
-import { removeChannelSubscriberHandler } from '../../../src/handlers/channel/remove-channel-subscriber'
-import { CORS_HEADERS } from '../../../src/utils/constants'
+import mockEvent from '../../../../__mocks__/mock-event'
+import { removeChannelSubscriberHandler } from '../../../../src/handlers/channel/remove-channel-subscriber'
+import { CORS_HEADERS } from '../../../../src/utils/constants'
 
 describe('Test removeChannelSubscriberHandler', function () {
   const ddbMock = mockClient(DynamoDBDocumentClient)

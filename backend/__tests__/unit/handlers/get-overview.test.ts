@@ -108,6 +108,7 @@ describe('Test getOverviewHandler', () => {
       body: JSON.stringify({
         profile: {
           channelCount: 0,
+          notificationsEnabled: true,
           subscriptionCount: 0,
           tier: 5,
           username: 'test_user',
