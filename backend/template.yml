@@ -621,6 +621,7 @@ Resources:
             - IsProdEnv
             - !Ref AWS::NoValue
             - http://localhost:5173/
+      RefreshTokenValidity: 365
       SupportedIdentityProviders:
         - COGNITO
       UserPoolId: !Ref ItsOnUserPool
