@@ -56,7 +56,7 @@ export const refreshTokens = async (refreshToken: string) => {
     body,
   })
   if (!response.ok) {
-    // TODO: Login error handling
+    logout()
     throw Error()
   }
   const { access_token, id_token } = (await response.json()) as {
