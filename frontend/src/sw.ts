@@ -1,10 +1,10 @@
-import { CacheFirst, NetworkFirst, NetworkOnly } from 'workbox-strategies'
 import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching'
 import { registerRoute, setDefaultHandler } from 'workbox-routing'
+import { CacheFirst, NetworkFirst, NetworkOnly } from 'workbox-strategies'
 
 import { CacheableResponsePlugin } from 'workbox-cacheable-response/CacheableResponsePlugin'
-import { ExpirationPlugin } from 'workbox-expiration'
 import { clientsClaim } from 'workbox-core'
+import { ExpirationPlugin } from 'workbox-expiration'
 
 declare let self: ServiceWorkerGlobalScope
 

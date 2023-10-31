@@ -16,20 +16,23 @@ const AllowNotifications = () => {
   const user = useUser()
 
   const syncDeviceNotificationSettings = useCallback(async () => {
-    const registration = await navigator.serviceWorker.ready
-    const notificationSubscription =
-      await registration.pushManager.getSubscription()
-    setServiceWorkerRegistration(registration)
-    if (notificationSubscription == null) {
-      setIsDialogOpen(true)
-    }
+    navigator.serviceWorker.ready
+      .then(registration => {
+        setServiceWorkerRegistration(registration)
+        return registration.pushManager
+          .getSubscription()
+          .then(notificationSubscription => {
+            if (notificationSubscription == null) {
+              setIsDialogOpen(true)
+            }
+          })
+      })
+      .catch(() => {
+        // TODO: handle error
+      })
   }, [])
 
   useEffect(() => {
-    console.log('notification in window: ', 'Notification' in window)
-    console.log('notification permission: ', Notification.permission)
-    console.log('subscriptions.length: ', subscriptions.length)
-    console.log('user.notificationsEnabled', user?.notificationsEnabled ?? true)
     if (!('Notification' in window)) return
     if (
       Notification.permission === 'default' &&
@@ -92,7 +95,6 @@ const AllowNotifications = () => {
           No
         </MDTextButton>
         <MDTextButton
-          className='Channel-button-delete'
           disabled={isLoading}
           onClick={() => void handleAllowNotifications()}
         >
