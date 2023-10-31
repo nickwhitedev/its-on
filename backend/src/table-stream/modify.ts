@@ -13,26 +13,57 @@ import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { batchWrite } from '../utils/dynamo'
 import { MS_IN_HOUR } from '../utils/time'
 
-const sendUserNotification = async (notificationSubscription: {
-  S: string
+const sendUserNotification = async ({
+  channelOwner,
+  channelTitle,
+  notificationSubscription,
+  TTL,
+}: {
+  channelOwner: string
+  channelTitle: string
+  notificationSubscription: {
+    S: string
+  }
+  TTL: number
 }) => {
   const pushSubscription = JSON.parse(
     notificationSubscription.S,
   ) as PushSubscription
   try {
-    await sendNotification(pushSubscription)
+    await sendNotification(
+      pushSubscription,
+      `${channelTitle} by ${channelOwner} is on!`,
+      {
+        TTL,
+      },
+    )
   } catch (error) {
     // TODO: Log error
     console.error('Notification Send Error: ', error)
   }
 }
 
-const sendUserNotifications = async (
-  notificationSubscriptions: IDynamoStreamUserNotificationSubscriptionsImage,
-) => {
+const sendUserNotifications = async ({
+  channelOwner,
+  channelTitle,
+  notificationSubscriptions,
+  TTL,
+}: {
+  channelOwner: string
+  channelTitle: string
+  notificationSubscriptions: IDynamoStreamUserNotificationSubscriptionsImage
+  TTL: number
+}) => {
   await Promise.all(
     Object.values(notificationSubscriptions.subscriptions.M).map(
-      sendUserNotification,
+      async notificationSubscription => {
+        await sendUserNotification({
+          channelOwner,
+          channelTitle,
+          notificationSubscription,
+          TTL,
+        })
+      },
     ),
   )
 }
@@ -238,7 +269,16 @@ export const handleModifyEvent = async (
 
         try {
           await Promise.all(
-            subscriberNotificationSubscriptions.map(sendUserNotifications),
+            subscriberNotificationSubscriptions.map(
+              async notificationSubscriptions => {
+                await sendUserNotifications({
+                  channelOwner: channelInfo.owner ?? 'unknown',
+                  channelTitle: channelInfo.title ?? 'Untitled Channel',
+                  notificationSubscriptions,
+                  TTL: (channelInfo.lastOnDuration ?? MS_IN_HOUR) * 1000,
+                })
+              },
+            ),
           )
         } catch (error) {
           console.error('Notification Send Error: ', error)
