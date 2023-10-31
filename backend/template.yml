@@ -435,7 +435,7 @@ Resources:
         EntryPoints:
           - src/handlers/channel/unsubscribe.ts
 
-  # This is a Lambda function config associated with the source code: get-notificationKey.ts
+  # This is a Lambda function config associated with the source code: get-notification-key.ts
   getNotificationKeyFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -446,6 +446,10 @@ Resources:
       MemorySize: 128
       Timeout: 100
       Description: Gets the public VAPID key to use for notifications
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
       Environment:
         Variables:
           PUSH_NOTIFICATION_PUBLIC_KEY: !Ref PushNotificationPublicKey
@@ -464,7 +468,6 @@ Resources:
         Sourcemap: true
         EntryPoints:
           - src/handlers/notifications/get-notification-key.ts
-
   
   # This is a Lambda function config associated with the source code: enable-notifications.ts
   enableNotificationsFunction:

@@ -46,20 +46,29 @@ const AllowNotifications = () => {
 
     const permission = await Notification.requestPermission()
     if (permission !== 'granted') {
+      setIsLoading(false)
+      setIsDialogOpen(false)
       return
     }
 
-    const response: { publicKey: string } = await fetchApi('/notification-key')
-    const convertedVapidKey = urlBase64ToUint8Array(response.publicKey)
+    try {
+      const response: { publicKey: string } = await fetchApi(
+        '/notification-key',
+      )
+      const convertedVapidKey = urlBase64ToUint8Array(response.publicKey)
 
-    const deviceNotificationSubscription =
-      await serviceWorkerRegistration?.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: convertedVapidKey,
+      const deviceNotificationSubscription =
+        await serviceWorkerRegistration?.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: convertedVapidKey,
+        })
+      await fetchApi('/subscribe-notifications', 'POST', {
+        subscription: deviceNotificationSubscription,
       })
-    await fetchApi('/subscribe-notifications', 'POST', {
-      subscription: deviceNotificationSubscription,
-    })
+    } catch (error) {
+      // TODO: error handling
+    }
+
     setIsLoading(false)
     setIsDialogOpen(false)
   }
