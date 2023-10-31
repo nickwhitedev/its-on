@@ -8,7 +8,7 @@ import { createResponse } from '../../utils/response'
  */
 export const getNotificationKeyHandler = (
   event: APIGatewayProxyEvent,
-): APIGatewayProxyResult => {
+): Promise<APIGatewayProxyResult> => {
   if (event.httpMethod !== 'GET') {
     throw new Error(
       `getMethod only accepts GET method, you tried: ${event.httpMethod} method.`,
@@ -16,9 +16,13 @@ export const getNotificationKeyHandler = (
   }
   console.debug('received:', event)
 
-  return createResponse({
-    eventPath: event.path,
-    responseBody: { publicKey: PUSH_NOTIFICATION_PUBLIC_KEY },
-    statusCode: 200,
+  return new Promise(resolve => {
+    resolve(
+      createResponse({
+        eventPath: event.path,
+        responseBody: { publicKey: PUSH_NOTIFICATION_PUBLIC_KEY },
+        statusCode: 200,
+      }),
+    )
   })
 }
