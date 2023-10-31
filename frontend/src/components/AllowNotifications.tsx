@@ -16,20 +16,18 @@ const AllowNotifications = () => {
   const user = useUser()
 
   const syncDeviceNotificationSettings = useCallback(async () => {
-    navigator.serviceWorker.ready
-      .then(registration => {
-        setServiceWorkerRegistration(registration)
-        return registration.pushManager
-          .getSubscription()
-          .then(notificationSubscription => {
-            if (notificationSubscription == null) {
-              setIsDialogOpen(true)
-            }
-          })
-      })
-      .catch(() => {
-        // TODO: handle error
-      })
+    try {
+      const registration = await navigator.serviceWorker.ready
+
+      setServiceWorkerRegistration(registration)
+      const notificationSubscription =
+        await registration.pushManager.getSubscription()
+      if (notificationSubscription == null) {
+        setIsDialogOpen(true)
+      }
+    } catch (error) {
+      // TODO: handle error
+    }
   }, [])
 
   useEffect(() => {
