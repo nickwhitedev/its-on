@@ -8,7 +8,7 @@ import {
 
 import { KeysAndAttributes } from '@aws-sdk/client-dynamodb'
 import { DynamoDBRecord } from 'aws-lambda'
-import webPush, { PushSubscription } from 'web-push'
+import { PushSubscription, sendNotification } from 'web-push'
 import {
   DYNAMODB_TABLE_NAME,
   PUSH_NOTIFICATION_PRIVATE_KEY,
@@ -16,12 +16,6 @@ import {
 } from '../utils/constants'
 import { batchWrite } from '../utils/dynamo'
 import { MS_IN_HOUR } from '../utils/time'
-
-webPush.setVapidDetails(
-  'mailto:contact@itson.fyi',
-  PUSH_NOTIFICATION_PUBLIC_KEY,
-  PUSH_NOTIFICATION_PRIVATE_KEY,
-)
 
 const sendUserNotification = async ({
   channelOwner,
@@ -38,11 +32,16 @@ const sendUserNotification = async ({
     notificationSubscription,
   ) as PushSubscription
   try {
-    await webPush.sendNotification(
+    await sendNotification(
       pushSubscription,
       `${channelTitle} by ${channelOwner} is on!`,
       {
         TTL,
+        vapidDetails: {
+          subject: 'mailto:contact@itson.fyi',
+          privateKey: PUSH_NOTIFICATION_PRIVATE_KEY,
+          publicKey: PUSH_NOTIFICATION_PUBLIC_KEY,
+        },
       },
     )
   } catch (error) {
