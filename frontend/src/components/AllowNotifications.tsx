@@ -45,9 +45,11 @@ const AllowNotifications = () => {
     setIsLoading(true)
 
     const permission = await Notification.requestPermission()
+
+    setIsLoading(false)
+    setIsDialogOpen(false)
+
     if (permission !== 'granted') {
-      setIsLoading(false)
-      setIsDialogOpen(false)
       return
     }
 
@@ -68,9 +70,6 @@ const AllowNotifications = () => {
     } catch (error) {
       // TODO: error handling
     }
-
-    setIsLoading(false)
-    setIsDialogOpen(false)
   }
 
   const handleDisallowNotifications = async () => {
@@ -83,7 +82,12 @@ const AllowNotifications = () => {
   }
 
   return (
-    <MDDialog open={isDialogOpen}>
+    <MDDialog
+      open={isDialogOpen}
+      onClose={() => {
+        void handleDisallowNotifications()
+      }}
+    >
       <div slot='headline'>Allow Notifications</div>
       <div slot='content'>
         <p>

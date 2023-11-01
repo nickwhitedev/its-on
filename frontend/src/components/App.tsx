@@ -19,6 +19,7 @@ import MDTabs from './material/tabs/MDTabs'
 
 interface OverviewData {
   channels: IChannel[]
+  notificationSubscriptions: { subscriptions: PushSubscription[] }
   profile: IUser
   subscriptions: IChannel[]
 }

@@ -54,6 +54,18 @@ const sendUserNotifications = async ({
   notificationSubscriptions: IDynamoStreamUserNotificationSubscriptionsImage
   TTL: number
 }) => {
+  console.debug(
+    'sendUserNotifications: notificationSubscriptions',
+    notificationSubscriptions,
+  )
+  console.debug(
+    'sendUserNotifications: notificationSubscriptions.subscriptions: ',
+    notificationSubscriptions.subscriptions,
+  )
+  console.debug(
+    'sendUserNotifications: notificationSubscriptions.subscriptions.M: ',
+    notificationSubscriptions.subscriptions.M,
+  )
   await Promise.all(
     Object.values(notificationSubscriptions.subscriptions.M).map(
       async notificationSubscription => {
@@ -260,7 +272,7 @@ export const handleModifyEvent = async (
           unprocessedKeys = ddbResponse.UnprocessedKeys
           console.info(
             'Get subscriber notification subscriptions: ',
-            ddbResponse,
+            subscriberNotificationSubscriptions,
           )
         } catch (err) {
           console.error('Get public channel subscribers error', err)
