@@ -21,13 +21,11 @@ const sendUserNotification = async ({
 }: {
   channelOwner: string
   channelTitle: string
-  notificationSubscription: {
-    S: string
-  }
+  notificationSubscription: string
   TTL: number
 }) => {
   const pushSubscription = JSON.parse(
-    notificationSubscription.S,
+    notificationSubscription,
   ) as PushSubscription
   try {
     await sendNotification(
@@ -51,23 +49,11 @@ const sendUserNotifications = async ({
 }: {
   channelOwner: string
   channelTitle: string
-  notificationSubscriptions: IDynamoStreamUserNotificationSubscriptionsImage
+  notificationSubscriptions: IDynamoUserNotificationSubscriptionsItem
   TTL: number
 }) => {
-  console.debug(
-    'sendUserNotifications: notificationSubscriptions',
-    notificationSubscriptions,
-  )
-  console.debug(
-    'sendUserNotifications: notificationSubscriptions.subscriptions: ',
-    notificationSubscriptions.subscriptions,
-  )
-  console.debug(
-    'sendUserNotifications: notificationSubscriptions.subscriptions.M: ',
-    notificationSubscriptions.subscriptions.M,
-  )
   await Promise.all(
-    Object.values(notificationSubscriptions.subscriptions.M).map(
+    Object.values(notificationSubscriptions.subscriptions).map(
       async notificationSubscription => {
         await sendUserNotification({
           channelOwner,
@@ -258,7 +244,7 @@ export const handleModifyEvent = async (
       do {
         console.info(`Start Get batch ${++getBatchCount}`)
 
-        let subscriberNotificationSubscriptions: IDynamoStreamUserNotificationSubscriptionsImage[]
+        let subscriberNotificationSubscriptions: IDynamoUserNotificationSubscriptionsItem[]
 
         try {
           const ddbResponse: BatchGetCommandOutput = await ddbDocClient.send(
@@ -268,7 +254,7 @@ export const handleModifyEvent = async (
           )
           subscriberNotificationSubscriptions = (ddbResponse.Responses?.[
             DYNAMODB_TABLE_NAME
-          ] ?? []) as IDynamoStreamUserNotificationSubscriptionsImage[]
+          ] ?? []) as IDynamoUserNotificationSubscriptionsItem[]
           unprocessedKeys = ddbResponse.UnprocessedKeys
           console.info(
             'Get subscriber notification subscriptions: ',
