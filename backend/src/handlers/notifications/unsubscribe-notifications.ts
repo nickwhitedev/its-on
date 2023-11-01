@@ -2,6 +2,7 @@ import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { PushSubscription } from 'web-push'
 import { DYNAMODB_TABLE_NAME } from '../../utils/constants'
 import { createResponse } from '../../utils/response'
 
@@ -9,7 +10,7 @@ const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
 
 interface IPayload {
-  subscription: string
+  subscription: PushSubscription
 }
 
 /**
@@ -41,9 +42,7 @@ export const unsubscribeNotificationsHandler = async (
     })
   }
 
-  const subscription = JSON.parse(
-    (JSON.parse(event.body) as IPayload).subscription,
-  ) as PushSubscription
+  const subscription = (JSON.parse(event.body) as IPayload).subscription
 
   try {
     const ddbResponse = await ddbDocClient.send(

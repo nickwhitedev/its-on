@@ -65,15 +65,65 @@ export const subscribeNotificationsHandler = async (
     )
     console.info('Success - user profile updated', ddbResponse)
   } catch (error) {
-    console.error(
-      'Error',
-      error instanceof Error ? error.stack : 'Unknown Type',
-    )
-    return createResponse({
-      eventPath,
-      responseBody: { message: 'Something went wrong' },
-      statusCode: 400,
-    })
+    if (
+      error instanceof Error &&
+      error.name === 'ValidationException' &&
+      error.message ===
+        'The document path provided in the update expression is invalid for update'
+    ) {
+      // If one of the attributes has not yet been created,
+      //   create them as empty maps...
+      const ddbEmptyMapResponse = await ddbDocClient.send(
+        new UpdateCommand({
+          Key: {
+            pk: `user#${userID}`,
+            sk: 'notificationSubscriptions',
+          },
+          ReturnValues: 'ALL_NEW',
+          TableName: DYNAMODB_TABLE_NAME,
+          UpdateExpression: 'SET #subscriptions = :emptyMap',
+          ExpressionAttributeNames: {
+            '#subscriptions': 'subscriptions',
+          },
+          ExpressionAttributeValues: {
+            ':emptyMap': {},
+          },
+        }),
+      )
+      console.info('Success - empty map added', ddbEmptyMapResponse)
+
+      // ...then retry the updates
+      const ddbResponse = await ddbDocClient.send(
+        new UpdateCommand({
+          Key: {
+            pk: `user#${userID}`,
+            sk: 'notificationSubscriptions',
+          },
+          ReturnValues: 'ALL_NEW',
+          TableName: DYNAMODB_TABLE_NAME,
+          UpdateExpression:
+            'SET #subscriptions.#subscriptionID = :subscription',
+          ExpressionAttributeNames: {
+            '#subscriptions': 'subscriptions',
+            '#subscriptionID': subscription.endpoint,
+          },
+          ExpressionAttributeValues: {
+            ':subscription': JSON.stringify(subscription),
+          },
+        }),
+      )
+      console.info('Success - user profile updated', ddbResponse)
+    } else {
+      console.error(
+        'Error',
+        error instanceof Error ? error.stack : 'Unknown Type',
+      )
+      return createResponse({
+        eventPath,
+        responseBody: { message: 'Something went wrong' },
+        statusCode: 400,
+      })
+    }
   }
 
   return createResponse({
