@@ -8,3 +8,6 @@ export const DYNAMODB_TABLE_NAME: string = process.env.ITS_ON_TABLE ?? ''
 
 export const PUSH_NOTIFICATION_PUBLIC_KEY: string =
   process.env.PUSH_NOTIFICATION_PUBLIC_KEY ?? ''
+
+export const PUSH_NOTIFICATION_PRIVATE_KEY: string =
+  process.env.PUSH_NOTIFICATION_PRIVATE_KEY ?? ''
