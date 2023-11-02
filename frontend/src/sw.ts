@@ -90,10 +90,10 @@ self.addEventListener('push', function (event) {
 
   event.waitUntil(
     self.registration.showNotification(data.title, {
-      // badge: 'badge-128x128.png',
+      // badge: '/badge-128x128.png',
       body: data.options.body,
       data: data.options.data,
-      icon: 'pwa-512x512.png',
+      // icon: '/pwa-512x512.png',
     }),
   )
 })
