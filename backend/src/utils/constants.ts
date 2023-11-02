@@ -11,3 +11,5 @@ export const PUSH_NOTIFICATION_PUBLIC_KEY: string =
 
 export const PUSH_NOTIFICATION_PRIVATE_KEY: string =
   process.env.PUSH_NOTIFICATION_PRIVATE_KEY ?? ''
+
+export const WEB_URL = process.env.WEB_URL ?? 'https://itson.fyi'

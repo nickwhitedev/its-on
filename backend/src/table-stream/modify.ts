@@ -13,16 +13,21 @@ import {
   DYNAMODB_TABLE_NAME,
   PUSH_NOTIFICATION_PRIVATE_KEY,
   PUSH_NOTIFICATION_PUBLIC_KEY,
+  WEB_URL,
 } from '../utils/constants'
 import { batchWrite } from '../utils/dynamo'
 import { MS_IN_HOUR } from '../utils/time'
 
 const sendUserNotification = async ({
+  channelID,
+  channelNote,
   channelOwner,
   channelTitle,
   notificationSubscription,
   TTL,
 }: {
+  channelID: string
+  channelNote: string
   channelOwner: string
   channelTitle: string
   notificationSubscription: string
@@ -34,7 +39,15 @@ const sendUserNotification = async ({
   try {
     await sendNotification(
       pushSubscription,
-      `${channelTitle} by ${channelOwner} is on!`,
+      JSON.stringify({
+        title: `${channelTitle} • ${channelOwner}`,
+        options: {
+          body: channelNote,
+          data: {
+            url: `${WEB_URL}/${channelID}`,
+          },
+        },
+      }),
       {
         TTL,
         vapidDetails: {
@@ -51,11 +64,15 @@ const sendUserNotification = async ({
 }
 
 const sendUserNotifications = async ({
+  channelID,
+  channelNote,
   channelOwner,
   channelTitle,
   notificationSubscriptions,
   TTL,
 }: {
+  channelID: string
+  channelNote: string
   channelOwner: string
   channelTitle: string
   notificationSubscriptions: IDynamoUserNotificationSubscriptionsItem
@@ -65,6 +82,8 @@ const sendUserNotifications = async ({
     Object.values(notificationSubscriptions.subscriptions).map(
       async notificationSubscription => {
         await sendUserNotification({
+          channelID,
+          channelNote,
           channelOwner,
           channelTitle,
           notificationSubscription,
@@ -279,6 +298,8 @@ export const handleModifyEvent = async (
             subscriberNotificationSubscriptions.map(
               async notificationSubscriptions => {
                 await sendUserNotifications({
+                  channelID,
+                  channelNote: channelInfo.note ?? '',
                   channelOwner: channelInfo.owner ?? 'unknown',
                   channelTitle: channelInfo.title ?? 'Untitled Channel',
                   notificationSubscriptions,

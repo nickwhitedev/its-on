@@ -632,6 +632,11 @@ Resources:
           ITS_ON_TABLE: !Ref ItsOnTable
           PUSH_NOTIFICATION_PUBLIC_KEY: !Ref PushNotificationPublicKey
           PUSH_NOTIFICATION_PRIVATE_KEY: !Ref PushNotificationPrivateKey
+          WEB_URL: 
+            'Fn::If':
+              - IsProdEnv
+              - https://itson.fyi
+              - !Sub https://${Env}.itson.fyi
       Events:
         TableStream:
           Type: DynamoDB
