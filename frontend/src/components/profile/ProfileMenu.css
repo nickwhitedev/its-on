@@ -1,5 +1,19 @@
 .ProfileMenu {
-  height: 2rem;
+  width: 100%;
+}
+
+.ProfileMenu-back-button {
   margin: 1.5rem;
-  width: fit-content;
+}
+
+.ProfileMenu-actions {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.ProfileMenu-actions-list {
+  text-align: center;
+  max-width: 90%;
+  min-width: 30%;
 }
