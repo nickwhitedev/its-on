@@ -121,6 +121,7 @@ const App = () => {
 
   useEffect(() => {
     if (
+      authenticated &&
       client.isMobileIOS() &&
       (('standalone' in window.navigator && window.navigator.standalone) ||
         window.matchMedia('(display-mode: standalone)').matches)
@@ -131,7 +132,7 @@ const App = () => {
         instructionsReleaseToRefresh: '',
         mainElement: '.App',
         onRefresh() {
-          if (authenticated) void syncOverview()
+          void syncOverview()
         },
       })
     }
