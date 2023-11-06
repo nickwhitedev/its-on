@@ -15,7 +15,6 @@ import MDDivider from '../material/MDDivider'
 import MDIcon from '../material/MDIcon'
 import MDList from '../material/list/MDList'
 import MDListItem from '../material/list/MDListItem'
-import AllowNotifications from '../notifications/AllowNotifications'
 
 const Subscriptions = () => {
   const subscriptions = useSubscriptions()
@@ -42,7 +41,6 @@ const Subscriptions = () => {
 
   return (
     <div className='Subscriptions'>
-      <AllowNotifications />
       <MDList className='Subscriptions-list'>
         {subscriptions.map((channel, index) => (
           <React.Fragment key={channel.id}>

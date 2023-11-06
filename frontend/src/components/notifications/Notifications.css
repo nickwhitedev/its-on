@@ -3,8 +3,10 @@
 }
 
 .Notifications-dialog {
+  width: 20rem;
   max-width: 90%;
   min-width: 30%;
+  text-align: left;
 }
 
 .Notifications-list {

@@ -22,6 +22,7 @@ import { SubscriptionsDispatchActionType } from '../../../contexts/subscriptions
 import { useUser, useUserDispatch } from '../../../contexts/user/userContext'
 import { UserDispatchActionType } from '../../../contexts/user/userReducer'
 import { fetchApi } from '../../../utils/api'
+import { requestNotificationPermissions } from '../../../utils/notifications'
 import { MS_IN_HOUR } from '../../../utils/time'
 import ItsOnIcon from '../../icons/ItsOnIcon'
 import MDDialog from '../../material/MDDialog'
@@ -190,6 +191,13 @@ const Channel = ({ channel }: Props) => {
       // display user friendly message
     }
     setIsLoading(false)
+
+    if (user?.notificationsEnabled ?? true) {
+      await requestNotificationPermissions({
+        registeredNotificationSubscriptions:
+          user?.notificationSubscriptions ?? {},
+      })
+    }
   }
 
   const handleClickUnsubscribe = async () => {

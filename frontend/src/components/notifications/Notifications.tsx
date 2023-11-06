@@ -61,7 +61,7 @@ const Notifications = ({ className }: { className: string }) => {
               ))}
             </MDList>
           ) : (
-            <p>It&apos;s not on... yet.</p>
+            <p>No channels are on right now</p>
           )}
         </div>
         <div slot='actions'>
