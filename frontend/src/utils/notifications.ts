@@ -8,33 +8,45 @@ interface registerNotificationSubscriptionParams {
 export const registerNotificationSubscription = async ({
   registeredNotificationSubscriptions,
 }: registerNotificationSubscriptionParams) => {
-  try {
-    const registration = await navigator.serviceWorker.ready
-    let notificationSubscription =
-      await registration.pushManager.getSubscription()
+  const registration = await navigator.serviceWorker.ready
+  let notificationSubscription =
+    await registration.pushManager.getSubscription()
 
-    if (notificationSubscription == null) {
-      const response: { publicKey: string } = await fetchApi(
-        '/notification-key',
-      )
-      const convertedVapidKey = urlBase64ToUint8Array(response.publicKey)
-      notificationSubscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: convertedVapidKey,
-      })
-    }
-
-    if (
-      !(
-        notificationSubscription.endpoint in
-        Object.keys(registeredNotificationSubscriptions)
-      )
-    ) {
-      await fetchApi('/subscribe-notifications', 'POST', {
-        subscription: notificationSubscription,
-      })
-    }
-  } catch (error) {
-    // TODO: error handling
+  if (notificationSubscription == null) {
+    const response: { publicKey: string } = await fetchApi('/notification-key')
+    const convertedVapidKey = urlBase64ToUint8Array(response.publicKey)
+    notificationSubscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: convertedVapidKey,
+    })
   }
+
+  if (
+    !(
+      notificationSubscription.endpoint in
+      Object.keys(registeredNotificationSubscriptions)
+    )
+  ) {
+    await fetchApi('/subscribe-notifications', 'POST', {
+      subscription: notificationSubscription,
+    })
+  }
+}
+
+export const requestNotificationPermissions = async ({
+  registeredNotificationSubscriptions,
+}: registerNotificationSubscriptionParams) => {
+  if (!('Notification' in window && Notification.permission === 'default')) {
+    return
+  }
+
+  const permission = await Notification.requestPermission()
+
+  if (permission !== 'granted') {
+    return
+  }
+
+  await registerNotificationSubscription({
+    registeredNotificationSubscriptions,
+  })
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSubscriptions } from '../../contexts/subscriptions/subscriptionsContext'
 import { useUser } from '../../contexts/user/userContext'
-import { registerNotificationSubscription } from '../../utils/notifications'
+import { requestNotificationPermissions } from '../../utils/notifications'
 import MDFilledTonalButton from '../material/button/MDFilledTonalButton'
 import './AllowNotifications.css'
 
@@ -15,7 +15,6 @@ const AllowNotifications = () => {
     if (
       'Notification' in window &&
       Notification.permission === 'default' &&
-      subscriptions.length > 0 &&
       (user?.notificationsEnabled ?? true)
     ) {
       setShowButton(true)
@@ -23,17 +22,15 @@ const AllowNotifications = () => {
   }, [subscriptions, user])
 
   const handleAllowNotifications = async () => {
-    const permission = await Notification.requestPermission()
     setShowButton(false)
-
-    if (permission !== 'granted') {
-      return
+    try {
+      await requestNotificationPermissions({
+        registeredNotificationSubscriptions:
+          user?.notificationSubscriptions ?? {},
+      })
+    } catch (error) {
+      // TODO: handle error
     }
-
-    await registerNotificationSubscription({
-      registeredNotificationSubscriptions:
-        user?.notificationSubscriptions ?? {},
-    })
   }
 
   return showButton ? (
