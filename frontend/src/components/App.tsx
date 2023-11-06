@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { getFullLoginUrl, getTokens, login } from '../utils/auth'
 
-import { init } from 'pulltorefreshjs'
+import PullToRefresh from 'pulltorefreshjs'
 import { useChannelsDispatch } from '../contexts/channels/channelsContext'
 import { ChannelsDispatchActionType } from '../contexts/channels/channelsReducer'
 import { useSubscriptionsDispatch } from '../contexts/subscriptions/subscriptionsContext'
@@ -125,7 +125,7 @@ const App = () => {
       (('standalone' in window.navigator && window.navigator.standalone) ||
         window.matchMedia('(display-mode: standalone)').matches)
     ) {
-      init({
+      PullToRefresh.init({
         onRefresh() {
           window.location.reload()
         },

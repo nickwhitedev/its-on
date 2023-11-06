@@ -5,6 +5,8 @@
   text-align: center;
   height: 100%;
   width: 100%;
+
+  --md-dialog-container-shape: 4px;
 }
 
 .App-header {
