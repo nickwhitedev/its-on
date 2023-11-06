@@ -20,7 +20,7 @@ const UserSettings = ({ className }: { className: string }) => {
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
 
-  const notificationsEnabled = user?.notificationsEnabled === true
+  const notificationsEnabled = user?.notificationsEnabled ?? true
 
   const handleLogout = useCallback(async () => {
     try {
@@ -68,12 +68,11 @@ const UserSettings = ({ className }: { className: string }) => {
   return (
     <div className={className}>
       <MDIconButton
-        aria-label='Account Settings'
         onClick={() => {
           setIsDialogOpen(previous => !previous)
         }}
       >
-        <MDIcon>account_circle</MDIcon>
+        <MDIcon>settings</MDIcon>
       </MDIconButton>
       <MDDialog
         className='UserSettings-dialog'
@@ -85,6 +84,10 @@ const UserSettings = ({ className }: { className: string }) => {
         <div slot='headline'>Settings</div>
         <div slot='content'>
           <MDList className='UserSettings-list'>
+            <MDListItem>
+              <div slot='headline'>Username</div>
+              <div slot='end'>{user?.username}</div>
+            </MDListItem>
             <MDListItem
               type='button'
               onClick={() => void handleToggleNotifications()}
