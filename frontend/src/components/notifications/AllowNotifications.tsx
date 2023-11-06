@@ -43,7 +43,7 @@ const AllowNotifications = () => {
         void handleAllowNotifications()
       }}
     >
-      Allow Notifiations
+      Allow Notifications
     </MDFilledTonalButton>
   ) : null
 }
