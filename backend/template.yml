@@ -706,6 +706,22 @@ Resources:
             - IsProdEnv
             - false
             - true
+        InviteMessageTemplate:
+          EmailMessage: 
+            Fn::Join:
+              - ''
+              -
+                - "You've been invited to use It's On!\n\n"
+                - "Your username is {username} and temporary password is {####}.\n\n"
+                - "Go to "
+                - 'Fn::If':
+                  - IsProdEnv
+                  - https://itson.fyi
+                  - !Sub https://${Env}.itson.fyi
+                - " and log in to get started.\n\n"
+                - "To use It's On as an app instead of a website, follow these instructions: https://support.google.com/chrome/answer/9658361.\n\n"
+                - "Enjoy!"
+          EmailSubject: It's On!
       AliasAttributes:
         - email
         - phone_number
@@ -730,22 +746,6 @@ Resources:
       EnabledMfas:
         - SMS_MFA
         - SOFTWARE_TOKEN_MFA
-      InviteMessageTemplate:
-        EmailMessage: 
-          Fn::Join:
-            - ''
-            -
-              - "You've been invited to use It's On!\n\n"
-              - "Your username is {username} and temporary password is {####}.\n\n"
-              - "Go to "
-              - 'Fn::If':
-                - IsProdEnv
-                - https://itson.fyi
-                - !Sub https://${Env}.itson.fyi
-              - " and log in to get started.\n\n"
-              - "To use It's On as an app instead of a website, follow these instructions: https://support.google.com/chrome/answer/9658361.\n\n"
-              - "Enjoy!"
-        EmailSubject: It's On!
       MfaConfiguration: OPTIONAL
       Policies:
         PasswordPolicy:
