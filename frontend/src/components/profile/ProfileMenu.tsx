@@ -1,17 +1,19 @@
 import './ProfileMenu.css'
 
 import { fullLogoutUrl, logout } from '../../utils/auth'
+import { useUser, useUserDispatch } from '../../contexts/user/userContext'
 
-import { useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import MDSwitch from '../material/MDSwitch'
+import MDTextButton from '../material/button/MDTextButton'
+import { UserDispatchActionType } from '../../contexts/user/userReducer'
 import { fetchApi } from '../../utils/api'
-import MDIcon from '../material/MDIcon'
-import MDIconButton from '../material/icon-button/MDIconButton'
-import MDList from '../material/list/MDList'
-import MDListItem from '../material/list/MDListItem'
+import { useCallback } from 'react'
 
 const ProfileMenu = () => {
-  const navigate = useNavigate()
+  const dispatchUser = useUserDispatch()
+  const user = useUser()
+
+  const notificationsEnabled = user?.notificationsEnabled === true
 
   const handleLogout = useCallback(async () => {
     try {
@@ -33,53 +35,43 @@ const ProfileMenu = () => {
     window.location.assign(fullLogoutUrl)
   }, [])
 
-  const handleEnableNotifications = useCallback(async () => {
-    try {
-      await fetchApi('/enable-notifications', 'POST')
-    } catch (error) {
-      // TODO: error handling
-    }
-  }, [])
-
-  const handleDisableNotifications = useCallback(async () => {
-    try {
-      await fetchApi('/disable-notifications', 'POST')
-    } catch (error) {
-      // TODO: error handling
-    }
-  }, [])
+  const handleToggleNotifications = useCallback(
+    async (event: Event) => {
+      const enabled =
+        (event.target as { selected: boolean } | null)?.selected ?? false
+      try {
+        await fetchApi(
+          enabled ? '/disable-notifications' : '/enable-notifications',
+          'POST',
+        )
+        dispatchUser({
+          type: enabled
+            ? UserDispatchActionType.NOTIFICATIONS_DISABLED
+            : UserDispatchActionType.NOTIFICATIONS_ENABLED,
+        })
+      } catch (error) {
+        // TODO: error handling
+      }
+    },
+    [dispatchUser],
+  )
 
   return (
-    <div className='ProfileMenu'>
-      <MDIconButton
-        className='ProfileMenu-back-button'
-        onClick={() => {
-          navigate('/')
-        }}
-      >
-        <MDIcon>arrow_back</MDIcon>
-      </MDIconButton>
-      <div className='ProfileMenu-actions'>
-        <MDList className='ProfileMenu-actions-list'>
-          <MDListItem
-            type='button'
-            onClick={() => void handleEnableNotifications()}
-          >
-            Enable Notifications
-          </MDListItem>
-          <MDListItem
-            type='button'
-            onClick={() => void handleDisableNotifications()}
-          >
-            Disable Notifications
-          </MDListItem>
-          <MDListItem
-            type='button'
-            onClick={() => void handleLogout()}
-          >
-            Logout
-          </MDListItem>
-        </MDList>
+    <div className="ProfileMenu">
+      <div className="ProfileMenu-actions">
+        <div className="ProfileMenu-action">
+          <span className="">Notifications</span>
+          <MDSwitch
+            selected={notificationsEnabled}
+            onChange={event => void handleToggleNotifications(event)}
+          />
+        </div>
+        <MDTextButton
+          type="button"
+          onClick={() => void handleLogout()}
+        >
+          Logout
+        </MDTextButton>
       </div>
     </div>
   )
