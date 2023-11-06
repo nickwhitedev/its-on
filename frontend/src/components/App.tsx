@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { getFullLoginUrl, getTokens, login } from '../utils/auth'
 
+import { init } from 'pulltorefreshjs'
 import { useChannelsDispatch } from '../contexts/channels/channelsContext'
 import { ChannelsDispatchActionType } from '../contexts/channels/channelsReducer'
 import { useSubscriptionsDispatch } from '../contexts/subscriptions/subscriptionsContext'
@@ -11,6 +12,7 @@ import { SubscriptionsDispatchActionType } from '../contexts/subscriptions/subsc
 import { useUser, useUserDispatch } from '../contexts/user/userContext'
 import { UserDispatchActionType } from '../contexts/user/userReducer'
 import { fetchApi } from '../utils/api'
+import client from '../utils/client'
 import { registerNotificationSubscription } from '../utils/notifications'
 import ItsOnIcon from './icons/ItsOnIcon'
 import MDIcon from './material/MDIcon'
@@ -116,6 +118,20 @@ const App = () => {
     user?.notificationSubscriptions,
     user?.notificationsEnabled,
   ])
+
+  useEffect(() => {
+    if (
+      client.isMobileIOS() &&
+      (('standalone' in window.navigator && window.navigator.standalone) ||
+        window.matchMedia('(display-mode: standalone)').matches)
+    ) {
+      init({
+        onRefresh() {
+          window.location.reload()
+        },
+      })
+    }
+  }, [])
 
   const getContent = () => {
     if (authenticating) {

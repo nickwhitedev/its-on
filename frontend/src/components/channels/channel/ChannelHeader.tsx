@@ -68,7 +68,7 @@ const ChannelHeader = ({
     try {
       await navigator.share({
         title: `It's On - ${channelDisplayTitle}`,
-        text: `Check out the channel, ${channelDisplayTitle} by ${channel.owner}`,
+        text: `Check out the channel, ${channelDisplayTitle}, by ${channel.owner}`,
         url: channelURL,
       })
     } catch (error) {

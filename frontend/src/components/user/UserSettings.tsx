@@ -20,7 +20,7 @@ const UserSettings = ({ className }: { className: string }) => {
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
 
-  const notificationsEnabled = user?.notificationsEnabled === true
+  const notificationsEnabled = user?.notificationsEnabled ?? true
 
   const handleLogout = useCallback(async () => {
     try {
