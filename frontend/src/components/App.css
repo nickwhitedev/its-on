@@ -29,10 +29,9 @@
   grid-area: settings;
   margin: 1rem;
   place-self: start end;
-}
-
-.App-settings-icon {
-  font-size: 2rem;
+  --md-icon-button-icon-size: 2rem;
+  height: 2rem;
+  width: 2rem;
 }
 
 .App-content {

@@ -1,25 +1,26 @@
 import './App.css'
 
 import { useCallback, useEffect, useState } from 'react'
-import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { getFullLoginUrl, getTokens, login } from '../utils/auth'
 
 import { useChannelsDispatch } from '../contexts/channels/channelsContext'
 import { ChannelsDispatchActionType } from '../contexts/channels/channelsReducer'
 import { useSubscriptionsDispatch } from '../contexts/subscriptions/subscriptionsContext'
 import { SubscriptionsDispatchActionType } from '../contexts/subscriptions/subscriptionsReducer'
-import { useUserDispatch } from '../contexts/user/userContext'
+import { useUser, useUserDispatch } from '../contexts/user/userContext'
 import { UserDispatchActionType } from '../contexts/user/userReducer'
 import { fetchApi } from '../utils/api'
-import AllowNotifications from './AllowNotifications'
+import { registerNotificationSubscription } from '../utils/notifications'
 import ItsOnIcon from './icons/ItsOnIcon'
 import MDIcon from './material/MDIcon'
 import MDPrimaryTab from './material/tabs/MDPrimaryTab'
 import MDTabs from './material/tabs/MDTabs'
+import UserSettings from './user/UserSettings'
 
 interface OverviewData {
   channels: IChannel[]
-  notificationSubscriptions: { subscriptions: PushSubscription[] }
+  notificationSubscriptions: { subscriptions: Record<string, PushSubscription> }
   profile: IUser
   subscriptions: IChannel[]
 }
@@ -33,6 +34,8 @@ const App = () => {
   const [authenticated, setAuthenticated] = useState(tokens !== null)
   const [authenticating, setAuthenticating] = useState(code !== null)
   const [loginUrl, setLoginUrl] = useState('')
+
+  const user = useUser()
 
   const dispatchChannels = useChannelsDispatch()
   const dispatchSubscriptions = useSubscriptionsDispatch()
@@ -58,7 +61,11 @@ const App = () => {
       })
       dispatchUser({
         type: UserDispatchActionType.SYNCED,
-        user: response.profile,
+        user: {
+          ...response.profile,
+          notificationSubscriptions:
+            response.notificationSubscriptions.subscriptions,
+        },
       })
     } catch (error) {
       // TODO: handle overview fetch error
@@ -90,6 +97,24 @@ const App = () => {
     }
     if (authenticated) void syncOverview()
   }, [authenticated, syncOverview])
+
+  useEffect(() => {
+    if (
+      authenticated &&
+      'Notification' in window &&
+      Notification.permission === 'granted' &&
+      (user?.notificationsEnabled ?? true)
+    ) {
+      void registerNotificationSubscription({
+        registeredNotificationSubscriptions:
+          user?.notificationSubscriptions ?? {},
+      })
+    }
+  }, [
+    authenticated,
+    user?.notificationSubscriptions,
+    user?.notificationsEnabled,
+  ])
 
   const getContent = () => {
     if (authenticating) {
@@ -132,7 +157,6 @@ const App = () => {
         <div className='App-content'>
           <Outlet />
         </div>
-        <AllowNotifications />
       </>
     )
   }
@@ -142,15 +166,7 @@ const App = () => {
       <header className='App-header'>
         <h1>It&apos;s On</h1>
         {!authenticating && authenticated && loginUrl !== '' ? (
-          <Link
-            to={'/profile'}
-            className='App-settings icon'
-            aria-label='Account Settings'
-          >
-            <span className='material-symbols-outlined App-settings-icon'>
-              account_circle
-            </span>
-          </Link>
+          <UserSettings className='App-settings' />
         ) : null}
       </header>
       <main className='App-main'>{getContent()}</main>

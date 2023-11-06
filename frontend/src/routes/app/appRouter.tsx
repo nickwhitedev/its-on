@@ -1,9 +1,8 @@
-import ChannelRouteHandler from './channels/ChannelRouteHandler'
-import Channels from '../../components/channels/Channels'
-import HomeBody from '../../components/HomeBody'
 import { LoaderFunctionArgs } from '@remix-run/router/dist/utils'
-import ProfileMenu from '../../components/profile/ProfileMenu'
+import HomeBody from '../../components/HomeBody'
+import Channels from '../../components/channels/Channels'
 import Subscriptions from '../../components/subscriptions/Subscriptions'
+import ChannelRouteHandler from './channels/ChannelRouteHandler'
 
 const appRouter = [
   {
@@ -24,10 +23,6 @@ const appRouter = [
       return { channelID: params.channelID ?? null }
     },
     path: ':channelID',
-  },
-  {
-    element: <ProfileMenu />,
-    path: '/profile',
   },
 ]
 
