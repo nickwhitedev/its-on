@@ -16,6 +16,7 @@ import ItsOnIcon from './icons/ItsOnIcon'
 import MDIcon from './material/MDIcon'
 import MDPrimaryTab from './material/tabs/MDPrimaryTab'
 import MDTabs from './material/tabs/MDTabs'
+import Notifications from './notifications/Notifications'
 import UserSettings from './user/UserSettings'
 
 interface OverviewData {
@@ -164,6 +165,9 @@ const App = () => {
   return (
     <div className='App'>
       <header className='App-header'>
+        {!authenticating && authenticated && loginUrl !== '' ? (
+          <Notifications className='App-notifications' />
+        ) : null}
         <h1>It&apos;s On</h1>
         {!authenticating && authenticated && loginUrl !== '' ? (
           <UserSettings className='App-settings' />

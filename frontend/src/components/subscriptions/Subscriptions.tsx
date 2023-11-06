@@ -9,13 +9,13 @@ import {
 import { useNavigate } from 'react-router-dom'
 import { SubscriptionsDispatchActionType } from '../../contexts/subscriptions/subscriptionsReducer'
 import { fetchApi } from '../../utils/api'
-import AllowNotifications from '../AllowNotifications'
 import { isChannelOn } from '../channels/channel/channelUtils'
 import ItsOnIcon from '../icons/ItsOnIcon'
 import MDDivider from '../material/MDDivider'
 import MDIcon from '../material/MDIcon'
 import MDList from '../material/list/MDList'
 import MDListItem from '../material/list/MDListItem'
+import AllowNotifications from '../notifications/AllowNotifications'
 
 const Subscriptions = () => {
   const subscriptions = useSubscriptions()

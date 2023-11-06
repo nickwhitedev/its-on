@@ -9,6 +9,7 @@ import { fetchApi } from '../../utils/api'
 import MDDialog from '../material/MDDialog'
 import MDIcon from '../material/MDIcon'
 import MDSwitch from '../material/MDSwitch'
+import MDTextButton from '../material/button/MDTextButton'
 import MDIconButton from '../material/icon-button/MDIconButton'
 import MDList from '../material/list/MDList'
 import MDListItem from '../material/list/MDListItem'
@@ -106,6 +107,15 @@ const UserSettings = ({ className }: { className: string }) => {
               <div slot='headline'>Logout</div>
             </MDListItem>
           </MDList>
+        </div>
+        <div slot='actions'>
+          <MDTextButton
+            onClick={() => {
+              setIsDialogOpen(false)
+            }}
+          >
+            Close
+          </MDTextButton>
         </div>
       </MDDialog>
     </div>

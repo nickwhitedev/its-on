@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { useSubscriptions } from '../contexts/subscriptions/subscriptionsContext'
-import { useUser } from '../contexts/user/userContext'
-import { registerNotificationSubscription } from '../utils/notifications'
+import { useSubscriptions } from '../../contexts/subscriptions/subscriptionsContext'
+import { useUser } from '../../contexts/user/userContext'
+import { registerNotificationSubscription } from '../../utils/notifications'
+import MDFilledTonalButton from '../material/button/MDFilledTonalButton'
 import './AllowNotifications.css'
-import MDFilledTonalButton from './material/button/MDFilledTonalButton'
 
 const AllowNotifications = () => {
   const [showButton, setShowButton] = useState<boolean>(false)
