@@ -126,12 +126,16 @@ const App = () => {
         window.matchMedia('(display-mode: standalone)').matches)
     ) {
       PullToRefresh.init({
+        instructionsPullToRefresh: '',
+        instructionsRefreshing: '',
+        instructionsReleaseToRefresh: '',
+        mainElement: '.App',
         onRefresh() {
-          window.location.reload()
+          if (authenticated) void syncOverview()
         },
       })
     }
-  }, [])
+  }, [authenticated, syncOverview])
 
   const getContent = () => {
     if (authenticating) {
