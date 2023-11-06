@@ -4,6 +4,7 @@ interface IResponseWithMessage {
 
 interface IOverviewResponse {
   channels?: IChannel[]
+  notificationSubscriptions?: IUserNotificationSubscriptions
   profile?: IUser
   subscriptions?: IChannel[]
 }

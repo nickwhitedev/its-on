@@ -5,3 +5,11 @@ export const CORS_HEADERS = {
 }
 
 export const DYNAMODB_TABLE_NAME: string = process.env.ITS_ON_TABLE ?? ''
+
+export const PUSH_NOTIFICATION_PUBLIC_KEY: string =
+  process.env.PUSH_NOTIFICATION_PUBLIC_KEY ?? ''
+
+export const PUSH_NOTIFICATION_PRIVATE_KEY: string =
+  process.env.PUSH_NOTIFICATION_PRIVATE_KEY ?? ''
+
+export const WEB_URL = process.env.WEB_URL ?? 'https://itson.fyi'

@@ -5,10 +5,10 @@ import {
 } from '@aws-sdk/lib-dynamodb'
 
 import { APIGatewayProxyEvent } from 'aws-lambda'
-import { CORS_HEADERS } from '../../../src/utils/constants'
-import { getChannelHandler } from '../../../src/handlers/get-channel'
 import { mockClient } from 'aws-sdk-client-mock'
-import mockEvent from '../../../__mocks__/mock-event'
+import mockEvent from '../../../../__mocks__/mock-event'
+import { getChannelHandler } from '../../../../src/handlers/channel/get-channel'
+import { CORS_HEADERS } from '../../../../src/utils/constants'
 
 describe('Test getChannelHandler', () => {
   const ddbMock = mockClient(DynamoDBDocumentClient)

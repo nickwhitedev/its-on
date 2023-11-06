@@ -6,8 +6,8 @@ import {
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DYNAMODB_TABLE_NAME } from '../utils/constants'
-import { createResponse } from '../utils/response'
+import { DYNAMODB_TABLE_NAME } from '../../utils/constants'
+import { createResponse } from '../../utils/response'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)

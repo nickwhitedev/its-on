@@ -10,7 +10,7 @@
 .App-header {
   display: grid;
   grid:
-    [row-start] '. hero settings' [row-end]
+    [row-start] 'notifications hero settings' [row-end]
     / 3rem auto 3rem;
   width: 100%;
 }
@@ -24,15 +24,18 @@
   user-select: none;
 }
 
+.App-notifications {
+  display: flex;
+  grid-area: notifications;
+  margin: 1rem;
+  place-self: start start;
+}
+
 .App-settings {
   display: flex;
   grid-area: settings;
   margin: 1rem;
   place-self: start end;
-}
-
-.App-settings-icon {
-  font-size: 2rem;
 }
 
 .App-content {

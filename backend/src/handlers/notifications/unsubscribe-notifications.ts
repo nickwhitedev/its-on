@@ -1,0 +1,81 @@
+import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { PushSubscription } from 'web-push'
+import { DYNAMODB_TABLE_NAME } from '../../utils/constants'
+import { createResponse } from '../../utils/response'
+
+const client = new DynamoDBClient({})
+const ddbDocClient = DynamoDBDocumentClient.from(client)
+
+interface IPayload {
+  subscription: PushSubscription
+}
+
+/**
+ * Removes a user's notification subscription from their profile in Dynamo DB
+ */
+export const unsubscribeNotificationsHandler = async (
+  event: APIGatewayProxyEvent,
+): Promise<APIGatewayProxyResult> => {
+  if (event.httpMethod !== 'POST') {
+    throw new Error(
+      `postMethod only accepts POST method, you tried: ${event.httpMethod} method.`,
+    )
+  }
+  console.debug('received:', event)
+
+  const eventPath = event.path
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+  const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
+
+  if (event.body == null) {
+    return createResponse({
+      eventPath,
+      responseBody: {
+        message:
+          'Request body must contain subscription as an instance of PushSubscription',
+      },
+      statusCode: 400,
+    })
+  }
+
+  const subscription = (JSON.parse(event.body) as IPayload).subscription
+
+  try {
+    const ddbResponse = await ddbDocClient.send(
+      new UpdateCommand({
+        Key: {
+          pk: `user#${userID}`,
+          sk: 'notificationSubscriptions',
+        },
+        ReturnValues: 'ALL_NEW',
+        TableName: DYNAMODB_TABLE_NAME,
+        UpdateExpression: 'REMOVE #subscriptions.#subscriptionID',
+        ExpressionAttributeNames: {
+          '#subscriptions': 'subscriptions',
+          '#subscriptionID': subscription.endpoint,
+        },
+      }),
+    )
+    console.info('Success - user profile updated', ddbResponse)
+  } catch (error) {
+    console.error(
+      'Error',
+      error instanceof Error ? error.stack : 'Unknown Type',
+    )
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Something went wrong' },
+      statusCode: 400,
+    })
+  }
+
+  return createResponse({
+    eventPath,
+    responseBody: { message: 'Notifications disabled for device' },
+    statusCode: 200,
+  })
+}

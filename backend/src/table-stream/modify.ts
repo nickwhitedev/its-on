@@ -1,13 +1,98 @@
 import {
+  BatchGetCommand,
+  BatchGetCommandOutput,
   DynamoDBDocumentClient,
   PutCommand,
   QueryCommand,
 } from '@aws-sdk/lib-dynamodb'
 
+import { KeysAndAttributes } from '@aws-sdk/client-dynamodb'
 import { DynamoDBRecord } from 'aws-lambda'
-import { DYNAMODB_TABLE_NAME } from '../utils/constants'
+import { PushSubscription, sendNotification } from 'web-push'
+import {
+  DYNAMODB_TABLE_NAME,
+  PUSH_NOTIFICATION_PRIVATE_KEY,
+  PUSH_NOTIFICATION_PUBLIC_KEY,
+  WEB_URL,
+} from '../utils/constants'
 import { batchWrite } from '../utils/dynamo'
 import { MS_IN_HOUR } from '../utils/time'
+
+const sendUserNotification = async ({
+  channelID,
+  channelNote,
+  channelOwner,
+  channelTitle,
+  notificationSubscription,
+  TTL,
+}: {
+  channelID: string
+  channelNote: string
+  channelOwner: string
+  channelTitle: string
+  notificationSubscription: string
+  TTL: number
+}) => {
+  const pushSubscription = JSON.parse(
+    notificationSubscription,
+  ) as PushSubscription
+  try {
+    await sendNotification(
+      pushSubscription,
+      JSON.stringify({
+        title: `${channelTitle} • ${channelOwner}`,
+        options: {
+          body: channelNote,
+          data: {
+            url: `${WEB_URL}/${channelID}`,
+          },
+        },
+      }),
+      {
+        TTL,
+        vapidDetails: {
+          subject: 'mailto:contact@itson.fyi',
+          privateKey: PUSH_NOTIFICATION_PRIVATE_KEY,
+          publicKey: PUSH_NOTIFICATION_PUBLIC_KEY,
+        },
+      },
+    )
+  } catch (error) {
+    // TODO: Log error
+    console.error('Notification Send Error: ', error)
+  }
+}
+
+const sendUserNotifications = async ({
+  channelID,
+  channelNote,
+  channelOwner,
+  channelTitle,
+  notificationSubscriptions,
+  TTL,
+}: {
+  channelID: string
+  channelNote: string
+  channelOwner: string
+  channelTitle: string
+  notificationSubscriptions: IDynamoUserNotificationSubscriptionsItem
+  TTL: number
+}) => {
+  await Promise.all(
+    Object.values(notificationSubscriptions.subscriptions).map(
+      async notificationSubscription => {
+        await sendUserNotification({
+          channelID,
+          channelNote,
+          channelOwner,
+          channelTitle,
+          notificationSubscription,
+          TTL,
+        })
+      },
+    ),
+  )
+}
 
 export const handleModifyEvent = async (
   record: DynamoDBRecord,
@@ -45,6 +130,28 @@ export const handleModifyEvent = async (
     title: record.dynamodb?.NewImage?.title?.S ?? '',
   }
 
+  const oldChannelInfo: IDynamoChannelItem = {
+    canceled: record.dynamodb?.OldImage?.canceled?.BOOL ?? false,
+    capacity: parseInt(record.dynamodb?.OldImage?.capacity?.N ?? '5'),
+    duration: parseInt(
+      record.dynamodb?.OldImage?.duration?.N ?? MS_IN_HOUR.toString(),
+    ),
+    lastOn: parseInt(record.dynamodb?.OldImage?.lastOn?.N ?? '0'),
+    lastOnDuration: parseInt(
+      record.dynamodb?.OldImage?.lastOnDuration?.N ?? MS_IN_HOUR.toString(),
+    ),
+    lastUpdated: parseInt(record.dynamodb?.OldImage?.lastUpdated?.N ?? '0'),
+    note: record.dynamodb?.OldImage?.note?.S ?? '',
+    owner: record.dynamodb?.OldImage?.owner?.S ?? '',
+    ownerID: record.dynamodb?.OldImage?.ownerID?.S ?? '',
+    pk,
+    sk,
+    subscriberCount: parseInt(
+      record.dynamodb?.OldImage?.subscriberCount?.N ?? '0',
+    ),
+    title: record.dynamodb?.OldImage?.title?.S ?? '',
+  }
+
   // Put a public channel
   try {
     await ddbDocClient.send(
@@ -73,7 +180,7 @@ export const handleModifyEvent = async (
   do {
     console.info(`Start Query batch ${++queryBatchCount}`)
 
-    let subscribers: IDynamoChannelSubscriber[] | null
+    let subscribers: IDynamoChannelSubscriber[]
 
     try {
       const ddbResponse = await ddbDocClient.send(
@@ -88,24 +195,26 @@ export const handleModifyEvent = async (
             ':pkvalue': `channel#${channelID}`,
             ':skprefix': 'subscriber',
           },
+          Limit: 100,
           ...(lastEvaluatedKey != null
             ? { ExclusiveStartKey: lastEvaluatedKey }
             : {}),
         }),
       )
-      subscribers = ddbResponse.Items as IDynamoChannelSubscriber[] | null
+      subscribers = (ddbResponse.Items ?? []) as IDynamoChannelSubscriber[]
       lastEvaluatedKey = ddbResponse.LastEvaluatedKey
-      console.info('Get public channel and subscribers: ', ddbResponse)
+      console.info('Get public channel subscribers: ', ddbResponse)
     } catch (err) {
-      console.error('Get public channel error', err)
+      console.error('Get public channel subscribers error', err)
       return
     }
 
     // bulk write all channel copies
     let batchCount = 0
-    while (subscribers != null && subscribers.length > 0) {
+    const subscribersToUpdate = [...subscribers]
+    while (subscribersToUpdate.length > 0) {
       // Limiting to 12 to stay under batch write limit, which is 25 requests per batch write
-      const subscriberChunk = subscribers.slice(0, 12)
+      const subscriberChunk = subscribersToUpdate.splice(0, 12)
       try {
         await batchWrite({
           batchWriteInput: {
@@ -136,12 +245,74 @@ export const handleModifyEvent = async (
         console.error('batch write failed: ', error)
         return
       }
-      console.info(`Batches of items updated: ${batchCount}`)
-      // Next batch in the queue
-      subscribers.splice(0, 12)
+    }
+
+    // Send notifications if it's on
+    if (
+      !channelInfo.canceled &&
+      (channelInfo.lastOn ?? 0) >
+        (oldChannelInfo.lastOn ?? 0) + (oldChannelInfo.lastOnDuration ?? 0)
+    ) {
+      let unprocessedKeys:
+        | Record<
+            string,
+            Omit<KeysAndAttributes, 'Keys'> & {
+              Keys: Record<string, unknown>[] | undefined
+            }
+          >
+        | undefined = {
+        [DYNAMODB_TABLE_NAME]: {
+          Keys: subscribers.map(({ sk: subscriberSK }) => ({
+            pk: `user#${subscriberSK.substring(subscriberSK.indexOf('#') + 1)}`,
+            sk: 'notificationSubscriptions',
+          })),
+        },
+      }
+      let getBatchCount = 0
+      do {
+        console.info(`Start Get batch ${++getBatchCount}`)
+
+        let subscriberNotificationSubscriptions: IDynamoUserNotificationSubscriptionsItem[]
+
+        try {
+          const ddbResponse: BatchGetCommandOutput = await ddbDocClient.send(
+            new BatchGetCommand({
+              RequestItems: unprocessedKeys,
+            }),
+          )
+          subscriberNotificationSubscriptions = (ddbResponse.Responses?.[
+            DYNAMODB_TABLE_NAME
+          ] ?? []) as IDynamoUserNotificationSubscriptionsItem[]
+          unprocessedKeys = ddbResponse.UnprocessedKeys
+          console.info(
+            'Get subscriber notification subscriptions: ',
+            subscriberNotificationSubscriptions,
+          )
+        } catch (err) {
+          console.error('Get public channel subscribers error', err)
+          return
+        }
+
+        try {
+          await Promise.all(
+            subscriberNotificationSubscriptions.map(
+              async notificationSubscriptions => {
+                await sendUserNotifications({
+                  channelID,
+                  channelNote: channelInfo.note ?? '',
+                  channelOwner: channelInfo.owner ?? 'unknown',
+                  channelTitle: channelInfo.title ?? 'Untitled Channel',
+                  notificationSubscriptions,
+                  TTL: (channelInfo.lastOnDuration ?? MS_IN_HOUR) * 1000,
+                })
+              },
+            ),
+          )
+        } catch (error) {
+          console.error('Notification Send Error: ', error)
+        }
+      } while ((unprocessedKeys?.[DYNAMODB_TABLE_NAME]?.Keys ?? []).length > 0)
     }
   } while (lastEvaluatedKey != null && Object.keys(lastEvaluatedKey).length > 0)
   console.info('Finished updating items successfully')
-
-  // TODO: send notifications if it's on
 }

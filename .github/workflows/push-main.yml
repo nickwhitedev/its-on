@@ -11,6 +11,8 @@ env:
   AWS_SES_DOMAIN_IDENTITY_ARN: ${{ secrets.AWS_SES_DOMAIN_IDENTITY_ARN }}
   PIPELINE_USER_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   PIPELINE_USER_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  PUSH_NOTIFICATION_PUBLIC_KEY: ${{ secrets.PUSH_NOTIFICATION_PUBLIC_KEY }}
+  PUSH_NOTIFICATION_PRIVATE_KEY: ${{ secrets.PUSH_NOTIFICATION_PRIVATE_KEY }}
   SAM_TEMPLATE: template.yml
   TESTING_STACK_NAME: its-on-test
   TESTING_PIPELINE_EXECUTION_ROLE: arn:aws:iam::303579314896:role/aws-sam-cli-managed-dev-pipe-PipelineExecutionRole-1EXGMRU8M7PIU
@@ -157,7 +159,9 @@ jobs:
               ParameterKey=PipelineRole,ParameterValue=${PROD_PIPELINE_EXECUTION_ROLE} \
               ParameterKey=SnsCognitoIamArn,ParameterValue=${AWS_SNS_COGNITO_IAM_ARN} \
               ParameterKey=SnsCognitoIamExternalId,ParameterValue=${AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID} \
-              ParameterKey=SESDomainIdentityArn,ParameterValue=${AWS_SES_DOMAIN_IDENTITY_ARN}
+              ParameterKey=SESDomainIdentityArn,ParameterValue=${AWS_SES_DOMAIN_IDENTITY_ARN} \
+              ParameterKey=PushNotificationPublicKey,ParameterValue=${PUSH_NOTIFICATION_PUBLIC_KEY} \
+              ParameterKey=PushNotificationPrivateKey,ParameterValue=${PUSH_NOTIFICATION_PRIVATE_KEY}
 
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v4.0.1
@@ -205,7 +209,9 @@ jobs:
               ParameterKey=PipelineRole,ParameterValue=${PROD_PIPELINE_EXECUTION_ROLE} \
               ParameterKey=SnsCognitoIamArn,ParameterValue=${AWS_SNS_COGNITO_IAM_ARN} \
               ParameterKey=SnsCognitoIamExternalId,ParameterValue=${AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID} \
-              ParameterKey=SESDomainIdentityArn,ParameterValue=${AWS_SES_DOMAIN_IDENTITY_ARN}
+              ParameterKey=SESDomainIdentityArn,ParameterValue=${AWS_SES_DOMAIN_IDENTITY_ARN} \
+              ParameterKey=PushNotificationPublicKey,ParameterValue=${PUSH_NOTIFICATION_PUBLIC_KEY} \
+              ParameterKey=PushNotificationPrivateKey,ParameterValue=${PUSH_NOTIFICATION_PRIVATE_KEY}
 
       - uses: actions/upload-artifact@v3
         with:
@@ -256,7 +262,9 @@ jobs:
               ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE} \
               ParameterKey=SnsCognitoIamArn,ParameterValue=${AWS_SNS_COGNITO_IAM_ARN} \
               ParameterKey=SnsCognitoIamExternalId,ParameterValue=${AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID} \
-              ParameterKey=SESDomainIdentityArn,ParameterValue=${AWS_SES_DOMAIN_IDENTITY_ARN}
+              ParameterKey=SESDomainIdentityArn,ParameterValue=${AWS_SES_DOMAIN_IDENTITY_ARN} \
+              ParameterKey=PushNotificationPublicKey,ParameterValue=${PUSH_NOTIFICATION_PUBLIC_KEY} \
+              ParameterKey=PushNotificationPrivateKey,ParameterValue=${PUSH_NOTIFICATION_PRIVATE_KEY}
 
   integration-test:
     if: github.ref == 'refs/heads/main'
@@ -322,7 +330,9 @@ jobs:
               ParameterKey=PipelineRole,ParameterValue=${PROD_PIPELINE_EXECUTION_ROLE} \
               ParameterKey=SnsCognitoIamArn,ParameterValue=${AWS_SNS_COGNITO_IAM_ARN} \
               ParameterKey=SnsCognitoIamExternalId,ParameterValue=${AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID} \
-              ParameterKey=SESDomainIdentityArn,ParameterValue=${AWS_SES_DOMAIN_IDENTITY_ARN}
+              ParameterKey=SESDomainIdentityArn,ParameterValue=${AWS_SES_DOMAIN_IDENTITY_ARN} \
+              ParameterKey=PushNotificationPublicKey,ParameterValue=${PUSH_NOTIFICATION_PUBLIC_KEY} \
+              ParameterKey=PushNotificationPrivateKey,ParameterValue=${PUSH_NOTIFICATION_PRIVATE_KEY}
 
       - name: Get stack outputs
         id: set-env-vars

@@ -1,10 +1,10 @@
-import { CacheFirst, NetworkFirst, NetworkOnly } from 'workbox-strategies'
 import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching'
 import { registerRoute, setDefaultHandler } from 'workbox-routing'
+import { CacheFirst, NetworkFirst, NetworkOnly } from 'workbox-strategies'
 
 import { CacheableResponsePlugin } from 'workbox-cacheable-response/CacheableResponsePlugin'
-import { ExpirationPlugin } from 'workbox-expiration'
 import { clientsClaim } from 'workbox-core'
+import { ExpirationPlugin } from 'workbox-expiration'
 
 declare let self: ServiceWorkerGlobalScope
 
@@ -72,4 +72,33 @@ registerRoute(
 self.addEventListener('install', () => void self.skipWaiting())
 self.addEventListener('activate', () => {
   clientsClaim()
+})
+
+self.addEventListener('push', function (event) {
+  const data = (event.data?.json() ?? {
+    title: "It's On!",
+    options: { body: '', data: { url: 'https://itson.fyi' } },
+  }) as {
+    title: string
+    options: {
+      body: string
+      data: {
+        url: string
+      }
+    }
+  }
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.options.body,
+      data: data.options.data,
+    }),
+  )
+})
+
+self.addEventListener('notificationclick', event => {
+  event.notification.close()
+  event.waitUntil(
+    self.clients.openWindow((event.notification.data as { url: string }).url),
+  )
 })
