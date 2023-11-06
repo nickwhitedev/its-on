@@ -1,3 +1,7 @@
+.Notifications-button.active {
+  --md-icon-button-icon-color: rgba(24, 216, 255, 0.7);
+}
+
 .Notifications-dialog {
   max-width: 90%;
   min-width: 30%;

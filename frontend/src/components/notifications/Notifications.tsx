@@ -20,10 +20,12 @@ const Notifications = ({ className }: { className: string }) => {
   const onSubscriptions = subscriptions.filter(subscription =>
     isChannelOn(subscription),
   )
+  const hasOnSubscriptions = onSubscriptions.length > 0
 
   return (
     <div className={className}>
       <MDIconButton
+        className={`Notifications-button ${hasOnSubscriptions ? 'active' : ''}`}
         onClick={() => {
           setIsDialogOpen(previous => !previous)
         }}
@@ -40,13 +42,14 @@ const Notifications = ({ className }: { className: string }) => {
         <div slot='headline'>Notifications</div>
         <div slot='content'>
           <AllowNotifications />
-          {onSubscriptions.length > 0 ? (
+          {hasOnSubscriptions ? (
             <MDList className='Notifications-list'>
               {onSubscriptions.map(subscription => (
                 <MDListItem
                   key={subscription.id}
                   type='button'
                   onClick={() => {
+                    setIsDialogOpen(false)
                     navigate(`/${subscription.id}`)
                   }}
                 >
