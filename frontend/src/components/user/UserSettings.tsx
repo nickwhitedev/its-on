@@ -96,7 +96,9 @@ const UserSettings = ({ className }: { className: string }) => {
               <div slot='end'>
                 <MDSwitch selected={notificationsEnabled} />
               </div>
-              {notificationsEnabled && Notification.permission === 'denied' ? (
+              {notificationsEnabled &&
+              'Notification' in window &&
+              Notification.permission === 'denied' ? (
                 <div slot='supporting-text'>
                   Notifications are disabled on this device. Go to device
                   settings.
