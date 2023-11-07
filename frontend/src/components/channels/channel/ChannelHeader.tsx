@@ -1,9 +1,6 @@
 import './ChannelHeader.css'
 
 import { useState } from 'react'
-import { useChannelsDispatch } from '../../../contexts/channels/channelsContext'
-import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
-import { fetchApi } from '../../../utils/api'
 import { baseUrl } from '../../../utils/urls'
 import MDIcon from '../../material/MDIcon'
 import MDIconButton from '../../material/icon-button/MDIconButton'
@@ -13,55 +10,28 @@ interface Props {
   channel: IChannel
   isEditing: boolean
   isLoading: boolean
+  title: string
   userIsChannelOwner: boolean
+  onChangeTitle: (value: string) => void
+  onResetFormState: () => void
+  onSaveUpdates: () => Promise<void>
   setIsEditing: (newValue: boolean) => void
-  setIsLoading: (newValue: boolean) => void
 }
 
 const ChannelHeader = ({
   channel,
   isEditing,
   isLoading,
+  title,
   userIsChannelOwner,
+  onChangeTitle,
+  onSaveUpdates,
+  onResetFormState,
   setIsEditing,
-  setIsLoading,
 }: Props) => {
-  const dispatchChannels = useChannelsDispatch()
-
-  const [newTitle, setNewTitle] = useState<string>(channel.title ?? '')
   const [channelCopied, setChannelCopied] = useState<boolean>(false)
 
-  const isUpdating = newTitle !== channel.title
-
-  const channelDisplayTitle =
-    channel.title === '' || channel.title == null ? 'Untitled' : channel.title
-
-  const handleSubmit = async () => {
-    setIsLoading(true)
-
-    try {
-      const channelUpdates = {
-        capacity: channel.capacity,
-        duration: channel.duration,
-        note: channel.note,
-        title: newTitle,
-      }
-      await fetchApi(`/${channel.id}`, 'PUT', channelUpdates)
-      dispatchChannels({
-        type: ChannelsDispatchActionType.CHANGED,
-        channel: {
-          ...channel,
-          ...channelUpdates,
-        },
-      })
-    } catch (error) {
-      // TODO: Handle update channel error
-      // log error to backend
-      // display user friendly message
-    }
-
-    setIsLoading(false)
-  }
+  const channelDisplayTitle = title === '' ? 'Untitled' : channel.title
 
   const handleClickShareChannel = async () => {
     const channelURL = `${baseUrl}/${channel.id}`
@@ -88,7 +58,7 @@ const ChannelHeader = ({
                 disabled={!channel.title || isLoading}
                 onClick={() => {
                   setIsEditing(false)
-                  setNewTitle(channel.title ?? '')
+                  onResetFormState()
                 }}
               >
                 <MDIcon>close</MDIcon>
@@ -111,13 +81,14 @@ const ChannelHeader = ({
         <MDOutlinedTextField
           // TODO: Implement autoFocus with ref
           className={'ChannelHeader-input'}
+          disabled={isLoading}
           label='Channel Title'
           maxLength={40}
           rows={1}
           type='textarea'
-          value={newTitle}
+          value={title}
           onInput={event => {
-            setNewTitle((event.target as unknown as { value: string }).value)
+            onChangeTitle((event.target as unknown as { value: string }).value)
           }}
         />
       ) : (
@@ -129,13 +100,12 @@ const ChannelHeader = ({
         </div>
       )}
       <div className='ChannelHeader-share'>
-        {(isUpdating && userIsChannelOwner) ||
-        (isEditing && newTitle === '') ? (
+        {userIsChannelOwner || (isEditing && title === '') ? (
           <div className='ChannelHeader-save-wrapper'>
             <MDIconButton
               className='ChannelHeader-button'
-              disabled={newTitle === '' || isLoading}
-              onClick={() => void handleSubmit()}
+              disabled={title === '' || isLoading}
+              onClick={() => void onSaveUpdates()}
             >
               <MDIcon>done</MDIcon>
             </MDIconButton>
