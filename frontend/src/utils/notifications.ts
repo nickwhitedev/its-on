@@ -7,7 +7,7 @@ interface registerNotificationSubscriptionParams {
 
 export const registerNotificationSubscription = async ({
   registeredNotificationSubscriptions,
-}: registerNotificationSubscriptionParams) => {
+}: registerNotificationSubscriptionParams): Promise<void> => {
   const registration = await navigator.serviceWorker.ready
   let notificationSubscription =
     await registration.pushManager.getSubscription()
@@ -35,7 +35,7 @@ export const registerNotificationSubscription = async ({
 
 export const requestNotificationPermissions = async ({
   registeredNotificationSubscriptions,
-}: registerNotificationSubscriptionParams) => {
+}: registerNotificationSubscriptionParams): Promise<void> => {
   if (!('Notification' in window && Notification.permission === 'default')) {
     return
   }
