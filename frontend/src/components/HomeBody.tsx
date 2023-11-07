@@ -4,7 +4,7 @@ import Channel from './channels/channel/Channel'
 const HomeBody = () => {
   const channels = useChannels()
 
-  return channels.length > 0 ? <Channel channel={channels[0]} /> : ''
+  return channels.length > 0 ? <Channel channelID={channels[0].id} /> : ''
 }
 
 export default HomeBody
