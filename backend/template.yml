@@ -711,16 +711,18 @@ Resources:
             Fn::Join:
               - ''
               -
-                - "You've been invited to use It's On!\n\n"
-                - "Your username is {username} and temporary password is {####}.\n\n"
-                - "Go to "
+                - "<body>"
+                - "<h3>You've been invited to use It's On!</h3>"
+                - "<p>Your username is <strong>{username}</strong> and temporary password is <strong>{####}</strong></p>"
+                - "<p>Go to "
                 - 'Fn::If':
                   - IsProdEnv
                   - https://itson.fyi
                   - !Sub https://${Env}.itson.fyi
-                - " and log in to get started.\n\n"
-                - "To use It's On as an app instead of a website, follow these instructions: https://support.google.com/chrome/answer/9658361.\n\n"
-                - "Enjoy!"
+                - " and log in to get started.</p>"
+                - "<p>To use It's On as an app instead of a website, follow these instructions: https://support.google.com/chrome/answer/9658361.</p>"
+                - "<p>Enjoy!</p>"
+                - "</body>"
           EmailSubject: It's On!
       AliasAttributes:
         - email
@@ -740,8 +742,7 @@ Resources:
       EmailConfiguration:
         # ConfigurationSet: Used for event monitoring and ip management
         EmailSendingAccount: DEVELOPER
-        From: no-reply@itson.fyi
-        ReplyToEmailAddress: no-reply@itson.fyi
+        From: It's On <no-reply@itson.fyi>
         SourceArn: !Ref SESDomainIdentityArn
       EnabledMfas:
         - SMS_MFA
