@@ -60,6 +60,15 @@ const Channel = ({ channel }: Props) => {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [isConfirmingDelete, setIsConfirmingDelete] = useState<boolean>(false)
 
+  const [currentCapacity, setCurrentCapacity] = useState<number>(
+    user?.tier ?? DEFAULT_USER_TIER,
+  )
+  const [currentDuration, setCurrentDuration] = useState<number>(
+    channel.duration ?? MS_IN_HOUR,
+  )
+  const [currentNote, setCurrentNote] = useState<string>(channel.note ?? '')
+  const [currentTitle, setCurrentTitle] = useState<string>(channel.title ?? '')
+
   const isOn = isChannelOn(channel)
   const onProgress = channelOnProgress(channel)
 
@@ -98,19 +107,22 @@ const Channel = ({ channel }: Props) => {
     setIsLoading(false)
   }
 
-  const handleChangeDuration = async (event: Event) => {
-    const newDuration = Number(
-      (event.target as EventTarget & HTMLSelectElement).value,
-    )
-    if (isNaN(newDuration)) return
+  const handleResetFormState = () => {
+    setCurrentCapacity(user?.tier ?? DEFAULT_USER_TIER)
+    setCurrentDuration(channel.duration ?? MS_IN_HOUR)
+    setCurrentNote(channel.note ?? '')
+    setCurrentTitle(channel.title ?? '')
+  }
+
+  const handleSaveUpdates = async () => {
     setIsLoading(true)
 
     try {
       const channelUpdates = {
-        capacity: channel.capacity,
-        duration: newDuration,
-        note: channel.note,
-        title: channel.title,
+        capacity: currentCapacity,
+        duration: currentDuration,
+        note: currentNote,
+        title: currentTitle,
       }
       await fetchApi(`/${channel.id}`, 'PUT', channelUpdates)
       dispatchChannels({
@@ -127,6 +139,7 @@ const Channel = ({ channel }: Props) => {
     }
 
     setIsLoading(false)
+    setIsEditing(false)
   }
 
   const handleClickCallOff = async () => {
@@ -225,17 +238,21 @@ const Channel = ({ channel }: Props) => {
         channel={channel}
         isEditing={isEditing}
         isLoading={isLoading}
+        title={currentTitle}
         userIsChannelOwner={userIsChannelOwner}
+        onResetFormState={handleResetFormState}
+        onSaveUpdates={handleSaveUpdates}
+        onChangeTitle={setCurrentTitle}
         setIsEditing={setIsEditing}
-        setIsLoading={setIsLoading}
       />
       {!userIsChannelOwner ? (
         <ChannelNote
           channel={channel}
           isEditing={isEditing}
           isLoading={isLoading}
+          note={currentNote}
           userIsChannelOwner={userIsChannelOwner}
-          setIsLoading={setIsLoading}
+          onChangeNote={setCurrentNote}
         />
       ) : null}
       {userIsChannelOwner ? (
@@ -261,8 +278,14 @@ const Channel = ({ channel }: Props) => {
           {isEditing ? (
             <MDOutlinedSelect
               className='Channel-select'
-              value={`${channel.duration ?? MS_IN_HOUR}`}
-              onChange={event => void handleChangeDuration(event)}
+              value={`${currentDuration}`}
+              onChange={event => {
+                const newDuration = Number(
+                  (event.target as EventTarget & HTMLSelectElement).value,
+                )
+                if (isNaN(newDuration)) return
+                setCurrentDuration(newDuration)
+              }}
             >
               {durationOptions.map(durationOption => (
                 <MDSelectOption
@@ -286,12 +309,16 @@ const Channel = ({ channel }: Props) => {
             channel={channel}
             isEditing={isEditing}
             isLoading={isLoading}
+            note={currentNote}
             userIsChannelOwner={userIsChannelOwner}
-            setIsLoading={setIsLoading}
+            onChangeNote={setCurrentNote}
           />
           <ChannelSubscribers
+            capacity={currentCapacity}
             channel={channel}
             isEditing={isEditing}
+            isLoading={isLoading}
+            onChangeCapacity={setCurrentCapacity}
             setIsLoading={setIsLoading}
           />
           <div className='Channel-delete-section'>

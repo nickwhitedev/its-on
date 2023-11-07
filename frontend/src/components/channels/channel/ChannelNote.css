@@ -17,16 +17,3 @@
   resize: both;
   text-align: left;
 }
-
-.ChannelNote-actions {
-  grid-area: actions;
-  display: flex;
-  justify-content: center;
-  align-items: start;
-}
-
-.ChannelNote-actions-wrapper {
-  display: flex;
-  justify-content: space-between;
-  padding: 2.6rem 0;
-}
