@@ -58,6 +58,10 @@
   width: max-content;
 }
 
+.Channel-loading {
+  margin-top: 1.8rem;
+}
+
 .Channel-progress {
   margin-bottom: 1.8rem;
   width: 75%;

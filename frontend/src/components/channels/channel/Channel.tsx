@@ -30,6 +30,7 @@ import MDIcon from '../../material/MDIcon'
 import MDFilledButton from '../../material/button/MDFilledButton'
 import MDFilledTonalButton from '../../material/button/MDFilledTonalButton'
 import MDTextButton from '../../material/button/MDTextButton'
+import MDCircularProgress from '../../material/progress/MDCircularProgress'
 import MDLinearProgress from '../../material/progress/MDLinearProgress'
 import MDOutlinedSelect from '../../material/select/MDOutlinedSelect'
 import MDSelectOption from '../../material/select/MDSelectOption'
@@ -38,10 +39,10 @@ import ChannelNote from './ChannelNote'
 import ChannelSubscribers from './subscribers/ChannelSubscribers'
 
 interface Props {
-  channel: IChannel
+  channelID: string
 }
 
-const Channel = ({ channel }: Props) => {
+const Channel = ({ channelID }: Props) => {
   const navigate = useNavigate()
 
   const channels = useChannels()
@@ -52,41 +53,91 @@ const Channel = ({ channel }: Props) => {
   const dispatchSubscriptions = useSubscriptionsDispatch()
   const dispatchUser = useUserDispatch()
 
-  const userIsChannelOwner = channels.some(ch => ch.id === channel.id)
-
-  const [isEditing, setIsEditing] = useState<boolean>(
-    userIsChannelOwner && !channel.title,
+  const [channel, setChannel] = useState<IChannel | null>(
+    channels.find(chan => chan.id === channelID) ??
+      subscriptions.find(chan => chan.id === channelID) ??
+      null,
   )
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+
+  const userIsChannelOwner = channels.some(ch => ch.id === channelID)
+
+  const [isLoading, setIsLoading] = useState<boolean>(channel == null)
+  const [isEditing, setIsEditing] = useState<boolean>(
+    userIsChannelOwner && !channel?.title,
+  )
+  const [isUpdating, setIsUpdating] = useState<boolean>(false)
   const [isConfirmingDelete, setIsConfirmingDelete] = useState<boolean>(false)
 
   const [currentCapacity, setCurrentCapacity] = useState<number>(
     user?.tier ?? DEFAULT_USER_TIER,
   )
   const [currentDuration, setCurrentDuration] = useState<number>(
-    channel.duration ?? MS_IN_HOUR,
+    channel?.duration ?? MS_IN_HOUR,
   )
-  const [currentNote, setCurrentNote] = useState<string>(channel.note ?? '')
-  const [currentTitle, setCurrentTitle] = useState<string>(channel.title ?? '')
+  const [currentNote, setCurrentNote] = useState<string>(channel?.note ?? '')
+  const [currentTitle, setCurrentTitle] = useState<string>(channel?.title ?? '')
 
-  const isOn = isChannelOn(channel)
-  const onProgress = channelOnProgress(channel)
+  const isOn = channel != null && isChannelOn(channel)
+  const onProgress = channel == null ? 0 : channelOnProgress(channel)
 
   const isChannelFull =
-    (channel.subscriberCount ?? 0) >= (channel.capacity ?? DEFAULT_USER_TIER)
+    (channel?.subscriberCount ?? 0) >= (channel?.capacity ?? DEFAULT_USER_TIER)
 
   const userHasMaxSubscriptions =
     (user?.subscriptionCount ?? 0) >= (user?.tier ?? DEFAULT_USER_TIER)
 
   useEffect(() => {
-    document.title = channel.title ?? "It's On"
+    document.title = channel?.title ?? "It's On"
     return () => {
       document.title = "It's On"
     }
   }, [channel])
 
+  useEffect(() => {
+    void (async () => {
+      let fetchedChannel: IChannel | null
+      try {
+        fetchedChannel = await fetchApi<IChannel>(`/${channelID}`)
+      } catch {
+        fetchedChannel = null
+        // TODO: Handle error
+      }
+      if (fetchedChannel != null && channelID in channels) {
+        dispatchChannels({
+          type: ChannelsDispatchActionType.CHANGED,
+          channel: fetchedChannel,
+        })
+      } else if (fetchedChannel != null && channelID in subscriptions) {
+        dispatchSubscriptions({
+          type: SubscriptionsDispatchActionType.CHANGED,
+          channel: fetchedChannel,
+        })
+      } else {
+        setChannel(fetchedChannel)
+      }
+      setIsLoading(false)
+    })()
+  }, [
+    channelID,
+    channels,
+    dispatchChannels,
+    dispatchSubscriptions,
+    subscriptions,
+  ])
+
+  if (channel == null) {
+    return isLoading ? (
+      <MDCircularProgress
+        className='Channel-loading'
+        indeterminate
+      />
+    ) : (
+      <h4>Channel not found</h4>
+    )
+  }
+
   const handleClickItsOn = async () => {
-    setIsLoading(true)
+    setIsUpdating(true)
     try {
       await fetchApi(`/${channel.id}/its-on`, 'POST')
       dispatchChannels({
@@ -104,7 +155,7 @@ const Channel = ({ channel }: Props) => {
       // log error to backend
       // display user friendly message
     }
-    setIsLoading(false)
+    setIsUpdating(false)
   }
 
   const handleResetFormState = () => {
@@ -115,7 +166,7 @@ const Channel = ({ channel }: Props) => {
   }
 
   const handleSaveUpdates = async () => {
-    setIsLoading(true)
+    setIsUpdating(true)
 
     try {
       const channelUpdates = {
@@ -138,12 +189,12 @@ const Channel = ({ channel }: Props) => {
       // display user friendly message
     }
 
-    setIsLoading(false)
+    setIsUpdating(false)
     setIsEditing(false)
   }
 
   const handleClickCallOff = async () => {
-    setIsLoading(true)
+    setIsUpdating(true)
     try {
       await fetchApi(`/${channel.id}/its-off`, 'POST')
       dispatchChannels({
@@ -159,7 +210,7 @@ const Channel = ({ channel }: Props) => {
       // log error to backend
       // display user friendly message
     }
-    setIsLoading(false)
+    setIsUpdating(false)
   }
 
   const handleClickDelete = () => {
@@ -167,7 +218,7 @@ const Channel = ({ channel }: Props) => {
   }
 
   const handleConfirmDelete = async () => {
-    setIsLoading(true)
+    setIsUpdating(true)
     try {
       await fetchApi(`/${channel.id}`, 'DELETE')
       dispatchChannels({
@@ -184,11 +235,11 @@ const Channel = ({ channel }: Props) => {
       // display user friendly message
     }
     setIsConfirmingDelete(false)
-    setIsLoading(false)
+    setIsUpdating(false)
   }
 
   const handleClickSubscribe = async () => {
-    setIsLoading(true)
+    setIsUpdating(true)
     try {
       await fetchApi(`/${channel.id}/subscribe`, 'POST')
       dispatchSubscriptions({
@@ -203,7 +254,7 @@ const Channel = ({ channel }: Props) => {
       // log error to backend
       // display user friendly message
     }
-    setIsLoading(false)
+    setIsUpdating(false)
 
     if (user?.notificationsEnabled ?? true) {
       await requestNotificationPermissions({
@@ -214,7 +265,7 @@ const Channel = ({ channel }: Props) => {
   }
 
   const handleClickUnsubscribe = async () => {
-    setIsLoading(true)
+    setIsUpdating(true)
     try {
       await fetchApi(`/${channel.id}/unsubscribe`, 'POST')
       dispatchSubscriptions({
@@ -229,7 +280,7 @@ const Channel = ({ channel }: Props) => {
       // log error to backend
       // display user friendly message
     }
-    setIsLoading(false)
+    setIsUpdating(false)
   }
 
   return (
@@ -237,7 +288,7 @@ const Channel = ({ channel }: Props) => {
       <ChannelHeader
         channel={channel}
         isEditing={isEditing}
-        isLoading={isLoading}
+        isLoading={isUpdating}
         title={currentTitle}
         userIsChannelOwner={userIsChannelOwner}
         onResetFormState={handleResetFormState}
@@ -249,7 +300,7 @@ const Channel = ({ channel }: Props) => {
         <ChannelNote
           channel={channel}
           isEditing={isEditing}
-          isLoading={isLoading}
+          isLoading={isUpdating}
           note={currentNote}
           userIsChannelOwner={userIsChannelOwner}
           onChangeNote={setCurrentNote}
@@ -260,7 +311,7 @@ const Channel = ({ channel }: Props) => {
           <button
             aria-label={isOn ? 'Turn off channel' : 'Turn on channel'}
             className={`Channel-button ${isOn ? 'on' : ''}`}
-            disabled={isLoading}
+            disabled={isUpdating}
             onClick={
               isOn
                 ? () => void handleClickCallOff()
@@ -289,7 +340,7 @@ const Channel = ({ channel }: Props) => {
             >
               {durationOptions.map(durationOption => (
                 <MDSelectOption
-                  disabled={isLoading}
+                  disabled={isUpdating}
                   key={durationOption.value}
                   selected={durationOption.value === channel.duration}
                   value={`${durationOption.value}`}
@@ -308,7 +359,7 @@ const Channel = ({ channel }: Props) => {
           <ChannelNote
             channel={channel}
             isEditing={isEditing}
-            isLoading={isLoading}
+            isLoading={isUpdating}
             note={currentNote}
             userIsChannelOwner={userIsChannelOwner}
             onChangeNote={setCurrentNote}
@@ -317,15 +368,15 @@ const Channel = ({ channel }: Props) => {
             capacity={currentCapacity}
             channel={channel}
             isEditing={isEditing}
-            isLoading={isLoading}
+            isLoading={isUpdating}
             onChangeCapacity={setCurrentCapacity}
-            setIsLoading={setIsLoading}
+            setIsLoading={setIsUpdating}
           />
           <div className='Channel-delete-section'>
             <MDTextButton
               aria-label='Delete channel'
               className='Channel-button-delete'
-              disabled={isLoading}
+              disabled={isUpdating}
               hasIcon
               onClick={() => {
                 handleClickDelete()
@@ -347,7 +398,7 @@ const Channel = ({ channel }: Props) => {
               </div>
               <div slot='actions'>
                 <MDTextButton
-                  disabled={isLoading}
+                  disabled={isUpdating}
                   onClick={() => {
                     setIsConfirmingDelete(false)
                   }}
@@ -356,7 +407,7 @@ const Channel = ({ channel }: Props) => {
                 </MDTextButton>
                 <MDTextButton
                   className='Channel-button-delete'
-                  disabled={isLoading}
+                  disabled={isUpdating}
                   onClick={() => void handleConfirmDelete()}
                 >
                   Delete
@@ -381,7 +432,7 @@ const Channel = ({ channel }: Props) => {
           ) : null}
           <MDFilledTonalButton
             className='Channel-subscribe-button'
-            disabled={isLoading}
+            disabled={isUpdating}
             onClick={() => void handleClickUnsubscribe()}
           >
             Unsubscribe
@@ -391,7 +442,7 @@ const Channel = ({ channel }: Props) => {
         <>
           <MDFilledButton
             className='Channel-subscribe-button'
-            disabled={isLoading || isChannelFull || userHasMaxSubscriptions}
+            disabled={isUpdating || isChannelFull || userHasMaxSubscriptions}
             onClick={() => void handleClickSubscribe()}
           >
             {isChannelFull ? 'Channel Full' : 'Subscribe'}
