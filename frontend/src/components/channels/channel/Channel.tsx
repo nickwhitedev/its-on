@@ -123,11 +123,15 @@ const Channel = ({ channelID }: Props) => {
       setIsLoading(false)
     })()
   }, [
+    channel?.duration,
+    channel?.note,
+    channel?.title,
     channelID,
     channels,
     dispatchChannels,
     dispatchSubscriptions,
     subscriptions,
+    user?.tier,
   ])
 
   if (channel == null) {
