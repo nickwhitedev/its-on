@@ -1,10 +1,10 @@
 import './ChannelHeader.css'
 
-import { useState } from 'react'
-import { baseUrl } from '../../../utils/urls'
 import MDIcon from '../../material/MDIcon'
 import MDIconButton from '../../material/icon-button/MDIconButton'
 import MDOutlinedTextField from '../../material/text-field/MDOutlinedTextField'
+import { baseUrl } from '../../../utils/urls'
+import { useState } from 'react'
 
 interface Props {
   channel: IChannel
@@ -49,12 +49,12 @@ const ChannelHeader = ({
 
   return (
     <div className={`ChannelHeader ${userIsChannelOwner ? 'editable' : ''}`}>
-      <div className='ChannelHeader-edit'>
+      <div className="ChannelHeader-edit">
         {userIsChannelOwner ? (
-          <div className='ChannelHeader-save-wrapper'>
+          <div className="ChannelHeader-save-wrapper">
             {isEditing ? (
               <MDIconButton
-                className='ChannelHeader-button'
+                className="ChannelHeader-button"
                 disabled={!channel.title || isLoading}
                 onClick={() => {
                   setIsEditing(false)
@@ -65,7 +65,7 @@ const ChannelHeader = ({
               </MDIconButton>
             ) : (
               <MDIconButton
-                className='ChannelHeader-button'
+                className="ChannelHeader-button"
                 disabled={false}
                 onClick={() => {
                   setIsEditing(true)
@@ -82,28 +82,28 @@ const ChannelHeader = ({
           // TODO: Implement autoFocus with ref
           className={'ChannelHeader-input'}
           disabled={isLoading}
-          label='Channel Title'
+          label="Channel Title"
           maxLength={40}
           rows={1}
-          type='textarea'
+          type="textarea"
           value={title}
           onInput={event => {
             onChangeTitle((event.target as unknown as { value: string }).value)
           }}
         />
       ) : (
-        <div className='ChannelHeader-title'>
-          <h2 className='ChannelHeader-title'>{channelDisplayTitle}</h2>
+        <div className="ChannelHeader-title">
+          <h2 className="ChannelHeader-title">{channelDisplayTitle}</h2>
           {userIsChannelOwner ? null : (
-            <span className='secondary-text'>by {channel.owner}</span>
+            <span className="secondary-text">by {channel.owner}</span>
           )}
         </div>
       )}
-      <div className='ChannelHeader-share'>
-        {userIsChannelOwner || (isEditing && title === '') ? (
-          <div className='ChannelHeader-save-wrapper'>
+      <div className="ChannelHeader-share">
+        {userIsChannelOwner && isEditing ? (
+          <div className="ChannelHeader-save-wrapper">
             <MDIconButton
-              className='ChannelHeader-button'
+              className="ChannelHeader-button"
               disabled={title === '' || isLoading}
               onClick={() => void onSaveUpdates()}
             >
@@ -111,9 +111,9 @@ const ChannelHeader = ({
             </MDIconButton>
           </div>
         ) : (
-          <div className='ChannelHeader-share-wrapper'>
+          <div className="ChannelHeader-share-wrapper">
             <MDIconButton
-              aria-label='Share'
+              aria-label="Share"
               disabled={isLoading}
               onClick={() => void handleClickShareChannel()}
               onBlur={() => {

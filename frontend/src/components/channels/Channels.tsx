@@ -5,18 +5,19 @@ import {
   useChannels,
   useChannelsDispatch,
 } from '../../contexts/channels/channelsContext'
-
-import { useNavigate } from 'react-router-dom'
-import { ChannelsDispatchActionType } from '../../contexts/channels/channelsReducer'
 import { useUser, useUserDispatch } from '../../contexts/user/userContext'
-import { UserDispatchActionType } from '../../contexts/user/userReducer'
-import { fetchApi } from '../../utils/api'
+
+import { ChannelsDispatchActionType } from '../../contexts/channels/channelsReducer'
 import ItsOnIcon from '../icons/ItsOnIcon'
 import MDDivider from '../material/MDDivider'
+import MDFilledButton from '../material/button/MDFilledButton'
 import MDIcon from '../material/MDIcon'
 import MDList from '../material/list/MDList'
 import MDListItem from '../material/list/MDListItem'
+import { UserDispatchActionType } from '../../contexts/user/userReducer'
+import { fetchApi } from '../../utils/api'
 import { isChannelOn } from './channel/channelUtils'
+import { useNavigate } from 'react-router-dom'
 
 const Channels = () => {
   const channels = useChannels()
@@ -55,54 +56,73 @@ const Channels = () => {
   }
 
   return (
-    <div className='Channels'>
-      <MDList className='Channels-list'>
-        <MDListItem
-          className='Channels-list-item'
-          disabled={isCreating || userHasMaxChannels}
-          type='button'
-          onClick={() => void handleCreateChannel()}
-        >
-          <MDIcon slot='start'>add</MDIcon>
-          <div slot='headline'>
-            {userHasMaxChannels ? 'Subscription limit reached' : 'New Channel'}
+    <div className="Channels">
+      {channels.length === 0 ? (
+        <div>
+          <div className="Channels-nux-text">
+            Create a channel to let people know when it&apos;s on
           </div>
-          {userHasMaxChannels ? (
-            <div slot='supporting-text'>
-              Delete a channel to create a new one
+          <MDFilledButton
+            className="Channels-nux-button"
+            disabled={isCreating}
+            onClick={() => void handleCreateChannel()}
+          >
+            Create Channel
+          </MDFilledButton>
+        </div>
+      ) : (
+        <MDList className="Channels-list">
+          <MDListItem
+            className="Channels-list-item"
+            disabled={isCreating || userHasMaxChannels}
+            type="button"
+            onClick={() => void handleCreateChannel()}
+          >
+            <MDIcon slot="start">add</MDIcon>
+            <div slot="headline">
+              {userHasMaxChannels
+                ? 'Subscription limit reached'
+                : 'New Channel'}
             </div>
-          ) : null}
-        </MDListItem>
-        {channels.map(channel => (
-          <React.Fragment key={channel.id}>
-            <MDDivider inset />
-            <MDListItem
-              className='Channels-list-item'
-              type='link'
-              onClick={() => {
-                navigate(`/${channel.id}`)
-              }}
-            >
-              <MDIcon
-                className={
-                  isChannelOn(channel)
-                    ? 'Channels-list-item-on'
-                    : 'Channels-list-item-off'
-                }
-                slot='start'
-              >
-                <ItsOnIcon />
-              </MDIcon>
-              <div slot='headline'>
-                {(channel.title?.length ?? 0) > 0 ? channel.title : 'Untitled'}
+            {userHasMaxChannels ? (
+              <div slot="supporting-text">
+                Delete a channel to create a new one
               </div>
-              {(channel.note?.length ?? 0) > 0 ? (
-                <div slot='supporting-text'>{channel.note}</div>
-              ) : null}
-            </MDListItem>
-          </React.Fragment>
-        ))}
-      </MDList>
+            ) : null}
+          </MDListItem>
+          {channels.map(channel => (
+            <React.Fragment key={channel.id}>
+              <MDDivider inset />
+              <MDListItem
+                className="Channels-list-item"
+                type="link"
+                onClick={() => {
+                  navigate(`/${channel.id}`)
+                }}
+              >
+                <MDIcon
+                  className={
+                    isChannelOn(channel)
+                      ? 'Channels-list-item-on'
+                      : 'Channels-list-item-off'
+                  }
+                  slot="start"
+                >
+                  <ItsOnIcon />
+                </MDIcon>
+                <div slot="headline">
+                  {(channel.title?.length ?? 0) > 0
+                    ? channel.title
+                    : 'Untitled'}
+                </div>
+                {(channel.note?.length ?? 0) > 0 ? (
+                  <div slot="supporting-text">{channel.note}</div>
+                ) : null}
+              </MDListItem>
+            </React.Fragment>
+          ))}
+        </MDList>
+      )}
     </div>
   )
 }

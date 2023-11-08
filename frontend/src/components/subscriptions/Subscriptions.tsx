@@ -6,15 +6,15 @@ import {
   useSubscriptionsDispatch,
 } from '../../contexts/subscriptions/subscriptionsContext'
 
-import { useNavigate } from 'react-router-dom'
-import { SubscriptionsDispatchActionType } from '../../contexts/subscriptions/subscriptionsReducer'
-import { fetchApi } from '../../utils/api'
-import { isChannelOn } from '../channels/channel/channelUtils'
 import ItsOnIcon from '../icons/ItsOnIcon'
 import MDDivider from '../material/MDDivider'
 import MDIcon from '../material/MDIcon'
 import MDList from '../material/list/MDList'
 import MDListItem from '../material/list/MDListItem'
+import { SubscriptionsDispatchActionType } from '../../contexts/subscriptions/subscriptionsReducer'
+import { fetchApi } from '../../utils/api'
+import { isChannelOn } from '../channels/channel/channelUtils'
+import { useNavigate } from 'react-router-dom'
 
 const Subscriptions = () => {
   const subscriptions = useSubscriptions()
@@ -40,65 +40,72 @@ const Subscriptions = () => {
   }
 
   return (
-    <div className='Subscriptions'>
-      <MDList className='Subscriptions-list'>
-        {subscriptions.map((channel, index) => (
-          <React.Fragment key={channel.id}>
-            {index > 0 ? <MDDivider inset /> : null}
-            {channel.deleted ? (
-              <MDListItem
-                className='Subscriptions-list-item'
-                disabled={isLoading}
-                key={index}
-                type='button'
-                onClick={() => void handleClickUnsubscribe(channel.id)}
-              >
-                <MDIcon
-                  className='red'
-                  slot='start'
+    <div className="Subscriptions">
+      {subscriptions.length === 0 ? (
+        <div className="Channels-nux-text">
+          Subscribe to a channel someone shared with you to know when it&apos;s
+          on
+        </div>
+      ) : (
+        <MDList className="Subscriptions-list">
+          {subscriptions.map((channel, index) => (
+            <React.Fragment key={channel.id}>
+              {index > 0 ? <MDDivider inset /> : null}
+              {channel.deleted ? (
+                <MDListItem
+                  className="Subscriptions-list-item"
+                  disabled={isLoading}
+                  key={index}
+                  type="button"
+                  onClick={() => void handleClickUnsubscribe(channel.id)}
                 >
-                  delete
-                </MDIcon>
-                <div slot='headline'>
-                  {(channel.title?.length ?? 0) > 0
-                    ? channel.title
-                    : 'Untitled'}
-                </div>
-                <div slot='supporting-text'>
-                  This channel is no longer available
-                </div>
-              </MDListItem>
-            ) : (
-              <MDListItem
-                className='Subscriptions-list-item'
-                disabled={isLoading}
-                key={index}
-                type='link'
-                onClick={() => {
-                  navigate(`/${channel.id}`)
-                }}
-              >
-                <MDIcon
-                  className={
-                    isChannelOn(channel)
-                      ? 'Subscriptions-list-item-on'
-                      : 'Subscriptions-list-item-off'
-                  }
-                  slot='start'
+                  <MDIcon
+                    className="red"
+                    slot="start"
+                  >
+                    delete
+                  </MDIcon>
+                  <div slot="headline">
+                    {(channel.title?.length ?? 0) > 0
+                      ? channel.title
+                      : 'Untitled'}
+                  </div>
+                  <div slot="supporting-text">
+                    This channel is no longer available
+                  </div>
+                </MDListItem>
+              ) : (
+                <MDListItem
+                  className="Subscriptions-list-item"
+                  disabled={isLoading}
+                  key={index}
+                  type="link"
+                  onClick={() => {
+                    navigate(`/${channel.id}`)
+                  }}
                 >
-                  <ItsOnIcon />
-                </MDIcon>
-                <div slot='headline'>
-                  {(channel.title?.length ?? 0) > 0
-                    ? channel.title
-                    : 'Untitled'}
-                </div>
-                <div slot='supporting-text'>by {channel.owner}</div>
-              </MDListItem>
-            )}
-          </React.Fragment>
-        ))}
-      </MDList>
+                  <MDIcon
+                    className={
+                      isChannelOn(channel)
+                        ? 'Subscriptions-list-item-on'
+                        : 'Subscriptions-list-item-off'
+                    }
+                    slot="start"
+                  >
+                    <ItsOnIcon />
+                  </MDIcon>
+                  <div slot="headline">
+                    {(channel.title?.length ?? 0) > 0
+                      ? channel.title
+                      : 'Untitled'}
+                  </div>
+                  <div slot="supporting-text">by {channel.owner}</div>
+                </MDListItem>
+              )}
+            </React.Fragment>
+          ))}
+        </MDList>
+      )}
     </div>
   )
 }
