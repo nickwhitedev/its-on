@@ -6,8 +6,13 @@
   position: relative;
 }
 
+.Channels-nux-text {
+  margin: 4rem 1rem;
+}
+
 .Channels-list {
   border-radius: 12px;
+  margin-top: 1.8rem;
 }
 
 .Channels-list-item {
