@@ -1,31 +1,33 @@
 import './App.css'
 
-import { useCallback, useEffect, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { getFullLoginUrl, getTokens, login } from '../utils/auth'
-
-import PullToRefresh from 'pulltorefreshjs'
-import { useChannelsDispatch } from '../contexts/channels/channelsContext'
-import { ChannelsDispatchActionType } from '../contexts/channels/channelsReducer'
-import { useSubscriptionsDispatch } from '../contexts/subscriptions/subscriptionsContext'
-import { SubscriptionsDispatchActionType } from '../contexts/subscriptions/subscriptionsReducer'
+import { useCallback, useEffect, useState } from 'react'
 import { useUser, useUserDispatch } from '../contexts/user/userContext'
-import { UserDispatchActionType } from '../contexts/user/userReducer'
-import { fetchApi } from '../utils/api'
-import client from '../utils/client'
-import { registerNotificationSubscription } from '../utils/notifications'
+
+import { ChannelsDispatchActionType } from '../contexts/channels/channelsReducer'
 import ItsOnIcon from './icons/ItsOnIcon'
 import MDIcon from './material/MDIcon'
 import MDPrimaryTab from './material/tabs/MDPrimaryTab'
 import MDTabs from './material/tabs/MDTabs'
 import Notifications from './notifications/Notifications'
+import PullToRefresh from 'pulltorefreshjs'
+import { SubscriptionsDispatchActionType } from '../contexts/subscriptions/subscriptionsReducer'
+import { UserDispatchActionType } from '../contexts/user/userReducer'
 import UserSettings from './user/UserSettings'
+import client from '../utils/client'
+import { fetchApi } from '../utils/api'
+import { registerNotificationSubscription } from '../utils/notifications'
+import { useChannelsDispatch } from '../contexts/channels/channelsContext'
+import { useSubscriptionsDispatch } from '../contexts/subscriptions/subscriptionsContext'
 
 interface OverviewData {
-  channels: IChannel[]
-  notificationSubscriptions: { subscriptions: Record<string, PushSubscription> }
+  channels?: IChannel[]
+  notificationSubscriptions?: {
+    subscriptions: Record<string, PushSubscription>
+  }
   profile: IUser
-  subscriptions: IChannel[]
+  subscriptions?: IChannel[]
 }
 
 const params = new URL(document.location.toString()).searchParams
@@ -67,7 +69,7 @@ const App = () => {
         user: {
           ...response.profile,
           notificationSubscriptions:
-            response.notificationSubscriptions.subscriptions,
+            response.notificationSubscriptions?.subscriptions ?? {},
         },
       })
     } catch (error) {
@@ -148,7 +150,7 @@ const App = () => {
     return (
       <>
         <MDTabs
-          className='App-nav'
+          className="App-nav"
           onChange={event => {
             const activeTabIndex = (
               event.target as { activeTabIndex: number } | null
@@ -176,7 +178,7 @@ const App = () => {
             Subscriptions
           </MDPrimaryTab>
         </MDTabs>
-        <div className='App-content'>
+        <div className="App-content">
           <Outlet />
         </div>
       </>
@@ -184,17 +186,17 @@ const App = () => {
   }
 
   return (
-    <div className='App'>
-      <header className='App-header'>
+    <div className="App">
+      <header className="App-header">
         {!authenticating && authenticated && loginUrl !== '' ? (
-          <Notifications className='App-notifications' />
+          <Notifications className="App-notifications" />
         ) : null}
         <h1>It&apos;s On</h1>
         {!authenticating && authenticated && loginUrl !== '' ? (
-          <UserSettings className='App-settings' />
+          <UserSettings className="App-settings" />
         ) : null}
       </header>
-      <main className='App-main'>{getContent()}</main>
+      <main className="App-main">{getContent()}</main>
     </div>
   )
 }
