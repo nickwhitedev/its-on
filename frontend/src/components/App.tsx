@@ -23,7 +23,9 @@ import { useSubscriptionsDispatch } from '../contexts/subscriptions/subscription
 
 interface OverviewData {
   channels?: IChannel[]
-  notificationSubscriptions?: { subscriptions: Record<string, PushSubscription> }
+  notificationSubscriptions?: {
+    subscriptions: Record<string, PushSubscription>
+  }
   profile: IUser
   subscriptions?: IChannel[]
 }
@@ -148,7 +150,7 @@ const App = () => {
     return (
       <>
         <MDTabs
-          className='App-nav'
+          className="App-nav"
           onChange={event => {
             const activeTabIndex = (
               event.target as { activeTabIndex: number } | null
@@ -176,7 +178,7 @@ const App = () => {
             Subscriptions
           </MDPrimaryTab>
         </MDTabs>
-        <div className='App-content'>
+        <div className="App-content">
           <Outlet />
         </div>
       </>
@@ -184,17 +186,17 @@ const App = () => {
   }
 
   return (
-    <div className='App'>
-      <header className='App-header'>
+    <div className="App">
+      <header className="App-header">
         {!authenticating && authenticated && loginUrl !== '' ? (
-          <Notifications className='App-notifications' />
+          <Notifications className="App-notifications" />
         ) : null}
         <h1>It&apos;s On</h1>
         {!authenticating && authenticated && loginUrl !== '' ? (
-          <UserSettings className='App-settings' />
+          <UserSettings className="App-settings" />
         ) : null}
       </header>
-      <main className='App-main'>{getContent()}</main>
+      <main className="App-main">{getContent()}</main>
     </div>
   )
 }
