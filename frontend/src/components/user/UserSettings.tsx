@@ -1,18 +1,18 @@
 import './UserSettings.css'
 
-import { useUser, useUserDispatch } from '../../contexts/user/userContext'
 import { fullLogoutUrl, logout } from '../../utils/auth'
-
 import { useCallback, useState } from 'react'
-import { UserDispatchActionType } from '../../contexts/user/userReducer'
-import { fetchApi } from '../../utils/api'
+import { useUser, useUserDispatch } from '../../contexts/user/userContext'
+
 import MDDialog from '../material/MDDialog'
 import MDIcon from '../material/MDIcon'
-import MDSwitch from '../material/MDSwitch'
-import MDTextButton from '../material/button/MDTextButton'
 import MDIconButton from '../material/icon-button/MDIconButton'
 import MDList from '../material/list/MDList'
 import MDListItem from '../material/list/MDListItem'
+import MDSwitch from '../material/MDSwitch'
+import MDTextButton from '../material/button/MDTextButton'
+import { UserDispatchActionType } from '../../contexts/user/userReducer'
+import { fetchApi } from '../../utils/api'
 
 const UserSettings = ({ className }: { className: string }) => {
   const dispatchUser = useUserDispatch()
