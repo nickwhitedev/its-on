@@ -468,7 +468,7 @@ Resources:
         Sourcemap: true
         EntryPoints:
           - src/handlers/notifications/get-notification-key.ts
-  
+
   # This is a Lambda function config associated with the source code: enable-notifications.ts
   enableNotificationsFunction:
     Type: AWS::Serverless::Function
@@ -504,7 +504,6 @@ Resources:
         EntryPoints:
           - src/handlers/notifications/enable-notifications.ts
 
-  
   # This is a Lambda function config associated with the source code: disable-notifications.ts
   disableNotificationsFunction:
     Type: AWS::Serverless::Function
@@ -540,7 +539,6 @@ Resources:
         EntryPoints:
           - src/handlers/notifications/disable-notifications.ts
 
-  
   # This is a Lambda function config associated with the source code: subscribe-notifications.ts
   subscribeNotificationsFunction:
     Type: AWS::Serverless::Function
@@ -576,7 +574,6 @@ Resources:
         EntryPoints:
           - src/handlers/notifications/subscribe-notifications.ts
 
-  
   # This is a Lambda function config associated with the source code: unsubscribe-notifications.ts
   unsubscribeNotificationsFunction:
     Type: AWS::Serverless::Function
@@ -632,7 +629,7 @@ Resources:
           ITS_ON_TABLE: !Ref ItsOnTable
           PUSH_NOTIFICATION_PUBLIC_KEY: !Ref PushNotificationPublicKey
           PUSH_NOTIFICATION_PRIVATE_KEY: !Ref PushNotificationPrivateKey
-          WEB_URL: 
+          WEB_URL:
             'Fn::If':
               - IsProdEnv
               - https://itson.fyi
@@ -707,22 +704,23 @@ Resources:
             - false
             - true
         InviteMessageTemplate:
-          EmailMessage: 
+          EmailMessage:
             Fn::Join:
               - ''
-              -
-                - "<body>"
-                - "<h3>You've been invited to use It's On!</h3>"
-                - "<p>Your username is <strong>{username}</strong> and temporary password is <strong>{####}</strong></p>"
-                - "<p>Go to "
+              - - '<body>'
+                - '<h3>You&apos;ve been invited to use It&apos;s On!</h3>'
+                - '<p>Your username is <strong>{username}</strong> and temporary password is <strong>{####}</strong></p>'
+                - '<p>Go to '
                 - 'Fn::If':
-                  - IsProdEnv
-                  - https://itson.fyi
-                  - !Sub https://${Env}.itson.fyi
-                - " and log in to get started.</p>"
-                - "<p>To use It's On as an app instead of a website, follow these instructions: https://support.google.com/chrome/answer/9658361.</p>"
-                - "<p>Enjoy!</p>"
-                - "</body>"
+                    - IsProdEnv
+                    - https://itson.fyi
+                    - !Sub https://${Env}.itson.fyi
+                - ' and log in to get started.</p>'
+                - '<p>To use It&apos;s On as an app instead of a website (please do try this), follow these instructions: https://support.google.com/chrome/answer/9658361.</p>''
+                - '<p>Feel free to send feedback to feedback@itson.fyi</p>'
+                - '<p>Join the It&apos;s On Discord Server here - https://discord.gg/jVtcuu2f5N</p>'
+                - '<p>Enjoy!</p>'
+                - '</body>'
           EmailSubject: It's On!
       AliasAttributes:
         - email
