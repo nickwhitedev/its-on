@@ -99,8 +99,8 @@ const ChannelHeader = ({
           rows={1}
           type="textarea"
           value={title}
-          onInput={event => {
-            onChangeTitle((event.target as unknown as { value: string }).value)
+          onInput={(event: { target: { value: string } }) => {
+            onChangeTitle(event.target.value)
           }}
         />
       ) : (

@@ -331,10 +331,10 @@ const Channel = ({ channelID }: Props) => {
               <MDOutlinedSelect
                 className="Channel-select"
                 value={`${currentDuration}`}
-                onChange={event => {
-                  const newDuration = Number(
-                    (event.target as EventTarget & HTMLSelectElement).value,
-                  )
+                onChange={(event: {
+                  target: EventTarget & HTMLSelectElement
+                }) => {
+                  const newDuration = Number(event.target.value)
                   if (isNaN(newDuration)) return
                   setCurrentDuration(newDuration)
                 }}

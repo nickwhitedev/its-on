@@ -20,24 +20,24 @@ const ChannelNote = ({
   onChangeNote,
 }: Props) => {
   return userIsChannelOwner || (channel.note?.length ?? 0) > 0 ? (
-    <div className='ChannelNote'>
+    <div className="ChannelNote">
       <div></div>
       {userIsChannelOwner && isEditing ? (
         <MDOutlinedTextField
           className={'ChannelNote-input'}
           disabled={isLoading}
-          label='Channel Note'
+          label="Channel Note"
           maxLength={200}
           placeholder="Let's meet at my place"
           rows={4}
-          type='textarea'
+          type="textarea"
           value={note}
-          onInput={event => {
-            onChangeNote((event.target as unknown as { value: string }).value)
+          onInput={(event: { target: { value: string } }) => {
+            onChangeNote(event.target.value)
           }}
         />
       ) : (
-        <span className='ChannelNote-note'>{channel.note}</span>
+        <span className="ChannelNote-note">{channel.note}</span>
       )}
     </div>
   ) : null
