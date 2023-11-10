@@ -1,6 +1,6 @@
-import { createComponent } from '@lit-labs/react'
 import { MdElevatedButton } from '@material/web/button/elevated-button'
 import React from 'react'
+import { createComponent } from '@lit/react'
 
 /**
  * React wrapper for md-elevated-button

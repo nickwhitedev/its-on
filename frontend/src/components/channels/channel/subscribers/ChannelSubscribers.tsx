@@ -1,21 +1,24 @@
 import './ChannelSubscribers.css'
 
 import React, { useState } from 'react'
-import { useUser } from '../../../../contexts/user/userContext'
+
+import ChannelSubscriber from './ChannelSubscriber'
+import { DEFAULT_USER_TIER } from '../channelUtils'
+import MDCircularProgress from '../../../material/progress/MDCircularProgress'
 import MDDivider from '../../../material/MDDivider'
 import MDList from '../../../material/list/MDList'
 import MDListItem from '../../../material/list/MDListItem'
 import MDOutlinedTextField from '../../../material/text-field/MDOutlinedTextField'
-import { DEFAULT_USER_TIER } from '../channelUtils'
-import ChannelSubscriber from './ChannelSubscriber'
+import { useUser } from '../../../../contexts/user/userContext'
 
 interface Props {
   capacity: number
   channel: IChannel
   isEditing: boolean
   isLoading: boolean
+  isUpdating: boolean
   onChangeCapacity: (value: number) => void
-  setIsLoading: (newValue: boolean) => void
+  setIsUpdating: (newValue: boolean) => void
 }
 
 const ChannelSubscribers = ({
@@ -23,8 +26,9 @@ const ChannelSubscribers = ({
   channel,
   isEditing,
   isLoading,
+  isUpdating,
   onChangeCapacity,
-  setIsLoading,
+  setIsUpdating,
 }: Props) => {
   const user = useUser()
 
@@ -49,11 +53,11 @@ const ChannelSubscribers = ({
   }
 
   return (
-    <div className='ChannelSubscribers'>
-      <MDList className='ChannelSubscribers-list'>
+    <div className="ChannelSubscribers">
+      <MDList className="ChannelSubscribers-list">
         <MDListItem>
-          <div slot='headline'>Subscribers</div>
-          <div slot='trailing-supporting-text'>
+          <div slot="headline">Subscribers</div>
+          <div slot="trailing-supporting-text">
             {subscriberCount}
             {channel.capacity == null ? null : (
               <>
@@ -62,12 +66,12 @@ const ChannelSubscribers = ({
                 {isEditing ? (
                   <MDOutlinedTextField
                     className={'ChannelSubscribers-capacity-input'}
-                    disabled={isLoading}
+                    disabled={isUpdating}
                     error={Number(newCapacity) > userTier}
                     max={`${userTier}`}
                     min={`${subscriberCount}`}
-                    step='1'
-                    type='number'
+                    step="1"
+                    type="number"
                     value={newCapacity}
                     onInput={event => {
                       setNewCapacity(
@@ -88,24 +92,33 @@ const ChannelSubscribers = ({
             )}
           </div>
         </MDListItem>
-        {channel.subscribers?.map(subscriber => (
-          <React.Fragment key={subscriber.id}>
-            <MDDivider inset />
-            <MDListItem className='ChannelSubscriber-list-item'>
-              <ChannelSubscriber
-                channel={channel}
-                subscriber={subscriber}
-                setIsLoading={setIsLoading}
-              />
-            </MDListItem>
-          </React.Fragment>
-        )) ?? (
+        {isLoading ? (
           <>
             <MDDivider inset />
             <MDListItem>
-              Share your channel to let people know it&apos;s on!
+              <MDCircularProgress indeterminate />
             </MDListItem>
           </>
+        ) : (
+          channel.subscribers?.map(subscriber => (
+            <React.Fragment key={subscriber.id}>
+              <MDDivider inset />
+              <MDListItem className="ChannelSubscriber-list-item">
+                <ChannelSubscriber
+                  channel={channel}
+                  subscriber={subscriber}
+                  setIsUpdating={setIsUpdating}
+                />
+              </MDListItem>
+            </React.Fragment>
+          )) ?? (
+            <>
+              <MDDivider inset />
+              <MDListItem>
+                Share your channel to let people know it&apos;s on!
+              </MDListItem>
+            </>
+          )
         )}
       </MDList>
     </div>

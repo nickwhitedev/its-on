@@ -5,7 +5,7 @@ import MDOutlinedTextField from '../../material/text-field/MDOutlinedTextField'
 interface Props {
   channel: IChannel
   isEditing: boolean
-  isLoading: boolean
+  isUpdating: boolean
   note: string
   userIsChannelOwner: boolean
   onChangeNote: (value: string) => void
@@ -13,7 +13,7 @@ interface Props {
 
 const ChannelNote = ({
   channel,
-  isLoading,
+  isUpdating,
   isEditing,
   note,
   userIsChannelOwner,
@@ -25,15 +25,15 @@ const ChannelNote = ({
       {userIsChannelOwner && isEditing ? (
         <MDOutlinedTextField
           className={'ChannelNote-input'}
-          disabled={isLoading}
+          disabled={isUpdating}
           label="Channel Note"
           maxLength={200}
           placeholder="Let's meet at my place"
           rows={4}
           type="textarea"
           value={note}
-          onInput={(event: { target: { value: string } }) => {
-            onChangeNote(event.target.value)
+          onInput={(event: Event) => {
+            onChangeNote((event.target as unknown as { value: string }).value)
           }}
         />
       ) : (

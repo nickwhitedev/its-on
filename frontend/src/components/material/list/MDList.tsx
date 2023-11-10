@@ -1,6 +1,6 @@
-import { createComponent } from '@lit-labs/react'
 import { MdList } from '@material/web/list/list'
 import React from 'react'
+import { createComponent } from '@lit/react'
 
 /**
  * React wrapper for md-list

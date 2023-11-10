@@ -1,6 +1,6 @@
 import { MdOutlinedSelect } from '@material/web/select/outlined-select'
 import React from 'react'
-import { createComponent } from '@lit-labs/react'
+import { createComponent } from '@lit/react'
 
 /**
  * React wrapper for md-outlined-select

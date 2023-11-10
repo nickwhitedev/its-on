@@ -1,6 +1,6 @@
-import { createComponent } from '@lit-labs/react'
 import { MdFilledTonalButton } from '@material/web/button/filled-tonal-button'
 import React from 'react'
+import { createComponent } from '@lit/react'
 
 /**
  * React wrapper for md-filled-tonal-button

@@ -1,6 +1,6 @@
 import { MdCircularProgress } from '@material/web/progress/circular-progress'
 import React from 'react'
-import { createComponent } from '@lit-labs/react'
+import { createComponent } from '@lit/react'
 
 /**
  * React wrapper for md-circular-progress

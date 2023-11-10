@@ -1,23 +1,24 @@
 import './ChannelSubscriber.css'
 
-import { MdIconButton } from '@material/web/iconbutton/icon-button'
-import { MdMenu } from '@material/web/menu/menu'
 import { useEffect, useRef, useState } from 'react'
-import { useChannelsDispatch } from '../../../../contexts/channels/channelsContext'
+
 import { ChannelsDispatchActionType } from '../../../../contexts/channels/channelsReducer'
-import { fetchApi } from '../../../../utils/api'
 import MDIcon from '../../../material/MDIcon'
 import MDIconButton from '../../../material/icon-button/MDIconButton'
 import MDMenu from '../../../material/menu/MDMenu'
 import MDMenuItem from '../../../material/menu/MDMenuItem'
+import { MdIconButton } from '@material/web/iconbutton/icon-button'
+import { MdMenu } from '@material/web/menu/menu'
+import { fetchApi } from '../../../../utils/api'
+import { useChannelsDispatch } from '../../../../contexts/channels/channelsContext'
 
 interface Props {
   channel: IChannel
   subscriber: IChannelSubscriber
-  setIsLoading: (newValue: boolean) => void
+  setIsUpdating: (newValue: boolean) => void
 }
 
-const ChannelSubscriber = ({ channel, subscriber, setIsLoading }: Props) => {
+const ChannelSubscriber = ({ channel, subscriber, setIsUpdating }: Props) => {
   const dispatchChannels = useChannelsDispatch()
 
   const menuAnchorRef = useRef<MdIconButton | null>(null)
@@ -43,7 +44,7 @@ const ChannelSubscriber = ({ channel, subscriber, setIsLoading }: Props) => {
   }, [menuAnchorRef, menuRef])
 
   const handleClickRemove = async () => {
-    setIsLoading(true)
+    setIsUpdating(true)
     setIsMenuOpen(false)
     try {
       await fetchApi(`/${channel.id}/subscribers/${subscriber.id}`, 'DELETE')
@@ -64,15 +65,15 @@ const ChannelSubscriber = ({ channel, subscriber, setIsLoading }: Props) => {
       // display user friendly message
     }
     // setIsConfirmingRemove(false)
-    setIsLoading(false)
+    setIsUpdating(false)
   }
 
   return (
     <>
-      <div slot='supporting-text'>{subscriber.username}</div>
+      <div slot="supporting-text">{subscriber.username}</div>
       <MDIconButton
-        aria-label='More'
-        slot='end'
+        aria-label="More"
+        slot="end"
         ref={menuAnchorRef}
         onClick={() => {
           setIsMenuOpen(previousIsMenuOpen => !previousIsMenuOpen)
@@ -82,14 +83,14 @@ const ChannelSubscriber = ({ channel, subscriber, setIsLoading }: Props) => {
       </MDIconButton>
       <MDMenu
         open={isMenuOpen}
-        positioning='fixed'
+        positioning="fixed"
         ref={menuRef}
         onClosed={() => {
           setIsMenuOpen(false)
         }}
       >
         <MDMenuItem
-          type='button'
+          type="button"
           onClick={() => void handleClickRemove()}
         >
           Remove

@@ -155,7 +155,7 @@ const App = () => {
       <>
         <MDTabs
           className="App-nav"
-          onChange={(event: { target: { activeTabIndex: number } | null }) => {
+          onChange={(event: Event) => {
             const activeTabIndex = (
               event.target as { activeTabIndex: number } | null
             )?.activeTabIndex

@@ -1,6 +1,6 @@
 import { MdSelectOption } from '@material/web/select/select-option'
 import React from 'react'
-import { createComponent } from '@lit-labs/react'
+import { createComponent } from '@lit/react'
 
 /**
  * React wrapper for md-select-option

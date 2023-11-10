@@ -1,6 +1,6 @@
 import { MdLinearProgress } from '@material/web/progress/linear-progress'
 import React from 'react'
-import { createComponent } from '@lit-labs/react'
+import { createComponent } from '@lit/react'
 
 /**
  * React wrapper for md-linear-progress

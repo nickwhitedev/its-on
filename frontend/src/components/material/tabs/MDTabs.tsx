@@ -1,6 +1,6 @@
-import { createComponent } from '@lit-labs/react'
 import { MdTabs } from '@material/web/tabs/tabs'
 import React from 'react'
+import { createComponent } from '@lit/react'
 
 /**
  * React wrapper for md-tabs

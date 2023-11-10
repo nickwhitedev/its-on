@@ -1,6 +1,6 @@
-import { createComponent } from '@lit-labs/react'
 import { MdTextButton } from '@material/web/button/text-button'
 import React from 'react'
+import { createComponent } from '@lit/react'
 
 /**
  * React wrapper for md-text-button

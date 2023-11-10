@@ -12,7 +12,7 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@lit-labs/react": "^2.1.0",
+    "@lit/react": "^1.0.1",
     "@material/web": "^1.0.0",
     "clientjs": "^0.2.1",
     "lit": "^3.0.0",
