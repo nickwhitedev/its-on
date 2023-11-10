@@ -29,42 +29,8 @@
   animation: pulsate 8s ease-out infinite;
 }
 
-.Channel-signal {
-  background-color: transparent;
-  border-radius: 50%;
-  padding: 0;
-  margin-bottom: 1.8rem;
-  font: inherit;
-  outline: inherit;
-  height: 60vh;
-  width: 60vh;
-  max-height: 80vw;
-  max-width: 80vw;
-  transition: background-color 0.5s ease-out;
-}
-
-.Channel-signal.on {
-  background-color: rgba(24, 216, 255, 0.7);
-  color: inherit;
-  box-shadow: 0px 0px 25px 25px rgba(45, 216, 255, 0.7);
-  animation: pulsate 8s ease-out infinite;
-}
-
-.Channel-button-call-off {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: min-content;
-  width: max-content;
-}
-
 .Channel-loading {
   margin-top: 1.8rem;
-}
-
-.Channel-progress {
-  margin-bottom: 1.8rem;
-  width: 75%;
 }
 
 .Channel-delete-section {
@@ -120,10 +86,6 @@
   max-width: 80vw;
 }
 
-.Channel-select {
-  margin-bottom: 1.8rem;
-}
-
 .Channel-select,
 .Channel-select md-select-option {
   min-width: 10rem;
@@ -131,4 +93,5 @@
 
 .Channel-duration-display {
   margin-bottom: 1.8rem;
+  font-size: 1.5rem;
 }

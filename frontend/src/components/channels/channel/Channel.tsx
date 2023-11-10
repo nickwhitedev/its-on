@@ -1,8 +1,9 @@
 import './Channel.css'
 
+import Countdown, { zeroPad } from 'react-countdown'
 import {
   DEFAULT_USER_TIER,
-  channelOnProgress,
+  channelOnExpirationTime,
   durationOptions,
   isChannelOn,
 } from './channelUtils'
@@ -27,7 +28,6 @@ import MDDialog from '../../material/MDDialog'
 import MDFilledButton from '../../material/button/MDFilledButton'
 import MDFilledTonalButton from '../../material/button/MDFilledTonalButton'
 import MDIcon from '../../material/MDIcon'
-import MDLinearProgress from '../../material/progress/MDLinearProgress'
 import MDOutlinedSelect from '../../material/select/MDOutlinedSelect'
 import MDSelectOption from '../../material/select/MDSelectOption'
 import MDTextButton from '../../material/button/MDTextButton'
@@ -78,14 +78,16 @@ const Channel = ({ channelID }: Props) => {
   const [currentNote, setCurrentNote] = useState<string>(channel?.note ?? '')
   const [currentTitle, setCurrentTitle] = useState<string>(channel?.title ?? '')
 
-  const isOn = channel != null && isChannelOn(channel)
-  const onProgress = channel == null ? 0 : channelOnProgress(channel)
+  const [isOn, setIsOn] = useState<boolean>(false)
+  const expirationTime = channel == null ? 0 : channelOnExpirationTime(channel)
 
   const isChannelFull =
     (channel?.subscriberCount ?? 0) >= (channel?.capacity ?? DEFAULT_USER_TIER)
 
   const userHasMaxSubscriptions =
     (user?.subscriptionCount ?? 0) >= (user?.tier ?? DEFAULT_USER_TIER)
+
+  const channelIsOn = channel != null && isChannelOn(channel)
 
   useEffect(() => {
     document.title = channel?.title ?? "It's On"
@@ -133,6 +135,10 @@ const Channel = ({ channelID }: Props) => {
     subscriptions,
     user?.tier,
   ])
+
+  useEffect(() => {
+    setIsOn(channelIsOn)
+  }, [channelIsOn])
 
   if (channel == null) {
     return isLoading ? (
@@ -298,6 +304,7 @@ const Channel = ({ channelID }: Props) => {
         channel={channel}
         isEditing={isEditing}
         isLoading={isUpdating}
+        isOn={isOn}
         title={currentTitle}
         userIsChannelOwner={userIsChannelOwner}
         onResetFormState={handleResetFormState}
@@ -305,22 +312,12 @@ const Channel = ({ channelID }: Props) => {
         onChangeTitle={setCurrentTitle}
         setIsEditing={setIsEditing}
       />
-      {!userIsChannelOwner ? (
-        <ChannelNote
-          channel={channel}
-          isEditing={isEditing}
-          isLoading={isUpdating}
-          note={currentNote}
-          userIsChannelOwner={userIsChannelOwner}
-          onChangeNote={setCurrentNote}
-        />
-      ) : null}
       {userIsChannelOwner ? (
         <>
           <button
             aria-label={isOn ? 'Turn off channel' : 'Turn on channel'}
             className={`Channel-button ${isOn ? 'on' : ''}`}
-            disabled={isUpdating}
+            disabled={isEditing || isUpdating}
             onClick={
               isOn
                 ? () => void handleClickCallOff()
@@ -329,42 +326,52 @@ const Channel = ({ channelID }: Props) => {
           >
             <ItsOnIcon className="Channel-button-image" />
           </button>
-          {isOn ? (
-            <MDLinearProgress
-              className="Channel-progress"
-              value={onProgress}
-            />
-          ) : null}
-          {isEditing ? (
-            <MDOutlinedSelect
-              className="Channel-select"
-              value={`${currentDuration}`}
-              onChange={event => {
-                const newDuration = Number(
-                  (event.target as EventTarget & HTMLSelectElement).value,
-                )
-                if (isNaN(newDuration)) return
-                setCurrentDuration(newDuration)
-              }}
-            >
-              {durationOptions.map(durationOption => (
-                <MDSelectOption
-                  disabled={isUpdating}
-                  key={durationOption.value}
-                  selected={durationOption.value === channel.duration}
-                  value={`${durationOption.value}`}
-                >
-                  <div slot="headline">{durationOption.displayName}</div>
-                </MDSelectOption>
-              ))}
-            </MDOutlinedSelect>
-          ) : (
-            <div className="Channel-duration-display">
-              {durationOptions.find(
-                durationOption => durationOption.value === channel.duration,
-              )?.displayName ?? '1 Hour'}
-            </div>
-          )}
+          <div className="Channel-duration-display">
+            {isEditing ? (
+              <MDOutlinedSelect
+                className="Channel-select"
+                value={`${currentDuration}`}
+                onChange={event => {
+                  const newDuration = Number(
+                    (event.target as EventTarget & HTMLSelectElement).value,
+                  )
+                  if (isNaN(newDuration)) return
+                  setCurrentDuration(newDuration)
+                }}
+              >
+                {durationOptions.map(durationOption => (
+                  <MDSelectOption
+                    disabled={isUpdating}
+                    key={durationOption.value}
+                    selected={durationOption.value === channel.duration}
+                    value={`${durationOption.value}`}
+                  >
+                    <div slot="headline">{durationOption.displayName}</div>
+                  </MDSelectOption>
+                ))}
+              </MDOutlinedSelect>
+            ) : isOn ? (
+              <Countdown
+                date={expirationTime}
+                renderer={({ hours, minutes, seconds }) => (
+                  <span>
+                    {hours > 0 ? `${zeroPad(hours)}:` : null}
+                    {minutes > 0 ? `${zeroPad(minutes)}:` : null}
+                    {zeroPad(seconds)}
+                  </span>
+                )}
+                onComplete={() => {
+                  setIsOn(false)
+                }}
+              />
+            ) : (
+              <div>
+                {durationOptions.find(
+                  durationOption => durationOption.value === channel.duration,
+                )?.displayName ?? '1 Hour'}
+              </div>
+            )}
+          </div>
           <ChannelNote
             channel={channel}
             isEditing={isEditing}
@@ -427,18 +434,31 @@ const Channel = ({ channelID }: Props) => {
         </>
       ) : subscriptions.some(chan => chan.id === channel.id) ? (
         <>
-          <div
-            aria-label={isOn ? "It's On" : "It's Off"}
-            className={`Channel-signal ${isOn ? 'on' : ''}`}
-          >
-            <ItsOnIcon className="Channel-button-image" />
-          </div>
           {isOn ? (
-            <MDLinearProgress
-              className="Channel-progress"
-              value={onProgress}
-            />
+            <div className="Channel-duration-display">
+              <Countdown
+                date={expirationTime}
+                renderer={({ hours, minutes, seconds }) => (
+                  <span>
+                    {hours > 0 ? `${zeroPad(hours)}:` : null}
+                    {minutes > 0 ? `${zeroPad(minutes)}:` : null}
+                    {zeroPad(seconds)}
+                  </span>
+                )}
+                onComplete={() => {
+                  setIsOn(false)
+                }}
+              />
+            </div>
           ) : null}
+          <ChannelNote
+            channel={channel}
+            isEditing={isEditing}
+            isLoading={isUpdating}
+            note={currentNote}
+            userIsChannelOwner={userIsChannelOwner}
+            onChangeNote={setCurrentNote}
+          />
           <MDFilledTonalButton
             className="Channel-subscribe-button"
             disabled={isUpdating}

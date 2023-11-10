@@ -1,5 +1,6 @@
 import './ChannelHeader.css'
 
+import ItsOnIcon from '../../icons/ItsOnIcon'
 import MDIcon from '../../material/MDIcon'
 import MDIconButton from '../../material/icon-button/MDIconButton'
 import MDOutlinedTextField from '../../material/text-field/MDOutlinedTextField'
@@ -10,6 +11,7 @@ interface Props {
   channel: IChannel
   isEditing: boolean
   isLoading: boolean
+  isOn: boolean
   title: string
   userIsChannelOwner: boolean
   onChangeTitle: (value: string) => void
@@ -22,6 +24,7 @@ const ChannelHeader = ({
   channel,
   isEditing,
   isLoading,
+  isOn,
   title,
   userIsChannelOwner,
   onChangeTitle,
@@ -75,7 +78,16 @@ const ChannelHeader = ({
               </MDIconButton>
             )}
           </div>
-        ) : null}
+        ) : (
+          <MDIcon
+            className={
+              isOn ? 'ChannelHeader-icon-on' : 'ChannelHeader-icon-off'
+            }
+            slot="start"
+          >
+            <ItsOnIcon />
+          </MDIcon>
+        )}
       </div>
       {isEditing ? (
         <MDOutlinedTextField

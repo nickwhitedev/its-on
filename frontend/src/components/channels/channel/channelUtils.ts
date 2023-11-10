@@ -19,12 +19,8 @@ export const isChannelOn = (channel: IChannel): boolean => {
   )
 }
 
-export const channelOnProgress = (channel: IChannel): number => {
-  return (
-    1 -
-    (Date.now() - (channel.lastOn ?? 0)) /
-      (channel.lastOnDuration ?? MS_IN_HOUR)
-  )
+export const channelOnExpirationTime = (channel: IChannel): number => {
+  return (channel.lastOn ?? 0) + (channel.lastOnDuration ?? MS_IN_HOUR)
 }
 
 export const channelsSorter = (
