@@ -1,6 +1,6 @@
-import { createComponent } from '@lit-labs/react'
 import { MdMenuItem } from '@material/web/menu/menu-item'
 import React from 'react'
+import { createComponent } from '@lit/react'
 
 /**
  * React wrapper for md-menu-item

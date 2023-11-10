@@ -29,10 +29,6 @@
   animation: pulsate 8s ease-out infinite;
 }
 
-.Channel-loading {
-  margin-top: 1.8rem;
-}
-
 .Channel-delete-section {
   margin-bottom: 1.8rem;
 }

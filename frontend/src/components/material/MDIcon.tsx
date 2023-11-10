@@ -1,6 +1,6 @@
-import { createComponent } from '@lit-labs/react'
 import { MdIcon } from '@material/web/icon/icon'
 import React from 'react'
+import { createComponent } from '@lit/react'
 
 /**
  * React wrapper for md-icon

@@ -1,6 +1,6 @@
-import { createComponent } from '@lit-labs/react'
 import { MdOutlinedIconButton } from '@material/web/iconbutton/outlined-icon-button'
 import React from 'react'
+import { createComponent } from '@lit/react'
 
 /**
  * React wrapper for md-outlined-icon-button

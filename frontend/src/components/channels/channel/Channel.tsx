@@ -62,7 +62,7 @@ const Channel = ({ channelID }: Props) => {
 
   const userIsChannelOwner = channels.some(ch => ch.id === channelID)
 
-  const [isLoading, setIsLoading] = useState<boolean>(channel == null)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
   const [isEditing, setIsEditing] = useState<boolean>(
     userIsChannelOwner && !channel?.title,
   )
@@ -303,7 +303,7 @@ const Channel = ({ channelID }: Props) => {
       <ChannelHeader
         channel={channel}
         isEditing={isEditing}
-        isLoading={isUpdating}
+        isUpdating={isUpdating}
         isOn={isOn}
         title={currentTitle}
         userIsChannelOwner={userIsChannelOwner}
@@ -331,7 +331,7 @@ const Channel = ({ channelID }: Props) => {
               <MDOutlinedSelect
                 className="Channel-select"
                 value={`${currentDuration}`}
-                onChange={event => {
+                onChange={(event: Event) => {
                   const newDuration = Number(
                     (event.target as EventTarget & HTMLSelectElement).value,
                   )
@@ -375,7 +375,7 @@ const Channel = ({ channelID }: Props) => {
           <ChannelNote
             channel={channel}
             isEditing={isEditing}
-            isLoading={isUpdating}
+            isUpdating={isUpdating}
             note={currentNote}
             userIsChannelOwner={userIsChannelOwner}
             onChangeNote={setCurrentNote}
@@ -384,9 +384,10 @@ const Channel = ({ channelID }: Props) => {
             capacity={currentCapacity}
             channel={channel}
             isEditing={isEditing}
-            isLoading={isUpdating}
+            isLoading={isLoading}
+            isUpdating={isUpdating}
             onChangeCapacity={setCurrentCapacity}
-            setIsLoading={setIsUpdating}
+            setIsUpdating={setIsUpdating}
           />
           <div className="Channel-delete-section">
             <MDTextButton
@@ -454,7 +455,7 @@ const Channel = ({ channelID }: Props) => {
           <ChannelNote
             channel={channel}
             isEditing={isEditing}
-            isLoading={isUpdating}
+            isUpdating={isUpdating}
             note={currentNote}
             userIsChannelOwner={userIsChannelOwner}
             onChangeNote={setCurrentNote}

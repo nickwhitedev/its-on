@@ -7,6 +7,7 @@ import { useUser, useUserDispatch } from '../contexts/user/userContext'
 
 import { ChannelsDispatchActionType } from '../contexts/channels/channelsReducer'
 import ItsOnIcon from './icons/ItsOnIcon'
+import MDCircularProgress from './material/progress/MDCircularProgress'
 import MDIcon from './material/MDIcon'
 import MDPrimaryTab from './material/tabs/MDPrimaryTab'
 import MDTabs from './material/tabs/MDTabs'
@@ -39,6 +40,7 @@ const App = () => {
   const [authenticated, setAuthenticated] = useState(tokens !== null)
   const [authenticating, setAuthenticating] = useState(code !== null)
   const [loginUrl, setLoginUrl] = useState('')
+  const [isLoading, setIsLoading] = useState<boolean>(true)
 
   const user = useUser()
 
@@ -53,6 +55,7 @@ const App = () => {
   const isSubscriptionsRoute = location.pathname.startsWith('/subscriptions')
 
   const syncOverview = useCallback(async () => {
+    setIsLoading(true)
     try {
       const response = await fetchApi<OverviewData>('/')
 
@@ -77,6 +80,7 @@ const App = () => {
       // Log error to backend
       // Show user-friendly message
     }
+    setIsLoading(false)
   }, [dispatchChannels, dispatchSubscriptions, dispatchUser])
 
   useEffect(() => {
@@ -151,7 +155,7 @@ const App = () => {
       <>
         <MDTabs
           className="App-nav"
-          onChange={event => {
+          onChange={(event: Event) => {
             const activeTabIndex = (
               event.target as { activeTabIndex: number } | null
             )?.activeTabIndex
@@ -179,7 +183,14 @@ const App = () => {
           </MDPrimaryTab>
         </MDTabs>
         <div className="App-content">
-          <Outlet />
+          {isLoading ? (
+            <MDCircularProgress
+              className="App-loading"
+              indeterminate
+            />
+          ) : (
+            <Outlet />
+          )}
         </div>
       </>
     )

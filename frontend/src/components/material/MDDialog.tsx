@@ -1,6 +1,6 @@
-import { createComponent } from '@lit-labs/react'
 import { MdDialog } from '@material/web/dialog/dialog'
 import React from 'react'
+import { createComponent } from '@lit/react'
 
 /**
  * React wrapper for md-dialog

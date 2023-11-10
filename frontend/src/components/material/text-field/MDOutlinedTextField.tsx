@@ -1,6 +1,6 @@
-import { createComponent } from '@lit-labs/react'
 import { MdOutlinedTextField } from '@material/web/textfield/outlined-text-field'
 import React from 'react'
+import { createComponent } from '@lit/react'
 
 /**
  * React wrapper for md-outlined-text-field

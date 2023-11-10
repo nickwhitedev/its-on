@@ -1,6 +1,6 @@
-import { createComponent } from '@lit-labs/react'
 import { MdFilledTextField } from '@material/web/textfield/filled-text-field'
 import React from 'react'
+import { createComponent } from '@lit/react'
 
 /**
  * React wrapper for md-filled-text-field

@@ -10,7 +10,7 @@ import { useState } from 'react'
 interface Props {
   channel: IChannel
   isEditing: boolean
-  isLoading: boolean
+  isUpdating: boolean
   isOn: boolean
   title: string
   userIsChannelOwner: boolean
@@ -23,7 +23,7 @@ interface Props {
 const ChannelHeader = ({
   channel,
   isEditing,
-  isLoading,
+  isUpdating,
   isOn,
   title,
   userIsChannelOwner,
@@ -58,7 +58,7 @@ const ChannelHeader = ({
             {isEditing ? (
               <MDIconButton
                 className="ChannelHeader-button"
-                disabled={!channel.title || isLoading}
+                disabled={!channel.title || isUpdating}
                 onClick={() => {
                   setIsEditing(false)
                   onResetFormState()
@@ -93,13 +93,13 @@ const ChannelHeader = ({
         <MDOutlinedTextField
           // TODO: Implement autoFocus with ref
           className={'ChannelHeader-input'}
-          disabled={isLoading}
+          disabled={isUpdating}
           label="Channel Title"
           maxLength={40}
           rows={1}
           type="textarea"
           value={title}
-          onInput={event => {
+          onInput={(event: Event) => {
             onChangeTitle((event.target as unknown as { value: string }).value)
           }}
         />
@@ -116,7 +116,7 @@ const ChannelHeader = ({
           <div className="ChannelHeader-save-wrapper">
             <MDIconButton
               className="ChannelHeader-button"
-              disabled={title === '' || isLoading}
+              disabled={title === '' || isUpdating}
               onClick={() => void onSaveUpdates()}
             >
               <MDIcon>done</MDIcon>
@@ -126,7 +126,7 @@ const ChannelHeader = ({
           <div className="ChannelHeader-share-wrapper">
             <MDIconButton
               aria-label="Share"
-              disabled={isLoading}
+              disabled={isUpdating}
               onClick={() => void handleClickShareChannel()}
               onBlur={() => {
                 setChannelCopied(false)

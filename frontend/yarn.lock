@@ -1194,19 +1194,12 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@lit-labs/react@^2.1.0":
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/@lit-labs/react/-/react-2.1.2.tgz#225ef6564212380fde955ba2014e4cc67a0ab94e"
-  integrity sha512-/Ej0zY/+OVHKRqk97sLSYpUknNq2XZh/GRPDBWi7pwLVumpH5r7b78JGPg0LA7z+qp8UZidndZbMtaGNCXvyqA==
-  dependencies:
-    "@lit/react" "^1.0.0"
-
 "@lit-labs/ssr-dom-shim@^1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@lit-labs/ssr-dom-shim/-/ssr-dom-shim-1.1.2.tgz#d693d972974a354034454ec1317eb6afd0b00312"
   integrity sha512-jnOD+/+dSrfTWYfSXBXlo5l5f0q1UuJo3tkbMDCYA2lKUYq79jaxqtGEvnRoh049nt1vdo1+45RinipU6FGY2g==
 
-"@lit/react@^1.0.0":
+"@lit/react@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@lit/react/-/react-1.0.1.tgz#00dc227c60947abd3cbdaa03bb9cca7f5b815451"
   integrity sha512-io4yIAl9ZFY5coI2ix+nSly4rmEKLFyZM66mxOr9xvxDqwtjdVU/g6Tchb7bo+A23+5Uu/1RZpLCpvHLCGi0rw==

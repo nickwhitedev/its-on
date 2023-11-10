@@ -1,6 +1,6 @@
-import { createComponent } from '@lit-labs/react'
 import { MdElevation } from '@material/web/elevation/elevation'
 import React from 'react'
+import { createComponent } from '@lit/react'
 
 /**
  * React wrapper for md-elevation
