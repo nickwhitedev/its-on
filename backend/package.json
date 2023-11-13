@@ -7,7 +7,7 @@
     "@aws-sdk/client-dynamodb": "^3.441.0",
     "@aws-sdk/lib-dynamodb": "^3.429.0",
     "esbuild": "^0.19.5",
-    "nanoid": "^5.0.2",
+    "nanoid": "^5.0.3",
     "nanoid-dictionary": "^4.3.0",
     "web-push": "^3.6.6"
   },
