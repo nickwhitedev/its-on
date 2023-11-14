@@ -298,12 +298,12 @@
     mnemonist "0.38.3"
     tslib "^2.5.0"
 
-"@aws-sdk/lib-dynamodb@^3.429.0":
-  version "3.429.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/lib-dynamodb/-/lib-dynamodb-3.429.0.tgz#99bd0c68f4da3becb708b9e7a398f9f4827762ab"
-  integrity sha512-JoYNg5ZkqXC+y0s58LKkURHzicCF62m/XGq9aYsanmOeEweZaXZEOo3aAhOPcpvUlsIhWbq7QrmXAJG4cKh/rA==
+"@aws-sdk/lib-dynamodb@^3.449.0":
+  version "3.449.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/lib-dynamodb/-/lib-dynamodb-3.449.0.tgz#1815014d8f052fef4316c3f4c495001df7b34960"
+  integrity sha512-w9cxP0b3aafufPhNlJ7bLW6bdv5+ccZlNzEY1khv43j+IomwAugLFwCeDrae/h8n1b2BAePRhut1bdbnnI3CsQ==
   dependencies:
-    "@aws-sdk/util-dynamodb" "3.429.0"
+    "@aws-sdk/util-dynamodb" "3.449.0"
     tslib "^2.5.0"
 
 "@aws-sdk/middleware-endpoint-discovery@3.433.0":
@@ -443,10 +443,10 @@
     "@smithy/types" "^2.4.0"
     tslib "^2.5.0"
 
-"@aws-sdk/util-dynamodb@3.429.0":
-  version "3.429.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/util-dynamodb/-/util-dynamodb-3.429.0.tgz#b29eaffcb89acd7bae00a12100380488c5f2ed0f"
-  integrity sha512-0dQ794kstMvBfsWYaEQVCcMhh6ZG868FbNfaK8/mSwqjHnKMu1jCNWD/KuHD+CdHus7nPox7GkBRog2rptmN8A==
+"@aws-sdk/util-dynamodb@3.449.0":
+  version "3.449.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/util-dynamodb/-/util-dynamodb-3.449.0.tgz#ced922c6146dc0539ef431e4912294cf0d84c631"
+  integrity sha512-3Y0ZMcMTcwP8EM/twMVcA0mr7rnarcmRchLM+Lxgt4172K9YJ5Iy895Xy03g0aOgiAwAE8ogkzum0hwbv6RClg==
   dependencies:
     tslib "^2.5.0"
 
@@ -1815,10 +1815,10 @@
   resolved "https://registry.yarnpkg.com/@tsconfig/node16/-/node16-1.0.4.tgz#0b92dcc0cc1c81f6f306a381f28e31b1a56536e9"
   integrity sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==
 
-"@types/aws-lambda@^8.10.125":
-  version "8.10.125"
-  resolved "https://registry.yarnpkg.com/@types/aws-lambda/-/aws-lambda-8.10.125.tgz#c2ba86f7d98fe1827a7b048e0d31a65a8b5aed8c"
-  integrity sha512-Vqw/WMlV4O1fJT6capim01v7VLDZkcX1n6Yhb52E7IfnMqYbNfwHfyDV8rRN42NLBtdDvfaqcCqs2K0fr5ljZw==
+"@types/aws-lambda@^8.10.126":
+  version "8.10.126"
+  resolved "https://registry.yarnpkg.com/@types/aws-lambda/-/aws-lambda-8.10.126.tgz#be132de6e68353e240c88505940e67cd95d3066e"
+  integrity sha512-5eh4ffLdGYgGYI1Xr6W5L4IVse4RR7L2ns5OVUXA52nW5GFapIcGMcCzHAIMMOdpcQs3aGVxbvFlJNZH6IpgEQ==
 
 "@types/babel__core@^7.0.0", "@types/babel__core@^7.1.14", "@types/babel__core@^7.1.7":
   version "7.20.1"
@@ -2844,10 +2844,10 @@ eslint-config-prettier@^9.0.0:
   resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-9.0.0.tgz#eb25485946dd0c66cd216a46232dc05451518d1f"
   integrity sha512-IcJsTkJae2S35pRsRAwoCE+925rJJStOdkKnLVgtE+tEpqU0EVVM7OqrwxqgptKdX29NUwC82I5pXsGFIgSevw==
 
-eslint-plugin-prettier@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-prettier/-/eslint-plugin-prettier-5.0.0.tgz#6887780ed95f7708340ec79acfdf60c35b9be57a"
-  integrity sha512-AgaZCVuYDXHUGxj/ZGu1u8H8CYgDY3iG6w5kUFw4AzMVXzB7VvbKgYR4nATIN+OvUrghMbiDLeimVjVY5ilq3w==
+eslint-plugin-prettier@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-prettier/-/eslint-plugin-prettier-5.0.1.tgz#a3b399f04378f79f066379f544e42d6b73f11515"
+  integrity sha512-m3u5RnR56asrwV/lDC4GHorlW75DsFfmUcjfCYylTUs85dBRnB7VM6xG8eCMJdeDRnppzmxZVf1GEPJvl1JmNg==
   dependencies:
     prettier-linter-helpers "^1.0.0"
     synckit "^0.8.5"
@@ -4354,10 +4354,10 @@ nanoid-dictionary@^4.3.0:
   resolved "https://registry.yarnpkg.com/nanoid-dictionary/-/nanoid-dictionary-4.3.0.tgz#d4cefa1e4c06b1f576789eeb2646101f8c5419e8"
   integrity sha512-Xw1+/QnRGWO1KJ0rLfU1xR85qXmAHyLbE3TUkklu9gOIDburP6CsUnLmTaNECGpBh5SHb2uPFmx0VT8UPyoeyw==
 
-nanoid@*, nanoid@^5.0.2:
-  version "5.0.2"
-  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-5.0.2.tgz#97588ebc70166d0feaf73ccd2799bb4ceaebf692"
-  integrity sha512-2ustYUX1R2rL/Br5B/FMhi8d5/QzvkJ912rBYxskcpu0myTHzSZfTr1LAS2Sm7jxRUObRrSBFoyzwAhL49aVSg==
+nanoid@*, nanoid@^5.0.3:
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-5.0.3.tgz#6c97f53d793a7a1de6a38ebb46f50f95bf9793c7"
+  integrity sha512-I7X2b22cxA4LIHXPSqbBCEQSL+1wv8TuoefejsX4HFWyC6jc5JG7CEaxOltiKjc1M+YCS2YkrZZcj4+dytw9GA==
 
 nanomatch@^1.2.9:
   version "1.2.13"
