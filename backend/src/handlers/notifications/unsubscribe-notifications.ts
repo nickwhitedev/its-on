@@ -3,8 +3,8 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { PushSubscription } from 'web-push'
-import { DYNAMODB_TABLE_NAME } from '../../utils/constants'
-import { createResponse } from '../../utils/response'
+import { DYNAMODB_TABLE_NAME, ENV } from '/opt/nodejs/constants'
+import { createResponse } from '/opt/nodejs/response'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -24,7 +24,9 @@ export const unsubscribeNotificationsHandler = async (
       `postMethod only accepts POST method, you tried: ${event.httpMethod} method.`,
     )
   }
-  console.debug('received:', event)
+  if (ENV !== 'prod') {
+    console.debug('received:', event)
+  }
 
   const eventPath = event.path
 
@@ -60,7 +62,9 @@ export const unsubscribeNotificationsHandler = async (
         },
       }),
     )
-    console.info('Success - user profile updated', ddbResponse)
+    if (ENV !== 'prod') {
+      console.debug('Success - user profile updated', ddbResponse)
+    }
   } catch (error) {
     console.error(
       'Error',

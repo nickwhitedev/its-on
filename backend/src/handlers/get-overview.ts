@@ -6,9 +6,9 @@ import {
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DYNAMODB_TABLE_NAME } from '../utils/constants'
-import { createResponse } from '../utils/response'
-import { serializeQueryResponse } from '../utils/serialize'
+import { DYNAMODB_TABLE_NAME, ENV } from '../common/constants'
+import { createResponse } from '../common/response'
+import { serializeQueryResponse } from '../common/serialize'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -26,7 +26,9 @@ export const getOverviewHandler = async (
       `getOverview only accept GET method, you tried: ${event.httpMethod}`,
     )
   }
-  console.debug('received:', event)
+  if (ENV !== 'prod') {
+    console.debug('received:', event)
+  }
 
   const eventPath = event.path
   const userID =
@@ -46,7 +48,9 @@ export const getOverviewHandler = async (
         },
       }),
     )
-    console.info('Successful user partition query - data: ', ddbResponse)
+    if (ENV !== 'prod') {
+      console.debug('Successful user partition query - data: ', ddbResponse)
+    }
 
     const data = serializeQueryResponse(
       ddbResponse.Items ?? [],
@@ -75,7 +79,9 @@ export const getOverviewHandler = async (
             } as IDynamoUserItem,
           }),
         )
-        console.info('Successful user profile write')
+        if (ENV !== 'prod') {
+          console.debug('Successful user profile write')
+        }
 
         data.profile = userAttributes
       } catch (error) {

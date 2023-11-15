@@ -6,9 +6,9 @@ import {
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DYNAMODB_TABLE_NAME } from '../../utils/constants'
-import { getChannel, getUserInfo } from '../../utils/dynamo'
-import { createResponse } from '../../utils/response'
+import { DYNAMODB_TABLE_NAME, ENV } from '/opt/nodejs/constants'
+import { getChannel, getUserInfo } from '/opt/nodejs/dynamo'
+import { createResponse } from '/opt/nodejs/response'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -24,7 +24,9 @@ export const removeChannelSubscriberHandler = async (
       `Delete method only accepts DELETE method, you tried: ${event.httpMethod} method.`,
     )
   }
-  console.debug('received:', event)
+  if (ENV !== 'prod') {
+    console.debug('received:', event)
+  }
 
   const eventPath = event.path
   const channelID = event.pathParameters?.channelID
@@ -58,7 +60,9 @@ export const removeChannelSubscriberHandler = async (
       break getPublicChannel
     }
     channelTitle = publicChannel.title ?? defaultUnsubscribedChannelTitle
-    console.info('Get public channel info: ', publicChannel)
+    if (ENV !== 'prod') {
+      console.debug('Get public channel info: ', publicChannel)
+    }
   } catch (error) {
     console.error('Get public channel error', error)
   }
@@ -94,7 +98,9 @@ export const removeChannelSubscriberHandler = async (
         },
       }),
     )
-    console.info('Success - user unsubscribed from channel', ddbResponse)
+    if (ENV !== 'prod') {
+      console.debug('Success - user unsubscribed from channel', ddbResponse)
+    }
   } catch (err) {
     // TODO: Error handling - make more robust
     console.error('Error', err instanceof Error ? err.stack : 'Unknown Type')
@@ -123,7 +129,9 @@ export const removeChannelSubscriberHandler = async (
         },
       }),
     )
-    console.info('Success - subscriber count updated', ddbResponse)
+    if (ENV !== 'prod') {
+      console.debug('Success - subscriber count updated', ddbResponse)
+    }
   } catch (error) {
     console.error(
       'Update Error',

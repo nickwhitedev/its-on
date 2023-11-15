@@ -6,10 +6,10 @@ import {
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DYNAMODB_TABLE_NAME } from '../../utils/constants'
-import { getChannel } from '../../utils/dynamo'
-import { ChannelCopyTypeEnum } from '../../utils/enums'
-import { createResponse } from '../../utils/response'
+import { DYNAMODB_TABLE_NAME, ENV } from '/opt/nodejs/constants'
+import { getChannel } from '/opt/nodejs/dynamo'
+import { ChannelCopyTypeEnum } from '/opt/nodejs/enums'
+import { createResponse } from '/opt/nodejs/response'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -25,7 +25,9 @@ export const unsubscribeHandler = async (
       `postMethod only accepts POST method, you tried: ${event.httpMethod} method.`,
     )
   }
-  console.debug('received:', event)
+  if (ENV !== 'prod') {
+    console.debug('received:', event)
+  }
 
   const eventPath = event.path
 
@@ -45,7 +47,9 @@ export const unsubscribeHandler = async (
     })
     channelOwnerID = subscriberChannelCopy?.ownerID
     channelIsDeleted = subscriberChannelCopy?.deleted
-    console.info("Get subscriber's channel copy: ", subscriberChannelCopy)
+    if (ENV !== 'prod') {
+      console.debug("Get subscriber's channel copy: ", subscriberChannelCopy)
+    }
   } catch (error) {
     console.error('Get public channel error', error)
     return createResponse({
@@ -80,7 +84,9 @@ export const unsubscribeHandler = async (
         },
       }),
     )
-    console.info('Success - items added or updated', ddbResponse)
+    if (ENV !== 'prod') {
+      console.debug('Success - items added or updated', ddbResponse)
+    }
   } catch (error) {
     console.error(
       'Error',
@@ -113,7 +119,9 @@ export const unsubscribeHandler = async (
         },
       }),
     )
-    console.info('Success - subscriber count updated', ddbResponse)
+    if (ENV !== 'prod') {
+      console.debug('Success - subscriber count updated', ddbResponse)
+    }
   } catch (error) {
     console.error(
       'Update Error',
@@ -144,7 +152,9 @@ export const unsubscribeHandler = async (
         },
       }),
     )
-    console.info('Success - subscription count updated', ddbResponse)
+    if (ENV !== 'prod') {
+      console.debug('Success - subscription count updated', ddbResponse)
+    }
   } catch (error) {
     console.error(
       'Update Error',

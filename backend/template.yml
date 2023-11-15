@@ -38,6 +38,29 @@ Conditions:
 # conditions don't work in the mappings section.
 # Just ask Bard.
 
+Globals:
+  Function:
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        ENV: !Ref Env
+        ITS_ON_TABLE: !Ref ItsOnTable
+        PUSH_NOTIFICATION_PUBLIC_KEY: !Ref PushNotificationPublicKey
+        PUSH_NOTIFICATION_PRIVATE_KEY: !Ref PushNotificationPrivateKey
+        WEB_URL:
+          'Fn::If':
+            - IsProdEnv
+            - https://itson.fyi
+            - !Sub https://${Env}.itson.fyi
+    Layers:
+      - !Ref ItsOnNodeModulesLambdaLayer
+      - !Ref ItsOnCommonLambdaLayer
+      - !Ref ItsOnTableStreamLambdaLayer
+    MemorySize: 128
+    Runtime: nodejs18.x
+    Timeout: 100
+
 # Resources declares the AWS resources that you want to include in the stack
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
 Resources:
@@ -78,6 +101,28 @@ Resources:
             Headers:
               Access-Control-Allow-Origin: "'*'"
 
+  ItsOnNodeModulesLambdaLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: node-modules
+      ContentUri: dist/node-modules-layer/
+      CompatibleRuntimes:
+        - nodejs18.x
+  ItsOnCommonLambdaLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: common
+      ContentUri: dist/common-layer/
+      CompatibleRuntimes:
+        - nodejs18.x
+  ItsOnTableStreamLambdaLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: table-stream
+      ContentUri: dist/table-stream-layer/
+      CompatibleRuntimes:
+        - nodejs18.x
+
   # Each Lambda function is defined by properties:
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
 
@@ -85,21 +130,8 @@ Resources:
   getOverviewFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/get-overview.getOverviewHandler
-      Runtime: nodejs18.x
-      Architectures:
-        - x86_64
-      MemorySize: 128
-      Timeout: 100
+      CodeUri: dist/src/handlers/
       Description: Gets all of a user's data.
-      Policies:
-        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
-        - DynamoDBCrudPolicy:
-            TableName: !Ref ItsOnTable
-      Environment:
-        Variables:
-          # Make table name accessible as environment variable from function code during execution
-          ITS_ON_TABLE: !Ref ItsOnTable
       Events:
         Api:
           Type: Api
@@ -107,36 +139,25 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /
             Method: GET
-    Metadata:
-      BuildMethod: esbuild
-      BuildProperties:
-        Minify: true
-        Target: 'es2022'
-        Sourcemap: true
-        EntryPoints:
-          - src/handlers/get-overview.ts
-  # Each Lambda function is defined by properties:
-  # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+      Handler: get-overview.getOverviewHandler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  getOverviewFunctionLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    DependsOn: "getOverviewFunction"
+    Properties: 
+      RetentionInDays: 30
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref getOverviewFunction]]
 
   # This is a Lambda function config associated with the source code: get-channel.ts
   getChannelFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/channel/get-channel.getChannelHandler
-      Runtime: nodejs18.x
-      Architectures:
-        - x86_64
-      MemorySize: 128
-      Timeout: 100
+      CodeUri: dist/src/handlers/channel/
       Description: Gets data related to a channel
-      Policies:
-        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
-        - DynamoDBCrudPolicy:
-            TableName: !Ref ItsOnTable
-      Environment:
-        Variables:
-          # Make table name accessible as environment variable from function code during execution
-          ITS_ON_TABLE: !Ref ItsOnTable
       Events:
         Api:
           Type: Api
@@ -144,36 +165,25 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /{channelID}
             Method: GET
-    Metadata:
-      BuildMethod: esbuild
-      BuildProperties:
-        Minify: true
-        Target: 'es2022'
-        Sourcemap: true
-        EntryPoints:
-          - src/handlers/channel/get-channel.ts
-  # Each Lambda function is defined by properties:
-  # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+      Handler: get-channel.getChannelHandler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  getChannelFunctionLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    DependsOn: "getChannelFunction"
+    Properties: 
+      RetentionInDays: 30
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref getChannelFunction]]
 
   # This is a Lambda function config associated with the source code: create-item.ts
   createChannelFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/channel/create-channel.createChannelHandler
-      Runtime: nodejs18.x
-      Architectures:
-        - x86_64
-      MemorySize: 128
-      Timeout: 100
+      CodeUri: dist/src/handlers/channel/
       Description: Creates a channel for a user
-      Policies:
-        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
-        - DynamoDBCrudPolicy:
-            TableName: !Ref ItsOnTable
-      Environment:
-        Variables:
-          # Make table name accessible as environment variable from function code during execution
-          ITS_ON_TABLE: !Ref ItsOnTable
       Events:
         Api:
           Type: Api
@@ -181,34 +191,25 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /channels
             Method: POST
-    Metadata:
-      BuildMethod: esbuild
-      BuildProperties:
-        Minify: true
-        Target: 'es2022'
-        Sourcemap: true
-        EntryPoints:
-          - src/handlers/channel/create-channel.ts
+      Handler: create-channel.createChannelHandler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  createChannelFunctionLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    DependsOn: "createChannelFunction"
+    Properties: 
+      RetentionInDays: 30
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref createChannelFunction]]
 
   # This is a Lambda function config associated with the source code: update-item.ts
   updateChannelFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/channel/update-channel.updateChannelHandler
-      Runtime: nodejs18.x
-      Architectures:
-        - x86_64
-      MemorySize: 128
-      Timeout: 100
+      CodeUri: dist/src/handlers/channel/
       Description: Updates a channel for a user
-      Policies:
-        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
-        - DynamoDBCrudPolicy:
-            TableName: !Ref ItsOnTable
-      Environment:
-        Variables:
-          # Make table name accessible as environment variable from function code during execution
-          ITS_ON_TABLE: !Ref ItsOnTable
       Events:
         Api:
           Type: Api
@@ -216,34 +217,25 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /{channelID}
             Method: PUT
-    Metadata:
-      BuildMethod: esbuild
-      BuildProperties:
-        Minify: true
-        Target: 'es2022'
-        Sourcemap: true
-        EntryPoints:
-          - src/handlers/channel/update-channel.ts
+      Handler: update-channel.updateChannelHandler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  updateChannelFunctionLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    DependsOn: "updateChannelFunction"
+    Properties: 
+      RetentionInDays: 30
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref updateChannelFunction]]
 
   # This is a Lambda function config associated with the source code: its-on.ts
   itsOnFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/channel/its-on.itsOnHandler
-      Runtime: nodejs18.x
-      Architectures:
-        - x86_64
-      MemorySize: 128
-      Timeout: 100
+      CodeUri: dist/src/handlers/channel/
       Description: Turns a channel on for a user
-      Policies:
-        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
-        - DynamoDBCrudPolicy:
-            TableName: !Ref ItsOnTable
-      Environment:
-        Variables:
-          # Make table name accessible as environment variable from function code during execution
-          ITS_ON_TABLE: !Ref ItsOnTable
       Events:
         Api:
           Type: Api
@@ -251,34 +243,25 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /{channelID}/its-on
             Method: POST
-    Metadata:
-      BuildMethod: esbuild
-      BuildProperties:
-        Minify: true
-        Target: 'es2022'
-        Sourcemap: true
-        EntryPoints:
-          - src/handlers/channel/its-on.ts
+      Handler: its-on.itsOnHandler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  itsOnFunctionLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    DependsOn: "itsOnFunction"
+    Properties: 
+      RetentionInDays: 30
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref itsOnFunction]]
 
   # This is a Lambda function config associated with the source code: its-off.ts
   itsOffFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/channel/its-off.itsOffHandler
-      Runtime: nodejs18.x
-      Architectures:
-        - x86_64
-      MemorySize: 128
-      Timeout: 100
+      CodeUri: dist/src/handlers/channel/
       Description: Turns a channel off for a user
-      Policies:
-        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
-        - DynamoDBCrudPolicy:
-            TableName: !Ref ItsOnTable
-      Environment:
-        Variables:
-          # Make table name accessible as environment variable from function code during execution
-          ITS_ON_TABLE: !Ref ItsOnTable
       Events:
         Api:
           Type: Api
@@ -286,34 +269,25 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /{channelID}/its-off
             Method: POST
-    Metadata:
-      BuildMethod: esbuild
-      BuildProperties:
-        Minify: true
-        Target: 'es2022'
-        Sourcemap: true
-        EntryPoints:
-          - src/handlers/channel/its-off.ts
+      Handler: its-off.itsOffHandler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  itsOffFunctionLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    DependsOn: "itsOffFunction"
+    Properties: 
+      RetentionInDays: 30
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref itsOffFunction]]
 
   # This is a Lambda function config associated with the source code: delete-item.ts
   deleteChannelFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/channel/delete-channel.deleteChannelHandler
-      Runtime: nodejs18.x
-      Architectures:
-        - x86_64
-      MemorySize: 128
-      Timeout: 100
+      CodeUri: dist/src/handlers/channel/
       Description: Deletes a channel for a user
-      Policies:
-        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
-        - DynamoDBCrudPolicy:
-            TableName: !Ref ItsOnTable
-      Environment:
-        Variables:
-          # Make table name accessible as environment variable from function code during execution
-          ITS_ON_TABLE: !Ref ItsOnTable
       Events:
         Api:
           Type: Api
@@ -321,34 +295,25 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /{channelID}
             Method: DELETE
-    Metadata:
-      BuildMethod: esbuild
-      BuildProperties:
-        Minify: true
-        Target: 'es2022'
-        Sourcemap: true
-        EntryPoints:
-          - src/handlers/channel/delete-channel.ts
+      Handler: delete-channel.deleteChannelHandler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  deleteChannelFunctionLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    DependsOn: "deleteChannelFunction"
+    Properties: 
+      RetentionInDays: 30
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref deleteChannelFunction]]
 
   # This is a Lambda function config associated with the source code: delete-item.ts
   removeChannelSubscriberFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/channel/remove-channel-subscriber.removeChannelSubscriberHandler
-      Runtime: nodejs18.x
-      Architectures:
-        - x86_64
-      MemorySize: 128
-      Timeout: 100
+      CodeUri: dist/src/handlers/channel/
       Description: Removes a channel's subscriber for a user
-      Policies:
-        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
-        - DynamoDBCrudPolicy:
-            TableName: !Ref ItsOnTable
-      Environment:
-        Variables:
-          # Make table name accessible as environment variable from function code during execution
-          ITS_ON_TABLE: !Ref ItsOnTable
       Events:
         Api:
           Type: Api
@@ -356,34 +321,25 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /{channelID}/subscribers/{subscriberID}
             Method: DELETE
-    Metadata:
-      BuildMethod: esbuild
-      BuildProperties:
-        Minify: true
-        Target: 'es2022'
-        Sourcemap: true
-        EntryPoints:
-          - src/handlers/channel/remove-channel-subscriber.ts
+      Handler: remove-channel-subscriber.removeChannelSubscriberHandler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  removeChannelSubscriberFunctionLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    DependsOn: "removeChannelSubscriberFunction"
+    Properties: 
+      RetentionInDays: 30
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref removeChannelSubscriberFunction]]
 
   # This is a Lambda function config associated with the source code: subscribe.ts
   subscribeFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/channel/subscribe.subscribeHandler
-      Runtime: nodejs18.x
-      Architectures:
-        - x86_64
-      MemorySize: 128
-      Timeout: 100
+      CodeUri: dist/src/handlers/channel/
       Description: Subscribes a user to a channel
-      Policies:
-        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
-        - DynamoDBCrudPolicy:
-            TableName: !Ref ItsOnTable
-      Environment:
-        Variables:
-          # Make table name accessible as environment variable from function code during execution
-          ITS_ON_TABLE: !Ref ItsOnTable
       Events:
         Api:
           Type: Api
@@ -391,34 +347,25 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /{channelID}/subscribe
             Method: POST
-    Metadata:
-      BuildMethod: esbuild
-      BuildProperties:
-        Minify: true
-        Target: 'es2022'
-        Sourcemap: true
-        EntryPoints:
-          - src/handlers/channel/subscribe.ts
+      Handler: subscribe.subscribeHandler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  subscribeFunctionLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    DependsOn: "subscribeFunction"
+    Properties: 
+      RetentionInDays: 30
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref subscribeFunction]]
 
   # This is a Lambda function config associated with the source code: unsubscribe.ts
   unsubscribeFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/channel/unsubscribe.unsubscribeHandler
-      Runtime: nodejs18.x
-      Architectures:
-        - x86_64
-      MemorySize: 128
-      Timeout: 100
+      CodeUri: dist/src/handlers/channel/
       Description: Unsubscribes a user from a channel
-      Policies:
-        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
-        - DynamoDBCrudPolicy:
-            TableName: !Ref ItsOnTable
-      Environment:
-        Variables:
-          # Make table name accessible as environment variable from function code during execution
-          ITS_ON_TABLE: !Ref ItsOnTable
       Events:
         Api:
           Type: Api
@@ -426,33 +373,25 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /{channelID}/unsubscribe
             Method: POST
-    Metadata:
-      BuildMethod: esbuild
-      BuildProperties:
-        Minify: true
-        Target: 'es2022'
-        Sourcemap: true
-        EntryPoints:
-          - src/handlers/channel/unsubscribe.ts
+      Handler: unsubscribe.unsubscribeHandler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  unsubscribeFunctionLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    DependsOn: "unsubscribeFunction"
+    Properties: 
+      RetentionInDays: 30
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref unsubscribeFunction]]
 
   # This is a Lambda function config associated with the source code: get-notification-key.ts
   getNotificationKeyFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/notifications/get-notification-key.getNotificationKeyHandler
-      Runtime: nodejs18.x
-      Architectures:
-        - x86_64
-      MemorySize: 128
-      Timeout: 100
+      CodeUri: dist/src/handlers/notifications/
       Description: Gets the public VAPID key to use for notifications
-      Policies:
-        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
-        - DynamoDBCrudPolicy:
-            TableName: !Ref ItsOnTable
-      Environment:
-        Variables:
-          PUSH_NOTIFICATION_PUBLIC_KEY: !Ref PushNotificationPublicKey
       Events:
         Api:
           Type: Api
@@ -460,34 +399,25 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /notification-key
             Method: GET
-    Metadata:
-      BuildMethod: esbuild
-      BuildProperties:
-        Minify: true
-        Target: 'es2022'
-        Sourcemap: true
-        EntryPoints:
-          - src/handlers/notifications/get-notification-key.ts
+      Handler: get-notification-key.getNotificationKeyHandler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  getNotificationKeyFunctionLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    DependsOn: "getNotificationKeyFunction"
+    Properties: 
+      RetentionInDays: 30
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref getNotificationKeyFunction]]
 
   # This is a Lambda function config associated with the source code: enable-notifications.ts
   enableNotificationsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/notifications/enable-notifications.enableNotificationsHandler
-      Runtime: nodejs18.x
-      Architectures:
-        - x86_64
-      MemorySize: 128
-      Timeout: 100
+      CodeUri: dist/src/handlers/notifications/
       Description: Enables notifications for a user
-      Policies:
-        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
-        - DynamoDBCrudPolicy:
-            TableName: !Ref ItsOnTable
-      Environment:
-        Variables:
-          # Make table name accessible as environment variable from function code during execution
-          ITS_ON_TABLE: !Ref ItsOnTable
       Events:
         Api:
           Type: Api
@@ -495,34 +425,25 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /enable-notifications
             Method: POST
-    Metadata:
-      BuildMethod: esbuild
-      BuildProperties:
-        Minify: true
-        Target: 'es2022'
-        Sourcemap: true
-        EntryPoints:
-          - src/handlers/notifications/enable-notifications.ts
+      Handler: enable-notifications.enableNotificationsHandler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  enableNotificationsFunctionLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    DependsOn: "enableNotificationsFunction"
+    Properties: 
+      RetentionInDays: 30
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref enableNotificationsFunction]]
 
   # This is a Lambda function config associated with the source code: disable-notifications.ts
   disableNotificationsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/notifications/disable-notifications.disableNotificationsHandler
-      Runtime: nodejs18.x
-      Architectures:
-        - x86_64
-      MemorySize: 128
-      Timeout: 100
+      CodeUri: dist/src/handlers/notifications/
       Description: Disables notifications for a user
-      Policies:
-        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
-        - DynamoDBCrudPolicy:
-            TableName: !Ref ItsOnTable
-      Environment:
-        Variables:
-          # Make table name accessible as environment variable from function code during execution
-          ITS_ON_TABLE: !Ref ItsOnTable
       Events:
         Api:
           Type: Api
@@ -530,34 +451,25 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /disable-notifications
             Method: POST
-    Metadata:
-      BuildMethod: esbuild
-      BuildProperties:
-        Minify: true
-        Target: 'es2022'
-        Sourcemap: true
-        EntryPoints:
-          - src/handlers/notifications/disable-notifications.ts
+      Handler: disable-notifications.disableNotificationsHandler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  disableNotificationsFunctionLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    DependsOn: "disableNotificationsFunction"
+    Properties: 
+      RetentionInDays: 30
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref disableNotificationsFunction]]
 
   # This is a Lambda function config associated with the source code: subscribe-notifications.ts
   subscribeNotificationsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/notifications/subscribe-notifications.subscribeNotificationsHandler
-      Runtime: nodejs18.x
-      Architectures:
-        - x86_64
-      MemorySize: 128
-      Timeout: 100
+      CodeUri: dist/src/handlers/notifications/
       Description: Register a user's notification subscription
-      Policies:
-        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
-        - DynamoDBCrudPolicy:
-            TableName: !Ref ItsOnTable
-      Environment:
-        Variables:
-          # Make table name accessible as environment variable from function code during execution
-          ITS_ON_TABLE: !Ref ItsOnTable
       Events:
         Api:
           Type: Api
@@ -565,34 +477,25 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /subscribe-notifications
             Method: POST
-    Metadata:
-      BuildMethod: esbuild
-      BuildProperties:
-        Minify: true
-        Target: 'es2022'
-        Sourcemap: true
-        EntryPoints:
-          - src/handlers/notifications/subscribe-notifications.ts
+      Handler: subscribe-notifications.subscribeNotificationsHandler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  subscribeNotificationsFunctionLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    DependsOn: "subscribeNotificationsFunction"
+    Properties: 
+      RetentionInDays: 30
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref subscribeNotificationsFunction]]
 
   # This is a Lambda function config associated with the source code: unsubscribe-notifications.ts
   unsubscribeNotificationsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/notifications/unsubscribe-notifications.unsubscribeNotificationsHandler
-      Runtime: nodejs18.x
-      Architectures:
-        - x86_64
-      MemorySize: 128
-      Timeout: 100
+      CodeUri: dist/src/handlers/notifications/
       Description: Unregister a user's notification subscription
-      Policies:
-        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
-        - DynamoDBCrudPolicy:
-            TableName: !Ref ItsOnTable
-      Environment:
-        Variables:
-          # Make table name accessible as environment variable from function code during execution
-          ITS_ON_TABLE: !Ref ItsOnTable
       Events:
         Api:
           Type: Api
@@ -600,40 +503,24 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /unsubscribe-notifications
             Method: POST
-    Metadata:
-      BuildMethod: esbuild
-      BuildProperties:
-        Minify: true
-        Target: 'es2022'
-        Sourcemap: true
-        EntryPoints:
-          - src/handlers/notifications/unsubscribe-notifications.ts
-
-  tableStreamFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: src/handlers/table-stream.tableStreamHandler
-      Runtime: nodejs18.x
-      Architectures:
-        - x86_64
-      MemorySize: 128
-      Timeout: 100
-      Description: Handles write events from the ItsOnTable
+      Handler: unsubscribe-notifications.unsubscribeNotificationsHandler
       Policies:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
-      Environment:
-        Variables:
-          # Make table name accessible as environment variable from function code during execution
-          ITS_ON_TABLE: !Ref ItsOnTable
-          PUSH_NOTIFICATION_PUBLIC_KEY: !Ref PushNotificationPublicKey
-          PUSH_NOTIFICATION_PRIVATE_KEY: !Ref PushNotificationPrivateKey
-          WEB_URL:
-            'Fn::If':
-              - IsProdEnv
-              - https://itson.fyi
-              - !Sub https://${Env}.itson.fyi
+
+  unsubscribeNotificationsFunctionLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    DependsOn: "unsubscribeNotificationsFunction"
+    Properties: 
+      RetentionInDays: 30
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref unsubscribeNotificationsFunction]]
+
+  tableStreamFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/src/handlers/
+      Description: Handles write events from the ItsOnTable
       Events:
         TableStream:
           Type: DynamoDB
@@ -654,14 +541,18 @@ Resources:
             # TumblingWindowInSeconds: 0
             # FunctionResponseTypes:
             #   - ReportBatchItemFailures
-    Metadata:
-      BuildMethod: esbuild
-      BuildProperties:
-        Minify: true
-        Target: 'es2022'
-        Sourcemap: true
-        EntryPoints:
-          - src/handlers/table-stream.ts
+      Handler: table-stream.tableStreamHandler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  tableStreamFunctionLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    DependsOn: "tableStreamFunction"
+    Properties: 
+      RetentionInDays: 30
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref tableStreamFunction]]
 
   # DynamoDB table to store item: {id: &lt;ID&gt;, name: &lt;NAME&gt;}
   ItsOnTable:

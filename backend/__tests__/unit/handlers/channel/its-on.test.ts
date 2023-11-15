@@ -8,8 +8,8 @@ import { jest } from '@jest/globals'
 import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
 import mockEvent from '../../../../__mocks__/mock-event'
+import { CORS_HEADERS } from '../../../../src/common/constants'
 import { itsOnHandler } from '../../../../src/handlers/channel/its-on'
-import { CORS_HEADERS } from '../../../../src/utils/constants'
 
 describe('Test itsOnHandler', function () {
   const ddbMock = mockClient(DynamoDBDocumentClient)

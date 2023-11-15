@@ -11,12 +11,13 @@ import { DynamoDBRecord } from 'aws-lambda'
 import { PushSubscription, sendNotification } from 'web-push'
 import {
   DYNAMODB_TABLE_NAME,
+  ENV,
   PUSH_NOTIFICATION_PRIVATE_KEY,
   PUSH_NOTIFICATION_PUBLIC_KEY,
   WEB_URL,
-} from '../utils/constants'
-import { batchWrite } from '../utils/dynamo'
-import { MS_IN_HOUR } from '../utils/time'
+} from '../common/constants'
+import { batchWrite } from '../common/dynamo'
+import { MS_IN_HOUR } from '../common/time'
 
 const sendUserNotification = async ({
   channelID,
@@ -169,7 +170,9 @@ export const handleModifyEvent = async (
         } as IDynamoChannelItem,
       }),
     )
-    console.info('Successful public channel write')
+    if (ENV !== 'prod') {
+      console.debug('Successful public channel write')
+    }
   } catch (error) {
     console.error('write public channel failed: ', error)
     return
@@ -178,7 +181,9 @@ export const handleModifyEvent = async (
   let lastEvaluatedKey: Record<string, unknown> | undefined
   let queryBatchCount = 0
   do {
-    console.info(`Start Query batch ${++queryBatchCount}`)
+    if (ENV !== 'prod') {
+      console.debug(`Start Query batch ${++queryBatchCount}`)
+    }
 
     let subscribers: IDynamoChannelSubscriber[]
 
@@ -203,7 +208,9 @@ export const handleModifyEvent = async (
       )
       subscribers = (ddbResponse.Items ?? []) as IDynamoChannelSubscriber[]
       lastEvaluatedKey = ddbResponse.LastEvaluatedKey
-      console.info('Get public channel subscribers: ', ddbResponse)
+      if (ENV !== 'prod') {
+        console.debug('Get public channel subscribers: ', ddbResponse)
+      }
     } catch (err) {
       console.error('Get public channel subscribers error', err)
       return
@@ -240,7 +247,9 @@ export const handleModifyEvent = async (
           },
           ddbDocClient,
         })
-        console.info(`Successful batch write - batch ${++batchCount}`)
+        if (ENV !== 'prod') {
+          console.debug(`Successful batch write - batch ${++batchCount}`)
+        }
       } catch (error) {
         console.error('batch write failed: ', error)
         return
@@ -270,7 +279,9 @@ export const handleModifyEvent = async (
       }
       let getBatchCount = 0
       do {
-        console.info(`Start Get batch ${++getBatchCount}`)
+        if (ENV !== 'prod') {
+          console.debug(`Start Get batch ${++getBatchCount}`)
+        }
 
         let subscriberNotificationSubscriptions: IDynamoUserNotificationSubscriptionsItem[]
 
@@ -284,10 +295,12 @@ export const handleModifyEvent = async (
             DYNAMODB_TABLE_NAME
           ] ?? []) as IDynamoUserNotificationSubscriptionsItem[]
           unprocessedKeys = ddbResponse.UnprocessedKeys
-          console.info(
-            'Get subscriber notification subscriptions: ',
-            subscriberNotificationSubscriptions,
-          )
+          if (ENV !== 'prod') {
+            console.debug(
+              'Get subscriber notification subscriptions: ',
+              subscriberNotificationSubscriptions,
+            )
+          }
         } catch (err) {
           console.error('Get public channel subscribers error', err)
           return
@@ -314,5 +327,7 @@ export const handleModifyEvent = async (
       } while ((unprocessedKeys?.[DYNAMODB_TABLE_NAME]?.Keys ?? []).length > 0)
     }
   } while (lastEvaluatedKey != null && Object.keys(lastEvaluatedKey).length > 0)
-  console.info('Finished updating items successfully')
+  if (ENV !== 'prod') {
+    console.debug('Finished updating items successfully')
+  }
 }

@@ -2,11 +2,11 @@ import { DynamoDBDocumentClient, QueryCommand } from '@aws-sdk/lib-dynamodb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DYNAMODB_TABLE_NAME } from '../../utils/constants'
-import { getChannel } from '../../utils/dynamo'
-import { ChannelCopyTypeEnum } from '../../utils/enums'
-import { createResponse } from '../../utils/response'
-import { serializeQueryResponse } from '../../utils/serialize'
+import { DYNAMODB_TABLE_NAME, ENV } from '/opt/nodejs/constants'
+import { getChannel } from '/opt/nodejs/dynamo'
+import { ChannelCopyTypeEnum } from '/opt/nodejs/enums'
+import { createResponse } from '/opt/nodejs/response'
+import { serializeQueryResponse } from '/opt/nodejs/serialize'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -17,7 +17,9 @@ const ddbDocClient = DynamoDBDocumentClient.from(client)
 export const getChannelHandler = async (
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
-  console.debug('received:', event)
+  if (ENV !== 'prod') {
+    console.debug('received:', event)
+  }
 
   if (event.httpMethod !== 'GET') {
     throw new Error(
@@ -78,7 +80,9 @@ export const getChannelHandler = async (
           subscribers: IChannelSubscriber[]
         }
       ).subscribers
-      console.info('Success - channel owner data: ', ddbResponse)
+      if (ENV !== 'prod') {
+        console.debug('Success - channel owner data: ', ddbResponse)
+      }
     } catch (error) {
       console.error('Dynamo Query Error', error)
       return createResponse({

@@ -32,7 +32,7 @@
   },
   "scripts": {
     "build": "sam build",
-    "compile": "tsc",
+    "compile": "tsc && ./scripts/setup-layers.sh",
     "lint": "eslint . --ext ts --report-unused-disable-directives --max-warnings 0",
     "test": "jest",
     "test-ci": "jest --silent"

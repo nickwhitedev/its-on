@@ -5,9 +5,9 @@ import {
   QueryCommandOutput,
 } from '@aws-sdk/lib-dynamodb'
 
-import { DYNAMODB_TABLE_NAME } from '../utils/constants'
 import { DynamoDBRecord } from 'aws-lambda'
-import { batchWrite } from '../utils/dynamo'
+import { DYNAMODB_TABLE_NAME, ENV } from '../common/constants'
+import { batchWrite } from '../common/dynamo'
 
 export const handleRemoveEvent = async (
   record: DynamoDBRecord,
@@ -35,7 +35,9 @@ export const handleRemoveEvent = async (
         },
       }),
     )
-    console.info('Successful public channel delete')
+    if (ENV !== 'prod') {
+      console.debug('Successful public channel delete')
+    }
   } catch (error) {
     console.error('public channel delete failed: ', error)
   }
@@ -57,7 +59,9 @@ export const handleRemoveEvent = async (
       )
       subscribers = ddbResponse.Items as IDynamoChannelSubscriber[] | null
       lastEvaluatedKey = ddbResponse.LastEvaluatedKey
-      console.info('Get channel subscribers: ', ddbResponse)
+      if (ENV !== 'prod') {
+        console.debug('Get channel subscribers: ', ddbResponse)
+      }
     } catch (error) {
       console.error('Get public channel error', error)
       return
@@ -102,11 +106,15 @@ export const handleRemoveEvent = async (
           },
           ddbDocClient,
         })
-        console.info(`Successful batch write/delete - batch ${++batchCount}`)
+        if (ENV !== 'prod') {
+          console.debug(`Successful batch write/delete - batch ${++batchCount}`)
+        }
       } catch (error) {
         console.error('batch write/delete failed: ', error)
       }
-      console.info(`Batches of items written/deleted: ${batchCount}`)
+      if (ENV !== 'prod') {
+        console.debug(`Batches of items written/deleted: ${batchCount}`)
+      }
       // Next batch in the queue
       subscribers.splice(0, 12)
     }

@@ -1,4 +1,4 @@
-import { CORS_HEADERS } from './constants'
+import { CORS_HEADERS, ENV } from './constants'
 
 interface ICreateResponseParams {
   eventPath: string
@@ -21,10 +21,12 @@ export const createResponse = ({
   responseBody,
   statusCode,
 }: ICreateResponseParams): IResponse => {
-  console.info(`response from: ${eventPath}: `, {
-    responseBody,
-    statusCode,
-  })
+  if (ENV !== 'prod') {
+    console.debug(`response from: ${eventPath}: `, {
+      responseBody,
+      statusCode,
+    })
+  }
 
   return {
     body: JSON.stringify(responseBody),

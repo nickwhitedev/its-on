@@ -4,14 +4,14 @@ import {
   UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import { getChannel, getUserInfo } from '../../utils/dynamo'
+import { getChannel, getUserInfo } from '/opt/nodejs/dynamo'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { customAlphabet } from 'nanoid'
 import { alphanumeric } from 'nanoid-dictionary'
-import { DYNAMODB_TABLE_NAME } from '../../utils/constants'
-import { createResponse } from '../../utils/response'
-import { MS_IN_HOUR } from '../../utils/time'
+import { DYNAMODB_TABLE_NAME, ENV } from '/opt/nodejs/constants'
+import { createResponse } from '/opt/nodejs/response'
+import { MS_IN_HOUR } from '/opt/nodejs/time'
 
 const nanoid = customAlphabet(alphanumeric, 11)
 
@@ -33,7 +33,9 @@ export const createChannelHandler = async (
       `postMethod only accepts POST method, you tried: ${event.httpMethod} method.`,
     )
   }
-  console.debug('received:', event)
+  if (ENV !== 'prod') {
+    console.debug('received:', event)
+  }
   const eventPath = event.path
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
@@ -70,7 +72,7 @@ export const createChannelHandler = async (
       })
     }
     if (channelIDIsTaken) {
-      console.info(`Collision detected. Generating id #${++channelIDAttempt}`)
+      console.warn(`Collision detected. Generating id #${++channelIDAttempt}`)
       channelID = nanoid()
     }
   } while (channelIDIsTaken)
@@ -116,7 +118,9 @@ export const createChannelHandler = async (
         },
       }),
     )
-    console.info('Success - item added or updated', ddbResponse)
+    if (ENV !== 'prod') {
+      console.debug('Success - item added or updated', ddbResponse)
+    }
   } catch (error) {
     console.error(
       'Error',
@@ -147,7 +151,9 @@ export const createChannelHandler = async (
         },
       }),
     )
-    console.info('Success - channel count updated', ddbResponse)
+    if (ENV !== 'prod') {
+      console.debug('Success - channel count updated', ddbResponse)
+    }
   } catch (error) {
     console.error(
       'Update Error',

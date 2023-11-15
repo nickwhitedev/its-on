@@ -1,6 +1,7 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb'
 import { DynamoDBStreamEvent } from 'aws-lambda'
+import { ENV } from '../common/constants'
 import { handleModifyEvent } from '../table-stream/modify'
 import { handleRemoveEvent } from '../table-stream/remove'
 
@@ -10,7 +11,9 @@ const ddbDocClient = DynamoDBDocumentClient.from(new DynamoDBClient({}))
  * Handles updates to the dynamo table
  */
 export const tableStreamHandler = async (event: DynamoDBStreamEvent) => {
-  console.debug('Received event:', JSON.stringify(event, null, 2))
+  if (ENV !== 'prod') {
+    console.debug('Received event:', JSON.stringify(event, null, 2))
+  }
   for (const record of event.Records) {
     switch (record.eventName) {
       case 'MODIFY': {
@@ -30,7 +33,7 @@ export const tableStreamHandler = async (event: DynamoDBStreamEvent) => {
         break
       }
       default:
-        console.info(`Unsupported dynamo event: ${record.eventName}`)
+        console.warn(`Unsupported dynamo event: ${record.eventName}`)
         return
     }
   }

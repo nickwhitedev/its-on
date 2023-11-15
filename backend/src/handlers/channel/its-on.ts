@@ -2,10 +2,10 @@ import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DYNAMODB_TABLE_NAME } from '../../utils/constants'
-import { getChannel } from '../../utils/dynamo'
-import { createResponse } from '../../utils/response'
-import { MS_IN_HOUR } from '../../utils/time'
+import { DYNAMODB_TABLE_NAME, ENV } from '/opt/nodejs/constants'
+import { getChannel } from '/opt/nodejs/dynamo'
+import { createResponse } from '/opt/nodejs/response'
+import { MS_IN_HOUR } from '/opt/nodejs/time'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -21,7 +21,9 @@ export const itsOnHandler = async (
       `postMethod only accepts POST method, you tried: ${event.httpMethod} method.`,
     )
   }
-  console.debug('received:', event)
+  if (ENV !== 'prod') {
+    console.debug('received:', event)
+  }
 
   const eventPath = event.path
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
@@ -43,7 +45,9 @@ export const itsOnHandler = async (
 
   if (privateChannel == null) {
     // Only the user that owns a channel can say it's on
-    console.info('User does not own channel')
+    if (ENV !== 'prod') {
+      console.debug('User does not own channel')
+    }
     return createResponse({
       eventPath,
       responseBody: {
@@ -79,7 +83,9 @@ export const itsOnHandler = async (
         },
       }),
     )
-    console.info('Success - item updated', ddbResponse)
+    if (ENV !== 'prod') {
+      console.debug('Success - item updated', ddbResponse)
+    }
     return createResponse({
       eventPath,
       responseBody: { message: "It's On!" },

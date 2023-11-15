@@ -6,8 +6,8 @@ import {
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DYNAMODB_TABLE_NAME } from '../../utils/constants'
-import { createResponse } from '../../utils/response'
+import { DYNAMODB_TABLE_NAME, ENV } from '/opt/nodejs/constants'
+import { createResponse } from '/opt/nodejs/response'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -23,7 +23,9 @@ export const deleteChannelHandler = async (
       `Delete method only accepts DELETE method, you tried: ${event.httpMethod} method.`,
     )
   }
-  console.debug('received:', event)
+  if (ENV !== 'prod') {
+    console.debug('received:', event)
+  }
 
   const eventPath = event.path
   const channelID = event.pathParameters?.channelID
@@ -41,7 +43,9 @@ export const deleteChannelHandler = async (
         TableName: DYNAMODB_TABLE_NAME,
       }),
     )
-    console.info('Success - item deleted', ddbResponse)
+    if (ENV !== 'prod') {
+      console.debug('Success - item deleted', ddbResponse)
+    }
   } catch (err) {
     // TODO: Error handling - make more robust
     console.error('Error', err instanceof Error ? err.stack : 'Unknown Type')
@@ -70,7 +74,9 @@ export const deleteChannelHandler = async (
         },
       }),
     )
-    console.info('Success - channel count updated', ddbResponse)
+    if (ENV !== 'prod') {
+      console.debug('Success - channel count updated', ddbResponse)
+    }
   } catch (error) {
     console.error(
       'Update Error',

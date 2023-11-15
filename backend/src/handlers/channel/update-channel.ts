@@ -1,11 +1,11 @@
 import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import { getChannel, getUserInfo } from '../../utils/dynamo'
+import { getChannel, getUserInfo } from '/opt/nodejs/dynamo'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DYNAMODB_TABLE_NAME } from '../../utils/constants'
-import { createResponse } from '../../utils/response'
-import { MS_IN_HOUR } from '../../utils/time'
+import { DYNAMODB_TABLE_NAME, ENV } from '/opt/nodejs/constants'
+import { createResponse } from '/opt/nodejs/response'
+import { MS_IN_HOUR } from '/opt/nodejs/time'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -21,7 +21,9 @@ export const updateChannelHandler = async (
       `putMethod only accepts PUT method, you tried: ${event.httpMethod} method.`,
     )
   }
-  console.debug('received:', event)
+  if (ENV !== 'prod') {
+    console.debug('received:', event)
+  }
 
   const eventPath = event.path
 
@@ -112,7 +114,9 @@ export const updateChannelHandler = async (
         },
       }),
     )
-    console.info('Success - item updated', ddbResponse)
+    if (ENV !== 'prod') {
+      console.debug('Success - item updated', ddbResponse)
+    }
     return createResponse({
       eventPath,
       responseBody: { message: 'Updated' },
