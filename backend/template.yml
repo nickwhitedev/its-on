@@ -141,7 +141,7 @@ Resources:
   getOverviewFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: dist/src/handlers/
+      CodeUri: dist/src/handlers/get-overview/
       Description: Gets all of a user's data.
       Events:
         Api:
@@ -150,7 +150,7 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /
             Method: GET
-      Handler: get-overview.getOverviewHandler
+      Handler: handler.handler
       Policies:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
