@@ -44,8 +44,19 @@ Globals:
       - x86_64
     Environment:
       Variables:
-        ENV: !Ref Env
         ITS_ON_TABLE: !Ref ItsOnTable
+        POWERTOOLS_LOG_LEVEL: 
+          'Fn::If':
+            - IsProdEnv
+            - INFO
+            - DEBUG
+        POWERTOOLS_LOGGER_LOG_EVENT:
+          'Fn::If':
+            - IsProdEnv
+            - false
+            - true
+        POWERTOOLS_LOGGER_SAMPLE_RATE: 0.05
+        POWERTOOLS_METRICS_NAMESPACE: its-on
         PUSH_NOTIFICATION_PUBLIC_KEY: !Ref PushNotificationPublicKey
         PUSH_NOTIFICATION_PRIVATE_KEY: !Ref PushNotificationPrivateKey
         WEB_URL:
@@ -588,7 +599,7 @@ Resources:
   ItsOnUserPool:
     Type: AWS::Cognito::UserPool
     Properties:
-      AdminCreateUserConfig: # Disable this to test signup flow in dev environments
+      AdminCreateUserConfig: # Disable this to test sign-up flow in dev environments
         AllowAdminCreateUserOnly:
           'Fn::If':
             - IsProdEnv

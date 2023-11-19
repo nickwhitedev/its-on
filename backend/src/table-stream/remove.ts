@@ -5,14 +5,22 @@ import {
   QueryCommandOutput,
 } from '@aws-sdk/lib-dynamodb'
 
+import { Logger } from '@aws-lambda-powertools/logger'
 import { DynamoDBRecord } from 'aws-lambda'
-import { DYNAMODB_TABLE_NAME, ENV } from '../common/constants'
+import { DYNAMODB_TABLE_NAME } from '../common/constants'
 import { batchWrite } from '../common/dynamo'
 
-export const handleRemoveEvent = async (
-  record: DynamoDBRecord,
-  ddbDocClient: DynamoDBDocumentClient,
-) => {
+interface Params {
+  record: DynamoDBRecord
+  ddbDocClient: DynamoDBDocumentClient
+  logger: Logger
+}
+
+export const handleRemoveEvent = async ({
+  record,
+  ddbDocClient,
+  logger,
+}: Params) => {
   if (
     !record.dynamodb?.Keys?.pk?.S?.startsWith('user') ||
     !record.dynamodb.Keys.sk.S?.startsWith('channel')
@@ -35,11 +43,9 @@ export const handleRemoveEvent = async (
         },
       }),
     )
-    if (ENV !== 'prod') {
-      console.debug('Successful public channel delete')
-    }
+    logger.debug('Successful public channel delete')
   } catch (error) {
-    console.error('public channel delete failed: ', error)
+    logger.error('public channel delete failed', error as Error)
   }
 
   let lastEvaluatedKey: Record<string, unknown> | undefined
@@ -59,11 +65,9 @@ export const handleRemoveEvent = async (
       )
       subscribers = ddbResponse.Items as IDynamoChannelSubscriber[] | null
       lastEvaluatedKey = ddbResponse.LastEvaluatedKey
-      if (ENV !== 'prod') {
-        console.debug('Get channel subscribers: ', ddbResponse)
-      }
+      logger.debug('Get channel subscribers', { ddbResponse })
     } catch (error) {
-      console.error('Get public channel error', error)
+      logger.error('Get public channel error', error as Error)
       return
     }
 
@@ -106,15 +110,11 @@ export const handleRemoveEvent = async (
           },
           ddbDocClient,
         })
-        if (ENV !== 'prod') {
-          console.debug(`Successful batch write/delete - batch ${++batchCount}`)
-        }
+        logger.debug(`Successful batch write/delete - batch ${++batchCount}`)
       } catch (error) {
-        console.error('batch write/delete failed: ', error)
+        logger.error('batch write/delete failed', error as Error)
       }
-      if (ENV !== 'prod') {
-        console.debug(`Batches of items written/deleted: ${batchCount}`)
-      }
+      logger.debug(`Batches of items written/deleted: ${batchCount}`)
       // Next batch in the queue
       subscribers.splice(0, 12)
     }

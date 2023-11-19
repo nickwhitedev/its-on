@@ -3,9 +3,9 @@ import {
   PutCommand,
   QueryCommand,
 } from '@aws-sdk/lib-dynamodb'
-
 import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
+import mockContext from '../../../__mocks__/mock-context'
 import mockEvent from '../../../__mocks__/mock-event'
 import { CORS_HEADERS } from '../../../src/common/constants'
 import { getOverviewHandler } from '../../../src/handlers/get-overview'
@@ -53,8 +53,7 @@ describe('Test getOverviewHandler', () => {
       ...mockEvent,
       httpMethod: 'GET',
     }
-
-    const result = await getOverviewHandler(event)
+    const result = await getOverviewHandler(event, mockContext)
 
     const expectedResult = {
       statusCode: 200,
@@ -100,7 +99,7 @@ describe('Test getOverviewHandler', () => {
       httpMethod: 'GET',
     }
 
-    const result = await getOverviewHandler(event)
+    const result = await getOverviewHandler(event, mockContext)
 
     const expectedResult = {
       statusCode: 200,

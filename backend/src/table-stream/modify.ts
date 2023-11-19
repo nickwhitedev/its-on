@@ -6,18 +6,26 @@ import {
   QueryCommand,
 } from '@aws-sdk/lib-dynamodb'
 
+import { Logger } from '@aws-lambda-powertools/logger'
+import { MetricUnits, Metrics } from '@aws-lambda-powertools/metrics'
 import { KeysAndAttributes } from '@aws-sdk/client-dynamodb'
 import { DynamoDBRecord } from 'aws-lambda'
 import { PushSubscription, sendNotification } from 'web-push'
 import {
   DYNAMODB_TABLE_NAME,
-  ENV,
   PUSH_NOTIFICATION_PRIVATE_KEY,
   PUSH_NOTIFICATION_PUBLIC_KEY,
   WEB_URL,
 } from '../common/constants'
 import { batchWrite } from '../common/dynamo'
 import { MS_IN_HOUR } from '../common/time'
+
+interface Params {
+  record: DynamoDBRecord
+  ddbDocClient: DynamoDBDocumentClient
+  logger: Logger
+  metrics: Metrics
+}
 
 const sendUserNotification = async ({
   channelID,
@@ -26,6 +34,7 @@ const sendUserNotification = async ({
   channelTitle,
   notificationSubscription,
   TTL,
+  logger,
 }: {
   channelID: string
   channelNote: string
@@ -33,6 +42,7 @@ const sendUserNotification = async ({
   channelTitle: string
   notificationSubscription: string
   TTL: number
+  logger: Logger
 }) => {
   const pushSubscription = JSON.parse(
     notificationSubscription,
@@ -60,7 +70,7 @@ const sendUserNotification = async ({
     )
   } catch (error) {
     // TODO: Log error
-    console.error('Notification Send Error: ', error)
+    logger.error('Notification Send Error: ', error as Error)
   }
 }
 
@@ -71,6 +81,7 @@ const sendUserNotifications = async ({
   channelTitle,
   notificationSubscriptions,
   TTL,
+  logger,
 }: {
   channelID: string
   channelNote: string
@@ -78,6 +89,7 @@ const sendUserNotifications = async ({
   channelTitle: string
   notificationSubscriptions: IDynamoUserNotificationSubscriptionsItem
   TTL: number
+  logger: Logger
 }) => {
   await Promise.all(
     Object.values(notificationSubscriptions.subscriptions).map(
@@ -89,16 +101,19 @@ const sendUserNotifications = async ({
           channelTitle,
           notificationSubscription,
           TTL,
+          logger,
         })
       },
     ),
   )
 }
 
-export const handleModifyEvent = async (
-  record: DynamoDBRecord,
-  ddbDocClient: DynamoDBDocumentClient,
-) => {
+export const handleModifyEvent = async ({
+  record,
+  ddbDocClient,
+  logger,
+  metrics,
+}: Params) => {
   const [pk, sk] = [
     record.dynamodb?.Keys?.pk?.S ?? '',
     record.dynamodb?.Keys?.sk?.S ?? '',
@@ -170,20 +185,16 @@ export const handleModifyEvent = async (
         } as IDynamoChannelItem,
       }),
     )
-    if (ENV !== 'prod') {
-      console.debug('Successful public channel write')
-    }
+    logger.debug('Successful public channel write')
   } catch (error) {
-    console.error('write public channel failed: ', error)
+    logger.error('write public channel failed', error as Error)
     return
   }
 
   let lastEvaluatedKey: Record<string, unknown> | undefined
   let queryBatchCount = 0
   do {
-    if (ENV !== 'prod') {
-      console.debug(`Start Query batch ${++queryBatchCount}`)
-    }
+    logger.debug(`Start Query batch ${++queryBatchCount}`)
 
     let subscribers: IDynamoChannelSubscriber[]
 
@@ -208,11 +219,9 @@ export const handleModifyEvent = async (
       )
       subscribers = (ddbResponse.Items ?? []) as IDynamoChannelSubscriber[]
       lastEvaluatedKey = ddbResponse.LastEvaluatedKey
-      if (ENV !== 'prod') {
-        console.debug('Get public channel subscribers: ', ddbResponse)
-      }
-    } catch (err) {
-      console.error('Get public channel subscribers error', err)
+      logger.debug('Get public channel subscribers', { ddbResponse })
+    } catch (error) {
+      logger.error('Get public channel subscribers error', error as Error)
       return
     }
 
@@ -247,11 +256,9 @@ export const handleModifyEvent = async (
           },
           ddbDocClient,
         })
-        if (ENV !== 'prod') {
-          console.debug(`Successful batch write - batch ${++batchCount}`)
-        }
+        logger.debug(`Successful batch write - batch ${++batchCount}`)
       } catch (error) {
-        console.error('batch write failed: ', error)
+        logger.error('batch write failed', error as Error)
         return
       }
     }
@@ -279,9 +286,7 @@ export const handleModifyEvent = async (
       }
       let getBatchCount = 0
       do {
-        if (ENV !== 'prod') {
-          console.debug(`Start Get batch ${++getBatchCount}`)
-        }
+        logger.debug(`Start Get batch ${++getBatchCount}`)
 
         let subscriberNotificationSubscriptions: IDynamoUserNotificationSubscriptionsItem[]
 
@@ -295,14 +300,11 @@ export const handleModifyEvent = async (
             DYNAMODB_TABLE_NAME
           ] ?? []) as IDynamoUserNotificationSubscriptionsItem[]
           unprocessedKeys = ddbResponse.UnprocessedKeys
-          if (ENV !== 'prod') {
-            console.debug(
-              'Get subscriber notification subscriptions: ',
-              subscriberNotificationSubscriptions,
-            )
-          }
-        } catch (err) {
-          console.error('Get public channel subscribers error', err)
+          logger.debug('Get subscriber notification subscriptions', {
+            subscriptions: subscriberNotificationSubscriptions,
+          })
+        } catch (error) {
+          logger.error('Get public channel subscribers error', error as Error)
           return
         }
 
@@ -317,17 +319,21 @@ export const handleModifyEvent = async (
                   channelTitle: channelInfo.title ?? 'Untitled Channel',
                   notificationSubscriptions,
                   TTL: (channelInfo.lastOnDuration ?? MS_IN_HOUR) * 1000,
+                  logger,
                 })
               },
             ),
           )
+          metrics.addMetric(
+            'notificationSent',
+            MetricUnits.Count,
+            subscriberNotificationSubscriptions.length,
+          )
         } catch (error) {
-          console.error('Notification Send Error: ', error)
+          logger.error('Notification Send Error', error as Error)
         }
       } while ((unprocessedKeys?.[DYNAMODB_TABLE_NAME]?.Keys ?? []).length > 0)
     }
   } while (lastEvaluatedKey != null && Object.keys(lastEvaluatedKey).length > 0)
-  if (ENV !== 'prod') {
-    console.debug('Finished updating items successfully')
-  }
+  logger.debug('Finished updating items successfully')
 }
