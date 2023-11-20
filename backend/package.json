@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.126",
-    "@types/jest": "^29.5.5",
+    "@types/jest": "^29.5.8",
     "@types/nanoid": "^3.0.0",
     "@types/nanoid-dictionary": "^4.2.2",
     "@types/node": "^20.8.10",
