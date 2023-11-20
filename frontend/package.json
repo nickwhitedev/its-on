@@ -20,7 +20,7 @@
     "react": "^18.2.0",
     "react-countdown": "^2.3.5",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.17.0"
+    "react-router-dom": "^6.19.0"
   },
   "devDependencies": {
     "@svgr/cli": "^8.1.0",
