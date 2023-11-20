@@ -8,8 +8,8 @@ import { jest } from '@jest/globals'
 import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
 import mockEvent from '../../../../__mocks__/mock-event.js'
-import { CORS_HEADERS } from '../../../../src/common/constants.js'
-import { updateChannelHandler } from '../../../../src/handlers/channel/update-channel.js'
+import { CORS_HEADERS } from '../../../../src/common/constants.mjs'
+import { updateChannelHandler } from '../../../../src/handlers/channel/update-channel.mjs'
 
 // This includes all tests for updateChannelHandler()
 describe('Test updateChannelHandler', function () {

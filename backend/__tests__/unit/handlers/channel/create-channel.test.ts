@@ -8,9 +8,9 @@ import { jest } from '@jest/globals'
 import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
 import mockEvent from '../../../../__mocks__/mock-event.js'
-import { CORS_HEADERS } from '../../../../src/common/constants.js'
-import { MS_IN_HOUR } from '../../../../src/common/time.js'
-import { createChannelHandler } from '../../../../src/handlers/channel/create-channel.js'
+import { CORS_HEADERS } from '../../../../src/common/constants.mjs'
+import { MS_IN_HOUR } from '../../../../src/common/time.mjs'
+import { createChannelHandler } from '../../../../src/handlers/channel/create-channel.mjs'
 
 // This includes all tests for createChannelHandler()
 describe('Test createChannelHandler', function () {

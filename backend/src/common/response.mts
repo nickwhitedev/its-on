@@ -1,4 +1,4 @@
-import { CORS_HEADERS, ENV } from './constants.js'
+import { CORS_HEADERS, ENV } from './constants.mjs'
 
 interface ICreateResponseParams {
   eventPath: string

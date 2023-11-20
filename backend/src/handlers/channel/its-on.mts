@@ -2,10 +2,10 @@ import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DYNAMODB_TABLE_NAME, ENV } from '/opt/nodejs/constants.js'
-import { getChannel } from '/opt/nodejs/dynamo.js'
-import { createResponse } from '/opt/nodejs/response.js'
-import { MS_IN_HOUR } from '/opt/nodejs/time.js'
+import { DYNAMODB_TABLE_NAME, ENV } from '/opt/nodejs/constants.mjs'
+import { getChannel } from '/opt/nodejs/dynamo.mjs'
+import { createResponse } from '/opt/nodejs/response.mjs'
+import { MS_IN_HOUR } from '/opt/nodejs/time.mjs'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)

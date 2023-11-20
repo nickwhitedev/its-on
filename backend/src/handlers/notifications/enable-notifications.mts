@@ -2,16 +2,16 @@ import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DYNAMODB_TABLE_NAME, ENV } from '/opt/nodejs/constants.js'
-import { createResponse } from '/opt/nodejs/response.js'
+import { DYNAMODB_TABLE_NAME, ENV } from '/opt/nodejs/constants.mjs'
+import { createResponse } from '/opt/nodejs/response.mjs'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
 
 /**
- * Disables notifications for a user
+ * Enables notifications for a user
  */
-export const disableNotificationsHandler = async (
+export const enableNotificationsHandler = async (
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
   if (event.httpMethod !== 'POST') {
@@ -42,7 +42,7 @@ export const disableNotificationsHandler = async (
           '#notificationsEnabled': 'notificationsEnabled',
         },
         ExpressionAttributeValues: {
-          ':notificationsEnabled': false,
+          ':notificationsEnabled': true,
         },
       }),
     )
@@ -63,7 +63,7 @@ export const disableNotificationsHandler = async (
 
   return createResponse({
     eventPath,
-    responseBody: { message: 'Notifications disabled' },
+    responseBody: { message: 'Notifications enabled' },
     statusCode: 200,
   })
 }

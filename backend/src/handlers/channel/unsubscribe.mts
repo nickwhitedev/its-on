@@ -6,10 +6,10 @@ import {
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DYNAMODB_TABLE_NAME, ENV } from '/opt/nodejs/constants.js'
-import { getChannel } from '/opt/nodejs/dynamo.js'
-import { ChannelCopyTypeEnum } from '/opt/nodejs/enums.js'
-import { createResponse } from '/opt/nodejs/response.js'
+import { DYNAMODB_TABLE_NAME, ENV } from '/opt/nodejs/constants.mjs'
+import { getChannel } from '/opt/nodejs/dynamo.mjs'
+import { ChannelCopyTypeEnum } from '/opt/nodejs/enums.mjs'
+import { createResponse } from '/opt/nodejs/response.mjs'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)

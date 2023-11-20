@@ -1,7 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
-import { ENV, PUSH_NOTIFICATION_PUBLIC_KEY } from '/opt/nodejs/constants.js'
-import { createResponse } from '/opt/nodejs/response.js'
+import { ENV, PUSH_NOTIFICATION_PUBLIC_KEY } from '/opt/nodejs/constants.mjs'
+import { createResponse } from '/opt/nodejs/response.mjs'
 
 /**
  * Handler for getting the VAPID public key used for notification encryption

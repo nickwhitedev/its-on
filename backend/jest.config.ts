@@ -16,6 +16,6 @@ export default {
   ],
   testPathIgnorePatterns: ['/node_modules/', '/dist/'],
   transform: {
-    '^.+\\.ts?$': 'ts-jest',
+    '^.+\\.mts?$': 'ts-jest',
   },
 }

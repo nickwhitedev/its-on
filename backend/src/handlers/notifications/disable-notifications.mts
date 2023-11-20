@@ -2,21 +2,16 @@ import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { PushSubscription } from 'web-push'
-import { DYNAMODB_TABLE_NAME, ENV } from '/opt/nodejs/constants.js'
-import { createResponse } from '/opt/nodejs/response.js'
+import { DYNAMODB_TABLE_NAME, ENV } from '/opt/nodejs/constants.mjs'
+import { createResponse } from '/opt/nodejs/response.mjs'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
 
-interface IPayload {
-  subscription: PushSubscription
-}
-
 /**
- * Removes a user's notification subscription from their profile in Dynamo DB
+ * Disables notifications for a user
  */
-export const unsubscribeNotificationsHandler = async (
+export const disableNotificationsHandler = async (
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
   if (event.httpMethod !== 'POST') {
@@ -33,32 +28,21 @@ export const unsubscribeNotificationsHandler = async (
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
 
-  if (event.body == null) {
-    return createResponse({
-      eventPath,
-      responseBody: {
-        message:
-          'Request body must contain subscription as an instance of PushSubscription',
-      },
-      statusCode: 400,
-    })
-  }
-
-  const subscription = (JSON.parse(event.body) as IPayload).subscription
-
   try {
     const ddbResponse = await ddbDocClient.send(
       new UpdateCommand({
         Key: {
           pk: `user#${userID}`,
-          sk: 'notificationSubscriptions',
+          sk: `profile`,
         },
         ReturnValues: 'ALL_NEW',
         TableName: DYNAMODB_TABLE_NAME,
-        UpdateExpression: 'REMOVE #subscriptions.#subscriptionID',
+        UpdateExpression: 'SET #notificationsEnabled = :notificationsEnabled',
         ExpressionAttributeNames: {
-          '#subscriptions': 'subscriptions',
-          '#subscriptionID': subscription.endpoint,
+          '#notificationsEnabled': 'notificationsEnabled',
+        },
+        ExpressionAttributeValues: {
+          ':notificationsEnabled': false,
         },
       }),
     )
@@ -79,7 +63,7 @@ export const unsubscribeNotificationsHandler = async (
 
   return createResponse({
     eventPath,
-    responseBody: { message: 'Notifications disabled for device' },
+    responseBody: { message: 'Notifications disabled' },
     statusCode: 200,
   })
 }

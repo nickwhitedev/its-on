@@ -6,9 +6,9 @@ import {
   GetCommand,
 } from '@aws-sdk/lib-dynamodb'
 
-import { DYNAMODB_TABLE_NAME } from './constants.js'
-import { ChannelCopyTypeEnum } from './enums.js'
-import wait from './wait.js'
+import { DYNAMODB_TABLE_NAME } from './constants.mjs'
+import { ChannelCopyTypeEnum } from './enums.mjs'
+import wait from './wait.mjs'
 
 interface GetUserInfoParams {
   ddbDocClient: DynamoDBDocumentClient
