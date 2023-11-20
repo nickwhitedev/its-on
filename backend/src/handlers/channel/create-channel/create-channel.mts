@@ -3,13 +3,19 @@ import {
   DynamoDBDocumentClient,
   UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import {
+  APIGatewayProxyEvent,
+  APIGatewayProxyResult,
+  Context,
+} from 'aws-lambda'
 import { getChannel, getUserInfo } from '/opt/nodejs/dynamo.mjs'
 
+import { Logger } from '@aws-lambda-powertools/logger'
+import { MetricUnits, Metrics } from '@aws-lambda-powertools/metrics'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { customAlphabet } from 'nanoid'
 import { alphanumeric } from 'nanoid-dictionary'
-import { DYNAMODB_TABLE_NAME, ENV } from '/opt/nodejs/constants.mjs'
+import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
 import { createResponse } from '/opt/nodejs/response.mjs'
 import { MS_IN_HOUR } from '/opt/nodejs/time.mjs'
 
@@ -25,16 +31,16 @@ interface IPayload {
 /**
  * Creates a channel for the authenticated user
  */
-export const createChannelHandler = async (
+const createChannel = async (
   event: APIGatewayProxyEvent,
+  _context: Context,
+  logger: Logger,
+  metrics: Metrics,
 ): Promise<APIGatewayProxyResult> => {
   if (event.httpMethod !== 'POST') {
     throw new Error(
       `postMethod only accepts POST method, you tried: ${event.httpMethod} method.`,
     )
-  }
-  if (ENV !== 'prod') {
-    console.debug('received:', event)
   }
   const eventPath = event.path
 
@@ -61,10 +67,7 @@ export const createChannelHandler = async (
     try {
       channelIDIsTaken = (await getChannel({ channelID, ddbDocClient })) != null
     } catch (error) {
-      console.error(
-        'Error',
-        error instanceof Error ? error.stack : 'Unknown Type',
-      )
+      logger.error('Channel fetch failed', error as Error)
       return createResponse({
         eventPath,
         responseBody: { message: 'Something went wrong' },
@@ -72,7 +75,9 @@ export const createChannelHandler = async (
       })
     }
     if (channelIDIsTaken) {
-      console.warn(`Collision detected. Generating id #${++channelIDAttempt}`)
+      logger.warn(`Collision detected. Generating id #${++channelIDAttempt}`, {
+        shortName: 'channelIDCollision',
+      })
       channelID = nanoid()
     }
   } while (channelIDIsTaken)
@@ -118,14 +123,9 @@ export const createChannelHandler = async (
         },
       }),
     )
-    if (ENV !== 'prod') {
-      console.debug('Success - item added or updated', ddbResponse)
-    }
+    logger.debug('Success - item added or updated', ddbResponse)
   } catch (error) {
-    console.error(
-      'Error',
-      error instanceof Error ? error.stack : 'Unknown Type',
-    )
+    logger.error('Error', error as Error)
     return createResponse({
       eventPath,
       responseBody: { message: 'Something went wrong' },
@@ -151,20 +151,17 @@ export const createChannelHandler = async (
         },
       }),
     )
-    if (ENV !== 'prod') {
-      console.debug('Success - channel count updated', ddbResponse)
-    }
+    logger.debug('Success - channel count updated', ddbResponse)
   } catch (error) {
-    console.error(
-      'Update Error',
-      error instanceof Error ? error.stack : 'Unknown Type',
-    )
+    logger.error('Update Error', error as Error)
     return createResponse({
       eventPath,
       responseBody: { message: 'Something went wrong' },
       statusCode: 400,
     })
   }
+
+  metrics.addMetric('channelCreated', MetricUnits.Count, 1)
 
   return createResponse({
     eventPath,
@@ -176,3 +173,5 @@ export const createChannelHandler = async (
     statusCode: 201,
   })
 }
+
+export default createChannel

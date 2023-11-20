@@ -6,7 +6,7 @@ export default {
   moduleNameMapper: {
     '/opt/nodejs/(.*)': '<rootDir>/src/common/$1',
   },
-  modulePathIgnorePatterns: ['.aws'],
+  modulePathIgnorePatterns: ['.aws', 'dist'],
   preset: 'ts-jest',
   resolver: 'ts-jest-resolver',
   setupFiles: ['<rootDir>/__tests__/setupTests.ts'],
