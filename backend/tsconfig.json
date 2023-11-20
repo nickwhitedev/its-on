@@ -3,8 +3,8 @@
     "baseUrl": ".",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "module": "es2015",
-    "moduleResolution": "node",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "outDir": "./dist",
     "paths": {
       "/opt/nodejs/*": [
@@ -16,7 +16,7 @@
     "skipLibCheck": true,
     "sourceMap": false,
     "strict": true,
-    "target": "es2022",
+    "target": "ESNext",
     "useUnknownInCatchVariables": false
   },
   "exclude": ["node_modules"]

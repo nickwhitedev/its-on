@@ -16,9 +16,9 @@ import {
   PUSH_NOTIFICATION_PRIVATE_KEY,
   PUSH_NOTIFICATION_PUBLIC_KEY,
   WEB_URL,
-} from '../common/constants'
-import { batchWrite } from '../common/dynamo'
-import { MS_IN_HOUR } from '../common/time'
+} from '../common/constants.js'
+import { batchWrite } from '../common/dynamo.js'
+import { MS_IN_HOUR } from '../common/time.js'
 
 interface Params {
   record: DynamoDBRecord

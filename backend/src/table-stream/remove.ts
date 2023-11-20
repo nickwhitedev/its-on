@@ -7,8 +7,8 @@ import {
 
 import { Logger } from '@aws-lambda-powertools/logger'
 import { DynamoDBRecord } from 'aws-lambda'
-import { DYNAMODB_TABLE_NAME } from '../common/constants'
-import { batchWrite } from '../common/dynamo'
+import { DYNAMODB_TABLE_NAME } from '../common/constants.js'
+import { batchWrite } from '../common/dynamo.js'
 
 interface Params {
   record: DynamoDBRecord

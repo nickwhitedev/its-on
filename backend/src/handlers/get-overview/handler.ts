@@ -1,7 +1,7 @@
 import { Logger, injectLambdaContext } from '@aws-lambda-powertools/logger'
 import middy from '@middy/core'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import getOverview from './get-overview'
+import getOverview from './get-overview.js'
 
 const logger = new Logger({ serviceName: 'itsOnOverview' })
 

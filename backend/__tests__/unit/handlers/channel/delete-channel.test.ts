@@ -3,9 +3,9 @@ import { DeleteCommand, DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb'
 import { jest } from '@jest/globals'
 import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
-import mockEvent from '../../../../__mocks__/mock-event'
-import { CORS_HEADERS } from '../../../../src/common/constants'
-import { deleteChannelHandler } from '../../../../src/handlers/channel/delete-channel'
+import mockEvent from '../../../../__mocks__/mock-event.js'
+import { CORS_HEADERS } from '../../../../src/common/constants.js'
+import { deleteChannelHandler } from '../../../../src/handlers/channel/delete-channel.js'
 
 describe('Test deleteHandler', function () {
   const ddbMock = mockClient(DynamoDBDocumentClient)

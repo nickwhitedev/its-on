@@ -8,9 +8,9 @@ import {
 import { jest } from '@jest/globals'
 import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
-import mockEvent from '../../../../__mocks__/mock-event'
-import { CORS_HEADERS } from '../../../../src/common/constants'
-import { unsubscribeHandler } from '../../../../src/handlers/channel/unsubscribe'
+import mockEvent from '../../../../__mocks__/mock-event.js'
+import { CORS_HEADERS } from '../../../../src/common/constants.js'
+import { unsubscribeHandler } from '../../../../src/handlers/channel/unsubscribe.js'
 
 // This includes all tests for unsubscribeHandler()
 describe('Test unsubscribeHandler', function () {

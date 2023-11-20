@@ -7,9 +7,9 @@ import {
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { APIGatewayProxyEvent, Context } from 'aws-lambda'
-import { DYNAMODB_TABLE_NAME } from '../../common/constants'
-import { createResponse } from '../../common/response'
-import { serializeQueryResponse } from '../../common/serialize'
+import { DYNAMODB_TABLE_NAME } from '../../common/constants.js'
+import { createResponse } from '../../common/response.js'
+import { serializeQueryResponse } from '../../common/serialize.js'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)

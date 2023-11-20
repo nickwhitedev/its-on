@@ -6,10 +6,10 @@ import {
 } from '@aws-sdk/lib-dynamodb'
 import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
-import mockContext from '../../../__mocks__/mock-context'
-import mockEvent from '../../../__mocks__/mock-event'
-import { CORS_HEADERS } from '../../../src/common/constants'
-import getOverview from '../../../src/handlers/get-overview/get-overview'
+import mockContext from '../../../__mocks__/mock-context.js'
+import mockEvent from '../../../__mocks__/mock-event.js'
+import { CORS_HEADERS } from '../../../src/common/constants.js'
+import getOverview from '../../../src/handlers/get-overview/get-overview.js'
 
 describe('Test getOverviewHandler', () => {
   const ddbMock = mockClient(DynamoDBDocumentClient)
