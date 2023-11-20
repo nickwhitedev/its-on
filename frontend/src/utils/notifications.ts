@@ -22,9 +22,8 @@ export const registerNotificationSubscription = async ({
   }
 
   if (
-    !(
-      notificationSubscription.endpoint in
-      Object.keys(registeredNotificationSubscriptions)
+    !Object.keys(registeredNotificationSubscriptions).includes(
+      notificationSubscription.endpoint,
     )
   ) {
     await fetchApi('/subscribe-notifications', 'POST', {

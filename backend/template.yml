@@ -138,7 +138,7 @@ Resources:
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
 
   # This is a Lambda function config associated with the source code: get-overview.ts
-  getOverviewFunction:
+  getOverviewLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: dist/src/handlers/get-overview/
@@ -156,15 +156,15 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
 
-  getOverviewFunctionLogGroup:
+  getOverviewLambdaFunctionLogGroup:
     Type: "AWS::Logs::LogGroup"
-    DependsOn: "getOverviewFunction"
+    DependsOn: "getOverviewLambdaFunction"
     Properties: 
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref getOverviewFunction]]
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref getOverviewLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: get-channel.ts
-  getChannelFunction:
+  getChannelLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: dist/src/handlers/channel/
@@ -182,15 +182,15 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
 
-  getChannelFunctionLogGroup:
+  getChannelLambdaFunctionLogGroup:
     Type: "AWS::Logs::LogGroup"
-    DependsOn: "getChannelFunction"
+    DependsOn: "getChannelLambdaFunction"
     Properties: 
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref getChannelFunction]]
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref getChannelLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: create-item.ts
-  createChannelFunction:
+  createChannelLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: dist/src/handlers/channel/
@@ -208,15 +208,15 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
 
-  createChannelFunctionLogGroup:
+  createChannelLambdaFunctionLogGroup:
     Type: "AWS::Logs::LogGroup"
-    DependsOn: "createChannelFunction"
+    DependsOn: "createChannelLambdaFunction"
     Properties: 
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref createChannelFunction]]
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref createChannelLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: update-item.ts
-  updateChannelFunction:
+  updateChannelLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: dist/src/handlers/channel/
@@ -234,15 +234,15 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
 
-  updateChannelFunctionLogGroup:
+  updateChannelLambdaFunctionLogGroup:
     Type: "AWS::Logs::LogGroup"
-    DependsOn: "updateChannelFunction"
+    DependsOn: "updateChannelLambdaFunction"
     Properties: 
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref updateChannelFunction]]
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref updateChannelLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: its-on.ts
-  itsOnFunction:
+  itsOnLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: dist/src/handlers/channel/
@@ -260,15 +260,15 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
 
-  itsOnFunctionLogGroup:
+  itsOnLambdaFunctionLogGroup:
     Type: "AWS::Logs::LogGroup"
-    DependsOn: "itsOnFunction"
+    DependsOn: "itsOnLambdaFunction"
     Properties: 
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref itsOnFunction]]
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref itsOnLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: its-off.ts
-  itsOffFunction:
+  itsOffLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: dist/src/handlers/channel/
@@ -286,15 +286,15 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
 
-  itsOffFunctionLogGroup:
+  itsOffLambdaFunctionLogGroup:
     Type: "AWS::Logs::LogGroup"
-    DependsOn: "itsOffFunction"
+    DependsOn: "itsOffLambdaFunction"
     Properties: 
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref itsOffFunction]]
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref itsOffLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: delete-item.ts
-  deleteChannelFunction:
+  deleteChannelLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: dist/src/handlers/channel/
@@ -312,15 +312,15 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
 
-  deleteChannelFunctionLogGroup:
+  deleteChannelLambdaFunctionLogGroup:
     Type: "AWS::Logs::LogGroup"
-    DependsOn: "deleteChannelFunction"
+    DependsOn: "deleteChannelLambdaFunction"
     Properties: 
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref deleteChannelFunction]]
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref deleteChannelLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: delete-item.ts
-  removeChannelSubscriberFunction:
+  removeChannelSubscriberLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: dist/src/handlers/channel/
@@ -338,15 +338,15 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
 
-  removeChannelSubscriberFunctionLogGroup:
+  removeChannelSubscriberLambdaFunctionLogGroup:
     Type: "AWS::Logs::LogGroup"
-    DependsOn: "removeChannelSubscriberFunction"
+    DependsOn: "removeChannelSubscriberLambdaFunction"
     Properties: 
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref removeChannelSubscriberFunction]]
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref removeChannelSubscriberLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: subscribe.ts
-  subscribeFunction:
+  subscribeLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: dist/src/handlers/channel/
@@ -364,15 +364,15 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
 
-  subscribeFunctionLogGroup:
+  subscribeLambdaFunctionLogGroup:
     Type: "AWS::Logs::LogGroup"
-    DependsOn: "subscribeFunction"
+    DependsOn: "subscribeLambdaFunction"
     Properties: 
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref subscribeFunction]]
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref subscribeLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: unsubscribe.ts
-  unsubscribeFunction:
+  unsubscribeLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: dist/src/handlers/channel/
@@ -390,15 +390,15 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
 
-  unsubscribeFunctionLogGroup:
+  unsubscribeLambdaFunctionLogGroup:
     Type: "AWS::Logs::LogGroup"
-    DependsOn: "unsubscribeFunction"
+    DependsOn: "unsubscribeLambdaFunction"
     Properties: 
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref unsubscribeFunction]]
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref unsubscribeLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: get-notification-key.ts
-  getNotificationKeyFunction:
+  getNotificationKeyLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: dist/src/handlers/notifications/
@@ -416,15 +416,15 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
 
-  getNotificationKeyFunctionLogGroup:
+  getNotificationKeyLambdaFunctionLogGroup:
     Type: "AWS::Logs::LogGroup"
-    DependsOn: "getNotificationKeyFunction"
+    DependsOn: "getNotificationKeyLambdaFunction"
     Properties: 
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref getNotificationKeyFunction]]
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref getNotificationKeyLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: enable-notifications.ts
-  enableNotificationsFunction:
+  enableNotificationsLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: dist/src/handlers/notifications/
@@ -442,15 +442,15 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
 
-  enableNotificationsFunctionLogGroup:
+  enableNotificationsLambdaFunctionLogGroup:
     Type: "AWS::Logs::LogGroup"
-    DependsOn: "enableNotificationsFunction"
+    DependsOn: "enableNotificationsLambdaFunction"
     Properties: 
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref enableNotificationsFunction]]
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref enableNotificationsLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: disable-notifications.ts
-  disableNotificationsFunction:
+  disableNotificationsLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: dist/src/handlers/notifications/
@@ -468,15 +468,15 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
 
-  disableNotificationsFunctionLogGroup:
+  disableNotificationsLambdaFunctionLogGroup:
     Type: "AWS::Logs::LogGroup"
-    DependsOn: "disableNotificationsFunction"
+    DependsOn: "disableNotificationsLambdaFunction"
     Properties: 
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref disableNotificationsFunction]]
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref disableNotificationsLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: subscribe-notifications.ts
-  subscribeNotificationsFunction:
+  subscribeNotificationsLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: dist/src/handlers/notifications/
@@ -494,15 +494,15 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
 
-  subscribeNotificationsFunctionLogGroup:
+  subscribeNotificationsLambdaFunctionLogGroup:
     Type: "AWS::Logs::LogGroup"
-    DependsOn: "subscribeNotificationsFunction"
+    DependsOn: "subscribeNotificationsLambdaFunction"
     Properties: 
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref subscribeNotificationsFunction]]
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref subscribeNotificationsLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: unsubscribe-notifications.ts
-  unsubscribeNotificationsFunction:
+  unsubscribeNotificationsLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: dist/src/handlers/notifications/
@@ -520,14 +520,14 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
 
-  unsubscribeNotificationsFunctionLogGroup:
+  unsubscribeNotificationsLambdaFunctionLogGroup:
     Type: "AWS::Logs::LogGroup"
-    DependsOn: "unsubscribeNotificationsFunction"
+    DependsOn: "unsubscribeNotificationsLambdaFunction"
     Properties: 
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref unsubscribeNotificationsFunction]]
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref unsubscribeNotificationsLambdaFunction]]
 
-  tableStreamFunction:
+  tableStreamLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: dist/src/handlers/
@@ -558,12 +558,12 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
 
-  tableStreamFunctionLogGroup:
+  tableStreamLambdaFunctionLogGroup:
     Type: "AWS::Logs::LogGroup"
-    DependsOn: "tableStreamFunction"
+    DependsOn: "tableStreamLambdaFunction"
     Properties: 
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref tableStreamFunction]]
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref tableStreamLambdaFunction]]
 
   # DynamoDB table to store item: {id: &lt;ID&gt;, name: &lt;NAME&gt;}
   ItsOnTable:
