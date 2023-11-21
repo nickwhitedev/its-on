@@ -1,27 +1,34 @@
 import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import {
+  APIGatewayProxyEvent,
+  APIGatewayProxyResult,
+  Context,
+} from 'aws-lambda'
 
+import { Logger } from '@aws-lambda-powertools/logger'
+import { MetricUnits, Metrics } from '@aws-lambda-powertools/metrics'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DYNAMODB_TABLE_NAME, ENV } from '/opt/nodejs/constants.mjs'
+import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
 import { getChannel } from '/opt/nodejs/dynamo.mjs'
 import { createResponse } from '/opt/nodejs/response.mjs'
+import { MS_IN_HOUR } from '/opt/nodejs/time.mjs'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
 
 /**
- * Handler for a user declaring that it is off
+ * Handler for a user declaring that it is on
  */
-export const itsOffHandler = async (
+const itsOn = async (
   event: APIGatewayProxyEvent,
+  _context: Context,
+  logger: Logger,
+  metrics: Metrics,
 ): Promise<APIGatewayProxyResult> => {
   if (event.httpMethod !== 'POST') {
     throw new Error(
       `postMethod only accepts POST method, you tried: ${event.httpMethod} method.`,
     )
-  }
-  if (ENV !== 'prod') {
-    console.debug('received:', event)
   }
 
   const eventPath = event.path
@@ -34,7 +41,7 @@ export const itsOffHandler = async (
   try {
     privateChannel = await getChannel({ channelID, ddbDocClient, userID })
   } catch (error) {
-    console.error('Error getting private channel: ', error)
+    logger.error('Error getting private channel: ', error as Error)
     return createResponse({
       eventPath,
       responseBody: { message: 'Something went wrong' },
@@ -44,9 +51,7 @@ export const itsOffHandler = async (
 
   if (privateChannel == null) {
     // Only the user that owns a channel can say it's on
-    if (ENV !== 'prod') {
-      console.debug('User does not own channel')
-    }
+    logger.warn('User does not own channel')
     return createResponse({
       eventPath,
       responseBody: {
@@ -67,31 +72,30 @@ export const itsOffHandler = async (
         ReturnValues: 'ALL_NEW',
         TableName: DYNAMODB_TABLE_NAME,
         UpdateExpression:
-          'SET #canceled = :canceled, #lastUpdated = :lastUpdated',
+          'SET #canceled = :canceled, #lastOn = :lastOn, #lastOnDuration = :lastOnDuration, #lastUpdated = :lastUpdated',
         ExpressionAttributeNames: {
           '#canceled': 'canceled',
+          '#lastOn': 'lastOn',
+          '#lastOnDuration': 'lastOnDuration',
           '#lastUpdated': 'lastUpdated',
         },
         ExpressionAttributeValues: {
-          ':canceled': true,
+          ':canceled': false,
+          ':lastOn': requestTime,
+          ':lastOnDuration': privateChannel.duration ?? MS_IN_HOUR,
           ':lastUpdated': requestTime,
         },
       }),
     )
-    if (ENV !== 'prod') {
-      console.debug('Success - item updated', ddbResponse)
-    }
+    logger.debug('Success - item updated', { ddbResponse })
+    metrics.addMetric('itsOn', MetricUnits.Count, 1)
     return createResponse({
       eventPath,
-      responseBody: { message: "It's Off" },
+      responseBody: { message: "It's On!" },
       statusCode: 200,
     })
   } catch (error) {
-    // TODO: Error handling - make more robust
-    console.error(
-      'Error',
-      error instanceof Error ? error.stack : 'Unknown Type',
-    )
+    logger.error('Error', error as Error)
     return createResponse({
       eventPath,
       responseBody: { message: 'Something went wrong' },
@@ -99,3 +103,5 @@ export const itsOffHandler = async (
     })
   }
 }
+
+export default itsOn

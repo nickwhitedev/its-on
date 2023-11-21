@@ -3,10 +3,16 @@ import {
   DynamoDBDocumentClient,
   UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import {
+  APIGatewayProxyEvent,
+  APIGatewayProxyResult,
+  Context,
+} from 'aws-lambda'
 
+import { Logger } from '@aws-lambda-powertools/logger'
+import { MetricUnits, Metrics } from '@aws-lambda-powertools/metrics'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DYNAMODB_TABLE_NAME, ENV } from '/opt/nodejs/constants.mjs'
+import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
 import { getChannel, getUserInfo } from '/opt/nodejs/dynamo.mjs'
 import { createResponse } from '/opt/nodejs/response.mjs'
 
@@ -16,16 +22,16 @@ const ddbDocClient = DynamoDBDocumentClient.from(client)
 /**
  * Removes a given subscriber from a channel for the authenticated user
  */
-export const removeChannelSubscriberHandler = async (
+const removeChannelSubscriber = async (
   event: APIGatewayProxyEvent,
+  _context: Context,
+  logger: Logger,
+  metrics: Metrics,
 ): Promise<APIGatewayProxyResult> => {
   if (event.httpMethod !== 'DELETE') {
     throw new Error(
       `Delete method only accepts DELETE method, you tried: ${event.httpMethod} method.`,
     )
-  }
-  if (ENV !== 'prod') {
-    console.debug('received:', event)
   }
 
   const eventPath = event.path
@@ -48,7 +54,7 @@ export const removeChannelSubscriberHandler = async (
     const userInfo = await getUserInfo({ ddbDocClient, userID })
     username = userInfo?.username ?? ''
   } catch (error) {
-    console.error('gerUserInfo error: ', error)
+    logger.error('gerUserInfo error: ', error as Error)
   }
 
   // get public channel info
@@ -60,11 +66,9 @@ export const removeChannelSubscriberHandler = async (
       break getPublicChannel
     }
     channelTitle = publicChannel.title ?? defaultUnsubscribedChannelTitle
-    if (ENV !== 'prod') {
-      console.debug('Get public channel info: ', publicChannel)
-    }
+    logger.debug('Get public channel info: ', { channel: publicChannel })
   } catch (error) {
-    console.error('Get public channel error', error)
+    logger.error('Get public channel error', error as Error)
   }
 
   try {
@@ -98,12 +102,9 @@ export const removeChannelSubscriberHandler = async (
         },
       }),
     )
-    if (ENV !== 'prod') {
-      console.debug('Success - user unsubscribed from channel', ddbResponse)
-    }
-  } catch (err) {
-    // TODO: Error handling - make more robust
-    console.error('Error', err instanceof Error ? err.stack : 'Unknown Type')
+    logger.debug('Success - user unsubscribed from channel', { ddbResponse })
+  } catch (error) {
+    logger.error('Error', error as Error)
     return createResponse({
       eventPath,
       responseBody: { message: 'Something went wrong' },
@@ -129,14 +130,9 @@ export const removeChannelSubscriberHandler = async (
         },
       }),
     )
-    if (ENV !== 'prod') {
-      console.debug('Success - subscriber count updated', ddbResponse)
-    }
+    logger.debug('Success - subscriber count updated', { ddbResponse })
   } catch (error) {
-    console.error(
-      'Update Error',
-      error instanceof Error ? error.stack : 'Unknown Type',
-    )
+    logger.error('Update Error', error as Error)
     return createResponse({
       eventPath,
       responseBody: { message: 'Something went wrong' },
@@ -144,9 +140,13 @@ export const removeChannelSubscriberHandler = async (
     })
   }
 
+  metrics.addMetric('subscriberRemoved', MetricUnits.Count, 1)
+
   return createResponse({
     eventPath,
     responseBody: { message: 'Subscriber removed' },
     statusCode: 204,
   })
 }
+
+export default removeChannelSubscriber

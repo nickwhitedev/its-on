@@ -4,15 +4,20 @@ import {
   UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
 
+import { Logger } from '@aws-lambda-powertools/logger'
+import { Metrics } from '@aws-lambda-powertools/metrics'
 import { jest } from '@jest/globals'
 import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
+import mockContext from '../../../../__mocks__/mock-context.js'
 import mockEvent from '../../../../__mocks__/mock-event.js'
 import { CORS_HEADERS } from '../../../../src/common/constants.mjs'
-import { itsOnHandler } from '../../../../src/handlers/channel/its-on.mjs'
+import itsOn from '../../../../src/handlers/channel/its-on/its-on.mjs'
 
 describe('Test itsOnHandler', function () {
   const ddbMock = mockClient(DynamoDBDocumentClient)
+  const silentLogger = new Logger({ logLevel: 'SILENT' })
+  const metrics = new Metrics()
   jest.useFakeTimers().setSystemTime(new Date('2020-01-01'))
 
   beforeEach(() => {
@@ -31,7 +36,7 @@ describe('Test itsOnHandler', function () {
       },
     }
 
-    const result = await itsOnHandler(event)
+    const result = await itsOn(event, mockContext, silentLogger, metrics)
 
     const resultBody = JSON.parse(result.body) as IResponseWithMessage
 

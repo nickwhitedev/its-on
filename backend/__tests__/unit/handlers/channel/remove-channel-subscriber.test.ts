@@ -5,15 +5,20 @@ import {
   UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
 
+import { Logger } from '@aws-lambda-powertools/logger'
+import { Metrics } from '@aws-lambda-powertools/metrics'
 import { jest } from '@jest/globals'
 import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
+import mockContext from '../../../../__mocks__/mock-context.js'
 import mockEvent from '../../../../__mocks__/mock-event.js'
 import { CORS_HEADERS } from '../../../../src/common/constants.mjs'
-import { removeChannelSubscriberHandler } from '../../../../src/handlers/channel/remove-channel-subscriber.mjs'
+import removeChannelSubscriber from '../../../../src/handlers/channel/remove-channel-subscriber/remove-channel-subscriber.mjs'
 
 describe('Test removeChannelSubscriberHandler', function () {
   const ddbMock = mockClient(DynamoDBDocumentClient)
+  const silentLogger = new Logger({ logLevel: 'SILENT' })
+  const metrics = new Metrics()
   jest.useFakeTimers().setSystemTime(new Date('2020-01-01'))
 
   beforeEach(() => {
@@ -34,7 +39,12 @@ describe('Test removeChannelSubscriberHandler', function () {
       },
     }
 
-    const result = await removeChannelSubscriberHandler(event)
+    const result = await removeChannelSubscriber(
+      event,
+      mockContext,
+      silentLogger,
+      metrics,
+    )
 
     const resultBody = JSON.parse(result.body) as IResponseWithMessage
     expect(result.headers).toEqual(CORS_HEADERS)

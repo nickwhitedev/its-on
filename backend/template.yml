@@ -167,7 +167,7 @@ Resources:
   getChannelLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: dist/src/handlers/channel/
+      CodeUri: dist/src/handlers/channel/get-channel
       Description: Gets data related to a channel
       Events:
         Api:
@@ -176,7 +176,7 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /{channelID}
             Method: GET
-      Handler: get-channel.getChannelHandler
+      Handler: handler.handler
       Policies:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
@@ -193,7 +193,7 @@ Resources:
   createChannelLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: dist/src/handlers/channel/
+      CodeUri: dist/src/handlers/channel/create-channel/
       Description: Creates a channel for a user
       Events:
         Api:
@@ -202,7 +202,7 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /channels
             Method: POST
-      Handler: create-channel.createChannelHandler
+      Handler: handler.handler
       Policies:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
@@ -245,7 +245,7 @@ Resources:
   itsOnLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: dist/src/handlers/channel/
+      CodeUri: dist/src/handlers/channel/its-on/
       Description: Turns a channel on for a user
       Events:
         Api:
@@ -254,7 +254,7 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /{channelID}/its-on
             Method: POST
-      Handler: its-on.itsOnHandler
+      Handler: handler.handler
       Policies:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
@@ -271,7 +271,7 @@ Resources:
   itsOffLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: dist/src/handlers/channel/
+      CodeUri: dist/src/handlers/channel/its-off
       Description: Turns a channel off for a user
       Events:
         Api:
@@ -280,7 +280,7 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /{channelID}/its-off
             Method: POST
-      Handler: its-off.itsOffHandler
+      Handler: handler.handler
       Policies:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
@@ -297,7 +297,7 @@ Resources:
   deleteChannelLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: dist/src/handlers/channel/
+      CodeUri: dist/src/handlers/channel/delete-channel/
       Description: Deletes a channel for a user
       Events:
         Api:
@@ -306,7 +306,7 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /{channelID}
             Method: DELETE
-      Handler: delete-channel.deleteChannelHandler
+      Handler: handler.handler
       Policies:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
@@ -323,7 +323,7 @@ Resources:
   removeChannelSubscriberLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: dist/src/handlers/channel/
+      CodeUri: dist/src/handlers/channel/remove-channel-subscriber/
       Description: Removes a channel's subscriber for a user
       Events:
         Api:
@@ -332,7 +332,7 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /{channelID}/subscribers/{subscriberID}
             Method: DELETE
-      Handler: remove-channel-subscriber.removeChannelSubscriberHandler
+      Handler: handler.handler
       Policies:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
@@ -349,7 +349,7 @@ Resources:
   subscribeLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: dist/src/handlers/channel/
+      CodeUri: dist/src/handlers/channel/subscribe/
       Description: Subscribes a user to a channel
       Events:
         Api:
@@ -358,7 +358,7 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /{channelID}/subscribe
             Method: POST
-      Handler: subscribe.subscribeHandler
+      Handler: handler.handler
       Policies:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
@@ -530,7 +530,7 @@ Resources:
   tableStreamLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: dist/src/handlers/
+      CodeUri: dist/src/handlers/table-stream
       Description: Handles write events from the ItsOnTable
       Events:
         TableStream:
@@ -552,7 +552,7 @@ Resources:
             # TumblingWindowInSeconds: 0
             # FunctionResponseTypes:
             #   - ReportBatchItemFailures
-      Handler: table-stream.tableStreamHandler
+      Handler: handler.handler
       Policies:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:

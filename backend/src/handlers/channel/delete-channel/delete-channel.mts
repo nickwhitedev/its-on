@@ -3,10 +3,16 @@ import {
   DynamoDBDocumentClient,
   UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import {
+  APIGatewayProxyEvent,
+  APIGatewayProxyResult,
+  Context,
+} from 'aws-lambda'
 
+import { Logger } from '@aws-lambda-powertools/logger'
+import { MetricUnits, Metrics } from '@aws-lambda-powertools/metrics'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DYNAMODB_TABLE_NAME, ENV } from '/opt/nodejs/constants.mjs'
+import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
 import { createResponse } from '/opt/nodejs/response.mjs'
 
 const client = new DynamoDBClient({})
@@ -15,16 +21,16 @@ const ddbDocClient = DynamoDBDocumentClient.from(client)
 /**
  * Deletes a channel for the authenticated user
  */
-export const deleteChannelHandler = async (
+const deleteChannel = async (
   event: APIGatewayProxyEvent,
+  _context: Context,
+  logger: Logger,
+  metrics: Metrics,
 ): Promise<APIGatewayProxyResult> => {
   if (event.httpMethod !== 'DELETE') {
     throw new Error(
       `Delete method only accepts DELETE method, you tried: ${event.httpMethod} method.`,
     )
-  }
-  if (ENV !== 'prod') {
-    console.debug('received:', event)
   }
 
   const eventPath = event.path
@@ -43,12 +49,10 @@ export const deleteChannelHandler = async (
         TableName: DYNAMODB_TABLE_NAME,
       }),
     )
-    if (ENV !== 'prod') {
-      console.debug('Success - item deleted', ddbResponse)
-    }
-  } catch (err) {
+    logger.debug('Success - item deleted', { ddbResponse })
+  } catch (error) {
     // TODO: Error handling - make more robust
-    console.error('Error', err instanceof Error ? err.stack : 'Unknown Type')
+    logger.error('Error', error as Error)
     return createResponse({
       eventPath,
       responseBody: { message: 'Something went wrong' },
@@ -74,14 +78,9 @@ export const deleteChannelHandler = async (
         },
       }),
     )
-    if (ENV !== 'prod') {
-      console.debug('Success - channel count updated', ddbResponse)
-    }
+    logger.debug('Success - channel count updated', { ddbResponse })
   } catch (error) {
-    console.error(
-      'Update Error',
-      error instanceof Error ? error.stack : 'Unknown Type',
-    )
+    logger.error('Update Error', error as Error)
     return createResponse({
       eventPath,
       responseBody: { message: 'Something went wrong' },
@@ -89,9 +88,13 @@ export const deleteChannelHandler = async (
     })
   }
 
+  metrics.addMetric('channelDeleted', MetricUnits.Count, 1)
+
   return createResponse({
     eventPath,
     responseBody: { message: 'Deleted' },
     statusCode: 204,
   })
 }
+
+export default deleteChannel

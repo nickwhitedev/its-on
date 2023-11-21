@@ -3,10 +3,16 @@ import {
   DynamoDBDocumentClient,
   UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import {
+  APIGatewayProxyEvent,
+  APIGatewayProxyResult,
+  Context,
+} from 'aws-lambda'
 
+import { Logger } from '@aws-lambda-powertools/logger'
+import { MetricUnits, Metrics } from '@aws-lambda-powertools/metrics'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DYNAMODB_TABLE_NAME, ENV } from '/opt/nodejs/constants.mjs'
+import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
 import { getChannel, getUserInfo } from '/opt/nodejs/dynamo.mjs'
 import { createResponse } from '/opt/nodejs/response.mjs'
 
@@ -16,16 +22,16 @@ const ddbDocClient = DynamoDBDocumentClient.from(client)
 /**
  * Subscribes the authenticated user to a channel
  */
-export const subscribeHandler = async (
+const subscribe = async (
   event: APIGatewayProxyEvent,
+  _context: Context,
+  logger: Logger,
+  metrics: Metrics,
 ): Promise<APIGatewayProxyResult> => {
   if (event.httpMethod !== 'POST') {
     throw new Error(
       `postMethod only accepts POST method, you tried: ${event.httpMethod} method.`,
     )
-  }
-  if (ENV !== 'prod') {
-    console.debug('received:', event)
   }
 
   const eventPath = event.path
@@ -44,10 +50,7 @@ export const subscribeHandler = async (
   try {
     userInfo = await getUserInfo({ ddbDocClient, userID })
   } catch (error) {
-    console.error(
-      'Get User Info Error',
-      error instanceof Error ? error.stack : 'Unknown Type',
-    )
+    logger.error('Get User Info Error', error as Error)
     return createResponse({
       eventPath,
       responseBody: { message: 'Something went wrong' },
@@ -68,7 +71,7 @@ export const subscribeHandler = async (
   try {
     privateChannel = await getChannel({ channelID, ddbDocClient, userID })
   } catch (error) {
-    console.error('Error getting private channel: ', error)
+    logger.error('Error getting private channel: ', error as Error)
     return createResponse({
       eventPath,
       responseBody: { message: 'Something went wrong' },
@@ -78,9 +81,7 @@ export const subscribeHandler = async (
 
   if (privateChannel != null) {
     // Subscriptions should only be for public copies of channels
-    if (ENV !== 'prod') {
-      console.debug('User owns channel')
-    }
+    logger.warn('User owns channel')
     return createResponse({
       eventPath,
       responseBody: {
@@ -103,11 +104,9 @@ export const subscribeHandler = async (
     }
     const { pk: _pk, sk: _sk, ...channelInfo } = publicChannel
     channelAttributes = channelInfo
-    if (ENV !== 'prod') {
-      console.debug('Get public channel info: ', publicChannel)
-    }
+    logger.debug('Get public channel info: ', { channel: publicChannel })
   } catch (error) {
-    console.error('Get public channel error', error)
+    logger.error('Get public channel error', error as Error)
     return createResponse({
       eventPath,
       responseBody: { message: 'Something went wrong' },
@@ -156,14 +155,9 @@ export const subscribeHandler = async (
         },
       }),
     )
-    if (ENV !== 'prod') {
-      console.debug('Success - items added or updated', ddbResponse)
-    }
+    logger.debug('Success - items added or updated', { ddbResponse })
   } catch (error) {
-    console.error(
-      'Batch Write Error',
-      error instanceof Error ? error.stack : 'Unknown Type',
-    )
+    logger.error('Batch Write Error', error as Error)
     return createResponse({
       eventPath,
       responseBody: { message: 'Something went wrong' },
@@ -190,14 +184,9 @@ export const subscribeHandler = async (
         },
       }),
     )
-    if (ENV !== 'prod') {
-      console.debug('Success - subscriber count updated', ddbResponse)
-    }
+    logger.debug('Success - subscriber count updated', { ddbResponse })
   } catch (error) {
-    console.error(
-      'Update Error',
-      error instanceof Error ? error.stack : 'Unknown Type',
-    )
+    logger.error('Update Error', error as Error)
     return createResponse({
       eventPath,
       responseBody: { message: 'Something went wrong' },
@@ -223,14 +212,9 @@ export const subscribeHandler = async (
         },
       }),
     )
-    if (ENV !== 'prod') {
-      console.debug('Success - subscription count updated', ddbResponse)
-    }
+    logger.debug('Success - subscription count updated', { ddbResponse })
   } catch (error) {
-    console.error(
-      'Update Error',
-      error instanceof Error ? error.stack : 'Unknown Type',
-    )
+    logger.error('Update Error', error as Error)
     return createResponse({
       eventPath,
       responseBody: { message: 'Something went wrong' },
@@ -238,9 +222,13 @@ export const subscribeHandler = async (
     })
   }
 
+  metrics.addMetric('subscribeToChannel', MetricUnits.Count, 1)
+
   return createResponse({
     eventPath,
     responseBody: { message: 'Subscribed' },
     statusCode: 200,
   })
 }
+
+export default subscribe
