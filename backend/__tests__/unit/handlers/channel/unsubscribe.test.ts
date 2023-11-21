@@ -5,16 +5,21 @@ import {
   UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
 
+import { Logger } from '@aws-lambda-powertools/logger'
+import { Metrics } from '@aws-lambda-powertools/metrics'
 import { jest } from '@jest/globals'
 import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
+import mockContext from '../../../../__mocks__/mock-context.js'
 import mockEvent from '../../../../__mocks__/mock-event.js'
 import { CORS_HEADERS } from '../../../../src/common/constants.mjs'
-import { unsubscribeHandler } from '../../../../src/handlers/channel/unsubscribe.mjs'
+import unsubscribe from '../../../../src/handlers/channel/unsubscribe/unsubscribe.mjs'
 
-// This includes all tests for unsubscribeHandler()
-describe('Test unsubscribeHandler', function () {
+// This includes all tests for unsubscribe()
+describe('Test unsubscribe', function () {
   const ddbMock = mockClient(DynamoDBDocumentClient)
+  const silentLogger = new Logger({ logLevel: 'SILENT' })
+  const metrics = new Metrics()
   jest.useFakeTimers().setSystemTime(new Date('2020-01-01'))
 
   beforeEach(() => {
@@ -46,8 +51,8 @@ describe('Test unsubscribeHandler', function () {
       },
     }
 
-    // Invoke unsubscribeHandler()
-    const result = await unsubscribeHandler(event)
+    // Invoke unsubscribe()
+    const result = await unsubscribe(event, mockContext, silentLogger, metrics)
 
     const resultBody = JSON.parse(result.body) as IResponseWithMessage
     // Compare the result with the expected result

@@ -1,21 +1,23 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import {
+  APIGatewayProxyEvent,
+  APIGatewayProxyResult,
+  Context,
+} from 'aws-lambda'
 
-import { ENV, PUSH_NOTIFICATION_PUBLIC_KEY } from '/opt/nodejs/constants.mjs'
+import { PUSH_NOTIFICATION_PUBLIC_KEY } from '/opt/nodejs/constants.mjs'
 import { createResponse } from '/opt/nodejs/response.mjs'
 
 /**
  * Handler for getting the VAPID public key used for notification encryption
  */
-export const getNotificationKeyHandler = (
+const getNotificationKey = (
   event: APIGatewayProxyEvent,
+  _context: Context,
 ): Promise<APIGatewayProxyResult> => {
   if (event.httpMethod !== 'GET') {
     throw new Error(
       `getMethod only accepts GET method, you tried: ${event.httpMethod} method.`,
     )
-  }
-  if (ENV !== 'prod') {
-    console.debug('received:', event)
   }
 
   return new Promise(resolve => {
@@ -28,3 +30,5 @@ export const getNotificationKeyHandler = (
     )
   })
 }
+
+export default getNotificationKey

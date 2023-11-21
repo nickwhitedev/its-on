@@ -1,26 +1,35 @@
 import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import {
+  APIGatewayProxyEvent,
+  APIGatewayProxyResult,
+  Context,
+} from 'aws-lambda'
 
+import { Logger } from '@aws-lambda-powertools/logger'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DYNAMODB_TABLE_NAME, ENV } from '/opt/nodejs/constants.mjs'
+import { PushSubscription } from 'web-push'
+import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
 import { createResponse } from '/opt/nodejs/response.mjs'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
 
+interface IPayload {
+  subscription: PushSubscription
+}
+
 /**
- * Disables notifications for a user
+ * Removes a user's notification subscription from their profile in Dynamo DB
  */
-export const disableNotificationsHandler = async (
+const unsubscribeNotifications = async (
   event: APIGatewayProxyEvent,
+  _context: Context,
+  logger: Logger,
 ): Promise<APIGatewayProxyResult> => {
   if (event.httpMethod !== 'POST') {
     throw new Error(
       `postMethod only accepts POST method, you tried: ${event.httpMethod} method.`,
     )
-  }
-  if (ENV !== 'prod') {
-    console.debug('received:', event)
   }
 
   const eventPath = event.path
@@ -28,32 +37,38 @@ export const disableNotificationsHandler = async (
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
 
+  if (event.body == null) {
+    return createResponse({
+      eventPath,
+      responseBody: {
+        message:
+          'Request body must contain subscription as an instance of PushSubscription',
+      },
+      statusCode: 400,
+    })
+  }
+
+  const subscription = (JSON.parse(event.body) as IPayload).subscription
+
   try {
     const ddbResponse = await ddbDocClient.send(
       new UpdateCommand({
         Key: {
           pk: `user#${userID}`,
-          sk: `profile`,
+          sk: 'notificationSubscriptions',
         },
         ReturnValues: 'ALL_NEW',
         TableName: DYNAMODB_TABLE_NAME,
-        UpdateExpression: 'SET #notificationsEnabled = :notificationsEnabled',
+        UpdateExpression: 'REMOVE #subscriptions.#subscriptionID',
         ExpressionAttributeNames: {
-          '#notificationsEnabled': 'notificationsEnabled',
-        },
-        ExpressionAttributeValues: {
-          ':notificationsEnabled': false,
+          '#subscriptions': 'subscriptions',
+          '#subscriptionID': subscription.endpoint,
         },
       }),
     )
-    if (ENV !== 'prod') {
-      console.debug('Success - user profile updated', ddbResponse)
-    }
+    logger.debug('Success - user profile updated', { ddbResponse })
   } catch (error) {
-    console.error(
-      'Error',
-      error instanceof Error ? error.stack : 'Unknown Type',
-    )
+    logger.error('Error', error as Error)
     return createResponse({
       eventPath,
       responseBody: { message: 'Something went wrong' },
@@ -63,7 +78,9 @@ export const disableNotificationsHandler = async (
 
   return createResponse({
     eventPath,
-    responseBody: { message: 'Notifications disabled' },
+    responseBody: { message: 'Notifications disabled for device' },
     statusCode: 200,
   })
 }
+
+export default unsubscribeNotifications

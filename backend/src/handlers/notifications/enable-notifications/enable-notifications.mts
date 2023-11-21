@@ -1,8 +1,13 @@
 import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import {
+  APIGatewayProxyEvent,
+  APIGatewayProxyResult,
+  Context,
+} from 'aws-lambda'
 
+import { Logger } from '@aws-lambda-powertools/logger'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DYNAMODB_TABLE_NAME, ENV } from '/opt/nodejs/constants.mjs'
+import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
 import { createResponse } from '/opt/nodejs/response.mjs'
 
 const client = new DynamoDBClient({})
@@ -11,16 +16,15 @@ const ddbDocClient = DynamoDBDocumentClient.from(client)
 /**
  * Enables notifications for a user
  */
-export const enableNotificationsHandler = async (
+const enableNotifications = async (
   event: APIGatewayProxyEvent,
+  _context: Context,
+  logger: Logger,
 ): Promise<APIGatewayProxyResult> => {
   if (event.httpMethod !== 'POST') {
     throw new Error(
       `postMethod only accepts POST method, you tried: ${event.httpMethod} method.`,
     )
-  }
-  if (ENV !== 'prod') {
-    console.debug('received:', event)
   }
 
   const eventPath = event.path
@@ -46,14 +50,9 @@ export const enableNotificationsHandler = async (
         },
       }),
     )
-    if (ENV !== 'prod') {
-      console.debug('Success - user profile updated', ddbResponse)
-    }
+    logger.debug('Success - user profile updated', { ddbResponse })
   } catch (error) {
-    console.error(
-      'Error',
-      error instanceof Error ? error.stack : 'Unknown Type',
-    )
+    logger.error('Error', error as Error)
     return createResponse({
       eventPath,
       responseBody: { message: 'Something went wrong' },
@@ -67,3 +66,5 @@ export const enableNotificationsHandler = async (
     statusCode: 200,
   })
 }
+
+export default enableNotifications

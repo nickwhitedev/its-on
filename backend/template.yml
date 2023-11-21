@@ -167,7 +167,7 @@ Resources:
   getChannelLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: dist/src/handlers/channel/get-channel
+      CodeUri: dist/src/handlers/channel/get-channel/
       Description: Gets data related to a channel
       Events:
         Api:
@@ -219,7 +219,7 @@ Resources:
   updateChannelLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: dist/src/handlers/channel/
+      CodeUri: dist/src/handlers/channel/update-channel/
       Description: Updates a channel for a user
       Events:
         Api:
@@ -228,7 +228,7 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /{channelID}
             Method: PUT
-      Handler: update-channel.updateChannelHandler
+      Handler: handler.handler
       Policies:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
@@ -271,7 +271,7 @@ Resources:
   itsOffLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: dist/src/handlers/channel/its-off
+      CodeUri: dist/src/handlers/channel/its-off/
       Description: Turns a channel off for a user
       Events:
         Api:
@@ -375,7 +375,7 @@ Resources:
   unsubscribeLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: dist/src/handlers/channel/
+      CodeUri: dist/src/handlers/channel/unsubscribe/
       Description: Unsubscribes a user from a channel
       Events:
         Api:
@@ -384,7 +384,7 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /{channelID}/unsubscribe
             Method: POST
-      Handler: unsubscribe.unsubscribeHandler
+      Handler: handler.handler
       Policies:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
@@ -401,7 +401,7 @@ Resources:
   getNotificationKeyLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: dist/src/handlers/notifications/
+      CodeUri: dist/src/handlers/notifications/get-notification-key/
       Description: Gets the public VAPID key to use for notifications
       Events:
         Api:
@@ -410,7 +410,7 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /notification-key
             Method: GET
-      Handler: get-notification-key.getNotificationKeyHandler
+      Handler: handler.handler
       Policies:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
@@ -427,7 +427,7 @@ Resources:
   enableNotificationsLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: dist/src/handlers/notifications/
+      CodeUri: dist/src/handlers/notifications/enable-notifications/
       Description: Enables notifications for a user
       Events:
         Api:
@@ -436,7 +436,7 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /enable-notifications
             Method: POST
-      Handler: enable-notifications.enableNotificationsHandler
+      Handler: handler.handler
       Policies:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
@@ -453,7 +453,7 @@ Resources:
   disableNotificationsLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: dist/src/handlers/notifications/
+      CodeUri: dist/src/handlers/notifications/disable-notifications/
       Description: Disables notifications for a user
       Events:
         Api:
@@ -462,7 +462,7 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /disable-notifications
             Method: POST
-      Handler: disable-notifications.disableNotificationsHandler
+      Handler: handler.handler
       Policies:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
@@ -479,7 +479,7 @@ Resources:
   subscribeNotificationsLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: dist/src/handlers/notifications/
+      CodeUri: dist/src/handlers/notifications/subscribe-notifications/
       Description: Register a user's notification subscription
       Events:
         Api:
@@ -488,7 +488,7 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /subscribe-notifications
             Method: POST
-      Handler: subscribe-notifications.subscribeNotificationsHandler
+      Handler: handler.handler
       Policies:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
@@ -505,7 +505,7 @@ Resources:
   unsubscribeNotificationsLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: dist/src/handlers/notifications/
+      CodeUri: dist/src/handlers/notifications/unsubscribe-notifications/
       Description: Unregister a user's notification subscription
       Events:
         Api:
@@ -514,7 +514,7 @@ Resources:
             RestApiId: !Ref ItsOnApi
             Path: /unsubscribe-notifications
             Method: POST
-      Handler: unsubscribe-notifications.unsubscribeNotificationsHandler
+      Handler: handler.handler
       Policies:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
@@ -530,7 +530,7 @@ Resources:
   tableStreamLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: dist/src/handlers/table-stream
+      CodeUri: dist/src/handlers/table-stream/
       Description: Handles write events from the ItsOnTable
       Events:
         TableStream:

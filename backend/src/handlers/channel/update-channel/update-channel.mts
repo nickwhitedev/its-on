@@ -1,9 +1,15 @@
 import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import {
+  APIGatewayProxyEvent,
+  APIGatewayProxyResult,
+  Context,
+} from 'aws-lambda'
 import { getChannel, getUserInfo } from '/opt/nodejs/dynamo.mjs'
 
+import { Logger } from '@aws-lambda-powertools/logger'
+import { MetricUnits, Metrics } from '@aws-lambda-powertools/metrics'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DYNAMODB_TABLE_NAME, ENV } from '/opt/nodejs/constants.mjs'
+import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
 import { createResponse } from '/opt/nodejs/response.mjs'
 import { MS_IN_HOUR } from '/opt/nodejs/time.mjs'
 
@@ -13,16 +19,16 @@ const ddbDocClient = DynamoDBDocumentClient.from(client)
 /**
  * Updates a channel for the authenticated user
  */
-export const updateChannelHandler = async (
+const updateChannel = async (
   event: APIGatewayProxyEvent,
+  _context: Context,
+  logger: Logger,
+  metrics: Metrics,
 ): Promise<APIGatewayProxyResult> => {
   if (event.httpMethod !== 'PUT') {
     throw new Error(
       `putMethod only accepts PUT method, you tried: ${event.httpMethod} method.`,
     )
-  }
-  if (ENV !== 'prod') {
-    console.debug('received:', event)
   }
 
   const eventPath = event.path
@@ -43,10 +49,7 @@ export const updateChannelHandler = async (
   try {
     userInfo = await getUserInfo({ ddbDocClient, userID })
   } catch (error) {
-    console.error(
-      'Get User Info Error',
-      error instanceof Error ? error.stack : 'Unknown Type',
-    )
+    logger.error('Get User Info Error', error as Error)
     return createResponse({
       eventPath,
       responseBody: { message: 'Something went wrong' },
@@ -60,10 +63,7 @@ export const updateChannelHandler = async (
     channelIsNotOwnedByUser =
       (await getChannel({ channelID, ddbDocClient, userID })) == null
   } catch (error) {
-    console.error(
-      'Error',
-      error instanceof Error ? error.stack : 'Unknown Type',
-    )
+    logger.error('Error', error as Error)
     return createResponse({
       eventPath,
       responseBody: { message: 'Something went wrong' },
@@ -114,20 +114,15 @@ export const updateChannelHandler = async (
         },
       }),
     )
-    if (ENV !== 'prod') {
-      console.debug('Success - item updated', ddbResponse)
-    }
+    logger.debug('Success - item updated', { ddbResponse })
+    metrics.addMetric('channelUpdated', MetricUnits.Count, 1)
     return createResponse({
       eventPath,
       responseBody: { message: 'Updated' },
       statusCode: 200,
     })
   } catch (error) {
-    // TODO: Error handling - make more robust
-    console.error(
-      'Error',
-      error instanceof Error ? error.stack : 'Unknown Type',
-    )
+    logger.error('Error', error as Error)
     return createResponse({
       eventPath,
       responseBody: { message: 'Something went wrong' },
@@ -135,3 +130,5 @@ export const updateChannelHandler = async (
     })
   }
 }
+
+export default updateChannel

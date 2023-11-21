@@ -1,9 +1,14 @@
 import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import {
+  APIGatewayProxyEvent,
+  APIGatewayProxyResult,
+  Context,
+} from 'aws-lambda'
 
+import { Logger } from '@aws-lambda-powertools/logger'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { PushSubscription } from 'web-push'
-import { DYNAMODB_TABLE_NAME, ENV } from '/opt/nodejs/constants.mjs'
+import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
 import { createResponse } from '/opt/nodejs/response.mjs'
 
 const client = new DynamoDBClient({})
@@ -16,16 +21,15 @@ interface IPayload {
 /**
  * Adds a user's notification subscription to their profile in Dynamo DB
  */
-export const subscribeNotificationsHandler = async (
+const subscribeNotifications = async (
   event: APIGatewayProxyEvent,
+  _context: Context,
+  logger: Logger,
 ): Promise<APIGatewayProxyResult> => {
   if (event.httpMethod !== 'POST') {
     throw new Error(
       `postMethod only accepts POST method, you tried: ${event.httpMethod} method.`,
     )
-  }
-  if (ENV !== 'prod') {
-    console.debug('received:', event)
   }
 
   const eventPath = event.path
@@ -65,9 +69,7 @@ export const subscribeNotificationsHandler = async (
         },
       }),
     )
-    if (ENV !== 'prod') {
-      console.debug('Success - user profile updated', ddbResponse)
-    }
+    logger.debug('Success - user profile updated', { ddbResponse })
   } catch (error) {
     if (
       error instanceof Error &&
@@ -94,9 +96,9 @@ export const subscribeNotificationsHandler = async (
           },
         }),
       )
-      if (ENV !== 'prod') {
-        console.debug('Success - empty map added', ddbEmptyMapResponse)
-      }
+      logger.debug('Success - empty map added', {
+        ddbResopnse: ddbEmptyMapResponse,
+      })
 
       // ...then retry the updates
       const ddbResponse = await ddbDocClient.send(
@@ -118,14 +120,9 @@ export const subscribeNotificationsHandler = async (
           },
         }),
       )
-      if (ENV !== 'prod') {
-        console.debug('Success - user profile updated', ddbResponse)
-      }
+      logger.debug('Success - user profile updated', { ddbResponse })
     } else {
-      console.error(
-        'Error',
-        error instanceof Error ? error.stack : 'Unknown Type',
-      )
+      logger.error('Error', error as Error)
       return createResponse({
         eventPath,
         responseBody: { message: 'Something went wrong' },
@@ -140,3 +137,5 @@ export const subscribeNotificationsHandler = async (
     statusCode: 200,
   })
 }
+
+export default subscribeNotifications
