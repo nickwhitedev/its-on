@@ -1,17 +1,19 @@
+import { Logger } from '@aws-lambda-powertools/logger'
 import {
   DynamoDBDocumentClient,
   PutCommand,
   QueryCommand,
 } from '@aws-sdk/lib-dynamodb'
-
 import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
-import mockEvent from '../../../__mocks__/mock-event'
-import { getOverviewHandler } from '../../../src/handlers/get-overview'
-import { CORS_HEADERS } from '../../../src/utils/constants'
+import mockContext from '../../../__mocks__/mock-context.js'
+import mockEvent from '../../../__mocks__/mock-event.js'
+import { CORS_HEADERS } from '../../../src/common/constants.mjs'
+import getOverview from '../../../src/handlers/get-overview/get-overview.mjs'
 
 describe('Test getOverviewHandler', () => {
   const ddbMock = mockClient(DynamoDBDocumentClient)
+  const silentLogger = new Logger({ logLevel: 'SILENT' })
 
   beforeEach(() => {
     ddbMock.reset()
@@ -53,8 +55,7 @@ describe('Test getOverviewHandler', () => {
       ...mockEvent,
       httpMethod: 'GET',
     }
-
-    const result = await getOverviewHandler(event)
+    const result = await getOverview(event, mockContext, silentLogger)
 
     const expectedResult = {
       statusCode: 200,
@@ -100,7 +101,7 @@ describe('Test getOverviewHandler', () => {
       httpMethod: 'GET',
     }
 
-    const result = await getOverviewHandler(event)
+    const result = await getOverview(event, mockContext, silentLogger)
 
     const expectedResult = {
       statusCode: 200,

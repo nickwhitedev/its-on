@@ -4,23 +4,28 @@ import {
   UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
 
+import { Logger } from '@aws-lambda-powertools/logger'
+import { Metrics } from '@aws-lambda-powertools/metrics'
 import { jest } from '@jest/globals'
 import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
-import mockEvent from '../../../../__mocks__/mock-event'
-import { updateChannelHandler } from '../../../../src/handlers/channel/update-channel'
-import { CORS_HEADERS } from '../../../../src/utils/constants'
+import mockContext from '../../../../__mocks__/mock-context.js'
+import mockEvent from '../../../../__mocks__/mock-event.js'
+import { CORS_HEADERS } from '../../../../src/common/constants.mjs'
+import updateChannel from '../../../../src/handlers/channel/update-channel/update-channel.mjs'
 
-// This includes all tests for updateChannelHandler()
-describe('Test updateChannelHandler', function () {
+// This includes all tests for updateChannel()
+describe('Test updateChannel', function () {
   const ddbMock = mockClient(DynamoDBDocumentClient)
+  const silentLogger = new Logger({ logLevel: 'SILENT' })
+  const metrics = new Metrics()
   jest.useFakeTimers().setSystemTime(new Date('2020-01-01'))
 
   beforeEach(() => {
     ddbMock.reset()
   })
 
-  // This test invokes updateChannelHandler() and compare the result
+  // This test invokes updateChannel() and compare the result
   it('should add id to the table', async () => {
     // Return the specified value whenever the spied put function is called
     ddbMock.on(UpdateCommand).resolves({})
@@ -35,8 +40,13 @@ describe('Test updateChannelHandler', function () {
       },
     }
 
-    // Invoke updateChannelHandler()
-    const result = await updateChannelHandler(event)
+    // Invoke updateChannel()
+    const result = await updateChannel(
+      event,
+      mockContext,
+      silentLogger,
+      metrics,
+    )
 
     const resultBody = JSON.parse(result.body) as IResponseWithMessage
     // Compare the result with the expected result
@@ -60,8 +70,13 @@ describe('Test updateChannelHandler', function () {
       },
     }
 
-    // Invoke updateChannelHandler()
-    const result = await updateChannelHandler(event)
+    // Invoke updateChannel()
+    const result = await updateChannel(
+      event,
+      mockContext,
+      silentLogger,
+      metrics,
+    )
 
     const resultBody = JSON.parse(result.body) as IResponseWithMessage
     // Compare the result with the expected result

@@ -1,15 +1,20 @@
 import { DeleteCommand, DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb'
 
+import { Logger } from '@aws-lambda-powertools/logger'
+import { Metrics } from '@aws-lambda-powertools/metrics'
 import { jest } from '@jest/globals'
 import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
-import mockEvent from '../../../../__mocks__/mock-event'
-import { deleteChannelHandler } from '../../../../src/handlers/channel/delete-channel'
-import { CORS_HEADERS } from '../../../../src/utils/constants'
+import mockContext from '../../../../__mocks__/mock-context.js'
+import mockEvent from '../../../../__mocks__/mock-event.js'
+import { CORS_HEADERS } from '../../../../src/common/constants.mjs'
+import deleteChannel from '../../../../src/handlers/channel/delete-channel/delete-channel.mjs'
 
 describe('Test deleteHandler', function () {
   const ddbMock = mockClient(DynamoDBDocumentClient)
   jest.useFakeTimers().setSystemTime(new Date('2020-01-01'))
+  const silentLogger = new Logger({ logLevel: 'SILENT' })
+  const metrics = new Metrics()
 
   beforeEach(() => {
     ddbMock.reset()
@@ -26,7 +31,12 @@ describe('Test deleteHandler', function () {
       },
     }
 
-    const result = await deleteChannelHandler(event)
+    const result = await deleteChannel(
+      event,
+      mockContext,
+      silentLogger,
+      metrics,
+    )
 
     const resultBody = JSON.parse(result.body) as IResponseWithMessage
     expect(result.headers).toEqual(CORS_HEADERS)

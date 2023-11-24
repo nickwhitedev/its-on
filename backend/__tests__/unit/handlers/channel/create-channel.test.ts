@@ -1,3 +1,5 @@
+import { Logger } from '@aws-lambda-powertools/logger'
+import { Metrics } from '@aws-lambda-powertools/metrics'
 import {
   DynamoDBDocumentClient,
   GetCommand,
@@ -7,14 +9,17 @@ import {
 import { jest } from '@jest/globals'
 import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
-import mockEvent from '../../../../__mocks__/mock-event'
-import { createChannelHandler } from '../../../../src/handlers/channel/create-channel'
-import { CORS_HEADERS } from '../../../../src/utils/constants'
-import { MS_IN_HOUR } from '../../../../src/utils/time'
+import mockContext from '../../../../__mocks__/mock-context.js'
+import mockEvent from '../../../../__mocks__/mock-event.js'
+import { CORS_HEADERS } from '../../../../src/common/constants.mjs'
+import { MS_IN_HOUR } from '../../../../src/common/time.mjs'
+import createChannel from '../../../../src/handlers/channel/create-channel/create-channel.mjs'
 
-// This includes all tests for createChannelHandler()
-describe('Test createChannelHandler', function () {
+// This includes all tests for createChannel()
+describe('Test createChannel', function () {
   const ddbMock = mockClient(DynamoDBDocumentClient)
+  const silentLogger = new Logger({ logLevel: 'SILENT' })
+  const metrics = new Metrics()
   jest.useFakeTimers().setSystemTime(new Date('2020-01-01'))
 
   beforeEach(() => {
@@ -39,8 +44,13 @@ describe('Test createChannelHandler', function () {
       httpMethod: 'POST',
     }
 
-    // Invoke createChannelHandler()
-    const result = await createChannelHandler(event)
+    // Invoke createChannel()
+    const result = await createChannel(
+      event,
+      mockContext,
+      silentLogger,
+      metrics,
+    )
 
     const resultBody = JSON.parse(result.body) as IChannel
     // Compare the result with the expected result
@@ -92,8 +102,13 @@ describe('Test createChannelHandler', function () {
       httpMethod: 'POST',
     }
 
-    // Invoke createChannelHandler()
-    const result = await createChannelHandler(event)
+    // Invoke createChannel()
+    const result = await createChannel(
+      event,
+      mockContext,
+      silentLogger,
+      metrics,
+    )
 
     const resultBody = JSON.parse(result.body) as IChannel
     // Compare the result with the expected result
@@ -146,8 +161,13 @@ describe('Test createChannelHandler', function () {
       httpMethod: 'POST',
     }
 
-    // Invoke createChannelHandler()
-    const result = await createChannelHandler(event)
+    // Invoke createChannel()
+    const result = await createChannel(
+      event,
+      mockContext,
+      silentLogger,
+      metrics,
+    )
 
     const resultBody = JSON.parse(result.body) as IChannel
     // Compare the result with the expected result
@@ -201,8 +221,13 @@ describe('Test createChannelHandler', function () {
       httpMethod: 'POST',
     }
 
-    // Invoke createChannelHandler()
-    const result = await createChannelHandler(event)
+    // Invoke createChannel()
+    const result = await createChannel(
+      event,
+      mockContext,
+      silentLogger,
+      metrics,
+    )
 
     const resultBody = JSON.parse(result.body) as IResponseWithMessage
     // Compare the result with the expected result

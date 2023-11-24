@@ -4,14 +4,17 @@ import {
   QueryCommand,
 } from '@aws-sdk/lib-dynamodb'
 
+import { Logger } from '@aws-lambda-powertools/logger'
 import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
-import mockEvent from '../../../../__mocks__/mock-event'
-import { getChannelHandler } from '../../../../src/handlers/channel/get-channel'
-import { CORS_HEADERS } from '../../../../src/utils/constants'
+import mockContext from '../../../../__mocks__/mock-context.js'
+import mockEvent from '../../../../__mocks__/mock-event.js'
+import { CORS_HEADERS } from '../../../../src/common/constants.mjs'
+import getChannel from '../../../../src/handlers/channel/get-channel/get-channel.mjs'
 
 describe('Test getChannelHandler', () => {
   const ddbMock = mockClient(DynamoDBDocumentClient)
+  const silentLogger = new Logger({ logLevel: 'SILENT' })
 
   beforeEach(() => {
     ddbMock.reset()
@@ -38,7 +41,7 @@ describe('Test getChannelHandler', () => {
       },
     }
 
-    const result = await getChannelHandler(event)
+    const result = await getChannel(event, mockContext, silentLogger)
 
     const expectedResult = {
       statusCode: 200,
@@ -92,7 +95,7 @@ describe('Test getChannelHandler', () => {
       },
     }
 
-    const result = await getChannelHandler(event)
+    const result = await getChannel(event, mockContext, silentLogger)
 
     const expectedResult = {
       statusCode: 200,
@@ -125,7 +128,7 @@ describe('Test getChannelHandler', () => {
       },
     }
 
-    const result = await getChannelHandler(event)
+    const result = await getChannel(event, mockContext, silentLogger)
 
     const expectedResult = {
       statusCode: 404,
