@@ -345,7 +345,7 @@ const Channel = ({ channelID }: Props) => {
                   <MDSelectOption
                     disabled={isUpdating}
                     key={durationOption.value}
-                    selected={durationOption.value === channel.duration}
+                    selected={durationOption.value === currentDuration}
                     value={`${durationOption.value}`}
                   >
                     <div slot='headline'>{durationOption.displayName}</div>
