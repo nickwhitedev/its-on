@@ -90,6 +90,7 @@ const Channel = ({ channelID }: Props) => {
   const channelIsOn = channel != null && isChannelOn(channel)
 
   useEffect(() => {
+    // Set page title
     document.title = channel?.title ?? "It's On"
     return () => {
       document.title = "It's On"
@@ -97,6 +98,7 @@ const Channel = ({ channelID }: Props) => {
   }, [channel])
 
   useEffect(() => {
+    // fetch channel
     if (!isLoading) return
     void (async () => {
       let fetchedChannel: IChannel | null
@@ -107,16 +109,19 @@ const Channel = ({ channelID }: Props) => {
         // TODO: Handle error
       }
       if (fetchedChannel != null && channelID in channels) {
+        // User owns channel
         dispatchChannels({
           type: ChannelsDispatchActionType.CHANGED,
           channel: fetchedChannel,
         })
       } else if (fetchedChannel != null && channelID in subscriptions) {
+        // User is subscribed to the channel
         dispatchSubscriptions({
           type: SubscriptionsDispatchActionType.CHANGED,
           channel: fetchedChannel,
         })
       } else {
+        // Channel doesn't exist or is a public channel
         setChannel(fetchedChannel)
         setCurrentCapacity(user?.tier ?? DEFAULT_USER_TIER)
         setCurrentDuration(channel?.duration ?? MS_IN_HOUR)
@@ -137,6 +142,15 @@ const Channel = ({ channelID }: Props) => {
     subscriptions,
     user?.tier,
   ])
+
+  useEffect(() => {
+    // Sync state with context
+    setChannel(
+      channels.find(chan => chan.id === channelID) ??
+        subscriptions.find(chan => chan.id === channelID) ??
+        null,
+    )
+  }, [channelID, channels, subscriptions])
 
   useEffect(() => {
     setIsOn(channelIsOn)
@@ -307,11 +321,11 @@ const Channel = ({ channelID }: Props) => {
         isEditing={isEditing}
         isUpdating={isUpdating}
         isOn={isOn}
-        title={currentTitle}
+        currentTitle={currentTitle}
         userIsChannelOwner={userIsChannelOwner}
         onResetFormState={handleResetFormState}
         onSaveUpdates={handleSaveUpdates}
-        onChangeTitle={setCurrentTitle}
+        onChangeCurrentTitle={setCurrentTitle}
         setIsEditing={setIsEditing}
       />
       {userIsChannelOwner ? (
@@ -378,17 +392,17 @@ const Channel = ({ channelID }: Props) => {
             channel={channel}
             isEditing={isEditing}
             isUpdating={isUpdating}
-            note={currentNote}
+            currentNote={currentNote}
             userIsChannelOwner={userIsChannelOwner}
-            onChangeNote={setCurrentNote}
+            onChangeCurrentNote={setCurrentNote}
           />
           <ChannelSubscribers
-            capacity={currentCapacity}
+            currentCapacity={currentCapacity}
             channel={channel}
             isEditing={isEditing}
             isLoading={isLoading}
             isUpdating={isUpdating}
-            onChangeCapacity={setCurrentCapacity}
+            onChangeCurrentCapacity={setCurrentCapacity}
             setIsUpdating={setIsUpdating}
           />
           <div className='Channel-delete-section'>
@@ -458,9 +472,9 @@ const Channel = ({ channelID }: Props) => {
             channel={channel}
             isEditing={isEditing}
             isUpdating={isUpdating}
-            note={currentNote}
+            currentNote={currentNote}
             userIsChannelOwner={userIsChannelOwner}
-            onChangeNote={setCurrentNote}
+            onChangeCurrentNote={setCurrentNote}
           />
           <MDFilledTonalButton
             className='Channel-subscribe-button'
