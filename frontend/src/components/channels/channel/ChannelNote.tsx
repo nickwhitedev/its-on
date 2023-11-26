@@ -6,38 +6,40 @@ interface Props {
   channel: IChannel
   isEditing: boolean
   isUpdating: boolean
-  note: string
+  currentNote: string
   userIsChannelOwner: boolean
-  onChangeNote: (value: string) => void
+  onChangeCurrentNote: (value: string) => void
 }
 
 const ChannelNote = ({
   channel,
   isUpdating,
   isEditing,
-  note,
+  currentNote,
   userIsChannelOwner,
-  onChangeNote,
+  onChangeCurrentNote,
 }: Props) => {
   return userIsChannelOwner || (channel.note?.length ?? 0) > 0 ? (
-    <div className="ChannelNote">
+    <div className='ChannelNote'>
       <div></div>
       {userIsChannelOwner && isEditing ? (
         <MDOutlinedTextField
           className={'ChannelNote-input'}
           disabled={isUpdating}
-          label="Channel Note"
+          label='Channel Note'
           maxLength={200}
           placeholder="Let's meet at my place"
           rows={4}
-          type="textarea"
-          value={note}
+          type='textarea'
+          value={currentNote}
           onInput={(event: Event) => {
-            onChangeNote((event.target as unknown as { value: string }).value)
+            onChangeCurrentNote(
+              (event.target as unknown as { value: string }).value,
+            )
           }}
         />
       ) : (
-        <span className="ChannelNote-note">{channel.note}</span>
+        <span className='ChannelNote-note'>{channel.note}</span>
       )}
     </div>
   ) : null
