@@ -3,8 +3,8 @@ import { Metrics } from '@aws-lambda-powertools/metrics'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb'
 import { Context, DynamoDBStreamEvent } from 'aws-lambda'
-import { handleModifyEvent } from '../../table-stream/modify.mjs'
-import { handleRemoveEvent } from '../../table-stream/remove.mjs'
+import { handleModifyEvent } from './events/modify.mjs'
+import { handleRemoveEvent } from './events/remove.mjs'
 
 const ddbDocClient = DynamoDBDocumentClient.from(new DynamoDBClient({}))
 
