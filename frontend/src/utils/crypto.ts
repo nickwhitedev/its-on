@@ -1,7 +1,5 @@
 // PKCE HELPER FUNCTIONS
 
-import { Buffer } from 'buffer'
-
 // Generate a secure random string using the browser crypto functions
 export function generateRandomString() {
   const array = new Uint32Array(28)
@@ -25,12 +23,11 @@ function base64urlencode(str: string) {
   // btoa accepts chars only within ascii 0-255 and base64 encodes them.
   // Then convert the base64 encoded to base64url encoded
   //   (replace + with -, replace / with _, trim trailing =)
-  return Buffer.from(
+  return btoa(
     String.fromCharCode.apply(null, [
       ...new Uint8Array(str as unknown as ArrayBufferLike),
     ]),
   )
-    .toString('base64')
     .replace(/\+/g, '-')
     .replace(/\//g, '_')
     .replace(/=+$/, '')
