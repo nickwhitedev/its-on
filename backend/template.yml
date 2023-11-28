@@ -67,7 +67,6 @@ Globals:
     Layers:
       - !Ref ItsOnNodeModulesLambdaLayer
       - !Ref ItsOnCommonLambdaLayer
-      - !Ref ItsOnTableStreamLambdaLayer
     MemorySize: 128
     Runtime: nodejs18.x
     Timeout: 100
@@ -124,13 +123,6 @@ Resources:
     Properties:
       LayerName: common
       ContentUri: dist/common-layer/
-      CompatibleRuntimes:
-        - nodejs18.x
-  ItsOnTableStreamLambdaLayer:
-    Type: AWS::Serverless::LayerVersion
-    Properties:
-      LayerName: table-stream
-      ContentUri: dist/table-stream-layer/
       CompatibleRuntimes:
         - nodejs18.x
 
