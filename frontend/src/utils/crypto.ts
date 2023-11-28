@@ -1,5 +1,7 @@
 // PKCE HELPER FUNCTIONS
 
+import { Buffer } from 'buffer'
+
 // Generate a secure random string using the browser crypto functions
 export function generateRandomString() {
   const array = new Uint32Array(28)
