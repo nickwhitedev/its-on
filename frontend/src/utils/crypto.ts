@@ -23,11 +23,12 @@ function base64urlencode(str: string) {
   // btoa accepts chars only within ascii 0-255 and base64 encodes them.
   // Then convert the base64 encoded to base64url encoded
   //   (replace + with -, replace / with _, trim trailing =)
-  return btoa(
+  return Buffer.from(
     String.fromCharCode.apply(null, [
       ...new Uint8Array(str as unknown as ArrayBufferLike),
     ]),
   )
+    .toString('base64')
     .replace(/\+/g, '-')
     .replace(/\//g, '_')
     .replace(/=+$/, '')
