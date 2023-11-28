@@ -10,7 +10,7 @@ import { Logger } from '@aws-lambda-powertools/logger'
 import { MetricUnits, Metrics } from '@aws-lambda-powertools/metrics'
 import { KeysAndAttributes } from '@aws-sdk/client-dynamodb'
 import { DynamoDBRecord } from 'aws-lambda'
-import { PushSubscription, sendNotification } from 'web-push'
+import webPush, { PushSubscription } from 'web-push'
 import {
   DYNAMODB_TABLE_NAME,
   PUSH_NOTIFICATION_PRIVATE_KEY,
@@ -19,6 +19,8 @@ import {
 } from '/opt/nodejs/constants.mjs'
 import { batchWrite } from '/opt/nodejs/dynamo.mjs'
 import { MS_IN_HOUR } from '/opt/nodejs/time.mjs'
+
+const { sendNotification } = webPush
 
 interface Params {
   record: DynamoDBRecord
