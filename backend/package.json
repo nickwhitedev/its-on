@@ -16,7 +16,7 @@
     "web-push": "^3.6.6"
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.129",
+    "@types/aws-lambda": "^8.10.130",
     "@types/jest": "^29.5.8",
     "@types/nanoid": "^3.0.0",
     "@types/nanoid-dictionary": "^4.2.2",
