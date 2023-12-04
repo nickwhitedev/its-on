@@ -1,6 +1,8 @@
 /** @module utils/api */
 
 import { getTokens, refreshTokens } from './auth'
+
+import { APIError } from './errors/apiError'
 import { apiUrl } from './urls'
 
 /**
@@ -41,8 +43,11 @@ export const fetchApi = async <T>(
   const response = await fetchApiCall(uri, method, body)
   if (!response.ok) {
     if (response.status !== 401 || noRefresh) {
-      // TODO: API Error handling
-      throw new Error()
+      throw new APIError({
+        cause: { responseCode: response.status },
+        message: 'Bad response',
+        name: 'REQUEST_FAILED',
+      })
     }
 
     // refresh tokens and retry

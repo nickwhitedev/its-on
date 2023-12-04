@@ -1,42 +1,45 @@
 import './Channel.css'
 
-import { useEffect, useState } from 'react'
 import Countdown, { zeroPad } from 'react-countdown'
-import {
-  useChannels,
-  useChannelsDispatch,
-} from '../../../contexts/channels/channelsContext'
-import {
-  useSubscriptions,
-  useSubscriptionsDispatch,
-} from '../../../contexts/subscriptions/subscriptionsContext'
-import { useUser, useUserDispatch } from '../../../contexts/user/userContext'
 import {
   DEFAULT_USER_TIER,
   channelOnExpirationTime,
   durationOptions,
   isChannelOn,
 } from './channelUtils'
+import {
+  useChannels,
+  useChannelsDispatch,
+} from '../../../contexts/channels/channelsContext'
+import { useEffect, useState } from 'react'
+import {
+  useSubscriptions,
+  useSubscriptionsDispatch,
+} from '../../../contexts/subscriptions/subscriptionsContext'
+import { useUser, useUserDispatch } from '../../../contexts/user/userContext'
 
-import { useNavigate } from 'react-router-dom'
+import ChannelHeader from './ChannelHeader'
+import ChannelNote from './ChannelNote'
+import ChannelSubscribers from './subscribers/ChannelSubscribers'
 import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
+import { ErrorDispatchActionType } from '../../../contexts/error/errorReducer'
+import ItsOnIcon from '../../icons/ItsOnIcon'
+import MDCircularProgress from '../../material/progress/MDCircularProgress'
+import MDDialog from '../../material/MDDialog'
+import MDFilledButton from '../../material/button/MDFilledButton'
+import MDFilledTonalButton from '../../material/button/MDFilledTonalButton'
+import MDIcon from '../../material/MDIcon'
+import MDOutlinedSelect from '../../material/select/MDOutlinedSelect'
+import MDSelectOption from '../../material/select/MDSelectOption'
+import MDTextButton from '../../material/button/MDTextButton'
+import { MS_IN_HOUR } from '../../../utils/time'
 import { SubscriptionsDispatchActionType } from '../../../contexts/subscriptions/subscriptionsReducer'
 import { UserDispatchActionType } from '../../../contexts/user/userReducer'
 import { fetchApi } from '../../../utils/api'
 import { requestNotificationPermissions } from '../../../utils/notifications'
-import { MS_IN_HOUR } from '../../../utils/time'
-import ItsOnIcon from '../../icons/ItsOnIcon'
-import MDDialog from '../../material/MDDialog'
-import MDIcon from '../../material/MDIcon'
-import MDFilledButton from '../../material/button/MDFilledButton'
-import MDFilledTonalButton from '../../material/button/MDFilledTonalButton'
-import MDTextButton from '../../material/button/MDTextButton'
-import MDCircularProgress from '../../material/progress/MDCircularProgress'
-import MDOutlinedSelect from '../../material/select/MDOutlinedSelect'
-import MDSelectOption from '../../material/select/MDSelectOption'
-import ChannelHeader from './ChannelHeader'
-import ChannelNote from './ChannelNote'
-import ChannelSubscribers from './subscribers/ChannelSubscribers'
+import { sendErrorLog } from '../../../utils/logging'
+import { useErrorDispatch } from '../../../contexts/error/errorContext'
+import { useNavigate } from 'react-router-dom'
 
 interface Props {
   channelID: string
@@ -50,6 +53,7 @@ const Channel = ({ channelID }: Props) => {
   const user = useUser()
 
   const dispatchChannels = useChannelsDispatch()
+  const dispatchError = useErrorDispatch()
   const dispatchSubscriptions = useSubscriptionsDispatch()
   const dispatchUser = useUserDispatch()
 
@@ -104,9 +108,12 @@ const Channel = ({ channelID }: Props) => {
       let fetchedChannel: IChannel | null
       try {
         fetchedChannel = await fetchApi<IChannel>(`/${channelID}`)
-      } catch {
+      } catch (error) {
         fetchedChannel = null
-        // TODO: Handle error
+        await sendErrorLog('Fetch channel error', { error })
+        dispatchError({
+          type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
+        })
       }
       if (fetchedChannel != null && channelID in channels) {
         // User owns channel
@@ -137,6 +144,7 @@ const Channel = ({ channelID }: Props) => {
     channelID,
     channels,
     dispatchChannels,
+    dispatchError,
     dispatchSubscriptions,
     isLoading,
     subscriptions,
@@ -159,7 +167,7 @@ const Channel = ({ channelID }: Props) => {
   if (channel == null) {
     return isLoading ? (
       <MDCircularProgress
-        className='Channel-loading'
+        className="Channel-loading"
         indeterminate
       />
     ) : (
@@ -182,9 +190,10 @@ const Channel = ({ channelID }: Props) => {
         },
       })
     } catch (error) {
-      // TODO: Handle update channel error
-      // log error to backend
-      // display user friendly message
+      await sendErrorLog("Channel it's on error", { error })
+      dispatchError({
+        type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
+      })
     }
     setIsUpdating(false)
   }
@@ -215,9 +224,10 @@ const Channel = ({ channelID }: Props) => {
         },
       })
     } catch (error) {
-      // TODO: Handle update channel error
-      // log error to backend
-      // display user friendly message
+      await sendErrorLog('Channel update error', { error })
+      dispatchError({
+        type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
+      })
     }
 
     setIsUpdating(false)
@@ -237,9 +247,10 @@ const Channel = ({ channelID }: Props) => {
         },
       })
     } catch (error) {
-      // TODO: Handle update channel error
-      // log error to backend
-      // display user friendly message
+      await sendErrorLog("Channel it's off error", { error })
+      dispatchError({
+        type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
+      })
     }
     setIsUpdating(false)
   }
@@ -261,9 +272,10 @@ const Channel = ({ channelID }: Props) => {
       })
       navigate('/channels')
     } catch (error) {
-      // TODO: Handle create channel error
-      // log error to backend
-      // display user friendly message
+      await sendErrorLog('Channel delete error', { error })
+      dispatchError({
+        type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
+      })
     }
     setIsConfirmingDelete(false)
     setIsUpdating(false)
@@ -281,9 +293,10 @@ const Channel = ({ channelID }: Props) => {
         type: UserDispatchActionType.SUBSCRIPTION_COUNT_INCREASED,
       })
     } catch (error) {
-      // TODO: Handle create channel error
-      // log error to backend
-      // display user friendly message
+      await sendErrorLog('Channel subscribe error', { error })
+      dispatchError({
+        type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
+      })
     }
     setIsUpdating(false)
 
@@ -307,15 +320,16 @@ const Channel = ({ channelID }: Props) => {
         type: UserDispatchActionType.SUBSCRIPTION_COUNT_DECREASED,
       })
     } catch (error) {
-      // TODO: Handle create channel error
-      // log error to backend
-      // display user friendly message
+      await sendErrorLog('Channel unsubscribe error', { error })
+      dispatchError({
+        type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
+      })
     }
     setIsUpdating(false)
   }
 
   return (
-    <div className='Channel'>
+    <div className="Channel">
       <ChannelHeader
         channel={channel}
         isEditing={isEditing}
@@ -340,12 +354,12 @@ const Channel = ({ channelID }: Props) => {
                 : () => void handleClickItsOn()
             }
           >
-            <ItsOnIcon className='Channel-button-image' />
+            <ItsOnIcon className="Channel-button-image" />
           </button>
-          <div className='Channel-duration-display'>
+          <div className="Channel-duration-display">
             {isEditing ? (
               <MDOutlinedSelect
-                className='Channel-select'
+                className="Channel-select"
                 value={`${currentDuration}`}
                 onChange={(event: Event) => {
                   const newDuration = Number(
@@ -362,7 +376,7 @@ const Channel = ({ channelID }: Props) => {
                     selected={durationOption.value === currentDuration}
                     value={`${durationOption.value}`}
                   >
-                    <div slot='headline'>{durationOption.displayName}</div>
+                    <div slot="headline">{durationOption.displayName}</div>
                   </MDSelectOption>
                 ))}
               </MDOutlinedSelect>
@@ -405,23 +419,23 @@ const Channel = ({ channelID }: Props) => {
             onChangeCurrentCapacity={setCurrentCapacity}
             setIsUpdating={setIsUpdating}
           />
-          <div className='Channel-delete-section'>
+          <div className="Channel-delete-section">
             <MDTextButton
-              aria-label='Delete channel'
-              className='Channel-button-delete'
+              aria-label="Delete channel"
+              className="Channel-button-delete"
               disabled={isUpdating}
               hasIcon
               onClick={() => {
                 handleClickDelete()
               }}
             >
-              <MDIcon slot='icon'>delete</MDIcon> Delete
+              <MDIcon slot="icon">delete</MDIcon> Delete
             </MDTextButton>
             <MDDialog open={isConfirmingDelete}>
-              <div slot='headline'>Delete Channel</div>
+              <div slot="headline">Delete Channel</div>
               <div
-                className='Channel-delete-confirmation-content'
-                slot='content'
+                className="Channel-delete-confirmation-content"
+                slot="content"
               >
                 This channel
                 {channel.title === '' || channel.title == null
@@ -429,7 +443,7 @@ const Channel = ({ channelID }: Props) => {
                   : `, ${channel.title}, `}
                 will be deleted forever. Are you sure?
               </div>
-              <div slot='actions'>
+              <div slot="actions">
                 <MDTextButton
                   disabled={isUpdating}
                   onClick={() => {
@@ -439,7 +453,7 @@ const Channel = ({ channelID }: Props) => {
                   Cancel
                 </MDTextButton>
                 <MDTextButton
-                  className='Channel-button-delete'
+                  className="Channel-button-delete"
                   disabled={isUpdating}
                   onClick={() => void handleConfirmDelete()}
                 >
@@ -452,7 +466,7 @@ const Channel = ({ channelID }: Props) => {
       ) : subscriptions.some(chan => chan.id === channel.id) ? (
         <>
           {isOn ? (
-            <div className='Channel-duration-display'>
+            <div className="Channel-duration-display">
               <Countdown
                 date={expirationTime}
                 renderer={({ hours, minutes, seconds }) => (
@@ -477,7 +491,7 @@ const Channel = ({ channelID }: Props) => {
             onChangeCurrentNote={setCurrentNote}
           />
           <MDFilledTonalButton
-            className='Channel-subscribe-button'
+            className="Channel-subscribe-button"
             disabled={isUpdating}
             onClick={() => void handleClickUnsubscribe()}
           >
@@ -487,7 +501,7 @@ const Channel = ({ channelID }: Props) => {
       ) : (
         <>
           <MDFilledButton
-            className='Channel-subscribe-button'
+            className="Channel-subscribe-button"
             disabled={isUpdating || isChannelFull || userHasMaxSubscriptions}
             onClick={() => void handleClickSubscribe()}
           >

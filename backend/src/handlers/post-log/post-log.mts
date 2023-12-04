@@ -1,0 +1,65 @@
+import {
+  APIGatewayProxyEvent,
+  APIGatewayProxyResult,
+  Context,
+} from 'aws-lambda'
+
+import { Logger } from '@aws-lambda-powertools/logger'
+import { MetricUnits, Metrics } from '@aws-lambda-powertools/metrics'
+import { LogLevel } from 'esbuild'
+import { createResponse } from '/opt/nodejs/response.mjs'
+
+interface IPayload {
+  log: {
+    message: string
+    [key: string]: unknown
+  }
+  logLevel: Uppercase<LogLevel>
+}
+
+/**
+ * Handles a log from the front-end
+ */
+const postLog = async (
+  event: APIGatewayProxyEvent,
+  _context: Context,
+  logger: Logger,
+  metrics: Metrics,
+): Promise<APIGatewayProxyResult> => {
+  if (event.httpMethod !== 'POST') {
+    throw new Error(
+      `postMethod only accepts POST method, you tried: ${event.httpMethod} method.`,
+    )
+  }
+  const eventPath = event.path
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+  const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
+  const eventBody = JSON.parse(event.body ?? '{}') as IPayload
+  const log = eventBody.log
+  const logLevel = eventBody.logLevel
+
+  if (eventBody.logLevel === 'ERROR') {
+    logger.error({ logLevel, userID, ...log })
+  } else if (eventBody.logLevel === 'WARNING') {
+    logger.warn({ logLevel, userID, ...log })
+  } else {
+    logger.info({ logLevel, userID, ...log })
+  }
+
+  metrics.addMetric('frontendLogs', MetricUnits.Count, 1)
+
+  return new Promise(resolve => {
+    resolve(
+      createResponse({
+        eventPath,
+        responseBody: {
+          message: 'Success',
+        },
+        statusCode: 200,
+      }),
+    )
+  })
+}
+
+export default postLog

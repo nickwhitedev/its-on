@@ -3,6 +3,7 @@ import './ChannelSubscriber.css'
 import { useEffect, useRef, useState } from 'react'
 
 import { ChannelsDispatchActionType } from '../../../../contexts/channels/channelsReducer'
+import { ErrorDispatchActionType } from '../../../../contexts/error/errorReducer'
 import MDIcon from '../../../material/MDIcon'
 import MDIconButton from '../../../material/icon-button/MDIconButton'
 import MDMenu from '../../../material/menu/MDMenu'
@@ -10,7 +11,9 @@ import MDMenuItem from '../../../material/menu/MDMenuItem'
 import { MdIconButton } from '@material/web/iconbutton/icon-button'
 import { MdMenu } from '@material/web/menu/menu'
 import { fetchApi } from '../../../../utils/api'
+import { sendErrorLog } from '../../../../utils/logging'
 import { useChannelsDispatch } from '../../../../contexts/channels/channelsContext'
+import { useErrorDispatch } from '../../../../contexts/error/errorContext'
 
 interface Props {
   channel: IChannel
@@ -20,6 +23,7 @@ interface Props {
 
 const ChannelSubscriber = ({ channel, subscriber, setIsUpdating }: Props) => {
   const dispatchChannels = useChannelsDispatch()
+  const dispatchError = useErrorDispatch()
 
   const menuAnchorRef = useRef<MdIconButton | null>(null)
   const menuRef = useRef<MdMenu | null>(null)
@@ -60,9 +64,8 @@ const ChannelSubscriber = ({ channel, subscriber, setIsUpdating }: Props) => {
         },
       })
     } catch (error) {
-      // TODO: Handle create channel error
-      // log error to backend
-      // display user friendly message
+      await sendErrorLog('ChannelSubscriber remove subscriber error', { error })
+      dispatchError({ type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED })
     }
     // setIsConfirmingRemove(false)
     setIsUpdating(false)

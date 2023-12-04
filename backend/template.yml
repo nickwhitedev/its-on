@@ -129,7 +129,7 @@ Resources:
   # Each Lambda function is defined by properties:
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
 
-  # This is a Lambda function config associated with the source code: get-overview.ts
+  # This is a Lambda function config associated with the source code: get-overview.mts
   getOverviewLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -155,7 +155,7 @@ Resources:
       RetentionInDays: 30
       LogGroupName: !Join ["", ["/aws/lambda/", !Ref getOverviewLambdaFunction]]
 
-  # This is a Lambda function config associated with the source code: get-channel.ts
+  # This is a Lambda function config associated with the source code: get-channel.mts
   getChannelLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -181,7 +181,7 @@ Resources:
       RetentionInDays: 30
       LogGroupName: !Join ["", ["/aws/lambda/", !Ref getChannelLambdaFunction]]
 
-  # This is a Lambda function config associated with the source code: create-item.ts
+  # This is a Lambda function config associated with the source code: create-item.mts
   createChannelLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -207,7 +207,7 @@ Resources:
       RetentionInDays: 30
       LogGroupName: !Join ["", ["/aws/lambda/", !Ref createChannelLambdaFunction]]
 
-  # This is a Lambda function config associated with the source code: update-item.ts
+  # This is a Lambda function config associated with the source code: update-item.mts
   updateChannelLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -233,7 +233,7 @@ Resources:
       RetentionInDays: 30
       LogGroupName: !Join ["", ["/aws/lambda/", !Ref updateChannelLambdaFunction]]
 
-  # This is a Lambda function config associated with the source code: its-on.ts
+  # This is a Lambda function config associated with the source code: its-on.mts
   itsOnLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -259,7 +259,7 @@ Resources:
       RetentionInDays: 30
       LogGroupName: !Join ["", ["/aws/lambda/", !Ref itsOnLambdaFunction]]
 
-  # This is a Lambda function config associated with the source code: its-off.ts
+  # This is a Lambda function config associated with the source code: its-off.mts
   itsOffLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -285,7 +285,7 @@ Resources:
       RetentionInDays: 30
       LogGroupName: !Join ["", ["/aws/lambda/", !Ref itsOffLambdaFunction]]
 
-  # This is a Lambda function config associated with the source code: delete-item.ts
+  # This is a Lambda function config associated with the source code: delete-item.mts
   deleteChannelLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -311,7 +311,7 @@ Resources:
       RetentionInDays: 30
       LogGroupName: !Join ["", ["/aws/lambda/", !Ref deleteChannelLambdaFunction]]
 
-  # This is a Lambda function config associated with the source code: delete-item.ts
+  # This is a Lambda function config associated with the source code: delete-item.mts
   removeChannelSubscriberLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -337,7 +337,7 @@ Resources:
       RetentionInDays: 30
       LogGroupName: !Join ["", ["/aws/lambda/", !Ref removeChannelSubscriberLambdaFunction]]
 
-  # This is a Lambda function config associated with the source code: subscribe.ts
+  # This is a Lambda function config associated with the source code: subscribe.mts
   subscribeLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -363,7 +363,7 @@ Resources:
       RetentionInDays: 30
       LogGroupName: !Join ["", ["/aws/lambda/", !Ref subscribeLambdaFunction]]
 
-  # This is a Lambda function config associated with the source code: unsubscribe.ts
+  # This is a Lambda function config associated with the source code: unsubscribe.mts
   unsubscribeLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -389,7 +389,7 @@ Resources:
       RetentionInDays: 30
       LogGroupName: !Join ["", ["/aws/lambda/", !Ref unsubscribeLambdaFunction]]
 
-  # This is a Lambda function config associated with the source code: get-notification-key.ts
+  # This is a Lambda function config associated with the source code: get-notification-key.mts
   getNotificationKeyLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -415,7 +415,7 @@ Resources:
       RetentionInDays: 30
       LogGroupName: !Join ["", ["/aws/lambda/", !Ref getNotificationKeyLambdaFunction]]
 
-  # This is a Lambda function config associated with the source code: enable-notifications.ts
+  # This is a Lambda function config associated with the source code: enable-notifications.mts
   enableNotificationsLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -441,7 +441,7 @@ Resources:
       RetentionInDays: 30
       LogGroupName: !Join ["", ["/aws/lambda/", !Ref enableNotificationsLambdaFunction]]
 
-  # This is a Lambda function config associated with the source code: disable-notifications.ts
+  # This is a Lambda function config associated with the source code: disable-notifications.mts
   disableNotificationsLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -467,7 +467,7 @@ Resources:
       RetentionInDays: 30
       LogGroupName: !Join ["", ["/aws/lambda/", !Ref disableNotificationsLambdaFunction]]
 
-  # This is a Lambda function config associated with the source code: subscribe-notifications.ts
+  # This is a Lambda function config associated with the source code: subscribe-notifications.mts
   subscribeNotificationsLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -493,7 +493,7 @@ Resources:
       RetentionInDays: 30
       LogGroupName: !Join ["", ["/aws/lambda/", !Ref subscribeNotificationsLambdaFunction]]
 
-  # This is a Lambda function config associated with the source code: unsubscribe-notifications.ts
+  # This is a Lambda function config associated with the source code: unsubscribe-notifications.mts
   unsubscribeNotificationsLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -518,6 +518,32 @@ Resources:
     Properties: 
       RetentionInDays: 30
       LogGroupName: !Join ["", ["/aws/lambda/", !Ref unsubscribeNotificationsLambdaFunction]]
+
+  # This is a Lambda function config associated with the source code: post-log.mts
+  postLogLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/src/handlers/post-log/
+      Description: Posts a log sent from the frontend
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ItsOnApi
+            Path: /log
+            Method: POST
+      Handler: handler.handler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  postLogLambdaFunctionLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    DependsOn: "postLogLambdaFunction"
+    Properties: 
+      RetentionInDays: 30
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref postLogLambdaFunction]]
 
   tableStreamLambdaFunction:
     Type: AWS::Serverless::Function

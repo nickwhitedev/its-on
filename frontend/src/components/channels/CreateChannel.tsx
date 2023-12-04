@@ -2,13 +2,17 @@ import './CreateChannel.css'
 
 import { SyntheticEvent, useState } from 'react'
 
-import { useNavigate } from 'react-router-dom'
-import { useChannelsDispatch } from '../../contexts/channels/channelsContext'
 import { ChannelsDispatchActionType } from '../../contexts/channels/channelsReducer'
+import { ErrorDispatchActionType } from '../../contexts/error/errorReducer'
 import { fetchApi } from '../../utils/api'
+import { sendErrorLog } from '../../utils/logging'
+import { useChannelsDispatch } from '../../contexts/channels/channelsContext'
+import { useErrorDispatch } from '../../contexts/error/errorContext'
+import { useNavigate } from 'react-router-dom'
 
 const CreateChannel = () => {
-  const dispatch = useChannelsDispatch()
+  const dispatchChannels = useChannelsDispatch()
+  const dispatchError = useErrorDispatch()
   const navigate = useNavigate()
 
   const [isCreating, setIsCreating] = useState<boolean>(false)
@@ -24,7 +28,7 @@ const CreateChannel = () => {
       const newChannel: IChannel = await fetchApi('/channels', 'POST', {
         title,
       })
-      dispatch({
+      dispatchChannels({
         type: ChannelsDispatchActionType.ADDED,
         channel: newChannel,
       })
@@ -32,18 +36,19 @@ const CreateChannel = () => {
       setTitle('')
       navigate(`/${newChannel.id}`)
     } catch (error) {
-      // TODO: Handle create channel error
-      // log error to backend
-      // display user friendly message
+      await sendErrorLog('CreateChannel create channel error', { error })
+      dispatchError({
+        type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
+      })
     }
     setIsSubmitting(false)
   }
 
   return (
-    <div className='CreateChannel'>
+    <div className="CreateChannel">
       {isCreating ? (
         <form
-          className='CreateChannel-form'
+          className="CreateChannel-form"
           onSubmit={event => void handleSubmit(event)}
         >
           <input
@@ -57,14 +62,14 @@ const CreateChannel = () => {
             }}
           />
           <button
-            type='submit'
-            className='CreateChannel-button'
+            type="submit"
+            className="CreateChannel-button"
             disabled={title === '' || isSubmitting}
           >
-            <span className='material-symbols-outlined'>done</span>
+            <span className="material-symbols-outlined">done</span>
           </button>
           <button
-            type='reset'
+            type="reset"
             className={'CreateChannel-button'}
             disabled={isSubmitting}
             onClick={() => {
@@ -72,17 +77,17 @@ const CreateChannel = () => {
               setTitle('')
             }}
           >
-            <span className='material-symbols-outlined'>close</span>
+            <span className="material-symbols-outlined">close</span>
           </button>
         </form>
       ) : (
         <button
-          className='CreateChannel-button'
+          className="CreateChannel-button"
           onClick={() => {
             setIsCreating(true)
           }}
         >
-          <span className='material-symbols-outlined'>add</span>
+          <span className="material-symbols-outlined">add</span>
         </button>
       )}
     </div>

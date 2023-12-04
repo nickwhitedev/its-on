@@ -6,6 +6,7 @@ import {
   useSubscriptionsDispatch,
 } from '../../contexts/subscriptions/subscriptionsContext'
 
+import { ErrorDispatchActionType } from '../../contexts/error/errorReducer'
 import ItsOnIcon from '../icons/ItsOnIcon'
 import MDDivider from '../material/MDDivider'
 import MDIcon from '../material/MDIcon'
@@ -14,11 +15,16 @@ import MDListItem from '../material/list/MDListItem'
 import { SubscriptionsDispatchActionType } from '../../contexts/subscriptions/subscriptionsReducer'
 import { fetchApi } from '../../utils/api'
 import { isChannelOn } from '../channels/channel/channelUtils'
+import { sendErrorLog } from '../../utils/logging'
+import { useErrorDispatch } from '../../contexts/error/errorContext'
 import { useNavigate } from 'react-router-dom'
 
 const Subscriptions = () => {
   const subscriptions = useSubscriptions()
+
+  const dispatchError = useErrorDispatch()
   const dispatchSubscriptions = useSubscriptionsDispatch()
+
   const navigate = useNavigate()
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -32,9 +38,10 @@ const Subscriptions = () => {
         id: channelID,
       })
     } catch (error) {
-      // TODO: Handle create channel error
-      // log error to backend
-      // display user friendly message
+      await sendErrorLog('Subscriptions unsubscribe error', { error })
+      dispatchError({
+        type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
+      })
     }
     setIsLoading(false)
   }
