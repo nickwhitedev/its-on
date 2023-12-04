@@ -8,6 +8,7 @@ import {
 import { useUser, useUserDispatch } from '../../contexts/user/userContext'
 
 import { ChannelsDispatchActionType } from '../../contexts/channels/channelsReducer'
+import { ErrorDispatchActionType } from '../../contexts/error/errorReducer'
 import ItsOnIcon from '../icons/ItsOnIcon'
 import MDDivider from '../material/MDDivider'
 import MDFilledButton from '../material/button/MDFilledButton'
@@ -17,12 +18,15 @@ import MDListItem from '../material/list/MDListItem'
 import { UserDispatchActionType } from '../../contexts/user/userReducer'
 import { fetchApi } from '../../utils/api'
 import { isChannelOn } from './channel/channelUtils'
+import { sendErrorLog } from '../../utils/logging'
+import { useErrorDispatch } from '../../contexts/error/errorContext'
 import { useNavigate } from 'react-router-dom'
 
 const Channels = () => {
   const channels = useChannels()
   const user = useUser()
   const dispatchChannels = useChannelsDispatch()
+  const dispatchError = useErrorDispatch()
   const dispatchUser = useUserDispatch()
 
   const navigate = useNavigate()
@@ -48,9 +52,10 @@ const Channels = () => {
       setIsCreating(false)
       navigate(`/${newChannel.id}`)
     } catch (error) {
-      // TODO: Handle create channel error
-      // log error to backend
-      // display user friendly message
+      await sendErrorLog('Channels create channel error', { error })
+      dispatchError({
+        type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
+      })
     }
     setIsCreating(false)
   }

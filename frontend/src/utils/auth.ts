@@ -13,8 +13,10 @@ import {
   PKCE_VERIFIER_KEY,
   REFRESH_TOKEN_KEY,
 } from './constants'
-import { generateRandomString, pkceChallengeFromVerifier } from './crypto'
 import { baseUrl, loginUrl, logoutUrl, tokenUrl } from './urls'
+import { generateRandomString, pkceChallengeFromVerifier } from './crypto'
+
+import { AuthError } from './errors/authError'
 
 const cognitoClientID = import.meta.env.VITE_COGNITO_CLIENT_ID as string
 
@@ -80,8 +82,10 @@ export const getFullLoginUrl = async () => {
 
 export const login = async (code: string | null, state: string | null) => {
   if (state !== pkceState) {
-    // TODO: Login error handling
-    throw Error()
+    throw new AuthError({
+      message: 'PKCE state does not match',
+      name: 'LOGIN_ERROR',
+    })
   }
   const body = `grant_type=authorization_code&client_id=${cognitoClientID}&code_verifier=${pkceVerifier}&redirect_uri=${baseUrl}/&code=${code}`
   const response = await fetch(tokenUrl, {
@@ -90,8 +94,10 @@ export const login = async (code: string | null, state: string | null) => {
     body,
   })
   if (!response.ok) {
-    // TODO: Login error handling
-    throw Error()
+    throw new AuthError({
+      message: 'Login failed',
+      name: 'LOGIN_ERROR',
+    })
   }
   const { access_token, id_token, refresh_token } = (await response.json()) as {
     access_token: string

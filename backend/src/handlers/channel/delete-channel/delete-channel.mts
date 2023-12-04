@@ -51,7 +51,6 @@ const deleteChannel = async (
     )
     logger.debug('Success - item deleted', { ddbResponse })
   } catch (error) {
-    // TODO: Error handling - make more robust
     logger.error('Error', error as Error)
     return createResponse({
       eventPath,

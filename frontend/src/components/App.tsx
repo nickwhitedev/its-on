@@ -1,26 +1,29 @@
 import './App.css'
 
-import { useCallback, useEffect, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { useUser, useUserDispatch } from '../contexts/user/userContext'
 import { getFullLoginUrl, getTokens, login } from '../utils/auth'
+import { useCallback, useEffect, useState } from 'react'
+import { useError, useErrorDispatch } from '../contexts/error/errorContext'
+import { useUser, useUserDispatch } from '../contexts/user/userContext'
 
-import PullToRefresh from 'pulltorefreshjs'
-import { useChannelsDispatch } from '../contexts/channels/channelsContext'
 import { ChannelsDispatchActionType } from '../contexts/channels/channelsReducer'
-import { useSubscriptionsDispatch } from '../contexts/subscriptions/subscriptionsContext'
-import { SubscriptionsDispatchActionType } from '../contexts/subscriptions/subscriptionsReducer'
-import { UserDispatchActionType } from '../contexts/user/userReducer'
-import { fetchApi } from '../utils/api'
-import client from '../utils/client'
-import { registerNotificationSubscription } from '../utils/notifications'
+import { ErrorDispatchActionType } from '../contexts/error/errorReducer'
+import ErrorSnackbar from './errors/ErrorSnackbar'
 import ItsOnIcon from './icons/ItsOnIcon'
-import MDIcon from './material/MDIcon'
 import MDCircularProgress from './material/progress/MDCircularProgress'
+import MDIcon from './material/MDIcon'
 import MDPrimaryTab from './material/tabs/MDPrimaryTab'
 import MDTabs from './material/tabs/MDTabs'
 import Notifications from './notifications/Notifications'
+import PullToRefresh from 'pulltorefreshjs'
+import { SubscriptionsDispatchActionType } from '../contexts/subscriptions/subscriptionsReducer'
+import { UserDispatchActionType } from '../contexts/user/userReducer'
 import UserSettings from './user/UserSettings'
+import client from '../utils/client'
+import { fetchApi } from '../utils/api'
+import { registerNotificationSubscription } from '../utils/notifications'
+import { useChannelsDispatch } from '../contexts/channels/channelsContext'
+import { useSubscriptionsDispatch } from '../contexts/subscriptions/subscriptionsContext'
 
 interface OverviewData {
   channels?: IChannel[]
@@ -41,12 +44,15 @@ const App = () => {
   const [authenticating, setAuthenticating] = useState(code !== null)
   const [loginUrl, setLoginUrl] = useState('')
   const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [hasOverviewError, setHasOverviewError] = useState<boolean>(false)
 
   const user = useUser()
+  const error = useError()
 
   const dispatchChannels = useChannelsDispatch()
   const dispatchSubscriptions = useSubscriptionsDispatch()
   const dispatchUser = useUserDispatch()
+  const dispatchError = useErrorDispatch()
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -76,9 +82,7 @@ const App = () => {
         },
       })
     } catch (error) {
-      // TODO: handle overview fetch error
-      // Log error to backend
-      // Show user-friendly message
+      setHasOverviewError(true)
     }
     setIsLoading(false)
   }, [dispatchChannels, dispatchSubscriptions, dispatchUser])
@@ -95,7 +99,9 @@ const App = () => {
         await login(code, state)
         setAuthenticated(true)
       } catch (err) {
-        // TODO: Login error handling
+        dispatchError({
+          type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
+        })
       }
       setAuthenticating(false)
     }
@@ -105,7 +111,7 @@ const App = () => {
       void finishLogin()
     }
     if (authenticated) void syncOverview()
-  }, [authenticated, syncOverview])
+  }, [authenticated, dispatchError, syncOverview])
 
   useEffect(() => {
     if (
@@ -146,7 +152,7 @@ const App = () => {
     }
   }, [authenticated, syncOverview])
 
-  const getContent = () => {
+  const getContent = useCallback(() => {
     if (authenticating) {
       return <div>authenticating...</div>
     }
@@ -156,7 +162,7 @@ const App = () => {
     return (
       <>
         <MDTabs
-          className='App-nav'
+          className="App-nav"
           onChange={(event: Event) => {
             const activeTabIndex = (
               event.target as { activeTabIndex: number } | null
@@ -184,32 +190,47 @@ const App = () => {
             Subscriptions
           </MDPrimaryTab>
         </MDTabs>
-        <div className='App-content'>
+        <div className="App-content">
           {isLoading ? (
             <MDCircularProgress
-              className='App-loading'
+              className="App-loading"
               indeterminate
             />
+          ) : hasOverviewError ? (
+            <div>
+              <p>Something went wrong...</p>
+              <p>Try again later.</p>
+            </div>
           ) : (
             <Outlet />
           )}
         </div>
       </>
     )
-  }
+  }, [
+    authenticated,
+    authenticating,
+    hasOverviewError,
+    isChannelsRoute,
+    isLoading,
+    isSubscriptionsRoute,
+    loginUrl,
+    navigate,
+  ])
 
   return (
-    <div className='App'>
-      <header className='App-header'>
+    <div className="App">
+      <header className="App-header">
         {!authenticating && authenticated && loginUrl !== '' ? (
-          <Notifications className='App-notifications' />
+          <Notifications className="App-notifications" />
         ) : null}
         <h1>It&apos;s On</h1>
         {!authenticating && authenticated && loginUrl !== '' ? (
-          <UserSettings className='App-settings' />
+          <UserSettings className="App-settings" />
         ) : null}
       </header>
-      <main className='App-main'>{getContent()}</main>
+      <main className="App-main">{getContent()}</main>
+      {error.isVisible ? <ErrorSnackbar>{error.message}</ErrorSnackbar> : null}
     </div>
   )
 }

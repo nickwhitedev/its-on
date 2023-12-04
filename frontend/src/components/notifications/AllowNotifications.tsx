@@ -1,15 +1,22 @@
+import './AllowNotifications.css'
+
 import { useEffect, useState } from 'react'
+
+import { ErrorDispatchActionType } from '../../contexts/error/errorReducer'
+import MDFilledTonalButton from '../material/button/MDFilledTonalButton'
+import { requestNotificationPermissions } from '../../utils/notifications'
+import { sendErrorLog } from '../../utils/logging'
+import { useErrorDispatch } from '../../contexts/error/errorContext'
 import { useSubscriptions } from '../../contexts/subscriptions/subscriptionsContext'
 import { useUser } from '../../contexts/user/userContext'
-import { requestNotificationPermissions } from '../../utils/notifications'
-import MDFilledTonalButton from '../material/button/MDFilledTonalButton'
-import './AllowNotifications.css'
 
 const AllowNotifications = () => {
   const [showButton, setShowButton] = useState<boolean>(false)
 
   const subscriptions = useSubscriptions()
   const user = useUser()
+
+  const dispatchError = useErrorDispatch()
 
   useEffect(() => {
     if (
@@ -29,13 +36,16 @@ const AllowNotifications = () => {
           user?.notificationSubscriptions ?? {},
       })
     } catch (error) {
-      // TODO: handle error
+      await sendErrorLog('AllowNotifications error', { error })
+      dispatchError({
+        type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
+      })
     }
   }
 
   return showButton ? (
     <MDFilledTonalButton
-      className='AllowNotifications-button'
+      className="AllowNotifications-button"
       onClick={() => {
         void handleAllowNotifications()
       }}
