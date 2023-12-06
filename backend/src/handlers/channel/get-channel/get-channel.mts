@@ -162,7 +162,16 @@ const getChannel = async (
     })
   }
 
-  const { pk, sk: _sk, ...channelInfo } = publicChannel
+  const {
+    canceled: _canceled,
+    duration: _duration,
+    lastOn: _lastOn,
+    lastOnDuration: _lastOnDuration,
+    note: _note,
+    pk,
+    sk: _sk,
+    ...channelInfo
+  } = publicChannel
 
   return createResponse({
     eventPath,

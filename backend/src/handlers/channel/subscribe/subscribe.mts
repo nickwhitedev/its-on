@@ -226,7 +226,14 @@ const subscribe = async (
 
   return createResponse({
     eventPath,
-    responseBody: { message: 'Subscribed' },
+    responseBody: {
+      channel: {
+        id: channelID,
+        subscribers: [],
+        ...channelAttributes,
+      } as IChannel,
+      message: 'Subscribed',
+    },
     statusCode: 200,
   })
 }

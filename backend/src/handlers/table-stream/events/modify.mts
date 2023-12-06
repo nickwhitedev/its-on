@@ -177,13 +177,8 @@ export const handleModifyEvent = async ({
         TableName: DYNAMODB_TABLE_NAME,
         Item: {
           ...channelInfo,
-          canceled: false,
           pk: `channel#${channelID}`,
           sk: 'info',
-          duration: 0,
-          lastOn: 0,
-          lastOnDuration: 0,
-          note: '',
         } as IDynamoChannelItem,
       }),
     )
