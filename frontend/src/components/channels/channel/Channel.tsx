@@ -316,6 +316,7 @@ const Channel = ({ channelID }: Props) => {
       })
     }
     setIsUpdating(false)
+    setIsLoading(true)
 
     if (user?.notificationsEnabled ?? true) {
       await requestNotificationPermissions({
@@ -343,6 +344,7 @@ const Channel = ({ channelID }: Props) => {
       })
     }
     setIsUpdating(false)
+    setIsLoading(true)
   }
 
   return (
