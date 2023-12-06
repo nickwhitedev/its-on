@@ -5,14 +5,14 @@ import {
   UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
 
+import { APIGatewayProxyEvent } from 'aws-lambda'
+import { CORS_HEADERS } from '../../../../src/common/constants.mjs'
 import { Logger } from '@aws-lambda-powertools/logger'
 import { Metrics } from '@aws-lambda-powertools/metrics'
 import { jest } from '@jest/globals'
-import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
 import mockContext from '../../../../__mocks__/mock-context.js'
 import mockEvent from '../../../../__mocks__/mock-event.js'
-import { CORS_HEADERS } from '../../../../src/common/constants.mjs'
 import subscribe from '../../../../src/handlers/channel/subscribe/subscribe.mjs'
 
 // This includes all tests for subscribe()
@@ -64,7 +64,19 @@ describe('Test subscribe', function () {
     expect(result.headers).toEqual(CORS_HEADERS)
     expect(result.statusCode).toEqual(200)
 
-    expect(resultBody).toEqual({ message: 'Subscribed' })
+    expect(resultBody).toEqual({
+      channel: {
+        capacity: 5,
+        id: 'someID',
+        note: '',
+        on: false,
+        ownerID: 'nanouserid1',
+        subscriberCount: 0,
+        subscribers: [],
+        title: 'test-channel',
+      },
+      message: 'Subscribed',
+    })
   })
 
   it('should return 403 when channel is full', async () => {

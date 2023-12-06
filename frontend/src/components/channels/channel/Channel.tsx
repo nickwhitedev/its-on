@@ -298,10 +298,13 @@ const Channel = ({ channelID }: Props) => {
   const handleClickSubscribe = async () => {
     setIsUpdating(true)
     try {
-      await fetchApi(`/${channel.id}/subscribe`, 'POST')
+      const { channel: subscribedChannel } = await fetchApi<{
+        message: string
+        channel: IChannel
+      }>(`/${channel.id}/subscribe`, 'POST')
       dispatchSubscriptions({
         type: SubscriptionsDispatchActionType.ADDED,
-        channel: channel,
+        channel: subscribedChannel,
       })
       dispatchUser({
         type: UserDispatchActionType.SUBSCRIPTION_COUNT_INCREASED,
@@ -313,6 +316,7 @@ const Channel = ({ channelID }: Props) => {
       })
     }
     setIsUpdating(false)
+    setIsLoading(true)
 
     if (user?.notificationsEnabled ?? true) {
       await requestNotificationPermissions({
@@ -340,6 +344,7 @@ const Channel = ({ channelID }: Props) => {
       })
     }
     setIsUpdating(false)
+    setIsLoading(true)
   }
 
   return (
