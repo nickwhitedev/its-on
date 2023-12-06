@@ -482,7 +482,8 @@ const Channel = ({ channelID }: Props) => {
             </MDDialog>
           </div>
         </>
-      ) : subscriptions.some(chan => chan.id === channel.id) ? (
+      ) : subscriptions.some(chan => chan.id === channel.id) &&
+        channel.deleted !== true ? (
         <>
           {isOn ? (
             <div className="Channel-duration-display">
