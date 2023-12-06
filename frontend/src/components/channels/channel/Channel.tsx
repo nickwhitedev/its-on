@@ -176,26 +176,34 @@ const Channel = ({ channelID }: Props) => {
   }
 
   const handleClickItsOn = async () => {
-    setIsUpdating(true)
+    dispatchChannels({
+      type: ChannelsDispatchActionType.CHANGED,
+      channel: {
+        ...channel,
+        canceled: false,
+        lastOn: Date.now(),
+        lastOnDuration: channel.duration,
+        lastUpdated: Date.now(),
+      },
+    })
     try {
       await fetchApi(`/${channel.id}/its-on`, 'POST')
-      dispatchChannels({
-        type: ChannelsDispatchActionType.CHANGED,
-        channel: {
-          ...channel,
-          canceled: false,
-          lastOn: Date.now(),
-          lastOnDuration: channel.duration,
-          lastUpdated: Date.now(),
-        },
-      })
     } catch (error) {
       await sendErrorLog("Channel it's on error", { error })
       dispatchError({
         type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
       })
+      dispatchChannels({
+        type: ChannelsDispatchActionType.CHANGED,
+        channel: {
+          ...channel,
+          canceled: false,
+          lastOn: 0,
+          lastOnDuration: channel.duration,
+          lastUpdated: Date.now(),
+        },
+      })
     }
-    setIsUpdating(false)
   }
 
   const handleResetFormState = () => {
@@ -235,24 +243,30 @@ const Channel = ({ channelID }: Props) => {
   }
 
   const handleClickCallOff = async () => {
-    setIsUpdating(true)
+    dispatchChannels({
+      type: ChannelsDispatchActionType.CHANGED,
+      channel: {
+        ...channel,
+        canceled: true,
+        lastUpdated: Date.now(),
+      },
+    })
     try {
       await fetchApi(`/${channel.id}/its-off`, 'POST')
-      dispatchChannels({
-        type: ChannelsDispatchActionType.CHANGED,
-        channel: {
-          ...channel,
-          canceled: true,
-          lastUpdated: Date.now(),
-        },
-      })
     } catch (error) {
       await sendErrorLog("Channel it's off error", { error })
       dispatchError({
         type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
       })
+      dispatchChannels({
+        type: ChannelsDispatchActionType.CHANGED,
+        channel: {
+          ...channel,
+          canceled: false,
+          lastUpdated: Date.now(),
+        },
+      })
     }
-    setIsUpdating(false)
   }
 
   const handleClickDelete = () => {
