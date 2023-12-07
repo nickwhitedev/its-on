@@ -7,20 +7,20 @@ import {
 } from '../../contexts/channels/channelsContext'
 import { useUser, useUserDispatch } from '../../contexts/user/userContext'
 
+import { useNavigate } from 'react-router-dom'
 import { ChannelsDispatchActionType } from '../../contexts/channels/channelsReducer'
+import { useErrorDispatch } from '../../contexts/error/errorContext'
 import { ErrorDispatchActionType } from '../../contexts/error/errorReducer'
-import ItsOnIcon from '../icons/ItsOnIcon'
-import MDDivider from '../material/MDDivider'
-import MDFilledButton from '../material/button/MDFilledButton'
-import MDIcon from '../material/MDIcon'
-import MDList from '../material/list/MDList'
-import MDListItem from '../material/list/MDListItem'
 import { UserDispatchActionType } from '../../contexts/user/userReducer'
 import { fetchApi } from '../../utils/api'
-import { isChannelOn } from './channel/channelUtils'
 import { sendErrorLog } from '../../utils/logging'
-import { useErrorDispatch } from '../../contexts/error/errorContext'
-import { useNavigate } from 'react-router-dom'
+import ItsOnIcon from '../icons/ItsOnIcon'
+import MDDivider from '../material/MDDivider'
+import MDIcon from '../material/MDIcon'
+import MDFilledButton from '../material/button/MDFilledButton'
+import MDList from '../material/list/MDList'
+import MDListItem from '../material/list/MDListItem'
+import { isChannelOn } from './channel/channelUtils'
 
 const Channels = () => {
   const channels = useChannels()
@@ -61,14 +61,14 @@ const Channels = () => {
   }
 
   return (
-    <div className="Channels">
+    <div className='Channels'>
       {channels.length === 0 ? (
         <div>
-          <div className="Channels-nux-text">
+          <div className='Channels-nux-text'>
             Create a channel to let people know when it&apos;s on
           </div>
           <MDFilledButton
-            className="Channels-nux-button"
+            className='Channels-nux-button'
             disabled={isCreating}
             onClick={() => void handleCreateChannel()}
           >
@@ -76,21 +76,19 @@ const Channels = () => {
           </MDFilledButton>
         </div>
       ) : (
-        <MDList className="Channels-list">
+        <MDList className='Channels-list'>
           <MDListItem
-            className="Channels-list-item"
+            className='Channels-list-item'
             disabled={isCreating || userHasMaxChannels}
-            type="button"
+            type='button'
             onClick={() => void handleCreateChannel()}
           >
-            <MDIcon slot="start">add</MDIcon>
-            <div slot="headline">
-              {userHasMaxChannels
-                ? 'Subscription limit reached'
-                : 'New Channel'}
+            <MDIcon slot='start'>add</MDIcon>
+            <div slot='headline'>
+              {userHasMaxChannels ? 'Channel limit reached' : 'New Channel'}
             </div>
             {userHasMaxChannels ? (
-              <div slot="supporting-text">
+              <div slot='supporting-text'>
                 Delete a channel to create a new one
               </div>
             ) : null}
@@ -99,8 +97,8 @@ const Channels = () => {
             <React.Fragment key={channel.id}>
               <MDDivider inset />
               <MDListItem
-                className="Channels-list-item"
-                type="link"
+                className='Channels-list-item'
+                type='link'
                 onClick={() => {
                   navigate(`/${channel.id}`)
                 }}
@@ -111,17 +109,17 @@ const Channels = () => {
                       ? 'Channels-list-item-on'
                       : 'Channels-list-item-off'
                   }
-                  slot="start"
+                  slot='start'
                 >
                   <ItsOnIcon />
                 </MDIcon>
-                <div slot="headline">
+                <div slot='headline'>
                   {(channel.title?.length ?? 0) > 0
                     ? channel.title
                     : 'Untitled'}
                 </div>
                 {(channel.note?.length ?? 0) > 0 ? (
-                  <div slot="supporting-text">{channel.note}</div>
+                  <div slot='supporting-text'>{channel.note}</div>
                 ) : null}
               </MDListItem>
             </React.Fragment>
