@@ -911,6 +911,8 @@ Outputs:
         - !Sub https://${Env}-auth.itson.fyi
   CognitoClientID:
     Value: !Ref ItsOnUserPoolClient
+  CognitoUserPoolID:
+    Value: !Ref ItsOnUserPool
   ItsOnFrontendBucketName:
     Value:
       'Fn::If':
