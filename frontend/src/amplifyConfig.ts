@@ -1,6 +1,6 @@
 import { ResourcesConfig } from 'aws-amplify'
 
-const config: ResourcesConfig = {
+const awsConfig: ResourcesConfig = {
   Auth: {
     Cognito: {
       userPoolId: import.meta.env.VITE_COGNITO_USER_POOL_ID as string,
@@ -22,4 +22,4 @@ const config: ResourcesConfig = {
   },
 }
 
-export default config
+export default awsConfig

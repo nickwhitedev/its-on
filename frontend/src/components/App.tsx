@@ -27,9 +27,9 @@ import UserSettings from './user/UserSettings'
 import '@aws-amplify/ui-react/styles.css'
 
 import { Authenticator, useAuthenticator } from '@aws-amplify/ui-react'
-import config from '../amplifyConfig'
+import awsConfig from '../amplifyConfig'
 
-Amplify.configure(config)
+Amplify.configure(awsConfig)
 
 interface OverviewData {
   channels?: IChannel[]
