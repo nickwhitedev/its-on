@@ -21,7 +21,7 @@
   cursor: default;
   font-family: 'Pacifico', cursive;
   grid-area: hero;
-  margin: 0.3rem 0;
+  margin: 1rem 0;
   place-self: center;
   user-select: none;
 }
@@ -59,4 +59,42 @@
   flex-flow: column nowrap;
   align-items: center;
   width: 100%;
+}
+
+[data-amplify-authenticator] {
+  text-align: left;
+  --amplify-components-tabs-item-active-color: var(--md-sys-color-primary);
+  --amplify-components-tabs-item-active-border-color: var(--md-sys-color-primary);
+  --amplify-components-tabs-item-active-background-color: transparent;
+  --amplify-components-tabs-item-hover-color: var(--md-sys-color-primary);
+  --amplify-components-tabs-item-font-size: calc(10px + 2vmin);
+  --amplify-components-button-primary-background-color: var(--md-sys-color-primary);
+  --amplify-components-button-primary-hover-background-color: var(--md-ref-palette-primary20);
+  --amplify-components-button-primary-active-background-color: var(--md-ref-palette-primary10);
+  --amplify-components-button-primary-focus-background-color: var(--md-ref-palette-primary20);
+  --amplify-components-button-link-color: var(--md-sys-color-primary);
+  --amplify-components-button-link-hover-background-color: var(--md-sys-color-surface-container);
+  --amplify-components-button-link-hover-color: var(--md-sys-color-primary);
+  --amplify-components-button-link-active-background-color: var(--md-sys-color-surface-container-highest);
+  --amplify-components-button-link-active-color: var(--md-sys-color-primary);
+  --amplify-components-button-link-focus-background-color: var(--md-sys-color-surface-container);
+  --amplify-components-button-link-focus-color: var(--md-sys-color-primary);
+  --amplify-components-passwordfield-button-hover-background-color: var(--md-sys-color-surface-container);
+  --amplify-components-passwordfield-button-hover-border-color: var(--md-sys-color-primary);
+  --amplify-components-passwordfield-button-hover-color: var(--md-sys-color-primary);
+  --amplify-components-passwordfield-button-active-background-color: var(--md-sys-color-surface-container-highest);
+  --amplify-components-passwordfield-button-active-border-color: var(--md-sys-color-primary);
+  --amplify-components-passwordfield-button-active-color: var(--md-sys-color-primary);
+}
+
+[data-amplify-authenticator] [data-amplify-router] {
+  background-color: transparent;
+  box-shadow: none;
+  border-color: transparent;
+  border-width: 0;
+  border-style: none;
+}
+
+.amplify-tabs__list--top {
+  --internal-item-border-width: 0 0 var(--amplify-components-tabs-border-width) 0;;
 }

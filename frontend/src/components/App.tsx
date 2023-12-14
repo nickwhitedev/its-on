@@ -1,3 +1,4 @@
+import '@aws-amplify/ui-react/styles.css'
 import './App.css'
 
 import { useCallback, useEffect, useState } from 'react'
@@ -24,12 +25,10 @@ import MDTabs from './material/tabs/MDTabs'
 import Notifications from './notifications/Notifications'
 import UserSettings from './user/UserSettings'
 
-import '@aws-amplify/ui-react/styles.css'
-
 import { Authenticator, useAuthenticator } from '@aws-amplify/ui-react'
-import awsConfig from '../amplifyConfig'
+import amplifyConfig from '../amplifyConfig'
 
-Amplify.configure(awsConfig)
+Amplify.configure(amplifyConfig)
 
 interface OverviewData {
   channels?: IChannel[]
@@ -138,7 +137,7 @@ const App = () => {
       return <div>Loading...</div>
     }
     if (authStatus === 'unauthenticated') {
-      return <Authenticator />
+      return <Authenticator loginMechanisms={['username', 'email']} />
     }
     return (
       <>

@@ -4,10 +4,10 @@ import { Authenticator } from '@aws-amplify/ui-react'
 import { Amplify } from 'aws-amplify'
 import { BrowserRouter } from 'react-router-dom'
 import { vi } from 'vitest'
-import awsConfig from '../../amplifyConfig'
+import amplifyConfig from '../../amplifyConfig'
 import App from '../App'
 
-Amplify.configure(awsConfig)
+Amplify.configure(amplifyConfig)
 
 vi.mock('../channels/Channels')
 
