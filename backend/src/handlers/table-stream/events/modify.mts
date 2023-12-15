@@ -71,7 +71,6 @@ const sendUserNotification = async ({
       },
     )
   } catch (error) {
-    // TODO: Log error
     logger.error('Notification Send Error: ', error as Error)
   }
 }
