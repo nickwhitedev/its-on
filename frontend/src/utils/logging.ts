@@ -7,7 +7,7 @@ export const sendLog = async (
   logLevel: Uppercase<LogLevel> = 'INFO',
 ) => {
   try {
-    await fetchApi('/channels', 'POST', {
+    await fetchApi('/log', 'POST', {
       log: {
         message,
         ...data,
@@ -23,15 +23,5 @@ export const sendErrorLog = async (
   message: string,
   data: Record<string, unknown> = {},
 ): Promise<void> => {
-  try {
-    await fetchApi('/channels', 'POST', {
-      log: {
-        message,
-        ...data,
-      },
-      logLevel: 'ERROR',
-    })
-  } catch {
-    return
-  }
+  await sendLog(message, data, 'ERROR')
 }

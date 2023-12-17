@@ -147,7 +147,7 @@ const subscribe = async (
                   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                   username:
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                    event.requestContext.authorizer?.claims['cognito:username'],
+                    event.requestContext.authorizer?.claims.preferred_username,
                 } as IDynamoChannelSubscriber,
               },
             },

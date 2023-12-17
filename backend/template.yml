@@ -519,6 +519,32 @@ Resources:
       RetentionInDays: 30
       LogGroupName: !Join ["", ["/aws/lambda/", !Ref unsubscribeNotificationsLambdaFunction]]
 
+  # This is a Lambda function config associated with the source code: update-profile.mts
+  updateProfileLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/src/handlers/user/update-profile/
+      Description: Updates a user's profile
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ItsOnApi
+            Path: /user
+            Method: PUT
+      Handler: handler.handler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  updateProfileLambdaFunctionLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    DependsOn: "updateProfileLambdaFunction"
+    Properties: 
+      RetentionInDays: 30
+      LogGroupName: !Join ["", ["/aws/lambda/", !Ref updateProfileLambdaFunction]]
+
   # This is a Lambda function config associated with the source code: post-log.mts
   postLogLambdaFunction:
     Type: AWS::Serverless::Function
@@ -911,6 +937,8 @@ Outputs:
         - !Sub https://${Env}-auth.itson.fyi
   CognitoClientID:
     Value: !Ref ItsOnUserPoolClient
+  CognitoUserPoolID:
+    Value: !Ref ItsOnUserPool
   ItsOnFrontendBucketName:
     Value:
       'Fn::If':

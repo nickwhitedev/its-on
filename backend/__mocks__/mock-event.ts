@@ -26,6 +26,7 @@ const mockEvent: APIGatewayProxyEvent = {
     authorizer: {
       claims: {
         'cognito:username': 'test_user',
+        preferred_username: 'test_user',
         sub: 'nanouserid1',
       },
     },

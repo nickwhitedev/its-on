@@ -1,29 +1,34 @@
+import '@aws-amplify/ui-react/styles.css'
 import './App.css'
 
-import { Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { getFullLoginUrl, getTokens, login } from '../utils/auth'
 import { useCallback, useEffect, useState } from 'react'
-import { useError, useErrorDispatch } from '../contexts/error/errorContext'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { useError } from '../contexts/error/errorContext'
 import { useUser, useUserDispatch } from '../contexts/user/userContext'
 
+import { Amplify } from 'aws-amplify'
+import PullToRefresh from 'pulltorefreshjs'
+import { useChannelsDispatch } from '../contexts/channels/channelsContext'
 import { ChannelsDispatchActionType } from '../contexts/channels/channelsReducer'
-import { ErrorDispatchActionType } from '../contexts/error/errorReducer'
+import { useSubscriptionsDispatch } from '../contexts/subscriptions/subscriptionsContext'
+import { SubscriptionsDispatchActionType } from '../contexts/subscriptions/subscriptionsReducer'
+import { UserDispatchActionType } from '../contexts/user/userReducer'
+import { fetchApi } from '../utils/api'
+import client from '../utils/client'
+import { registerNotificationSubscription } from '../utils/notifications'
 import ErrorSnackbar from './errors/ErrorSnackbar'
 import ItsOnIcon from './icons/ItsOnIcon'
-import MDCircularProgress from './material/progress/MDCircularProgress'
 import MDIcon from './material/MDIcon'
+import MDCircularProgress from './material/progress/MDCircularProgress'
 import MDPrimaryTab from './material/tabs/MDPrimaryTab'
 import MDTabs from './material/tabs/MDTabs'
 import Notifications from './notifications/Notifications'
-import PullToRefresh from 'pulltorefreshjs'
-import { SubscriptionsDispatchActionType } from '../contexts/subscriptions/subscriptionsReducer'
-import { UserDispatchActionType } from '../contexts/user/userReducer'
 import UserSettings from './user/UserSettings'
-import client from '../utils/client'
-import { fetchApi } from '../utils/api'
-import { registerNotificationSubscription } from '../utils/notifications'
-import { useChannelsDispatch } from '../contexts/channels/channelsContext'
-import { useSubscriptionsDispatch } from '../contexts/subscriptions/subscriptionsContext'
+
+import { Authenticator, useAuthenticator } from '@aws-amplify/ui-react'
+import amplifyConfig from '../amplifyConfig'
+
+Amplify.configure(amplifyConfig)
 
 interface OverviewData {
   channels?: IChannel[]
@@ -34,28 +39,23 @@ interface OverviewData {
   subscriptions?: IChannel[]
 }
 
-const params = new URL(document.location.toString()).searchParams
-const code = params.get('code')
-const state = params.get('state')
-const tokens = getTokens()
-
 const App = () => {
-  const [authenticated, setAuthenticated] = useState(tokens !== null)
-  const [authenticating, setAuthenticating] = useState(code !== null)
-  const [loginUrl, setLoginUrl] = useState('')
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [hasOverviewError, setHasOverviewError] = useState<boolean>(false)
 
-  const user = useUser()
+  const userContext = useUser()
   const error = useError()
 
   const dispatchChannels = useChannelsDispatch()
   const dispatchSubscriptions = useSubscriptionsDispatch()
   const dispatchUser = useUserDispatch()
-  const dispatchError = useErrorDispatch()
 
   const navigate = useNavigate()
   const location = useLocation()
+
+  const { authStatus, signOut } = useAuthenticator(context => [
+    context.authStatus,
+  ])
 
   const isChannelsRoute = location.pathname.startsWith('/channels')
   const isSubscriptionsRoute = location.pathname.startsWith('/subscriptions')
@@ -88,54 +88,28 @@ const App = () => {
   }, [dispatchChannels, dispatchSubscriptions, dispatchUser])
 
   useEffect(() => {
-    const setFullLoginUrl = async () => {
-      const fullLoginUrl = await getFullLoginUrl()
-      setLoginUrl(fullLoginUrl)
-    }
-
-    const finishLogin = async () => {
-      window.history.replaceState({}, document.title, '/')
-      try {
-        await login(code, state)
-        setAuthenticated(true)
-      } catch (err) {
-        dispatchError({
-          type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
-        })
-      }
-      setAuthenticating(false)
-    }
-
-    void setFullLoginUrl()
-    if (code !== null && state !== null) {
-      void finishLogin()
-    }
-    if (authenticated) void syncOverview()
-  }, [authenticated, dispatchError, syncOverview])
-
-  useEffect(() => {
     if (
-      authenticated &&
+      authStatus === 'authenticated' &&
       !isLoading &&
       'Notification' in window &&
       Notification.permission === 'granted' &&
-      (user?.notificationsEnabled ?? true)
+      (userContext?.notificationsEnabled ?? true)
     ) {
       void registerNotificationSubscription({
         registeredNotificationSubscriptions:
-          user?.notificationSubscriptions ?? {},
+          userContext?.notificationSubscriptions ?? {},
       })
     }
   }, [
-    authenticated,
+    authStatus,
     isLoading,
-    user?.notificationSubscriptions,
-    user?.notificationsEnabled,
+    userContext?.notificationSubscriptions,
+    userContext?.notificationsEnabled,
   ])
 
   useEffect(() => {
     if (
-      authenticated &&
+      authStatus === 'authenticated' &&
       client.isMobileIOS() &&
       (('standalone' in window.navigator && window.navigator.standalone) ||
         window.matchMedia('(display-mode: standalone)').matches)
@@ -150,19 +124,25 @@ const App = () => {
         },
       })
     }
-  }, [authenticated, syncOverview])
+  }, [authStatus, syncOverview])
+
+  useEffect(() => {
+    if (authStatus === 'authenticated') {
+      void syncOverview()
+    }
+  }, [authStatus, syncOverview])
 
   const getContent = useCallback(() => {
-    if (authenticating) {
-      return <div>authenticating...</div>
+    if (authStatus === 'configuring') {
+      return <div>Loading...</div>
     }
-    if (!authenticated && loginUrl !== '') {
-      return <a href={loginUrl}>Log in</a>
+    if (authStatus === 'unauthenticated') {
+      return <Authenticator loginMechanisms={['username', 'email']} />
     }
     return (
       <>
         <MDTabs
-          className="App-nav"
+          className='App-nav'
           onChange={(event: Event) => {
             const activeTabIndex = (
               event.target as { activeTabIndex: number } | null
@@ -190,10 +170,10 @@ const App = () => {
             Subscriptions
           </MDPrimaryTab>
         </MDTabs>
-        <div className="App-content">
+        <div className='App-content'>
           {isLoading ? (
             <MDCircularProgress
-              className="App-loading"
+              className='App-loading'
               indeterminate
             />
           ) : hasOverviewError ? (
@@ -208,28 +188,29 @@ const App = () => {
       </>
     )
   }, [
-    authenticated,
-    authenticating,
+    authStatus,
     hasOverviewError,
     isChannelsRoute,
     isLoading,
     isSubscriptionsRoute,
-    loginUrl,
     navigate,
   ])
 
   return (
-    <div className="App">
-      <header className="App-header">
-        {!authenticating && authenticated && loginUrl !== '' ? (
-          <Notifications className="App-notifications" />
+    <div className='App'>
+      <header className='App-header'>
+        {authStatus === 'authenticated' ? (
+          <Notifications className='App-notifications' />
         ) : null}
         <h1>It&apos;s On</h1>
-        {!authenticating && authenticated && loginUrl !== '' ? (
-          <UserSettings className="App-settings" />
+        {authStatus === 'authenticated' ? (
+          <UserSettings
+            className='App-settings'
+            onSignOut={signOut}
+          />
         ) : null}
       </header>
-      <main className="App-main">{getContent()}</main>
+      <main className='App-main'>{getContent()}</main>
       {error.isVisible ? <ErrorSnackbar>{error.message}</ErrorSnackbar> : null}
     </div>
   )
