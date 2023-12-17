@@ -62,7 +62,7 @@ const getOverview = async (
         tier: 5,
         username:
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          (event.requestContext.authorizer?.claims['cognito:username'] ??
+          (event.requestContext.authorizer?.claims.preferred_username ??
             '') as string,
       }
       // Put a user profile item

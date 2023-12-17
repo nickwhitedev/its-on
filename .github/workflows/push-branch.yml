@@ -131,6 +131,7 @@ jobs:
       run:
         working-directory: backend
     outputs:
+      cognito-user-pool-id: ${{ steps.set-env-vars.outputs.CognitoUserPoolID }}
       cognito-client-id: ${{ steps.set-env-vars.outputs.CognitoClientID }}
       web-endpoint: ${{ steps.set-env-vars.outputs.WebEndpoint }}
       auth-endpoint: ${{ steps.set-env-vars.outputs.AuthEndpoint }}
@@ -225,6 +226,7 @@ jobs:
       - name: Set environment variables
         shell: bash
         run: |
+          echo "VITE_COGNITO_USER_POOL_ID=\"${{needs.build-and-deploy-branch-api.outputs.cognito-user-pool-id}}\"" >> .env.production
           echo "VITE_COGNITO_CLIENT_ID=\"${{needs.build-and-deploy-branch-api.outputs.cognito-client-id}}\"" >> .env.production
           echo "VITE_BASE_URL=\"${{needs.build-and-deploy-branch-api.outputs.web-endpoint}}\"" >> .env.production
           echo "VITE_AUTH_URL=\"${{needs.build-and-deploy-branch-api.outputs.auth-endpoint}}\"" >> .env.production
