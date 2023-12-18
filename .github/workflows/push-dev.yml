@@ -175,7 +175,7 @@ jobs:
             --region ${TESTING_REGION} \
             --output-template-file packaged-dev.yml
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: packaged-dev.yml
           path: backend/packaged-dev.yml

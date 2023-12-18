@@ -184,7 +184,7 @@ jobs:
             --region ${TESTING_REGION} \
             --output-template-file packaged-testing.yml
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: packaged-testing.yml
           path: backend/packaged-testing.yml
@@ -216,7 +216,7 @@ jobs:
               ParameterKey=PushNotificationPublicKey,ParameterValue=${PUSH_NOTIFICATION_PUBLIC_KEY} \
               ParameterKey=PushNotificationPrivateKey,ParameterValue=${PUSH_NOTIFICATION_PRIVATE_KEY}
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: packaged-prod.yml
           path: backend/packaged-prod.yml
