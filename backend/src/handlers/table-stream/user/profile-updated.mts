@@ -73,32 +73,30 @@ export const handleProfileUpdated = async ({
       try {
         await ddbDocClient.send(
           new TransactWriteCommand({
-            TransactItems: [
-              channelChunk.map(({ sk: channelSK }) => {
-                return {
-                  UpdateRequest: {
-                    Key: {
-                      pk: pk,
-                      sk: channelSK,
-                    },
-                    ReturnValues: 'ALL_NEW',
-                    TableName: DYNAMODB_TABLE_NAME,
-                    UpdateExpression: 'SET #owner = :owner',
-                    ExpressionAttributeNames: {
-                      '#owner': 'owner',
-                    },
-                    ExpressionAttributeValues: {
-                      ':owner': record.dynamodb?.NewImage?.username?.S,
-                    },
-                  },
-                }
-              }),
-            ],
+            TransactItems: channelChunk.map(({ sk: channelSK }) => ({
+              Update: {
+                Key: {
+                  pk: pk,
+                  sk: channelSK,
+                },
+                ReturnValues: 'ALL_NEW',
+                TableName: DYNAMODB_TABLE_NAME,
+                UpdateExpression: 'SET #owner = :owner',
+                ExpressionAttributeNames: {
+                  '#owner': 'owner',
+                },
+                ExpressionAttributeValues: {
+                  ':owner': record.dynamodb?.NewImage?.username?.S,
+                },
+              },
+            })),
           }),
         )
-        logger.debug(`Successful batch update - batch ${++batchCount}`)
+        logger.debug(
+          `Successful batch update user channels - batch ${++batchCount}`,
+        )
       } catch (error) {
-        logger.error('batch update failed', error as Error)
+        logger.error('batch update user channels failed', error as Error)
       }
     }
   } while (lastEvaluatedKey != null && Object.keys(lastEvaluatedKey).length > 0)
@@ -147,34 +145,34 @@ export const handleProfileUpdated = async ({
       try {
         await ddbDocClient.send(
           new TransactWriteCommand({
-            TransactItems: [
-              subscriptionChunk.map(
-                ({ pk: subscriptionPK, sk: subscriberSK }) => {
-                  return {
-                    UpdateRequest: {
-                      Key: {
-                        pk: subscriptionPK,
-                        sk: subscriberSK,
-                      },
-                      ReturnValues: 'ALL_NEW',
-                      TableName: DYNAMODB_TABLE_NAME,
-                      UpdateExpression: 'SET #username = :username',
-                      ExpressionAttributeNames: {
-                        '#username': 'username',
-                      },
-                      ExpressionAttributeValues: {
-                        ':username': record.dynamodb?.NewImage?.username?.S,
-                      },
-                    },
-                  }
+            TransactItems: subscriptionChunk.map(
+              ({ pk: subscriptionPK, sk: subscriptionSK }) => ({
+                Update: {
+                  Key: {
+                    pk: `channel#${subscriptionSK.substring(
+                      subscriptionSK.indexOf('#') + 1,
+                    )}`,
+                    sk: `subscriber#${subscriptionPK.substring(
+                      subscriptionPK.indexOf('#') + 1,
+                    )}`,
+                  },
+                  ReturnValues: 'ALL_NEW',
+                  TableName: DYNAMODB_TABLE_NAME,
+                  UpdateExpression: 'SET #username = :username',
+                  ExpressionAttributeNames: {
+                    '#username': 'username',
+                  },
+                  ExpressionAttributeValues: {
+                    ':username': record.dynamodb?.NewImage?.username?.S,
+                  },
                 },
-              ),
-            ],
+              }),
+            ),
           }),
         )
         logger.debug(`Successful transact update - batch ${++batchCount}`)
       } catch (error) {
-        logger.error('batch update failed', error as Error)
+        logger.error('batch update user channels failed', error as Error)
       }
     }
   } while (lastEvaluatedKey != null && Object.keys(lastEvaluatedKey).length > 0)

@@ -4,20 +4,20 @@ import { useCallback, useState } from 'react'
 import { useUser, useUserDispatch } from '../../contexts/user/userContext'
 
 import { AuthEventData } from '@aws-amplify/ui'
+import { updateUserAttribute } from 'aws-amplify/auth'
+import { useErrorDispatch } from '../../contexts/error/errorContext'
 import { ErrorDispatchActionType } from '../../contexts/error/errorReducer'
-import MDDialog from '../material/MDDialog'
-import MDFilledTextField from '../material/text-field/MDFilledTextField'
-import MDIcon from '../material/MDIcon'
-import MDIconButton from '../material/icon-button/MDIconButton'
-import MDList from '../material/list/MDList'
-import MDListItem from '../material/list/MDListItem'
-import MDSwitch from '../material/MDSwitch'
-import MDTextButton from '../material/button/MDTextButton'
 import { UserDispatchActionType } from '../../contexts/user/userReducer'
 import { fetchApi } from '../../utils/api'
 import { sendErrorLog } from '../../utils/logging'
-import { updateUserAttribute } from 'aws-amplify/auth'
-import { useErrorDispatch } from '../../contexts/error/errorContext'
+import MDDialog from '../material/MDDialog'
+import MDIcon from '../material/MDIcon'
+import MDSwitch from '../material/MDSwitch'
+import MDTextButton from '../material/button/MDTextButton'
+import MDIconButton from '../material/icon-button/MDIconButton'
+import MDList from '../material/list/MDList'
+import MDListItem from '../material/list/MDListItem'
+import MDFilledTextField from '../material/text-field/MDFilledTextField'
 
 const UserSettings = ({
   className,
@@ -48,15 +48,6 @@ const UserSettings = ({
     setIsUpdating(true)
 
     try {
-      console.log({
-        newUsername,
-        params: {
-          userAttributes: {
-            attributeKey: 'preferred_username',
-            value: newUsername,
-          },
-        },
-      })
       await updateUserAttribute({
         userAttribute: {
           attributeKey: 'preferred_username',
