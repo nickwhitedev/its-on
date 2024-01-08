@@ -45,7 +45,7 @@ Globals:
     Environment:
       Variables:
         ITS_ON_TABLE: !Ref ItsOnTable
-        POWERTOOLS_LOG_LEVEL: 
+        POWERTOOLS_LOG_LEVEL:
           'Fn::If':
             - IsProdEnv
             - INFO
@@ -149,11 +149,11 @@ Resources:
             TableName: !Ref ItsOnTable
 
   getOverviewLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "getOverviewLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    DependsOn: 'getOverviewLambdaFunction'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref getOverviewLambdaFunction]]
+      LogGroupName: !Join ['', ['/aws/lambda/', !Ref getOverviewLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: get-channel.mts
   getChannelLambdaFunction:
@@ -175,11 +175,11 @@ Resources:
             TableName: !Ref ItsOnTable
 
   getChannelLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "getChannelLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    DependsOn: 'getChannelLambdaFunction'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref getChannelLambdaFunction]]
+      LogGroupName: !Join ['', ['/aws/lambda/', !Ref getChannelLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: create-item.mts
   createChannelLambdaFunction:
@@ -201,11 +201,12 @@ Resources:
             TableName: !Ref ItsOnTable
 
   createChannelLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "createChannelLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    DependsOn: 'createChannelLambdaFunction'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref createChannelLambdaFunction]]
+      LogGroupName:
+        !Join ['', ['/aws/lambda/', !Ref createChannelLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: update-item.mts
   updateChannelLambdaFunction:
@@ -227,11 +228,12 @@ Resources:
             TableName: !Ref ItsOnTable
 
   updateChannelLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "updateChannelLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    DependsOn: 'updateChannelLambdaFunction'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref updateChannelLambdaFunction]]
+      LogGroupName:
+        !Join ['', ['/aws/lambda/', !Ref updateChannelLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: its-on.mts
   itsOnLambdaFunction:
@@ -253,11 +255,11 @@ Resources:
             TableName: !Ref ItsOnTable
 
   itsOnLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "itsOnLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    DependsOn: 'itsOnLambdaFunction'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref itsOnLambdaFunction]]
+      LogGroupName: !Join ['', ['/aws/lambda/', !Ref itsOnLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: its-off.mts
   itsOffLambdaFunction:
@@ -279,11 +281,11 @@ Resources:
             TableName: !Ref ItsOnTable
 
   itsOffLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "itsOffLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    DependsOn: 'itsOffLambdaFunction'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref itsOffLambdaFunction]]
+      LogGroupName: !Join ['', ['/aws/lambda/', !Ref itsOffLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: delete-item.mts
   deleteChannelLambdaFunction:
@@ -305,11 +307,12 @@ Resources:
             TableName: !Ref ItsOnTable
 
   deleteChannelLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "deleteChannelLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    DependsOn: 'deleteChannelLambdaFunction'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref deleteChannelLambdaFunction]]
+      LogGroupName:
+        !Join ['', ['/aws/lambda/', !Ref deleteChannelLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: delete-item.mts
   removeChannelSubscriberLambdaFunction:
@@ -331,11 +334,12 @@ Resources:
             TableName: !Ref ItsOnTable
 
   removeChannelSubscriberLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "removeChannelSubscriberLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    DependsOn: 'removeChannelSubscriberLambdaFunction'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref removeChannelSubscriberLambdaFunction]]
+      LogGroupName:
+        !Join ['', ['/aws/lambda/', !Ref removeChannelSubscriberLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: subscribe.mts
   subscribeLambdaFunction:
@@ -357,11 +361,11 @@ Resources:
             TableName: !Ref ItsOnTable
 
   subscribeLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "subscribeLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    DependsOn: 'subscribeLambdaFunction'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref subscribeLambdaFunction]]
+      LogGroupName: !Join ['', ['/aws/lambda/', !Ref subscribeLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: unsubscribe.mts
   unsubscribeLambdaFunction:
@@ -383,11 +387,11 @@ Resources:
             TableName: !Ref ItsOnTable
 
   unsubscribeLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "unsubscribeLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    DependsOn: 'unsubscribeLambdaFunction'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref unsubscribeLambdaFunction]]
+      LogGroupName: !Join ['', ['/aws/lambda/', !Ref unsubscribeLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: get-notification-key.mts
   getNotificationKeyLambdaFunction:
@@ -409,11 +413,12 @@ Resources:
             TableName: !Ref ItsOnTable
 
   getNotificationKeyLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "getNotificationKeyLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    DependsOn: 'getNotificationKeyLambdaFunction'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref getNotificationKeyLambdaFunction]]
+      LogGroupName:
+        !Join ['', ['/aws/lambda/', !Ref getNotificationKeyLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: enable-notifications.mts
   enableNotificationsLambdaFunction:
@@ -435,11 +440,12 @@ Resources:
             TableName: !Ref ItsOnTable
 
   enableNotificationsLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "enableNotificationsLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    DependsOn: 'enableNotificationsLambdaFunction'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref enableNotificationsLambdaFunction]]
+      LogGroupName:
+        !Join ['', ['/aws/lambda/', !Ref enableNotificationsLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: disable-notifications.mts
   disableNotificationsLambdaFunction:
@@ -461,11 +467,12 @@ Resources:
             TableName: !Ref ItsOnTable
 
   disableNotificationsLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "disableNotificationsLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    DependsOn: 'disableNotificationsLambdaFunction'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref disableNotificationsLambdaFunction]]
+      LogGroupName:
+        !Join ['', ['/aws/lambda/', !Ref disableNotificationsLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: subscribe-notifications.mts
   subscribeNotificationsLambdaFunction:
@@ -487,11 +494,12 @@ Resources:
             TableName: !Ref ItsOnTable
 
   subscribeNotificationsLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "subscribeNotificationsLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    DependsOn: 'subscribeNotificationsLambdaFunction'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref subscribeNotificationsLambdaFunction]]
+      LogGroupName:
+        !Join ['', ['/aws/lambda/', !Ref subscribeNotificationsLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: unsubscribe-notifications.mts
   unsubscribeNotificationsLambdaFunction:
@@ -513,11 +521,15 @@ Resources:
             TableName: !Ref ItsOnTable
 
   unsubscribeNotificationsLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "unsubscribeNotificationsLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    DependsOn: 'unsubscribeNotificationsLambdaFunction'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref unsubscribeNotificationsLambdaFunction]]
+      LogGroupName:
+        !Join [
+          '',
+          ['/aws/lambda/', !Ref unsubscribeNotificationsLambdaFunction],
+        ]
 
   # This is a Lambda function config associated with the source code: update-profile.mts
   updateProfileLambdaFunction:
@@ -539,11 +551,12 @@ Resources:
             TableName: !Ref ItsOnTable
 
   updateProfileLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "updateProfileLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    DependsOn: 'updateProfileLambdaFunction'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref updateProfileLambdaFunction]]
+      LogGroupName:
+        !Join ['', ['/aws/lambda/', !Ref updateProfileLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: post-log.mts
   postLogLambdaFunction:
@@ -565,11 +578,11 @@ Resources:
             TableName: !Ref ItsOnTable
 
   postLogLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "postLogLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    DependsOn: 'postLogLambdaFunction'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref postLogLambdaFunction]]
+      LogGroupName: !Join ['', ['/aws/lambda/', !Ref postLogLambdaFunction]]
 
   tableStreamLambdaFunction:
     Type: AWS::Serverless::Function
@@ -603,11 +616,11 @@ Resources:
             TableName: !Ref ItsOnTable
 
   tableStreamLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "tableStreamLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    DependsOn: 'tableStreamLambdaFunction'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref tableStreamLambdaFunction]]
+      LogGroupName: !Join ['', ['/aws/lambda/', !Ref tableStreamLambdaFunction]]
 
   # DynamoDB table to store item: {id: &lt;ID&gt;, name: &lt;NAME&gt;}
   ItsOnTable:
@@ -653,8 +666,7 @@ Resources:
           EmailMessage:
             Fn::Join:
               - ''
-              -
-                - '<body>'
+              - - '<body>'
                 - '<h3>You&apos;ve been invited to the Closed Alpha for It&apos;s On!</h3>'
                 - '<p>Your username is <strong>{username}</strong> and temporary password is <strong>{####}</strong></p>'
                 - '<p>Go to '
@@ -704,17 +716,17 @@ Resources:
           RequireUppercase: true
       Schema:
         - AttributeDataType: String
+          Mutable: true
           Name: email
           Required: true
         - AttributeDataType: String
-          Name: name
-          Required: false
-        - AttributeDataType: String
+          Mutable: true
           Name: phone_number
           Required: false # TODO: UserPool: phone number based sign-up?
         - AttributeDataType: String
+          Mutable: true
           Name: preferred_username
-          Required: false
+          Required: true
       SmsConfiguration:
         ExternalId: !Ref SnsCognitoIamExternalId
         SnsCallerArn: !Ref SnsCognitoIamArn
