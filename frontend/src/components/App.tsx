@@ -25,7 +25,10 @@ import MDTabs from './material/tabs/MDTabs'
 import Notifications from './notifications/Notifications'
 import UserSettings from './user/UserSettings'
 
+import { SignUpInput, SignUpOutput } from '@aws-amplify/auth/cognito'
 import { Authenticator, useAuthenticator } from '@aws-amplify/ui-react'
+import { signUp } from 'aws-amplify/auth'
+import { nanoid } from 'nanoid'
 import amplifyConfig from '../amplifyConfig'
 
 Amplify.configure(amplifyConfig)
@@ -137,7 +140,28 @@ const App = () => {
       return <div>Loading...</div>
     }
     if (authStatus === 'unauthenticated') {
-      return <Authenticator loginMechanisms={['username', 'email']} />
+      return (
+        <Authenticator
+          loginMechanisms={['username', 'email']}
+          services={{
+            async handleSignUp(formData: SignUpInput): Promise<SignUpOutput> {
+              const { password, options } = formData
+              console.log('signup options: ', options)
+              return signUp({
+                username: nanoid(),
+                password,
+                options: {
+                  autoSignIn: true,
+                  userAttributes: {
+                    email: options?.userAttributes.email,
+                  },
+                },
+              })
+            },
+          }}
+          signUpAttributes={['email']}
+        />
+      )
     }
     return (
       <>

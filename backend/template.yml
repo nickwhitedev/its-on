@@ -726,7 +726,7 @@ Resources:
         - AttributeDataType: String
           Mutable: true
           Name: preferred_username
-          Required: true
+          Required: false
       SmsConfiguration:
         ExternalId: !Ref SnsCognitoIamExternalId
         SnsCallerArn: !Ref SnsCognitoIamArn
@@ -736,7 +736,7 @@ Resources:
           - phone_number
           - email
       UsernameConfiguration:
-        CaseSensitive: false
+        CaseSensitive: true
       # TODO: UserPool: Delete if not needed
       # UsernameAttributes:
       #   - phone_number
