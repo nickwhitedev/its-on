@@ -25,8 +25,9 @@ import MDTabs from './material/tabs/MDTabs'
 import Notifications from './notifications/Notifications'
 import UserSettings from './user/UserSettings'
 
-import { Authenticator, useAuthenticator } from '@aws-amplify/ui-react'
+import { useAuthenticator } from '@aws-amplify/ui-react'
 import amplifyConfig from '../amplifyConfig'
+import MDRipple from './material/MDRipple'
 
 Amplify.configure(amplifyConfig)
 
@@ -42,6 +43,7 @@ interface OverviewData {
 const App = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [hasOverviewError, setHasOverviewError] = useState<boolean>(false)
+  const [isOn, setIsOn] = useState<boolean>(false)
 
   const userContext = useUser()
   const error = useError()
@@ -137,7 +139,33 @@ const App = () => {
       return <div>Loading...</div>
     }
     if (authStatus === 'unauthenticated') {
-      return <Authenticator loginMechanisms={['username', 'email']} />
+      return (
+        <div className='App-about'>
+          <button
+            aria-label={isOn ? 'Turn off channel' : 'Turn on channel'}
+            className={`App-button ${isOn ? 'on' : ''}`}
+            onClick={() => {
+              setIsOn(prev => !prev)
+            }}
+          >
+            <MDRipple />
+            <ItsOnIcon className='App-button-image' />
+          </button>
+          <h2>Coming Soon</h2>
+          <p>
+            It&apos;s On is an app for spontaneous low-key invites to your
+            social circles for any activity.
+          </p>
+          <p>
+            If you have a group that you regularly see, call, or hang out with,
+            It&apos;s On provides an easy way to let them know you&apos;re ready
+            for activities.
+          </p>
+          <p>
+            Invite people to your circles and they will know when It&apos;s On!
+          </p>
+        </div>
+      )
     }
     return (
       <>
@@ -192,6 +220,7 @@ const App = () => {
     hasOverviewError,
     isChannelsRoute,
     isLoading,
+    isOn,
     isSubscriptionsRoute,
     navigate,
   ])
