@@ -1214,10 +1214,10 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@middy/core@^5.2.1":
-  version "5.2.1"
-  resolved "https://registry.yarnpkg.com/@middy/core/-/core-5.2.1.tgz#a953d57baa427c0d5413d5bd807cac70faf25f8a"
-  integrity sha512-2FUTtwVAsbzryY0mxuXfZYcL8j2oag06BffV+fK33rhe1EXuumagLJ1azWk99J/AqDVzHPAaqz0HuZyC1pnY+w==
+"@middy/core@^5.2.3":
+  version "5.2.3"
+  resolved "https://registry.yarnpkg.com/@middy/core/-/core-5.2.3.tgz#9c322a0fad41eb371ef1e110eb0cee5028683c15"
+  integrity sha512-C/efwjqBCQhNAzLrzQtQWl9FSj4j3CBy0CCTlagmbiD7g/l6HPwieR6baN+Oc81+p91xy//dg2hR7sP9X0X6qA==
   dependencies:
     "@datastream/core" "0.0.35"
 
