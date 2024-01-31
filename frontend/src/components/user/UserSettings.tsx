@@ -1,12 +1,10 @@
 import './UserSettings.css'
 
+import { SignOutButton } from '@clerk/clerk-react'
 import { useCallback, useState } from 'react'
-import { useUser, useUserDispatch } from '../../contexts/user/userContext'
-
-import { AuthEventData } from '@aws-amplify/ui'
-import { updateUserAttribute } from 'aws-amplify/auth'
 import { useErrorDispatch } from '../../contexts/error/errorContext'
 import { ErrorDispatchActionType } from '../../contexts/error/errorReducer'
+import { useUser, useUserDispatch } from '../../contexts/user/userContext'
 import { UserDispatchActionType } from '../../contexts/user/userReducer'
 import { fetchApi } from '../../utils/api'
 import { sendErrorLog } from '../../utils/logging'
@@ -19,13 +17,7 @@ import MDList from '../material/list/MDList'
 import MDListItem from '../material/list/MDListItem'
 import MDFilledTextField from '../material/text-field/MDFilledTextField'
 
-const UserSettings = ({
-  className,
-  onSignOut,
-}: {
-  className: string
-  onSignOut: ((data?: AuthEventData | undefined) => void) | undefined
-}) => {
+const UserSettings = ({ className }: { className: string }) => {
   const user = useUser()
 
   const dispatchError = useErrorDispatch()
@@ -33,45 +25,45 @@ const UserSettings = ({
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
 
-  const [isUpdating, setIsUpdating] = useState<boolean>(false)
+  // const [isUpdating, setIsUpdating] = useState<boolean>(false)
 
   const [newUsername, setNewUsername] = useState<string>('')
   const [isEditingUsername, setIsEditingUsername] = useState<boolean>(false)
 
   const notificationsEnabled = user?.notificationsEnabled ?? true
 
-  const handleSaveUsername = async () => {
-    if (newUsername === user?.username) {
-      setIsEditingUsername(false)
-      return
-    }
-    setIsUpdating(true)
+  // const handleSaveUsername = async () => {
+  //   if (newUsername === user?.username) {
+  //     setIsEditingUsername(false)
+  //     return
+  //   }
+  //   setIsUpdating(true)
 
-    try {
-      await updateUserAttribute({
-        userAttribute: {
-          attributeKey: 'preferred_username',
-          value: newUsername,
-        },
-      })
-      await fetchApi(`/user`, 'PUT', { username: newUsername })
-      dispatchUser({
-        type: UserDispatchActionType.SYNCED,
-        user: {
-          ...user,
-          username: newUsername,
-        },
-      })
-    } catch (error) {
-      await sendErrorLog('Profile update error', { error })
-      dispatchError({
-        type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
-      })
-    }
+  //   try {
+  //     await updateUserAttribute({
+  //       userAttribute: {
+  //         attributeKey: 'preferred_username',
+  //         value: newUsername,
+  //       },
+  //     })
+  //     await fetchApi(`/user`, 'PUT', { username: newUsername })
+  //     dispatchUser({
+  //       type: UserDispatchActionType.SYNCED,
+  //       user: {
+  //         ...user,
+  //         username: newUsername,
+  //       },
+  //     })
+  //   } catch (error) {
+  //     await sendErrorLog('Profile update error', { error })
+  //     dispatchError({
+  //       type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
+  //     })
+  //   }
 
-    setIsUpdating(false)
-    setIsEditingUsername(false)
-  }
+  //   setIsUpdating(false)
+  //   setIsEditingUsername(false)
+  // }
 
   const handleToggleNotifications = useCallback(async () => {
     dispatchUser({
@@ -131,7 +123,7 @@ const UserSettings = ({
                 <>
                   <div slot='headline'>
                     <MDFilledTextField
-                      disabled={isUpdating}
+                      // disabled={isUpdating}
                       label='Username'
                       rows={1}
                       value={newUsername}
@@ -144,7 +136,7 @@ const UserSettings = ({
                   </div>
                   <div slot='end'>
                     <MDIconButton
-                      disabled={isUpdating}
+                      // disabled={isUpdating}
                       onClick={() => {
                         setIsEditingUsername(false)
                       }}
@@ -152,8 +144,8 @@ const UserSettings = ({
                       <MDIcon>close</MDIcon>
                     </MDIconButton>
                     <MDIconButton
-                      disabled={newUsername === '' || isUpdating}
-                      onClick={() => void handleSaveUsername()}
+                    // disabled={newUsername === '' || isUpdating}
+                    // onClick={() => void handleSaveUsername()}
                     >
                       <MDIcon>done</MDIcon>
                     </MDIconButton>
@@ -183,12 +175,11 @@ const UserSettings = ({
                 </div>
               ) : null}
             </MDListItem>
-            <MDListItem
-              type='button'
-              onClick={onSignOut}
-            >
-              <div slot='headline'>Logout</div>
-            </MDListItem>
+            <SignOutButton>
+              <MDListItem type='button'>
+                <div slot='headline'>Sign Out</div>
+              </MDListItem>
+            </SignOutButton>
           </MDList>
         </div>
         <div slot='actions'>
