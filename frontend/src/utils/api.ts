@@ -1,5 +1,3 @@
-import { fetchAuthSession } from 'aws-amplify/auth'
-
 import { APIError } from './errors/apiError'
 import { apiUrl } from './urls'
 

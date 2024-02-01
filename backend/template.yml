@@ -88,9 +88,9 @@ Resources:
       Auth:
         AddDefaultAuthorizerToCorsPreflight: false
         Authorizers:
-          ItsOnCognitoAuthorizer:
-            UserPoolArn: !GetAtt ItsOnUserPool.Arn
-        DefaultAuthorizer: ItsOnCognitoAuthorizer
+          ItsOnLambdaTokenAuthorizer:
+            FunctionArn: !GetAtt ItsOnAuthFunction.Arn
+        DefaultAuthorizer: ItsOnLambdaTokenAuthorizer
       Domain:
         CertificateArn: arn:aws:acm:us-east-1:303579314896:certificate/89fd3c8f-9ccb-479e-b61a-36987061371e
         DomainName:
@@ -128,6 +128,12 @@ Resources:
 
   # Each Lambda function is defined by properties:
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+
+  ItsOnAuthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/src/handlers/
+      Handler: authorizer.handler
 
   # This is a Lambda function config associated with the source code: get-overview.mts
   getOverviewLambdaFunction:
