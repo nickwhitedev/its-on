@@ -1,9 +1,13 @@
 import './App.css'
 
-import { SignedIn, SignedOut, SignInButton } from '@clerk/clerk-react'
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  UserButton,
+} from '@clerk/clerk-react'
 import ErrorSnackbar from './errors/ErrorSnackbar'
 import Notifications from './notifications/Notifications'
-import UserSettings from './user/UserSettings'
 
 import { useError } from '../contexts/error/errorContext'
 import Home from './Home'
@@ -21,7 +25,9 @@ const App = () => {
         </SignedIn>
         <h1>It&apos;s On</h1>
         <SignedIn>
-          <UserSettings className='App-settings' />
+          <div className='App-settings'>
+            <UserButton userProfileMode='modal'>Hello</UserButton>
+          </div>
         </SignedIn>
       </header>
       <main className='App-main'>
