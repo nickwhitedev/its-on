@@ -7,9 +7,9 @@ import { useSubscriptionsDispatch } from '../contexts/subscriptions/subscription
 import { SubscriptionsDispatchActionType } from '../contexts/subscriptions/subscriptionsReducer'
 import { useUser, useUserDispatch } from '../contexts/user/userContext'
 import { UserDispatchActionType } from '../contexts/user/userReducer'
-import { fetchApi } from '../utils/api'
+import { useFetchApi } from '../utils/api'
 import client from '../utils/client'
-import { registerNotificationSubscription } from '../utils/notifications'
+import { useRegisterNotificationSubscription } from '../utils/notifications'
 import ItsOnIcon from './icons/ItsOnIcon'
 import MDIcon from './material/MDIcon'
 import MDCircularProgress from './material/progress/MDCircularProgress'
@@ -37,6 +37,8 @@ const Home = () => {
 
   const navigate = useNavigate()
   const location = useLocation()
+  const fetchApi = useFetchApi()
+  const registerNotificationSubscription = useRegisterNotificationSubscription()
 
   const isChannelsRoute = location.pathname.startsWith('/channels')
   const isSubscriptionsRoute = location.pathname.startsWith('/subscriptions')
@@ -66,7 +68,7 @@ const Home = () => {
       setHasOverviewError(true)
     }
     setIsLoading(false)
-  }, [dispatchChannels, dispatchSubscriptions, dispatchUser])
+  }, [dispatchChannels, dispatchSubscriptions, dispatchUser, fetchApi])
 
   useEffect(() => {
     if (
@@ -82,6 +84,7 @@ const Home = () => {
     }
   }, [
     isLoading,
+    registerNotificationSubscription,
     userContext?.notificationSubscriptions,
     userContext?.notificationsEnabled,
   ])

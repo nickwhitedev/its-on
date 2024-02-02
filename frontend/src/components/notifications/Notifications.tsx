@@ -7,8 +7,8 @@ import { ErrorDispatchActionType } from '../../contexts/error/errorReducer'
 import { useSubscriptions } from '../../contexts/subscriptions/subscriptionsContext'
 import { useUser, useUserDispatch } from '../../contexts/user/userContext'
 import { UserDispatchActionType } from '../../contexts/user/userReducer'
-import { fetchApi } from '../../utils/api'
-import { sendErrorLog } from '../../utils/logging'
+import { useFetchApi } from '../../utils/api'
+import { useSendLog } from '../../utils/logging'
 import { isChannelOn } from '../channels/channel/channelUtils'
 import MDDialog from '../material/MDDialog'
 import MDIcon from '../material/MDIcon'
@@ -25,7 +25,10 @@ const Notifications = ({ className }: { className: string }) => {
 
   const dispatchError = useErrorDispatch()
   const dispatchUser = useUserDispatch()
+
   const navigate = useNavigate()
+  const fetchApi = useFetchApi()
+  const sendLog = useSendLog()
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
 
@@ -54,12 +57,16 @@ const Notifications = ({ className }: { className: string }) => {
           ? UserDispatchActionType.NOTIFICATIONS_ENABLED
           : UserDispatchActionType.NOTIFICATIONS_DISABLED,
       })
-      await sendErrorLog('Notifications toggle notifications error', { error })
+      await sendLog(
+        'Notifications toggle notifications error',
+        { error },
+        'ERROR',
+      )
       dispatchError({
         type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
       })
     }
-  }, [dispatchError, dispatchUser, notificationsEnabled])
+  }, [dispatchError, dispatchUser, fetchApi, notificationsEnabled, sendLog])
 
   return (
     <div className={className}>

@@ -1,27 +1,24 @@
 import { LogLevel } from 'vite'
-import { fetchApi } from './api'
+import { useFetchApi } from './api'
 
-export const sendLog = async (
-  message: string,
-  data: Record<string, unknown> = {},
-  logLevel: Uppercase<LogLevel> = 'INFO',
-) => {
-  try {
-    await fetchApi('/log', 'POST', {
-      log: {
-        message,
-        ...data,
-      },
-      logLevel,
-    })
-  } catch {
-    return
+export const useSendLog = () => {
+  const fetchApi = useFetchApi()
+
+  return async (
+    message: string,
+    data: Record<string, unknown> = {},
+    logLevel: Uppercase<LogLevel> = 'INFO',
+  ) => {
+    try {
+      await fetchApi('/log', 'POST', {
+        log: {
+          message,
+          ...data,
+        },
+        logLevel,
+      })
+    } catch {
+      return
+    }
   }
-}
-
-export const sendErrorLog = async (
-  message: string,
-  data: Record<string, unknown> = {},
-): Promise<void> => {
-  await sendLog(message, data, 'ERROR')
 }

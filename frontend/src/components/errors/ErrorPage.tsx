@@ -1,10 +1,12 @@
-import { isRouteErrorResponse, useRouteError } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import { isRouteErrorResponse, useRouteError } from 'react-router-dom'
 
-import { sendErrorLog } from '../../utils/logging'
+import { useSendLog } from '../../utils/logging'
 
 export default function ErrorPage() {
   const error = useRouteError()
+  const sendLog = useSendLog()
+
   let errorMessage: string
 
   const [sendError, setSendError] = useState<boolean>(false)
@@ -12,11 +14,11 @@ export default function ErrorPage() {
   useEffect(() => {
     if (sendError) {
       void (async () => {
-        await sendErrorLog('ErrorPage unknown error')
+        await sendLog('ErrorPage unknown error')
       })()
       setSendError(false)
     }
-  }, [sendError, setSendError])
+  }, [sendError, sendLog, setSendError])
 
   if (isRouteErrorResponse(error)) {
     // error is type `ErrorResponse`
