@@ -87,22 +87,15 @@ async function verifyAccessToken(accessToken: string) {
    * Fetch the KID attribute from your JWKS Endpoint to verify its integrity
    * You can either use a Environment Variable containing the KID or call AWS Secrets Manager with KID already securely stored.
    */
-  try {
-    const data = await new SecretsManagerClient({ region: 'REGION' }).send(
-      new GetSecretValueCommand({
-        SecretId: process.env.SM_JWKS_SECRET_NAME,
-      }),
-    )
-    const key = await client.getSigningKey(
-      (JSON.parse(data.SecretString ?? '[]') as JWKS).keys[0].kid,
-    )
-    return jwt.verify(accessToken, key.getPublicKey())
-    // process data.
-  } catch (error) {
-    // error handling.
-  } finally {
-    // finally.
-  }
+  const data = await new SecretsManagerClient({ region: 'REGION' }).send(
+    new GetSecretValueCommand({
+      SecretId: process.env.SM_JWKS_SECRET_NAME,
+    }),
+  )
+  const key = await client.getSigningKey(
+    (JSON.parse(data.SecretString ?? '[]') as JWKS).keys[0].kid,
+  )
+  return jwt.verify(accessToken, key.getPublicKey())
 }
 
 function generateIAMPolicy(scopeClaims: string[]) {
@@ -136,10 +129,10 @@ export const handler: APIGatewayTokenAuthorizerHandler = async event => {
     const data = await verifyAccessToken(
       event.authorizationToken.replace('Bearer ', ''),
     )
-    console.log('Decoded and Verified JWT Token', JSON.stringify(data))
-    // TODO: productionize authorizer For testing purposes using a ID token without scopes. If you have an access token with scopes,
-    // uncomment 'data.claims.scp' and pass the array of scopes present in the scp attribute instead.
-    const scopeClaims = ['email'] // data.claims.scp;
+    if (typeof data === 'string') {
+      throw new Error('verifyAccessToken returned a string')
+    }
+    const scopeClaims = data.claims.scp
     // Generate IAM Policy
     return generateIAMPolicy(scopeClaims)
   } catch (error) {
