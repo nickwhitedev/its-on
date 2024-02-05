@@ -1,3 +1,5 @@
+import './Home.css'
+
 import PullToRefresh from 'pulltorefreshjs'
 import { useCallback, useEffect, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
@@ -108,8 +110,10 @@ const Home = () => {
   }, [syncOverview])
 
   useEffect(() => {
-    void syncOverview()
-  }, [syncOverview])
+    if (isLoading) {
+      void syncOverview()
+    }
+  }, [isLoading, syncOverview])
 
   return (
     <>
