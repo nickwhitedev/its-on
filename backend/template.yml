@@ -19,12 +19,6 @@ Parameters:
     Description: Environment name - used to populate stack names and subdomains
   PipelineRole:
     Type: String
-  SnsCognitoIamExternalId:
-    Type: String
-  SnsCognitoIamArn:
-    Type: String
-  SESDomainIdentityArn:
-    Type: String
   PushNotificationPublicKey:
     Type: String
   PushNotificationPrivateKey:
@@ -44,8 +38,14 @@ Globals:
       - x86_64
     Environment:
       Variables:
+        CLERK_SECRET_KEY_NAME:
+          'Fn::If':
+            - IsProdEnv
+            - ItsOnClerkSecretKey
+            - ItsOnClerkDevSecretKey
         ITS_ON_TABLE: !Ref ItsOnTable
-        POWERTOOLS_LOG_LEVEL: 
+        JWKS_ENDPOINT: https://api.clerk.dev/v1/jwks
+        POWERTOOLS_LOG_LEVEL:
           'Fn::If':
             - IsProdEnv
             - INFO
@@ -155,11 +155,10 @@ Resources:
             TableName: !Ref ItsOnTable
 
   getOverviewLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "getOverviewLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref getOverviewLambdaFunction]]
+      LogGroupName: !Join ['', ['/aws/lambda/', !Ref getOverviewLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: get-channel.mts
   getChannelLambdaFunction:
@@ -181,11 +180,10 @@ Resources:
             TableName: !Ref ItsOnTable
 
   getChannelLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "getChannelLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref getChannelLambdaFunction]]
+      LogGroupName: !Join ['', ['/aws/lambda/', !Ref getChannelLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: create-item.mts
   createChannelLambdaFunction:
@@ -207,11 +205,11 @@ Resources:
             TableName: !Ref ItsOnTable
 
   createChannelLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "createChannelLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref createChannelLambdaFunction]]
+      LogGroupName:
+        !Join ['', ['/aws/lambda/', !Ref createChannelLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: update-item.mts
   updateChannelLambdaFunction:
@@ -233,11 +231,11 @@ Resources:
             TableName: !Ref ItsOnTable
 
   updateChannelLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "updateChannelLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref updateChannelLambdaFunction]]
+      LogGroupName:
+        !Join ['', ['/aws/lambda/', !Ref updateChannelLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: its-on.mts
   itsOnLambdaFunction:
@@ -259,11 +257,10 @@ Resources:
             TableName: !Ref ItsOnTable
 
   itsOnLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "itsOnLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref itsOnLambdaFunction]]
+      LogGroupName: !Join ['', ['/aws/lambda/', !Ref itsOnLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: its-off.mts
   itsOffLambdaFunction:
@@ -285,11 +282,10 @@ Resources:
             TableName: !Ref ItsOnTable
 
   itsOffLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "itsOffLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref itsOffLambdaFunction]]
+      LogGroupName: !Join ['', ['/aws/lambda/', !Ref itsOffLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: delete-item.mts
   deleteChannelLambdaFunction:
@@ -311,11 +307,11 @@ Resources:
             TableName: !Ref ItsOnTable
 
   deleteChannelLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "deleteChannelLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref deleteChannelLambdaFunction]]
+      LogGroupName:
+        !Join ['', ['/aws/lambda/', !Ref deleteChannelLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: delete-item.mts
   removeChannelSubscriberLambdaFunction:
@@ -337,11 +333,11 @@ Resources:
             TableName: !Ref ItsOnTable
 
   removeChannelSubscriberLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "removeChannelSubscriberLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref removeChannelSubscriberLambdaFunction]]
+      LogGroupName:
+        !Join ['', ['/aws/lambda/', !Ref removeChannelSubscriberLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: subscribe.mts
   subscribeLambdaFunction:
@@ -363,11 +359,10 @@ Resources:
             TableName: !Ref ItsOnTable
 
   subscribeLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "subscribeLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref subscribeLambdaFunction]]
+      LogGroupName: !Join ['', ['/aws/lambda/', !Ref subscribeLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: unsubscribe.mts
   unsubscribeLambdaFunction:
@@ -389,11 +384,10 @@ Resources:
             TableName: !Ref ItsOnTable
 
   unsubscribeLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "unsubscribeLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref unsubscribeLambdaFunction]]
+      LogGroupName: !Join ['', ['/aws/lambda/', !Ref unsubscribeLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: get-notification-key.mts
   getNotificationKeyLambdaFunction:
@@ -415,11 +409,11 @@ Resources:
             TableName: !Ref ItsOnTable
 
   getNotificationKeyLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "getNotificationKeyLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref getNotificationKeyLambdaFunction]]
+      LogGroupName:
+        !Join ['', ['/aws/lambda/', !Ref getNotificationKeyLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: enable-notifications.mts
   enableNotificationsLambdaFunction:
@@ -441,11 +435,11 @@ Resources:
             TableName: !Ref ItsOnTable
 
   enableNotificationsLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "enableNotificationsLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref enableNotificationsLambdaFunction]]
+      LogGroupName:
+        !Join ['', ['/aws/lambda/', !Ref enableNotificationsLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: disable-notifications.mts
   disableNotificationsLambdaFunction:
@@ -467,11 +461,11 @@ Resources:
             TableName: !Ref ItsOnTable
 
   disableNotificationsLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "disableNotificationsLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref disableNotificationsLambdaFunction]]
+      LogGroupName:
+        !Join ['', ['/aws/lambda/', !Ref disableNotificationsLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: subscribe-notifications.mts
   subscribeNotificationsLambdaFunction:
@@ -493,11 +487,11 @@ Resources:
             TableName: !Ref ItsOnTable
 
   subscribeNotificationsLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "subscribeNotificationsLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref subscribeNotificationsLambdaFunction]]
+      LogGroupName:
+        !Join ['', ['/aws/lambda/', !Ref subscribeNotificationsLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: unsubscribe-notifications.mts
   unsubscribeNotificationsLambdaFunction:
@@ -519,11 +513,14 @@ Resources:
             TableName: !Ref ItsOnTable
 
   unsubscribeNotificationsLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "unsubscribeNotificationsLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref unsubscribeNotificationsLambdaFunction]]
+      LogGroupName:
+        !Join [
+          '',
+          ['/aws/lambda/', !Ref unsubscribeNotificationsLambdaFunction],
+        ]
 
   # This is a Lambda function config associated with the source code: update-profile.mts
   updateProfileLambdaFunction:
@@ -545,11 +542,11 @@ Resources:
             TableName: !Ref ItsOnTable
 
   updateProfileLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "updateProfileLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref updateProfileLambdaFunction]]
+      LogGroupName:
+        !Join ['', ['/aws/lambda/', !Ref updateProfileLambdaFunction]]
 
   # This is a Lambda function config associated with the source code: post-log.mts
   postLogLambdaFunction:
@@ -571,11 +568,10 @@ Resources:
             TableName: !Ref ItsOnTable
 
   postLogLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "postLogLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref postLogLambdaFunction]]
+      LogGroupName: !Join ['', ['/aws/lambda/', !Ref postLogLambdaFunction]]
 
   tableStreamLambdaFunction:
     Type: AWS::Serverless::Function
@@ -609,11 +605,10 @@ Resources:
             TableName: !Ref ItsOnTable
 
   tableStreamLambdaFunctionLogGroup:
-    Type: "AWS::Logs::LogGroup"
-    DependsOn: "tableStreamLambdaFunction"
-    Properties: 
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
       RetentionInDays: 30
-      LogGroupName: !Join ["", ["/aws/lambda/", !Ref tableStreamLambdaFunction]]
+      LogGroupName: !Join ['', ['/aws/lambda/', !Ref tableStreamLambdaFunction]]
 
   # DynamoDB table to store item: {id: &lt;ID&gt;, name: &lt;NAME&gt;}
   ItsOnTable:
@@ -644,158 +639,6 @@ Resources:
           Value: itson
         - Key: env
           Value: !Ref Env
-
-  # Auth Resources
-  ItsOnUserPool:
-    Type: AWS::Cognito::UserPool
-    Properties:
-      AdminCreateUserConfig: # Disable this to test sign-up flow in dev environments
-        AllowAdminCreateUserOnly:
-          'Fn::If':
-            - IsProdEnv
-            - false
-            - true
-        InviteMessageTemplate:
-          EmailMessage:
-            Fn::Join:
-              - ''
-              -
-                - '<body>'
-                - '<h3>You&apos;ve been invited to the Closed Alpha for It&apos;s On!</h3>'
-                - '<p>Your username is <strong>{username}</strong> and temporary password is <strong>{####}</strong></p>'
-                - '<p>Go to '
-                - 'Fn::If':
-                    - IsProdEnv
-                    - https://itson.fyi
-                    - !Sub https://${Env}.itson.fyi
-                - ' and log in to get started.</p>'
-                - '<p>Once the alpha is over and the app is in beta/fully launched, alpha accounts and the data associated with them will be deleted.</p>'
-                - '<p>To use It&apos;s On as an app instead of a website (please do try this), follow these instructions: https://support.google.com/chrome/answer/9658361.</p>'
-                - '<p>Anyone can email the username they want and their email address to alpha@itson.fyi to request an invite, so tell your friends!</p>'
-                - '<p>Subscribe to the It&apos;s On Alpha channel by nick to get alpha related updates: https://dev.itson.fyi/IDFxN39mg5O</p>'
-                - '<p>Feel free to send feedback to feedback@itson.fyi</p>'
-                - '<p>Join the It&apos;s On Discord Server here - https://discord.gg/jVtcuu2f5N</p>'
-                - '<p>Enjoy!</p>'
-                - '</body>'
-          EmailSubject: It's On!
-      AliasAttributes:
-        - email
-        - phone_number
-        - preferred_username
-      AutoVerifiedAttributes:
-        - email
-        - phone_number
-      DeletionProtection:
-        'Fn::If':
-          - IsProdEnv
-          - ACTIVE
-          - INACTIVE
-      DeviceConfiguration:
-        ChallengeRequiredOnNewDevice: true
-        DeviceOnlyRememberedOnUserPrompt: false
-      EmailConfiguration:
-        # ConfigurationSet: Used for event monitoring and ip management
-        EmailSendingAccount: DEVELOPER
-        From: It's On <no-reply@itson.fyi>
-        SourceArn: !Ref SESDomainIdentityArn
-      EnabledMfas:
-        - SMS_MFA
-        - SOFTWARE_TOKEN_MFA
-      MfaConfiguration: OPTIONAL
-      Policies:
-        PasswordPolicy:
-          MinimumLength: 8
-          RequireLowercase: true
-          RequireNumbers: true
-          RequireUppercase: true
-      Schema:
-        - AttributeDataType: String
-          Name: email
-          Required: true
-        - AttributeDataType: String
-          Name: name
-          Required: false
-        - AttributeDataType: String
-          Name: phone_number
-          Required: false # TODO: UserPool: phone number based sign-up?
-        - AttributeDataType: String
-          Name: preferred_username
-          Required: false
-      SmsConfiguration:
-        ExternalId: !Ref SnsCognitoIamExternalId
-        SnsCallerArn: !Ref SnsCognitoIamArn
-        SnsRegion: us-east-1
-      UserAttributeUpdateSettings:
-        AttributesRequireVerificationBeforeUpdate:
-          - phone_number
-          - email
-      UsernameConfiguration:
-        CaseSensitive: false
-      # TODO: UserPool: Delete if not needed
-      # UsernameAttributes:
-      #   - phone_number
-      #   - email
-      # TODO: UserPool: Enable on Launch
-      # UserPoolAddOns:
-      #   AdvancedSecurityMode:
-      #     "Fn::If":
-      #       - IsProdEnv
-      #       - AUDIT # Audit for a couple of weeks then switch to ENFORCE
-      #       - OFF
-      UserPoolName: !Sub ItsOnUsers-${Env}
-
-  ItsOnUserPoolClient:
-    Type: AWS::Cognito::UserPoolClient
-    Properties:
-      AllowedOAuthFlows:
-        - code
-      AllowedOAuthFlowsUserPoolClient: true
-      AllowedOAuthScopes:
-        - email
-        - phone
-        - profile
-        - openid
-      CallbackURLs:
-        - 'Fn::If':
-            - IsProdEnv
-            - https://itson.fyi/
-            - !Sub https://${Env}.itson.fyi/
-        - 'Fn::If':
-            - IsProdEnv
-            - !Ref AWS::NoValue
-            - http://localhost:5173/
-      ClientName: !Sub ItsOnUsersClient-${Env}
-      DefaultRedirectURI:
-        'Fn::If':
-          - IsProdEnv
-          - https://itson.fyi/
-          - !Sub https://${Env}.itson.fyi/
-      GenerateSecret: false
-      LogoutURLs:
-        - 'Fn::If':
-            - IsProdEnv
-            - https://itson.fyi/
-            - !Sub https://${Env}.itson.fyi/
-        - 'Fn::If':
-            - IsProdEnv
-            - !Ref AWS::NoValue
-            - http://localhost:5173/
-      RefreshTokenValidity: 365
-      SupportedIdentityProviders:
-        - COGNITO
-      UserPoolId: !Ref ItsOnUserPool
-
-  ItsOnUserPoolDomain:
-    Type: AWS::Cognito::UserPoolDomain
-    Properties:
-      CustomDomainConfig:
-        CertificateArn: arn:aws:acm:us-east-1:303579314896:certificate/89fd3c8f-9ccb-479e-b61a-36987061371e
-      Domain:
-        'Fn::If':
-          - IsProdEnv
-          - auth.itson.fyi
-          - !Sub ${Env}-auth.itson.fyi
-      UserPoolId: !Ref ItsOnUserPool
 
   # Front End Resources
   ItsOnFrontendBucket:
@@ -916,15 +759,16 @@ Resources:
           AliasTarget:
             HostedZoneId: Z2FDTNDATAQYW2
             DNSName: !GetAtt ItsOnCloudFrontDistribution.DomainName
-        - Name:
-            'Fn::If':
-              - IsProdEnv
-              - auth.itson.fyi
-              - !Sub ${Env}-auth.itson.fyi
-          ResourceRecords:
-            - !GetAtt ItsOnUserPoolDomain.CloudFrontDistribution
-          TTL: 60
-          Type: CNAME
+        # TODO: Auth CName
+        # - Name:
+        #     'Fn::If':
+        #       - IsProdEnv
+        #       - auth.itson.fyi
+        #       - !Sub ${Env}-auth.itson.fyi
+        #   ResourceRecords:
+        #     - !GetAtt ItsOnUserPoolDomain.CloudFrontDistribution
+        #   TTL: 60
+        #   Type: CNAME
 
 Outputs:
   ApiEndpoint:
@@ -941,10 +785,6 @@ Outputs:
         - IsProdEnv
         - https://auth.itson.fyi
         - !Sub https://${Env}-auth.itson.fyi
-  CognitoClientID:
-    Value: !Ref ItsOnUserPoolClient
-  CognitoUserPoolID:
-    Value: !Ref ItsOnUserPool
   ItsOnFrontendBucketName:
     Value:
       'Fn::If':

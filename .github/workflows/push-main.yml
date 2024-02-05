@@ -6,8 +6,6 @@ on:
       - 'main'
 
 env:
-  AWS_SNS_COGNITO_IAM_ARN: ${{ secrets.AWS_SNS_COGNITO_IAM_ARN }}
-  AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID: ${{ secrets.AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID }}
   AWS_SES_DOMAIN_IDENTITY_ARN: ${{ secrets.AWS_SES_DOMAIN_IDENTITY_ARN }}
   PIPELINE_USER_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   PIPELINE_USER_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -160,9 +158,6 @@ jobs:
             --parameter-overrides \
               ParameterKey=Env,ParameterValue=prod \
               ParameterKey=PipelineRole,ParameterValue=${PROD_PIPELINE_EXECUTION_ROLE} \
-              ParameterKey=SnsCognitoIamArn,ParameterValue=${AWS_SNS_COGNITO_IAM_ARN} \
-              ParameterKey=SnsCognitoIamExternalId,ParameterValue=${AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID} \
-              ParameterKey=SESDomainIdentityArn,ParameterValue=${AWS_SES_DOMAIN_IDENTITY_ARN} \
               ParameterKey=PushNotificationPublicKey,ParameterValue=${PUSH_NOTIFICATION_PUBLIC_KEY} \
               ParameterKey=PushNotificationPrivateKey,ParameterValue=${PUSH_NOTIFICATION_PRIVATE_KEY}
 
@@ -210,9 +205,6 @@ jobs:
             --parameter-overrides \
               ParameterKey=Env,ParameterValue=prod \
               ParameterKey=PipelineRole,ParameterValue=${PROD_PIPELINE_EXECUTION_ROLE} \
-              ParameterKey=SnsCognitoIamArn,ParameterValue=${AWS_SNS_COGNITO_IAM_ARN} \
-              ParameterKey=SnsCognitoIamExternalId,ParameterValue=${AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID} \
-              ParameterKey=SESDomainIdentityArn,ParameterValue=${AWS_SES_DOMAIN_IDENTITY_ARN} \
               ParameterKey=PushNotificationPublicKey,ParameterValue=${PUSH_NOTIFICATION_PUBLIC_KEY} \
               ParameterKey=PushNotificationPrivateKey,ParameterValue=${PUSH_NOTIFICATION_PRIVATE_KEY}
 
@@ -263,9 +255,6 @@ jobs:
             --parameter-overrides \
               ParameterKey=Env,ParameterValue=test \
               ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE} \
-              ParameterKey=SnsCognitoIamArn,ParameterValue=${AWS_SNS_COGNITO_IAM_ARN} \
-              ParameterKey=SnsCognitoIamExternalId,ParameterValue=${AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID} \
-              ParameterKey=SESDomainIdentityArn,ParameterValue=${AWS_SES_DOMAIN_IDENTITY_ARN} \
               ParameterKey=PushNotificationPublicKey,ParameterValue=${PUSH_NOTIFICATION_PUBLIC_KEY} \
               ParameterKey=PushNotificationPrivateKey,ParameterValue=${PUSH_NOTIFICATION_PRIVATE_KEY}
 
@@ -290,8 +279,6 @@ jobs:
       run:
         working-directory: backend
     outputs:
-      cognito-user-pool-id: ${{ steps.set-env-vars.outputs.CognitoUserPoolID }}
-      cognito-client-id: ${{ steps.set-env-vars.outputs.CognitoClientID }}
       web-endpoint: ${{ steps.set-env-vars.outputs.WebEndpoint }}
       auth-endpoint: ${{ steps.set-env-vars.outputs.AuthEndpoint }}
       api-endpoint: ${{ steps.set-env-vars.outputs.ApiEndpoint }}
@@ -332,9 +319,6 @@ jobs:
             --parameter-overrides \
               ParameterKey=Env,ParameterValue=prod \
               ParameterKey=PipelineRole,ParameterValue=${PROD_PIPELINE_EXECUTION_ROLE} \
-              ParameterKey=SnsCognitoIamArn,ParameterValue=${AWS_SNS_COGNITO_IAM_ARN} \
-              ParameterKey=SnsCognitoIamExternalId,ParameterValue=${AWS_SNS_COGNITO_IAM_ROLE_EXTERNAL_ID} \
-              ParameterKey=SESDomainIdentityArn,ParameterValue=${AWS_SES_DOMAIN_IDENTITY_ARN} \
               ParameterKey=PushNotificationPublicKey,ParameterValue=${PUSH_NOTIFICATION_PUBLIC_KEY} \
               ParameterKey=PushNotificationPrivateKey,ParameterValue=${PUSH_NOTIFICATION_PRIVATE_KEY}
 
@@ -372,11 +356,11 @@ jobs:
       - name: Set environment variables
         working-directory: frontend
         run: |
-          echo "VITE_COGNITO_USER_POOL_ID=\"${{needs.deploy-prod-api.outputs.cognito-user-pool-id}}\"" >> .env.production
-          echo "VITE_COGNITO_CLIENT_ID=\"${{needs.deploy-prod-api.outputs.cognito-client-id}}\"" >> .env.production
           echo "VITE_BASE_URL=\"${{needs.deploy-prod-api.outputs.web-endpoint}}\"" >> .env.production
           echo "VITE_AUTH_URL=\"${{needs.deploy-prod-api.outputs.auth-endpoint}}\"" >> .env.production
           echo "VITE_API_URL=\"${{needs.deploy-prod-api.outputs.api-endpoint}}\"" >> .env.production
+          echo "VITE_CLERK_PUBLISHABLE_KEY=\"pk_test_Y2hhcm1lZC1ncmFja2xlLTgxLmNsZXJrLmFjY291bnRzLmRldiQ\"" >> .env.production
+        # TODO: Clerk Prod
       - name: Build frontend
         run: CI=true yarn build
       - name: Assume the prod pipeline user role
