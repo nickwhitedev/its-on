@@ -44,8 +44,7 @@ const subscribe = async (
     })
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-  const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
+  const userID = (event.requestContext.authorizer?.sub ?? '') as string
   let userInfo
   try {
     userInfo = await getUserInfo({ ddbDocClient, userID })
@@ -144,10 +143,8 @@ const subscribe = async (
                 Item: {
                   pk: `channel#${channelID}`,
                   sk: `subscriber#${userID}`,
-                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                  username:
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                    event.requestContext.authorizer?.claims.preferred_username,
+                  username: (event.requestContext.authorizer?.username ??
+                    '') as string,
                 } as IDynamoChannelSubscriber,
               },
             },

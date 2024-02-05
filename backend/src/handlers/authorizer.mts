@@ -63,9 +63,15 @@ export const handler: APIGatewayTokenAuthorizerHandler = async event => {
 
   // validate the incoming token
   // and produce the principal user identifier associated with the token
-  const claims = await verifyAccessToken(
-    event.authorizationToken.replace('Bearer ', ''),
-  )
+  let claims: JwtPayload
+  try {
+    claims = await verifyAccessToken(
+      event.authorizationToken.replace('Bearer ', ''),
+    )
+  } catch (error) {
+    console.error(error)
+    throw new Error('Unauthorized')
+  }
 
   const principalId = `user|${claims.sub ?? 'noid'}`
 
@@ -78,11 +84,12 @@ export const handler: APIGatewayTokenAuthorizerHandler = async event => {
     restApiId: apiGatewayArnSplit[0],
     stage: apiGatewayArnSplit[1],
   }
-  const method = apiGatewayArnSplit[2] as HttpVerb
-  let resource = '/' // root resource
-  if (apiGatewayArnSplit[3]) {
-    resource += apiGatewayArnSplit.slice(3, apiGatewayArnSplit.length).join('/')
-  }
+  //// Use for specific method - remember this gets cached - see tip below too
+  // const method = apiGatewayArnSplit[2] as HttpVerb
+  // let resource = '/' // root resource
+  // if (apiGatewayArnSplit[3]) {
+  //   resource += apiGatewayArnSplit.slice(3, apiGatewayArnSplit.length).join('/')
+  // }
 
   // this function must generate a policy that is associated with the recognized principal user identifier.
   // depending on your use case, you might store policies in a DB, or generate them on the fly
@@ -94,7 +101,7 @@ export const handler: APIGatewayTokenAuthorizerHandler = async event => {
 
   // the example policy below denies access to all resources in the RestApi
   // policy.denyAllMethods();
-  policy.allowMethod(method, resource)
+  policy.allowAllMethods()
 
   // finally, build the policy
   const authResponse = policy.build()
@@ -114,11 +121,14 @@ export const handler: APIGatewayTokenAuthorizerHandler = async event => {
 
 async function verifyAccessToken(accessToken: string): Promise<JwtPayload> {
   const jwksEndpoint = process.env.JWKS_ENDPOINT ?? ''
-  const secretKey = await new SecretsManagerClient({ region: 'REGION' }).send(
+  const secretKey = await new SecretsManagerClient({
+    region: 'us-east-1',
+  }).send(
     new GetSecretValueCommand({
       SecretId: process.env.CLERK_SECRET_KEY_NAME,
     }),
   )
+
   const requestHeaders = {
     Authorization: `Bearer ${secretKey.SecretString ?? ''}`,
   }
@@ -146,7 +156,7 @@ async function verifyAccessToken(accessToken: string): Promise<JwtPayload> {
     throw new Error('verifyAccessToken returned a string')
   }
   const now = Date.now()
-  if ((claims.exp ?? 0) < now || (claims.nbf ?? 0 > now)) {
+  if ((claims.exp ?? 0) * 1000 < now || (claims.nbf ?? 0 * 1000) > now) {
     throw new Error('Claim not valid - expired or early')
   }
 

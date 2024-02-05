@@ -31,9 +31,7 @@ const getOverview = async (
   }
 
   const eventPath = event.path
-  const userID =
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    (event.requestContext.authorizer?.claims?.sub as string | null) ?? ''
+  const userID = (event.requestContext.authorizer?.sub ?? '') as string
 
   try {
     const ddbResponse = await ddbDocClient.send(
@@ -60,10 +58,7 @@ const getOverview = async (
         notificationsEnabled: true,
         subscriptionCount: 0,
         tier: 5,
-        username:
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          (event.requestContext.authorizer?.claims.preferred_username ??
-            '') as string,
+        username: (event.requestContext.authorizer?.username ?? '') as string,
       }
       // Put a user profile item
       try {

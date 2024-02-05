@@ -34,8 +34,7 @@ const subscribeNotifications = async (
 
   const eventPath = event.path
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-  const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
+  const userID = (event.requestContext.authorizer?.sub ?? '') as string
 
   if (event.body == null) {
     return createResponse({
@@ -97,7 +96,7 @@ const subscribeNotifications = async (
         }),
       )
       logger.debug('Success - empty map added', {
-        ddbResopnse: ddbEmptyMapResponse,
+        ddbResponse: ddbEmptyMapResponse,
       })
 
       // ...then retry the updates
