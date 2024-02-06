@@ -1,5 +1,6 @@
 import './Home.css'
 
+import { useUser as useClerkUser } from '@clerk/clerk-react'
 import PullToRefresh from 'pulltorefreshjs'
 import { useCallback, useEffect, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
@@ -32,6 +33,7 @@ const Home = () => {
   const [hasOverviewError, setHasOverviewError] = useState<boolean>(false)
 
   const userContext = useUser()
+  const clerkUser = useClerkUser()
 
   const dispatchChannels = useChannelsDispatch()
   const dispatchSubscriptions = useSubscriptionsDispatch()
@@ -114,6 +116,18 @@ const Home = () => {
       void syncOverview()
     }
   }, [isLoading, syncOverview])
+
+  useEffect(() => {
+    const savedUsername = userContext?.username
+    const clerkUsername = clerkUser.user?.username
+    if (
+      savedUsername != null &&
+      clerkUsername != null &&
+      savedUsername !== clerkUsername
+    ) {
+      void fetchApi('/user', 'PUT', { username: clerkUsername })
+    }
+  }, [clerkUser.user?.username, fetchApi, userContext?.username])
 
   return (
     <>
