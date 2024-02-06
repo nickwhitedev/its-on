@@ -2,7 +2,6 @@ tmp
 .aws-sam
 samconfig.toml
 .DS_Store
-.vscode
 node_modules
 
 
