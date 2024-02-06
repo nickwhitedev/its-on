@@ -12,8 +12,8 @@ import { ChannelsDispatchActionType } from '../../contexts/channels/channelsRedu
 import { useErrorDispatch } from '../../contexts/error/errorContext'
 import { ErrorDispatchActionType } from '../../contexts/error/errorReducer'
 import { UserDispatchActionType } from '../../contexts/user/userReducer'
-import { fetchApi } from '../../utils/api'
-import { sendErrorLog } from '../../utils/logging'
+import { useFetchApi } from '../../utils/api'
+import { useSendLog } from '../../utils/logging'
 import ItsOnIcon from '../icons/ItsOnIcon'
 import MDDivider from '../material/MDDivider'
 import MDIcon from '../material/MDIcon'
@@ -30,6 +30,8 @@ const Channels = () => {
   const dispatchUser = useUserDispatch()
 
   const navigate = useNavigate()
+  const fetchApi = useFetchApi()
+  const sendLog = useSendLog()
 
   const [isCreating, setIsCreating] = useState<boolean>(false)
 
@@ -52,7 +54,7 @@ const Channels = () => {
       setIsCreating(false)
       navigate(`/${newChannel.id}`)
     } catch (error) {
-      await sendErrorLog('Channels create channel error', { error })
+      await sendLog('Channels create channel error', { error }, 'ERROR')
       dispatchError({
         type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
       })

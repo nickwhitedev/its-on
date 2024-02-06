@@ -12,10 +12,9 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@aws-amplify/ui-react": "^6.1.2",
+    "@clerk/clerk-react": "^4.30.3",
     "@lit/react": "^1.0.2",
     "@material/web": "^1.1.1",
-    "aws-amplify": "^6.0.13",
     "clientjs": "^0.2.1",
     "lit": "^3.1.0",
     "pulltorefreshjs": "^0.1.22",

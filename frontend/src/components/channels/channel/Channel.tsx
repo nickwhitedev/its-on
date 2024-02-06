@@ -24,9 +24,9 @@ import { useErrorDispatch } from '../../../contexts/error/errorContext'
 import { ErrorDispatchActionType } from '../../../contexts/error/errorReducer'
 import { SubscriptionsDispatchActionType } from '../../../contexts/subscriptions/subscriptionsReducer'
 import { UserDispatchActionType } from '../../../contexts/user/userReducer'
-import { fetchApi } from '../../../utils/api'
-import { sendErrorLog } from '../../../utils/logging'
-import { requestNotificationPermissions } from '../../../utils/notifications'
+import { useFetchApi } from '../../../utils/api'
+import { useSendLog } from '../../../utils/logging'
+import { useRequestNotificationPermissions } from '../../../utils/notifications'
 import { MS_IN_HOUR } from '../../../utils/time'
 import ItsOnIcon from '../../icons/ItsOnIcon'
 import MDDialog from '../../material/MDDialog'
@@ -48,6 +48,9 @@ interface Props {
 
 const Channel = ({ channelID }: Props) => {
   const navigate = useNavigate()
+  const fetchApi = useFetchApi()
+  const requestNotificationPermissions = useRequestNotificationPermissions()
+  const sendLog = useSendLog()
 
   const channels = useChannels()
   const subscriptions = useSubscriptions()
@@ -111,7 +114,7 @@ const Channel = ({ channelID }: Props) => {
         fetchedChannel = await fetchApi<IChannel>(`/${channelID}`)
       } catch (error) {
         fetchedChannel = null
-        await sendErrorLog('Fetch channel error', { error })
+        await sendLog('Fetch channel error', { error }, 'ERROR')
         dispatchError({
           type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
         })
@@ -147,7 +150,9 @@ const Channel = ({ channelID }: Props) => {
     dispatchChannels,
     dispatchError,
     dispatchSubscriptions,
+    fetchApi,
     isLoading,
+    sendLog,
     subscriptions,
     user?.tier,
   ])
@@ -193,7 +198,7 @@ const Channel = ({ channelID }: Props) => {
     try {
       await fetchApi(`/${channel.id}/its-on`, 'POST')
     } catch (error) {
-      await sendErrorLog("Channel it's on error", { error })
+      await sendLog("Channel it's on error", { error }, 'ERROR')
       dispatchError({
         type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
       })
@@ -236,7 +241,7 @@ const Channel = ({ channelID }: Props) => {
         },
       })
     } catch (error) {
-      await sendErrorLog('Channel update error', { error })
+      await sendLog('Channel update error', { error }, 'ERROR')
       dispatchError({
         type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
       })
@@ -258,7 +263,7 @@ const Channel = ({ channelID }: Props) => {
     try {
       await fetchApi(`/${channel.id}/its-off`, 'POST')
     } catch (error) {
-      await sendErrorLog("Channel it's off error", { error })
+      await sendLog("Channel it's off error", { error }, 'ERROR')
       dispatchError({
         type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
       })
@@ -290,7 +295,7 @@ const Channel = ({ channelID }: Props) => {
       })
       navigate('/channels')
     } catch (error) {
-      await sendErrorLog('Channel delete error', { error })
+      await sendLog('Channel delete error', { error }, 'ERROR')
       dispatchError({
         type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
       })
@@ -314,7 +319,7 @@ const Channel = ({ channelID }: Props) => {
         type: UserDispatchActionType.SUBSCRIPTION_COUNT_INCREASED,
       })
     } catch (error) {
-      await sendErrorLog('Channel subscribe error', { error })
+      await sendLog('Channel subscribe error', { error }, 'ERROR')
       dispatchError({
         type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
       })
@@ -342,7 +347,7 @@ const Channel = ({ channelID }: Props) => {
         type: UserDispatchActionType.SUBSCRIPTION_COUNT_DECREASED,
       })
     } catch (error) {
-      await sendErrorLog('Channel unsubscribe error', { error })
+      await sendLog('Channel unsubscribe error', { error }, 'ERROR')
       dispatchError({
         type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
       })

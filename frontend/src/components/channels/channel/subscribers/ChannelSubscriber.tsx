@@ -2,18 +2,18 @@ import './ChannelSubscriber.css'
 
 import { useEffect, useRef, useState } from 'react'
 
+import { MdIconButton } from '@material/web/iconbutton/icon-button'
+import { MdMenu } from '@material/web/menu/menu'
+import { useChannelsDispatch } from '../../../../contexts/channels/channelsContext'
 import { ChannelsDispatchActionType } from '../../../../contexts/channels/channelsReducer'
+import { useErrorDispatch } from '../../../../contexts/error/errorContext'
 import { ErrorDispatchActionType } from '../../../../contexts/error/errorReducer'
+import { useFetchApi } from '../../../../utils/api'
+import { useSendLog } from '../../../../utils/logging'
 import MDIcon from '../../../material/MDIcon'
 import MDIconButton from '../../../material/icon-button/MDIconButton'
 import MDMenu from '../../../material/menu/MDMenu'
 import MDMenuItem from '../../../material/menu/MDMenuItem'
-import { MdIconButton } from '@material/web/iconbutton/icon-button'
-import { MdMenu } from '@material/web/menu/menu'
-import { fetchApi } from '../../../../utils/api'
-import { sendErrorLog } from '../../../../utils/logging'
-import { useChannelsDispatch } from '../../../../contexts/channels/channelsContext'
-import { useErrorDispatch } from '../../../../contexts/error/errorContext'
 
 interface Props {
   channel: IChannel
@@ -22,6 +22,9 @@ interface Props {
 }
 
 const ChannelSubscriber = ({ channel, subscriber, setIsUpdating }: Props) => {
+  const fetchApi = useFetchApi()
+  const sendLog = useSendLog()
+
   const dispatchChannels = useChannelsDispatch()
   const dispatchError = useErrorDispatch()
 
@@ -64,7 +67,11 @@ const ChannelSubscriber = ({ channel, subscriber, setIsUpdating }: Props) => {
         },
       })
     } catch (error) {
-      await sendErrorLog('ChannelSubscriber remove subscriber error', { error })
+      await sendLog(
+        'ChannelSubscriber remove subscriber error',
+        { error },
+        'ERROR',
+      )
       dispatchError({ type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED })
     }
     // setIsConfirmingRemove(false)
@@ -73,10 +80,10 @@ const ChannelSubscriber = ({ channel, subscriber, setIsUpdating }: Props) => {
 
   return (
     <>
-      <div slot="supporting-text">{subscriber.username}</div>
+      <div slot='supporting-text'>{subscriber.username}</div>
       <MDIconButton
-        aria-label="More"
-        slot="end"
+        aria-label='More'
+        slot='end'
         ref={menuAnchorRef}
         onClick={() => {
           setIsMenuOpen(previousIsMenuOpen => !previousIsMenuOpen)
@@ -86,14 +93,14 @@ const ChannelSubscriber = ({ channel, subscriber, setIsUpdating }: Props) => {
       </MDIconButton>
       <MDMenu
         open={isMenuOpen}
-        positioning="fixed"
+        positioning='fixed'
         ref={menuRef}
         onClosed={() => {
           setIsMenuOpen(false)
         }}
       >
         <MDMenuItem
-          type="button"
+          type='button'
           onClick={() => void handleClickRemove()}
         >
           Remove

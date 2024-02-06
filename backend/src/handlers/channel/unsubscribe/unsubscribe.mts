@@ -38,8 +38,7 @@ const unsubscribe = async (
   const eventPath = event.path
 
   const channelID = event.pathParameters?.channelID ?? ''
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-  const userID: string = event.requestContext.authorizer?.claims?.sub ?? ''
+  const userID = (event.requestContext.authorizer?.sub ?? '') as string
 
   // get channel ownerID
   let channelOwnerID
