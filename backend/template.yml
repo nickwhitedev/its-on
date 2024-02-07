@@ -43,6 +43,11 @@ Globals:
             - IsProdEnv
             - ItsOnClerkSecretKey
             - ItsOnClerkDevSecretKey
+        CLERK_WEBHOOK_SECRET_NAME:
+          'Fn::If':
+            - IsProdEnv
+            - ItsOnClerkWebhookSecret
+            - ItsOnClerkDevWebhookSecret
         ITS_ON_TABLE: !Ref ItsOnTable
         JWKS_ENDPOINT: https://api.clerk.dev/v1/jwks
         POWERTOOLS_LOG_LEVEL:

@@ -7,6 +7,10 @@ import {
 import { Logger } from '@aws-lambda-powertools/logger'
 import { MetricUnits, Metrics } from '@aws-lambda-powertools/metrics'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import {
+  GetSecretValueCommand,
+  SecretsManagerClient,
+} from '@aws-sdk/client-secrets-manager'
 import { DeleteCommand, DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb'
 import { WebhookEvent } from '@clerk/clerk-sdk-node'
 import { Webhook } from 'svix'
@@ -33,9 +37,18 @@ const authWebhook = async (
   const eventPath = event.path
 
   // Check if the 'Signing Secret' from the Clerk Dashboard was correctly provided
-  const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET
-  if (!WEBHOOK_SECRET) {
-    throw new Error('You need a WEBHOOK_SECRET in your ')
+  const secretKey = await new SecretsManagerClient({
+    region: 'us-east-1',
+  }).send(
+    new GetSecretValueCommand({
+      SecretId: process.env.CLERK_WEBHOOK_SECRET_NAME,
+    }),
+  )
+
+  const webhookSecret = secretKey.SecretString ?? ''
+
+  if (!webhookSecret) {
+    throw new Error('Webhook secret not found')
   }
 
   // Grab the headers and body
@@ -59,15 +72,15 @@ const authWebhook = async (
   }
 
   // Initiate Svix
-  const wh = new Webhook(WEBHOOK_SECRET)
+  const webhook = new Webhook(webhookSecret)
 
-  let evt: WebhookEvent
+  let webhookEvent: WebhookEvent
 
   // Attempt to verify the incoming webhook
-  // If successful, the payload will be available from 'evt'
+  // If successful, the payload will be available from 'webhookEvent'
   // If the verification fails, error out and  return error code
   try {
-    evt = wh.verify(payload, {
+    webhookEvent = webhook.verify(payload, {
       'svix-id': svix_id,
       'svix-timestamp': svix_timestamp,
       'svix-signature': svix_signature,
@@ -81,10 +94,10 @@ const authWebhook = async (
     })
   }
 
-  const eventType = evt.type
+  const eventType = webhookEvent.type
 
   if (eventType === 'user.deleted') {
-    const { id, deleted } = evt.data
+    const { id, deleted } = webhookEvent.data
     if (deleted) {
       try {
         const ddbResponse = await ddbDocClient.send(
