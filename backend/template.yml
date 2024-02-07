@@ -576,6 +576,34 @@ Resources:
       RetentionInDays: 30
       LogGroupName: !Join ['', ['/aws/lambda/', !Ref postLogLambdaFunction]]
 
+  # This is a Lambda function config associated with the source code: auth-webhook.mts
+  authWebhookLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/src/handlers/auth-webhook/
+      Description: Handles auth webhook calls
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Auth:
+              Authorizer: NONE
+              OverrideApiAuth: true
+            RestApiId: !Ref ItsOnApi
+            Path: /auth-webhook
+            Method: POST
+      Handler: handler.handler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  authWebhookLambdaFunctionLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      RetentionInDays: 30
+      LogGroupName: !Join ['', ['/aws/lambda/', !Ref authWebhookLambdaFunction]]
+
   tableStreamLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
