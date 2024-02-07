@@ -602,6 +602,8 @@ Resources:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: arn:aws:secretsmanager:us-east-1:303579314896:secret:ItsOnClerkDevWebhookSecret-QudzJw
 
   authWebhookLambdaFunctionLogGroup:
     Type: 'AWS::Logs::LogGroup'
