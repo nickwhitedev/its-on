@@ -141,6 +141,7 @@ Resources:
       Handler: authorizer.handler
       Policies:
         - AWSSecretsManagerGetSecretValuePolicy:
+            # TODO: Add prod secret if prod env
             SecretArn: arn:aws:secretsmanager:us-east-1:303579314896:secret:ItsOnClerkDevSecretKey-esfdY8
 
   # This is a Lambda function config associated with the source code: get-overview.mts
@@ -603,6 +604,7 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
         - AWSSecretsManagerGetSecretValuePolicy:
+            # TODO: Add prod secret if prod env 
             SecretArn: arn:aws:secretsmanager:us-east-1:303579314896:secret:ItsOnClerkDevWebhookSecret-QudzJw
 
   authWebhookLambdaFunctionLogGroup:
