@@ -1,8 +1,4 @@
-import {
-  DeleteCommand,
-  DynamoDBDocumentClient,
-  UpdateCommand,
-} from '@aws-sdk/lib-dynamodb'
+import { DeleteCommand, DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb'
 import {
   APIGatewayProxyEvent,
   APIGatewayProxyResult,
@@ -51,34 +47,6 @@ const deleteChannel = async (
     logger.debug('Success - item deleted', { ddbResponse })
   } catch (error) {
     logger.error('Error', error as Error)
-    return createResponse({
-      eventPath,
-      responseBody: { message: 'Something went wrong' },
-      statusCode: 400,
-    })
-  }
-
-  try {
-    const ddbResponse = await ddbDocClient.send(
-      new UpdateCommand({
-        Key: {
-          pk: `user#${userID}`,
-          sk: `profile`,
-        },
-        ReturnValues: 'ALL_NEW',
-        TableName: DYNAMODB_TABLE_NAME,
-        UpdateExpression: 'ADD #channelCount :channelCount',
-        ExpressionAttributeNames: {
-          '#channelCount': 'channelCount',
-        },
-        ExpressionAttributeValues: {
-          ':channelCount': -1,
-        },
-      }),
-    )
-    logger.debug('Success - channel count updated', { ddbResponse })
-  } catch (error) {
-    logger.error('Update Error', error as Error)
     return createResponse({
       eventPath,
       responseBody: { message: 'Something went wrong' },

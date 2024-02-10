@@ -1,7 +1,6 @@
 import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
-  UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
 import {
   APIGatewayProxyEvent,
@@ -104,34 +103,6 @@ const removeChannelSubscriber = async (
     logger.debug('Success - user unsubscribed from channel', { ddbResponse })
   } catch (error) {
     logger.error('Error', error as Error)
-    return createResponse({
-      eventPath,
-      responseBody: { message: 'Something went wrong' },
-      statusCode: 400,
-    })
-  }
-
-  try {
-    const ddbResponse = await ddbDocClient.send(
-      new UpdateCommand({
-        Key: {
-          pk: `user#${userID}`,
-          sk: `channel#${channelID}`,
-        },
-        ReturnValues: 'ALL_NEW',
-        TableName: DYNAMODB_TABLE_NAME,
-        UpdateExpression: 'ADD #subscriberCount :subscriberCount',
-        ExpressionAttributeNames: {
-          '#subscriberCount': 'subscriberCount',
-        },
-        ExpressionAttributeValues: {
-          ':subscriberCount': -1,
-        },
-      }),
-    )
-    logger.debug('Success - subscriber count updated', { ddbResponse })
-  } catch (error) {
-    logger.error('Update Error', error as Error)
     return createResponse({
       eventPath,
       responseBody: { message: 'Something went wrong' },
