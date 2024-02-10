@@ -3,12 +3,14 @@ import {
   DynamoDBDocumentClient,
   QueryCommand,
   QueryCommandOutput,
+  UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
 
 import { Logger } from '@aws-lambda-powertools/logger'
 import { DynamoDBRecord } from 'aws-lambda'
+import { nanoid } from 'nanoid'
 import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
-import { batchWrite } from '/opt/nodejs/dynamo.mjs'
+import { batchWrite, getUserInfo } from '/opt/nodejs/dynamo.mjs'
 
 interface Params {
   record: DynamoDBRecord
@@ -21,9 +23,37 @@ export const handleChannelDeleted = async ({
   ddbDocClient,
   logger,
 }: Params) => {
+  const channelPK = record.dynamodb?.Keys?.pk?.S ?? ''
   const channelSK = record.dynamodb?.Keys?.sk?.S ?? ''
 
+  const ownerID = channelPK.substring(channelPK.indexOf('#') + 1)
   const channelID = channelSK.substring(channelSK.indexOf('#') + 1)
+
+  // Reduce channel owner's channel count (if user still exists)
+  if ((await getUserInfo({ ddbDocClient, userID: ownerID })) != null) {
+    try {
+      const ddbResponse = await ddbDocClient.send(
+        new UpdateCommand({
+          Key: {
+            pk: `user#${ownerID}`,
+            sk: `profile`,
+          },
+          ReturnValues: 'ALL_NEW',
+          TableName: DYNAMODB_TABLE_NAME,
+          UpdateExpression: 'ADD #channelCount :channelCount',
+          ExpressionAttributeNames: {
+            '#channelCount': 'channelCount',
+          },
+          ExpressionAttributeValues: {
+            ':channelCount': -1,
+          },
+        }),
+      )
+      logger.debug('Success - channel count updated', { ddbResponse })
+    } catch (error) {
+      logger.error('Channel count decrement error', error as Error)
+    }
+  }
 
   // Delete the public channel
   try {
@@ -90,10 +120,10 @@ export const handleChannelDeleted = async ({
                         duration: 0,
                         note: '',
                         lastOn: 0,
-                        owner: record.dynamodb?.OldImage?.owner?.S ?? '',
+                        owner: '',
                         pk: `user#${sk.substring(sk.indexOf('#') + 1)}`,
-                        sk: `subscription#${pk.substring(pk.indexOf('#') + 1)}`,
-                        title: record.dynamodb?.OldImage?.title?.S ?? '',
+                        sk: `subscription#${nanoid()}`,
+                        title: 'Removed',
                       } as IDynamoChannelItem,
                     },
                   },

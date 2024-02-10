@@ -3,6 +3,7 @@ import { Metrics } from '@aws-lambda-powertools/metrics'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb'
 import { Context, DynamoDBStreamEvent } from 'aws-lambda'
+import { handleInsertEvent } from './events/insert.mjs'
 import { handleModifyEvent } from './events/modify.mjs'
 import { handleRemoveEvent } from './events/remove.mjs'
 
@@ -19,6 +20,14 @@ const processTableStream = async (
 ) => {
   for (const record of event.Records) {
     switch (record.eventName) {
+      case 'INSERT': {
+        try {
+          await handleInsertEvent({ record, ddbDocClient, logger })
+        } catch (error) {
+          logger.error('Insert handler failed', error as Error)
+        }
+        break
+      }
       case 'MODIFY': {
         try {
           await handleModifyEvent({ record, ddbDocClient, logger, metrics })

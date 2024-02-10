@@ -3,6 +3,8 @@ import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb'
 import { Logger } from '@aws-lambda-powertools/logger'
 import { DynamoDBRecord } from 'aws-lambda'
 import { handleChannelDeleted } from '../channel/channel-deleted.mjs'
+import { handleChannelSubscriberDeleted } from '../channel/subscriber-deleted.mjs'
+import { handleSubscriptionDeleted } from '../user/subscription-deleted.mjs'
 import { handleUserDeleted } from '../user/user-deleted.mjs'
 
 interface Params {
@@ -24,5 +26,16 @@ export const handleRemoveEvent = async ({
     await handleChannelDeleted({ record, ddbDocClient, logger })
   } else if (pk.startsWith('user') && sk === 'profile') {
     await handleUserDeleted({ record, ddbDocClient, logger })
+  } else if (pk.startsWith('user') && sk.startsWith('subscription')) {
+    await handleSubscriptionDeleted({ record, ddbDocClient, logger })
+  } else if (pk.startsWith('channel') && sk.startsWith('subscriber')) {
+    await handleChannelSubscriberDeleted({ record, ddbDocClient, logger })
   }
 }
+;`
+what do i have here? Whats my idea? its the counts. I want to keep track of the counts with dynamodb streams. 
+Which counts do I have? 
+- channel subscribers (channel#id, subscriber#id) insert and delete
+- channels (user#id, channel#id) insert and delete
+- subscriptions (user#id, subscription#id) insert and delete
+`

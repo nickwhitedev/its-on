@@ -1,7 +1,6 @@
 import {
   BatchWriteCommand,
   DynamoDBDocumentClient,
-  UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
 import {
   APIGatewayProxyEvent,
@@ -155,63 +154,6 @@ const subscribe = async (
     logger.debug('Success - items added or updated', { ddbResponse })
   } catch (error) {
     logger.error('Batch Write Error', error as Error)
-    return createResponse({
-      eventPath,
-      responseBody: { message: 'Something went wrong' },
-      statusCode: 400,
-    })
-  }
-
-  updateSubscriberCount: try {
-    if (channelAttributes.ownerID == null) break updateSubscriberCount
-    const ddbResponse = await ddbDocClient.send(
-      new UpdateCommand({
-        Key: {
-          pk: `user#${channelAttributes.ownerID}`,
-          sk: `channel#${channelID}`,
-        },
-        ReturnValues: 'ALL_NEW',
-        TableName: DYNAMODB_TABLE_NAME,
-        UpdateExpression: 'ADD #subscriberCount :subscriberCount',
-        ExpressionAttributeNames: {
-          '#subscriberCount': 'subscriberCount',
-        },
-        ExpressionAttributeValues: {
-          ':subscriberCount': 1,
-        },
-      }),
-    )
-    logger.debug('Success - subscriber count updated', { ddbResponse })
-  } catch (error) {
-    logger.error('Update Error', error as Error)
-    return createResponse({
-      eventPath,
-      responseBody: { message: 'Something went wrong' },
-      statusCode: 400,
-    })
-  }
-
-  try {
-    const ddbResponse = await ddbDocClient.send(
-      new UpdateCommand({
-        Key: {
-          pk: `user#${userID}`,
-          sk: `profile`,
-        },
-        ReturnValues: 'ALL_NEW',
-        TableName: DYNAMODB_TABLE_NAME,
-        UpdateExpression: 'ADD #subscriptionCount :subscriptionCount',
-        ExpressionAttributeNames: {
-          '#subscriptionCount': 'subscriptionCount',
-        },
-        ExpressionAttributeValues: {
-          ':subscriptionCount': 1,
-        },
-      }),
-    )
-    logger.debug('Success - subscription count updated', { ddbResponse })
-  } catch (error) {
-    logger.error('Update Error', error as Error)
     return createResponse({
       eventPath,
       responseBody: { message: 'Something went wrong' },
