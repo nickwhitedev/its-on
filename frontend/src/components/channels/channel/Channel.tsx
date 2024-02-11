@@ -373,7 +373,7 @@ const Channel = ({ channelID }: Props) => {
       {userIsChannelOwner ? (
         <>
           <button
-            aria-label={isOn ? 'Turn off channel' : 'Turn on channel'}
+            aria-label='Turn on channel'
             className={`Channel-button ${isOn ? 'on' : ''}`}
             disabled={isEditing || isUpdating}
             onClick={() => void handleClickItsOn()}
