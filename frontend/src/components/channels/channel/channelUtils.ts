@@ -34,3 +34,6 @@ export const channelsSorter = (
   }
   return (channelB.lastUpdated ?? 0) - (channelA.lastUpdated ?? 0)
 }
+
+export const channelDisplayTitle = (channel: IChannel): string =>
+  channel.title == null || channel.title === '' ? 'Untitled' : channel.title

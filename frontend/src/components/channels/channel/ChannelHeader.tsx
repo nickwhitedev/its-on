@@ -1,11 +1,11 @@
 import './ChannelHeader.css'
 
-import { useState } from 'react'
-import { baseUrl } from '../../../utils/urls'
 import ItsOnIcon from '../../icons/ItsOnIcon'
 import MDIcon from '../../material/MDIcon'
 import MDIconButton from '../../material/icon-button/MDIconButton'
 import MDOutlinedTextField from '../../material/text-field/MDOutlinedTextField'
+import ShareChannelButton from './ShareChannelButton'
+import { channelDisplayTitle } from './channelUtils'
 
 interface Props {
   channel: IChannel
@@ -32,24 +32,6 @@ const ChannelHeader = ({
   onResetFormState,
   setIsEditing,
 }: Props) => {
-  const [channelCopied, setChannelCopied] = useState<boolean>(false)
-
-  const channelDisplayTitle = channel.title === '' ? 'Untitled' : channel.title
-
-  const handleClickShareChannel = async () => {
-    const channelURL = `${baseUrl}/${channel.id}`
-    try {
-      await navigator.share({
-        title: `It's On - ${channelDisplayTitle}`,
-        text: `Check out the channel, ${channelDisplayTitle}, by ${channel.owner}`,
-        url: channelURL,
-      })
-    } catch (error) {
-      await navigator.clipboard.writeText(channelURL)
-      setChannelCopied(true)
-    }
-  }
-
   return (
     <div className={`ChannelHeader ${userIsChannelOwner ? 'editable' : ''}`}>
       <div className='ChannelHeader-edit'>
@@ -93,7 +75,7 @@ const ChannelHeader = ({
         <MDOutlinedTextField
           className={'ChannelHeader-input'}
           disabled={isUpdating}
-          label='Channel Title'
+          label='Title'
           maxLength={40}
           rows={1}
           type='textarea'
@@ -106,7 +88,9 @@ const ChannelHeader = ({
         />
       ) : (
         <div className='ChannelHeader-title'>
-          <h2 className='ChannelHeader-title'>{channelDisplayTitle}</h2>
+          <h2 className='ChannelHeader-title'>
+            {channelDisplayTitle(channel)}
+          </h2>
           {userIsChannelOwner ? null : (
             <span className='secondary-text'>by {channel.owner}</span>
           )}
@@ -124,25 +108,11 @@ const ChannelHeader = ({
             </MDIconButton>
           </div>
         ) : (
-          <div className='ChannelHeader-share-wrapper'>
-            <MDIconButton
-              aria-label='Share'
-              disabled={isUpdating}
-              onClick={() => void handleClickShareChannel()}
-              onBlur={() => {
-                setChannelCopied(false)
-              }}
-            >
-              <MDIcon>share</MDIcon>
-            </MDIconButton>
-            <span
-              className={`ChannelHeader-copied secondary-text ${
-                channelCopied ? '' : 'hidden'
-              }`}
-            >
-              Copied!
-            </span>
-          </div>
+          <ShareChannelButton
+            channel={channel}
+            isUpdating={isUpdating}
+            size='small'
+          />
         )}
       </div>
     </div>

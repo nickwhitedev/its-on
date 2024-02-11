@@ -85,24 +85,3 @@
   display: flex;
   justify-content: space-between;
 }
-
-.ChannelHeader-share-wrapper {
-  align-items: center;
-  display: flex;
-  justify-content: center;
-  flex-flow: column nowrap;
-  position: relative;
-}
-
-.ChannelHeader-copied {
-  cursor: default;
-  font-size: 0.7rem;
-  margin-top: 0.2rem;
-  transition: all 0.2s ease-in-out;
-  user-select: none;
-  position: absolute;
-  top: 40px;
-}
-.ChannelHeader-copied.hidden {
-  color: rgba(0, 0, 0, 0);
-}
