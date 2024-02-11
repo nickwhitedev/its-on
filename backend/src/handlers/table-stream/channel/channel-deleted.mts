@@ -79,11 +79,12 @@ export const handleChannelDeleted = async ({
       const ddbResponse: QueryCommandOutput = await ddbDocClient.send(
         new QueryCommand({
           TableName: DYNAMODB_TABLE_NAME,
-          KeyConditionExpression: 'pk = :pkval',
-          ExpressionAttributeValues: { ':pkval': `channel#${channelID}` },
-          ...(lastEvaluatedKey != null
-            ? { ExclusiveStartKey: lastEvaluatedKey }
-            : {}),
+          KeyConditionExpression:
+            'pk = :pkvalue and begins_with(sk, :skprefix)',
+          ExpressionAttributeValues: {
+            ':pkvalue': `channel#${channelID}`,
+            ':skprefix': 'subscriber',
+          },
         }),
       )
       subscribers = ddbResponse.Items as IDynamoChannelSubscriber[] | null
@@ -105,6 +106,7 @@ export const handleChannelDeleted = async ({
             RequestItems: {
               [DYNAMODB_TABLE_NAME]: subscriberChunk.flatMap(({ pk, sk }) => {
                 return [
+                  // Delete pk=channel sk=subscriber copy
                   {
                     DeleteRequest: {
                       Key: {
@@ -113,6 +115,16 @@ export const handleChannelDeleted = async ({
                       },
                     },
                   },
+                  // Delete pk=user sk=subscription copy
+                  {
+                    DeleteRequest: {
+                      Key: {
+                        pk: `user#${sk.substring(sk.indexOf('#') + 1)}`,
+                        sk: `subscription#${pk.substring(pk.indexOf('#') + 1)}`,
+                      },
+                    },
+                  },
+                  // Create 'Removed' placeholder pk=user sk=subscription copy
                   {
                     PutRequest: {
                       Item: {
