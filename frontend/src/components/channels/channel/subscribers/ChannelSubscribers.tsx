@@ -2,14 +2,15 @@ import './ChannelSubscribers.css'
 
 import React, { useState } from 'react'
 
-import ChannelSubscriber from './ChannelSubscriber'
-import { DEFAULT_USER_TIER } from '../channelUtils'
-import MDCircularProgress from '../../../material/progress/MDCircularProgress'
+import { useUser } from '../../../../contexts/user/userContext'
 import MDDivider from '../../../material/MDDivider'
 import MDList from '../../../material/list/MDList'
 import MDListItem from '../../../material/list/MDListItem'
+import MDCircularProgress from '../../../material/progress/MDCircularProgress'
 import MDOutlinedTextField from '../../../material/text-field/MDOutlinedTextField'
-import { useUser } from '../../../../contexts/user/userContext'
+import ShareChannelButton from '../ShareChannelButton'
+import { DEFAULT_USER_TIER } from '../channelUtils'
+import ChannelSubscriber from './ChannelSubscriber'
 
 interface Props {
   currentCapacity: number
@@ -53,11 +54,11 @@ const ChannelSubscribers = ({
   }
 
   return (
-    <div className="ChannelSubscribers">
-      <MDList className="ChannelSubscribers-list">
+    <div className='ChannelSubscribers'>
+      <MDList className='ChannelSubscribers-list'>
         <MDListItem>
-          <div slot="headline">Subscribers</div>
-          <div slot="trailing-supporting-text">
+          <div slot='headline'>Subscribers</div>
+          <div slot='trailing-supporting-text'>
             {subscriberCount}
             {channel.capacity == null ? null : (
               <>
@@ -70,8 +71,8 @@ const ChannelSubscribers = ({
                     error={Number(newCapacity) > userTier}
                     max={`${userTier}`}
                     min={`${subscriberCount}`}
-                    step="1"
-                    type="number"
+                    step='1'
+                    type='number'
                     value={newCapacity}
                     onInput={event => {
                       setNewCapacity(
@@ -95,7 +96,7 @@ const ChannelSubscribers = ({
         {isLoading ? (
           <>
             <MDDivider inset />
-            <MDListItem>
+            <MDListItem className='ChannelSubscribers-spinner-container'>
               <MDCircularProgress indeterminate />
             </MDListItem>
           </>
@@ -103,7 +104,7 @@ const ChannelSubscribers = ({
           channel.subscribers?.map(subscriber => (
             <React.Fragment key={subscriber.id}>
               <MDDivider inset />
-              <MDListItem className="ChannelSubscriber-list-item">
+              <MDListItem className='ChannelSubscriber-list-item'>
                 <ChannelSubscriber
                   channel={channel}
                   subscriber={subscriber}
@@ -116,7 +117,14 @@ const ChannelSubscribers = ({
           <>
             <MDDivider inset />
             <MDListItem>
-              Share your channel to let people know it&apos;s on!
+              Share your channel to let people know when it&apos;s on!
+            </MDListItem>
+            <MDListItem>
+              <ShareChannelButton
+                channel={channel}
+                isUpdating={isUpdating}
+                size='large'
+              />
             </MDListItem>
           </>
         )}

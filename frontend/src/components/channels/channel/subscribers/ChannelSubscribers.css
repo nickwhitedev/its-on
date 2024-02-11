@@ -23,3 +23,9 @@
 .ChannelSubscribers-list-item {
   position: relative;
 }
+
+.ChannelSubscribers-spinner-container {
+  display: flex;
+  padding-top: 1rem;
+  text-align: center;
+}

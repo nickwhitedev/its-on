@@ -26,7 +26,7 @@ const ChannelNote = ({
         <MDOutlinedTextField
           className={'ChannelNote-input'}
           disabled={isUpdating}
-          label='Channel Note'
+          label='Note'
           maxLength={200}
           placeholder="Let's meet at my place"
           rows={4}
