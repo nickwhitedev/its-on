@@ -12,7 +12,7 @@
     "@aws-sdk/lib-dynamodb": "^3.502.0",
     "@clerk/clerk-sdk-node": "^4.13.8",
     "@middy/core": "^5.2.3",
-    "esbuild": "^0.19.11",
+    "esbuild": "^0.20.0",
     "jsonwebtoken": "^9.0.2",
     "jwks-rsa": "^3.1.0",
     "nanoid": "^5.0.4",
