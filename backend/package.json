@@ -7,7 +7,7 @@
   "dependencies": {
     "@aws-lambda-powertools/logger": "^1.18.0",
     "@aws-lambda-powertools/metrics": "^1.18.0",
-    "@aws-sdk/client-dynamodb": "^3.502.0",
+    "@aws-sdk/client-dynamodb": "^3.511.0",
     "@aws-sdk/client-secrets-manager": "^3.504.0",
     "@aws-sdk/lib-dynamodb": "^3.502.0",
     "@clerk/clerk-sdk-node": "^4.13.8",
