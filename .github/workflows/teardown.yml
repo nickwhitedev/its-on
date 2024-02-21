@@ -3,8 +3,8 @@ name: Teardown
 on: delete
 
 env:
-  GITHUB_ACTION_ROLE: arn:aws:iam::992382488292:role/GithubActionRole
   AWS_REGION: us-east-1
+  TESTING_PIPELINE_EXECUTION_ROLE: arn:aws:iam::992382488292:role/aws-sam-cli-managed-dev-pipel-PipelineExecutionRole-fAuX9MNwbZ4E
 
 permissions:
   id-token: write
@@ -18,7 +18,7 @@ jobs:
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
-          role-to-assume: ${{ env.GITHUB_ACTION_ROLE }}
+          role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
           role-session-name: destroy-frontend
           aws-region: ${{ env.AWS_REGION }}
       - name: echo ref
@@ -52,7 +52,7 @@ jobs:
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
-          role-to-assume: ${{ env.GITHUB_ACTION_ROLE }}
+          role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
           role-session-name: destroy-api
           aws-region: ${{ env.AWS_REGION }}
 

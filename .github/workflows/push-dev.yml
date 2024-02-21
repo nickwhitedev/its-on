@@ -10,11 +10,12 @@ env:
   AWS_SES_DOMAIN_IDENTITY_ARN: ${{ secrets.AWS_SES_DOMAIN_IDENTITY_ARN }}
   CLERK_PUBLIC_KEY: pk_test_Y2hhcm1lZC1ncmFja2xlLTgxLmNsZXJrLmFjY291bnRzLmRldiQ
   DEV_STACK_NAME: its-on-dev
-  GITHUB_ACTION_ROLE: arn:aws:iam::992382488292:role/GithubActionRole
   PUSH_NOTIFICATION_PUBLIC_KEY: ${{ secrets.PUSH_NOTIFICATION_PUBLIC_KEY }}
   PUSH_NOTIFICATION_PRIVATE_KEY: ${{ secrets.PUSH_NOTIFICATION_PRIVATE_KEY }}
   SAM_TEMPLATE: template.yml
   TESTING_ARTIFACTS_BUCKET: its-on-testing-artifacts
+  TESTING_CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::992382488292:role/aws-sam-cli-managed-dev-p-CloudFormationExecutionRo-DoShwApzYF47
+  TESTING_PIPELINE_EXECUTION_ROLE: arn:aws:iam::992382488292:role/aws-sam-cli-managed-dev-pipel-PipelineExecutionRole-fAuX9MNwbZ4E
 
 permissions:
   id-token: write
@@ -146,14 +147,14 @@ jobs:
             --use-container \
             --parameter-overrides \
               ParameterKey=Env,ParameterValue=dev \
-              ParameterKey=PipelineRole,ParameterValue=${GITHUB_ACTION_ROLE} \
+              ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE} \
               ParameterKey=PushNotificationPublicKey,ParameterValue=${PUSH_NOTIFICATION_PUBLIC_KEY} \
               ParameterKey=PushNotificationPrivateKey,ParameterValue=${PUSH_NOTIFICATION_PRIVATE_KEY}
 
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
-          role-to-assume: ${{ env.GITHUB_ACTION_ROLE }}
+          role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
           role-session-name: dev-packaging
           aws-region: ${{ env.AWS_REGION }}
 
@@ -194,7 +195,7 @@ jobs:
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
-          role-to-assume: ${{ env.GITHUB_ACTION_ROLE }}
+          role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
           role-session-name: deploy-dev-api
           aws-region: ${{ env.AWS_REGION }}
 
@@ -210,7 +211,7 @@ jobs:
             --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE} \
             --parameter-overrides \
               ParameterKey=Env,ParameterValue=dev \
-              ParameterKey=PipelineRole,ParameterValue=${GITHUB_ACTION_ROLE} \
+              ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE} \
               ParameterKey=PushNotificationPublicKey,ParameterValue=${PUSH_NOTIFICATION_PUBLIC_KEY} \
               ParameterKey=PushNotificationPrivateKey,ParameterValue=${PUSH_NOTIFICATION_PRIVATE_KEY}
 
@@ -258,7 +259,7 @@ jobs:
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
-          role-to-assume: ${{ env.GITHUB_ACTION_ROLE }}
+          role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
           role-session-name: deploy-dev-frontend
           aws-region: ${{ env.AWS_REGION }}
 
