@@ -7,8 +7,7 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  # TODO: Use prod clerk key
-  CLERK_PUBLIC_KEY: pk_test_Y2hhcm1lZC1ncmFja2xlLTgxLmNsZXJrLmFjY291bnRzLmRldiQ
+  CLERK_PUBLIC_KEY: pk_live_Y2xlcmsuaXRzb24uZnlpJA
   PROD_STACK_NAME: its-on-prod
   PROD_ARTIFACTS_BUCKET: its-on-prod-artifacts
   PROD_CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::992382488292:role/aws-sam-cli-managed-prod--CloudFormationExecutionRo-5LY7VkKQdvm7
@@ -338,7 +337,6 @@ jobs:
           echo "VITE_AUTH_URL=\"${{ needs.deploy-prod-api.outputs.auth-endpoint }}\"" >> .env.production
           echo "VITE_API_URL=\"${{ needs.deploy-prod-api.outputs.api-endpoint }}\"" >> .env.production
           echo "VITE_CLERK_PUBLISHABLE_KEY=\"${{ env.CLERK_PUBLIC_KEY }}\"" >> .env.production
-        # TODO: Clerk Prod
       - name: Build frontend
         run: CI=true yarn build
       - name: Assume the prod pipeline user role

@@ -19,7 +19,6 @@ const Splash = () => {
         <MDRipple />
         <ItsOnIcon className='Splash-button-image' />
       </button>
-      <h2>Coming Soon</h2>
       <p>
         It&apos;s On is an app for spontaneous low-key invites to your social
         circles for any activity.
