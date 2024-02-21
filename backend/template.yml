@@ -97,7 +97,7 @@ Resources:
             FunctionArn: !GetAtt ItsOnAuthFunction.Arn
         DefaultAuthorizer: ItsOnLambdaTokenAuthorizer
       Domain:
-        CertificateArn: arn:aws:acm:us-east-1:992382488292:certificate/3cc2935e-caff-495e-a325-39ed3ea15a9c
+        CertificateArn: arn:aws:acm:us-east-1:992382488292:certificate/197d9b24-eb88-4153-b506-f5816e4868c7
         DomainName:
           'Fn::If':
             - IsProdEnv
