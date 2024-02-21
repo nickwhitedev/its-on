@@ -6,21 +6,19 @@ on:
       - 'dev'
 
 env:
+  AWS_REGION: us-east-1
   AWS_SES_DOMAIN_IDENTITY_ARN: ${{ secrets.AWS_SES_DOMAIN_IDENTITY_ARN }}
-  PIPELINE_USER_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  PIPELINE_USER_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  CLERK_PUBLIC_KEY: pk_test_Y2hhcm1lZC1ncmFja2xlLTgxLmNsZXJrLmFjY291bnRzLmRldiQ
+  DEV_STACK_NAME: its-on-dev
+  GITHUB_ACTION_ROLE: arn:aws:iam::992382488292:role/GithubActionRole
   PUSH_NOTIFICATION_PUBLIC_KEY: ${{ secrets.PUSH_NOTIFICATION_PUBLIC_KEY }}
   PUSH_NOTIFICATION_PRIVATE_KEY: ${{ secrets.PUSH_NOTIFICATION_PRIVATE_KEY }}
   SAM_TEMPLATE: template.yml
-  DEV_STACK_NAME: its-on-dev
-  TESTING_PIPELINE_EXECUTION_ROLE: arn:aws:iam::303579314896:role/aws-sam-cli-managed-dev-pipe-PipelineExecutionRole-1EXGMRU8M7PIU
-  TESTING_CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::303579314896:role/aws-sam-cli-managed-dev-p-CloudFormationExecutionR-13FN6CKHSS9UA
-  TESTING_ARTIFACTS_BUCKET: aws-sam-cli-managed-dev-pipeline-artifactsbucket-1awxr7qt59hmv
-  # If there are functions with "Image" PackageType in your template,
-  # uncomment the line below and add "--image-repository ${TESTING_IMAGE_REPOSITORY}" to
-  # testing "sam package" and "sam deploy" commands.
-  # TESTING_IMAGE_REPOSITORY = '0123456789.dkr.ecr.region.amazonaws.com/repository-name'
-  TESTING_REGION: us-east-1
+  TESTING_ARTIFACTS_BUCKET: its-on-testing-artifacts
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   test-backend:
@@ -148,26 +146,22 @@ jobs:
             --use-container \
             --parameter-overrides \
               ParameterKey=Env,ParameterValue=dev \
-              ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE} \
+              ParameterKey=PipelineRole,ParameterValue=${GITHUB_ACTION_ROLE} \
               ParameterKey=PushNotificationPublicKey,ParameterValue=${PUSH_NOTIFICATION_PUBLIC_KEY} \
               ParameterKey=PushNotificationPrivateKey,ParameterValue=${PUSH_NOTIFICATION_PRIVATE_KEY}
 
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
-          aws-access-key-id: ${{ env.PIPELINE_USER_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.TESTING_REGION }}
-          role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
+          role-to-assume: ${{ env.GITHUB_ACTION_ROLE }}
           role-session-name: dev-packaging
-          role-duration-seconds: 3600
-          role-skip-session-tagging: true
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Upload artifacts to testing artifact buckets
         run: |
           sam package \
             --s3-bucket ${TESTING_ARTIFACTS_BUCKET} \
-            --region ${TESTING_REGION} \
+            --region ${AWS_REGION} \
             --output-template-file packaged-dev.yml
 
       - uses: actions/upload-artifact@v4
@@ -200,13 +194,9 @@ jobs:
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
-          aws-access-key-id: ${{ env.PIPELINE_USER_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.TESTING_REGION }}
-          role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
+          role-to-assume: ${{ env.GITHUB_ACTION_ROLE }}
           role-session-name: deploy-dev-api
-          role-duration-seconds: 3600
-          role-skip-session-tagging: true
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Deploy to testing account
         run: |
@@ -214,13 +204,13 @@ jobs:
             --stack-name ${DEV_STACK_NAME} \
             --template packaged-dev.yml \
             --capabilities CAPABILITY_IAM \
-            --region ${TESTING_REGION} \
+            --region ${AWS_REGION} \
             --s3-bucket ${TESTING_ARTIFACTS_BUCKET} \
             --no-fail-on-empty-changeset \
             --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE} \
             --parameter-overrides \
               ParameterKey=Env,ParameterValue=dev \
-              ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE} \
+              ParameterKey=PipelineRole,ParameterValue=${GITHUB_ACTION_ROLE} \
               ParameterKey=PushNotificationPublicKey,ParameterValue=${PUSH_NOTIFICATION_PUBLIC_KEY} \
               ParameterKey=PushNotificationPrivateKey,ParameterValue=${PUSH_NOTIFICATION_PRIVATE_KEY}
 
@@ -258,23 +248,19 @@ jobs:
       - name: Set environment variables
         working-directory: frontend
         run: |
-          echo "VITE_BASE_URL=\"${{needs.deploy-dev-api.outputs.web-endpoint}}\"" >> .env.production
-          echo "VITE_AUTH_URL=\"${{needs.deploy-dev-api.outputs.auth-endpoint}}\"" >> .env.production
-          echo "VITE_API_URL=\"${{needs.deploy-dev-api.outputs.api-endpoint}}\"" >> .env.production
-          echo "VITE_CLERK_PUBLISHABLE_KEY=\"pk_test_Y2hhcm1lZC1ncmFja2xlLTgxLmNsZXJrLmFjY291bnRzLmRldiQ\"" >> .env.production
+          echo "VITE_BASE_URL=\"${{ needs.deploy-dev-api.outputs.web-endpoint }}\"" >> .env.production
+          echo "VITE_AUTH_URL=\"${{ needs.deploy-dev-api.outputs.auth-endpoint }}\"" >> .env.production
+          echo "VITE_API_URL=\"${{ needs.deploy-dev-api.outputs.api-endpoint }}\"" >> .env.production
+          echo "VITE_CLERK_PUBLISHABLE_KEY=\"${{ env.CLERK_PUBLIC_KEY }}\"" >> .env.production
       - name: Build frontend
         run: CI=true yarn build
 
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
-          aws-access-key-id: ${{ env.PIPELINE_USER_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.TESTING_REGION }}
-          role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
+          role-to-assume: ${{ env.GITHUB_ACTION_ROLE }}
           role-session-name: deploy-dev-frontend
-          role-duration-seconds: 3600
-          role-skip-session-tagging: true
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Clear frontend bucket
         run: |
