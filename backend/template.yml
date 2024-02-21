@@ -97,7 +97,7 @@ Resources:
             FunctionArn: !GetAtt ItsOnAuthFunction.Arn
         DefaultAuthorizer: ItsOnLambdaTokenAuthorizer
       Domain:
-        CertificateArn: arn:aws:acm:us-east-1:303579314896:certificate/89fd3c8f-9ccb-479e-b61a-36987061371e
+        CertificateArn: arn:aws:acm:us-east-1:992382488292:certificate/3cc2935e-caff-495e-a325-39ed3ea15a9c
         DomainName:
           'Fn::If':
             - IsProdEnv
@@ -142,7 +142,7 @@ Resources:
       Policies:
         - AWSSecretsManagerGetSecretValuePolicy:
             # TODO: Add prod secret if prod env
-            SecretArn: arn:aws:secretsmanager:us-east-1:303579314896:secret:ItsOnClerkDevSecretKey-esfdY8
+            SecretArn: arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnClerkDevSecretKey-jZLzk2
 
   # This is a Lambda function config associated with the source code: get-overview.mts
   getOverviewLambdaFunction:
@@ -605,7 +605,7 @@ Resources:
             TableName: !Ref ItsOnTable
         - AWSSecretsManagerGetSecretValuePolicy:
             # TODO: Add prod secret if prod env 
-            SecretArn: arn:aws:secretsmanager:us-east-1:303579314896:secret:ItsOnClerkDevWebhookSecret-QudzJw
+            SecretArn: arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnClerkDevWebhookSecret-kasu1B
 
   authWebhookLambdaFunctionLogGroup:
     Type: 'AWS::Logs::LogGroup'
@@ -752,7 +752,7 @@ Resources:
           ViewerProtocolPolicy: redirect-to-https
         PriceClass: PriceClass_All
         ViewerCertificate:
-          AcmCertificateArn: arn:aws:acm:us-east-1:303579314896:certificate/89fd3c8f-9ccb-479e-b61a-36987061371e
+          AcmCertificateArn: arn:aws:acm:us-east-1:992382488292:certificate/3cc2935e-caff-495e-a325-39ed3ea15a9c
           SslSupportMethod: sni-only
 
   ItsOnFrontendBucketPolicy:
