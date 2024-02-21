@@ -62,5 +62,5 @@ jobs:
         run: |
           sam delete \
             --stack-name its-on-$(echo ${BRANCH_NAME##*/} | tr -cd '[a-zA-Z0-9-]') \
-            --region ${TESTING_REGION} \
+            --region ${AWS_REGION} \
             --no-prompts
