@@ -752,7 +752,7 @@ Resources:
           ViewerProtocolPolicy: redirect-to-https
         PriceClass: PriceClass_All
         ViewerCertificate:
-          AcmCertificateArn: arn:aws:acm:us-east-1:992382488292:certificate/3cc2935e-caff-495e-a325-39ed3ea15a9c
+          AcmCertificateArn: arn:aws:acm:us-east-1:992382488292:certificate/197d9b24-eb88-4153-b506-f5816e4868c7
           SslSupportMethod: sni-only
 
   ItsOnFrontendBucketPolicy:
