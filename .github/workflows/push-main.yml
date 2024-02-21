@@ -7,7 +7,6 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  AWS_SES_DOMAIN_IDENTITY_ARN: ${{ secrets.AWS_SES_DOMAIN_IDENTITY_ARN }}
   # TODO: Use prod clerk key
   CLERK_PUBLIC_KEY: pk_test_Y2hhcm1lZC1ncmFja2xlLTgxLmNsZXJrLmFjY291bnRzLmRldiQ
   PROD_STACK_NAME: its-on-prod
