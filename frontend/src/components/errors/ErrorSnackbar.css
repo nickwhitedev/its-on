@@ -1,0 +1,20 @@
+.ErrorSnackbar {
+  align-items: center;
+  background-color: var(--md-sys-color-inverse-surface);
+  border-radius: 12px;
+  bottom: 2rem;
+  color: var(--md-sys-color-inverse-on-surface);
+  display: flex;
+  font-size: 0.75rem;
+  justify-content: space-between;
+  padding: 0.1rem 0.5rem;
+  position: fixed;
+  width: 20rem;
+  max-width: 90%;
+  min-width: 50%;
+  z-index: 100;
+}
+
+.ErrorSnackbar-close-button {
+  --_icon-color: var(--md-sys-color-inverse-on-surface);
+}

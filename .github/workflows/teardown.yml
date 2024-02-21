@@ -1,0 +1,66 @@
+name: Teardown
+
+on: delete
+
+env:
+  AWS_REGION: us-east-1
+  TESTING_PIPELINE_EXECUTION_ROLE: arn:aws:iam::992382488292:role/aws-sam-cli-managed-dev-pipel-PipelineExecutionRole-fAuX9MNwbZ4E
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  destroy-frontend:
+    if: (startsWith(github.event.ref, 'feature') || startsWith(github.event.ref, 'release')) && github.event_name == 'delete' && github.event.ref_type == 'branch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Assume the testing pipeline user role
+        uses: aws-actions/configure-aws-credentials@v4.0.2
+        with:
+          role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
+          role-session-name: destroy-frontend
+          aws-region: ${{ env.AWS_REGION }}
+      - name: echo ref
+        env:
+          BRANCH_NAME: ${{ github.event.ref }}
+        run: echo ${BRANCH_NAME##*/}
+      - name: Clear frontend bucket
+        env:
+          BRANCH_NAME: ${{ github.event.ref }}
+        run: |
+          aws s3 rm s3://$(echo ${BRANCH_NAME##*/} | tr -cd '[a-zA-Z0-9-]').itson.fyi --recursive
+      - name: Remove s3 bucket
+        env:
+          BRANCH_NAME: ${{ github.event.ref }}
+        run: |
+          aws s3 rb s3://$(echo ${BRANCH_NAME##*/} | tr -cd '[a-zA-Z0-9-]').itson.fyi
+
+  destroy-api:
+    if: (startsWith(github.event.ref, 'feature') || startsWith(github.event.ref, 'release')) && github.event_name == 'delete' && github.event.ref_type == 'branch'
+    needs: [destroy-frontend]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
+
+      - name: Assume the testing pipeline user role
+        uses: aws-actions/configure-aws-credentials@v4.0.2
+        with:
+          role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
+          role-session-name: destroy-api
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Delete api stack
+        env:
+          BRANCH_NAME: ${{ github.event.ref }}
+        run: |
+          sam delete \
+            --stack-name its-on-$(echo ${BRANCH_NAME##*/} | tr -cd '[a-zA-Z0-9-]') \
+            --region ${AWS_REGION} \
+            --no-prompts

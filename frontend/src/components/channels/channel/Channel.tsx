@@ -1,0 +1,553 @@
+import './Channel.css'
+
+import { useEffect, useState } from 'react'
+import Countdown, { zeroPad } from 'react-countdown'
+import {
+  useChannels,
+  useChannelsDispatch,
+} from '../../../contexts/channels/channelsContext'
+import {
+  useSubscriptions,
+  useSubscriptionsDispatch,
+} from '../../../contexts/subscriptions/subscriptionsContext'
+import { useUser, useUserDispatch } from '../../../contexts/user/userContext'
+import {
+  DEFAULT_USER_TIER,
+  channelOnExpirationTime,
+  durationOptions,
+  isChannelOn,
+} from './channelUtils'
+
+import { useNavigate } from 'react-router-dom'
+import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
+import { useErrorDispatch } from '../../../contexts/error/errorContext'
+import { ErrorDispatchActionType } from '../../../contexts/error/errorReducer'
+import { SubscriptionsDispatchActionType } from '../../../contexts/subscriptions/subscriptionsReducer'
+import { UserDispatchActionType } from '../../../contexts/user/userReducer'
+import { useFetchApi } from '../../../utils/api'
+import { useSendLog } from '../../../utils/logging'
+import { useRequestNotificationPermissions } from '../../../utils/notifications'
+import { MS_IN_HOUR } from '../../../utils/time'
+import ItsOnIcon from '../../icons/ItsOnIcon'
+import MDDialog from '../../material/MDDialog'
+import MDIcon from '../../material/MDIcon'
+import MDRipple from '../../material/MDRipple'
+import MDFilledButton from '../../material/button/MDFilledButton'
+import MDFilledTonalButton from '../../material/button/MDFilledTonalButton'
+import MDTextButton from '../../material/button/MDTextButton'
+import MDCircularProgress from '../../material/progress/MDCircularProgress'
+import MDOutlinedSelect from '../../material/select/MDOutlinedSelect'
+import MDSelectOption from '../../material/select/MDSelectOption'
+import ChannelHeader from './ChannelHeader'
+import ChannelNote from './ChannelNote'
+import ChannelSubscribers from './subscribers/ChannelSubscribers'
+
+interface Props {
+  channelID: string
+}
+
+const Channel = ({ channelID }: Props) => {
+  const navigate = useNavigate()
+  const fetchApi = useFetchApi()
+  const requestNotificationPermissions = useRequestNotificationPermissions()
+  const sendLog = useSendLog()
+
+  const channels = useChannels()
+  const subscriptions = useSubscriptions()
+  const user = useUser()
+
+  const dispatchChannels = useChannelsDispatch()
+  const dispatchError = useErrorDispatch()
+  const dispatchSubscriptions = useSubscriptionsDispatch()
+  const dispatchUser = useUserDispatch()
+
+  const prefetchedChannel =
+    channels.find(chan => chan.id === channelID) ??
+    subscriptions.find(chan => chan.id === channelID) ??
+    null
+
+  const [channel, setChannel] = useState<IChannel | null>(prefetchedChannel)
+
+  const userIsChannelOwner = channels.some(ch => ch.id === channelID)
+
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [isEditing, setIsEditing] = useState<boolean>(
+    userIsChannelOwner && !channel?.title,
+  )
+  const [isUpdating, setIsUpdating] = useState<boolean>(false)
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState<boolean>(false)
+
+  const [currentCapacity, setCurrentCapacity] = useState<number>(
+    user?.tier ?? DEFAULT_USER_TIER,
+  )
+  const [currentDuration, setCurrentDuration] = useState<number>(
+    channel?.duration ?? MS_IN_HOUR,
+  )
+  const [currentNote, setCurrentNote] = useState<string>(channel?.note ?? '')
+  const [currentTitle, setCurrentTitle] = useState<string>(channel?.title ?? '')
+
+  const [isOn, setIsOn] = useState<boolean>(false)
+  const expirationTime = channel == null ? 0 : channelOnExpirationTime(channel)
+
+  const isChannelFull =
+    (channel?.subscriberCount ?? 0) >= (channel?.capacity ?? DEFAULT_USER_TIER)
+
+  const userHasMaxSubscriptions =
+    (user?.subscriptionCount ?? 0) >= (user?.tier ?? DEFAULT_USER_TIER)
+
+  const channelIsOn = channel != null && isChannelOn(channel)
+
+  useEffect(() => {
+    // Set page title
+    document.title = channel?.title ?? "It's On"
+    return () => {
+      document.title = "It's On"
+    }
+  }, [channel])
+
+  useEffect(() => {
+    // fetch channel
+    if (!isLoading) return
+    void (async () => {
+      let fetchedChannel: IChannel | null
+      try {
+        fetchedChannel = await fetchApi<IChannel>(`/${channelID}`)
+      } catch (error) {
+        fetchedChannel = null
+        await sendLog('Fetch channel error', { error }, 'ERROR')
+        dispatchError({
+          type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
+        })
+      }
+      if (fetchedChannel != null && channelID in channels) {
+        // User owns channel
+        dispatchChannels({
+          type: ChannelsDispatchActionType.CHANGED,
+          channel: fetchedChannel,
+        })
+      } else if (fetchedChannel != null && channelID in subscriptions) {
+        // User is subscribed to the channel
+        dispatchSubscriptions({
+          type: SubscriptionsDispatchActionType.CHANGED,
+          channel: fetchedChannel,
+        })
+      } else {
+        // Channel doesn't exist or is a public channel
+        setChannel(fetchedChannel)
+        setCurrentCapacity(user?.tier ?? DEFAULT_USER_TIER)
+        setCurrentDuration(channel?.duration ?? MS_IN_HOUR)
+        setCurrentNote(channel?.note ?? '')
+        setCurrentTitle(channel?.title ?? '')
+      }
+      setIsLoading(false)
+    })()
+  }, [
+    channel?.duration,
+    channel?.note,
+    channel?.title,
+    channelID,
+    channels,
+    dispatchChannels,
+    dispatchError,
+    dispatchSubscriptions,
+    fetchApi,
+    isLoading,
+    sendLog,
+    subscriptions,
+    user?.tier,
+  ])
+
+  useEffect(() => {
+    // Sync state with context
+    setChannel(
+      channels.find(chan => chan.id === channelID) ??
+        subscriptions.find(chan => chan.id === channelID) ??
+        null,
+    )
+  }, [channelID, channels, subscriptions])
+
+  useEffect(() => {
+    setIsOn(channelIsOn)
+  }, [channelIsOn])
+
+  if (channel == null) {
+    return isLoading ? (
+      <MDCircularProgress
+        className='Channel-loading'
+        indeterminate
+      />
+    ) : (
+      <h4>Channel not found</h4>
+    )
+  }
+
+  const handleClickItsOn = async () => {
+    if (isOn) {
+      return
+    }
+    dispatchChannels({
+      type: ChannelsDispatchActionType.CHANGED,
+      channel: {
+        ...channel,
+        canceled: false,
+        lastOn: Date.now(),
+        lastOnDuration: channel.duration,
+        lastUpdated: Date.now(),
+      },
+    })
+    try {
+      await fetchApi(`/${channel.id}/its-on`, 'POST')
+    } catch (error) {
+      await sendLog("Channel it's on error", { error }, 'ERROR')
+      dispatchError({
+        type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
+      })
+      dispatchChannels({
+        type: ChannelsDispatchActionType.CHANGED,
+        channel: {
+          ...channel,
+          canceled: false,
+          lastOn: 0,
+          lastOnDuration: channel.duration,
+          lastUpdated: Date.now(),
+        },
+      })
+    }
+  }
+
+  const handleResetFormState = () => {
+    setCurrentCapacity(user?.tier ?? DEFAULT_USER_TIER)
+    setCurrentDuration(channel.duration ?? MS_IN_HOUR)
+    setCurrentNote(channel.note ?? '')
+    setCurrentTitle(channel.title ?? '')
+  }
+
+  const handleSaveUpdates = async () => {
+    setIsUpdating(true)
+
+    try {
+      const channelUpdates = {
+        capacity: currentCapacity,
+        duration: currentDuration,
+        note: currentNote,
+        title: currentTitle,
+      }
+      await fetchApi(`/${channel.id}`, 'PUT', channelUpdates)
+      dispatchChannels({
+        type: ChannelsDispatchActionType.CHANGED,
+        channel: {
+          ...channel,
+          ...channelUpdates,
+        },
+      })
+    } catch (error) {
+      await sendLog('Channel update error', { error }, 'ERROR')
+      dispatchError({
+        type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
+      })
+    }
+
+    setIsUpdating(false)
+    setIsEditing(false)
+  }
+
+  const handleClickCallOff = async () => {
+    dispatchChannels({
+      type: ChannelsDispatchActionType.CHANGED,
+      channel: {
+        ...channel,
+        canceled: true,
+        lastUpdated: Date.now(),
+      },
+    })
+    try {
+      await fetchApi(`/${channel.id}/its-off`, 'POST')
+    } catch (error) {
+      await sendLog("Channel it's off error", { error }, 'ERROR')
+      dispatchError({
+        type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
+      })
+      dispatchChannels({
+        type: ChannelsDispatchActionType.CHANGED,
+        channel: {
+          ...channel,
+          canceled: false,
+          lastUpdated: Date.now(),
+        },
+      })
+    }
+  }
+
+  const handleClickDelete = () => {
+    setIsConfirmingDelete(true)
+  }
+
+  const handleConfirmDelete = async () => {
+    setIsUpdating(true)
+    try {
+      await fetchApi(`/${channel.id}`, 'DELETE')
+      dispatchChannels({
+        type: ChannelsDispatchActionType.DELETED,
+        id: channel.id,
+      })
+      dispatchUser({
+        type: UserDispatchActionType.CHANNEL_COUNT_DECREASED,
+      })
+      navigate('/channels')
+    } catch (error) {
+      await sendLog('Channel delete error', { error }, 'ERROR')
+      dispatchError({
+        type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
+      })
+    }
+    setIsConfirmingDelete(false)
+    setIsUpdating(false)
+  }
+
+  const handleClickSubscribe = async () => {
+    setIsUpdating(true)
+    try {
+      const { channel: subscribedChannel } = await fetchApi<{
+        message: string
+        channel: IChannel
+      }>(`/${channel.id}/subscribe`, 'POST')
+      dispatchSubscriptions({
+        type: SubscriptionsDispatchActionType.ADDED,
+        channel: subscribedChannel,
+      })
+      dispatchUser({
+        type: UserDispatchActionType.SUBSCRIPTION_COUNT_INCREASED,
+      })
+    } catch (error) {
+      await sendLog('Channel subscribe error', { error }, 'ERROR')
+      dispatchError({
+        type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
+      })
+    }
+    setIsUpdating(false)
+    setIsLoading(true)
+
+    if (user?.notificationsEnabled ?? true) {
+      await requestNotificationPermissions({
+        registeredNotificationSubscriptions:
+          user?.notificationSubscriptions ?? {},
+      })
+    }
+  }
+
+  const handleClickUnsubscribe = async () => {
+    setIsUpdating(true)
+    try {
+      await fetchApi(`/${channel.id}/unsubscribe`, 'POST')
+      dispatchSubscriptions({
+        type: SubscriptionsDispatchActionType.DELETED,
+        id: channel.id,
+      })
+      dispatchUser({
+        type: UserDispatchActionType.SUBSCRIPTION_COUNT_DECREASED,
+      })
+    } catch (error) {
+      await sendLog('Channel unsubscribe error', { error }, 'ERROR')
+      dispatchError({
+        type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
+      })
+    }
+    setIsUpdating(false)
+    setIsLoading(true)
+  }
+
+  return (
+    <div className='Channel'>
+      <ChannelHeader
+        channel={channel}
+        isEditing={isEditing}
+        isUpdating={isUpdating}
+        isOn={isOn}
+        currentTitle={currentTitle}
+        userIsChannelOwner={userIsChannelOwner}
+        onResetFormState={handleResetFormState}
+        onSaveUpdates={handleSaveUpdates}
+        onChangeCurrentTitle={setCurrentTitle}
+        setIsEditing={setIsEditing}
+      />
+      {userIsChannelOwner ? (
+        <>
+          <button
+            aria-label='Turn on channel'
+            className={`Channel-button ${isOn ? 'on' : ''}`}
+            disabled={isEditing || isUpdating}
+            onClick={() => void handleClickItsOn()}
+          >
+            <MDRipple />
+            <ItsOnIcon className='Channel-button-image' />
+          </button>
+          <div className='Channel-duration-display'>
+            {isEditing ? (
+              <MDOutlinedSelect
+                className='Channel-select'
+                value={`${currentDuration}`}
+                onChange={(event: Event) => {
+                  const newDuration = Number(
+                    (event.target as EventTarget & HTMLSelectElement).value,
+                  )
+                  if (isNaN(newDuration)) return
+                  setCurrentDuration(newDuration)
+                }}
+              >
+                {durationOptions.map(durationOption => (
+                  <MDSelectOption
+                    disabled={isUpdating}
+                    key={durationOption.value}
+                    selected={durationOption.value === currentDuration}
+                    value={`${durationOption.value}`}
+                  >
+                    <div slot='headline'>{durationOption.displayName}</div>
+                  </MDSelectOption>
+                ))}
+              </MDOutlinedSelect>
+            ) : isOn ? (
+              <>
+                <Countdown
+                  date={expirationTime}
+                  renderer={({ hours, minutes, seconds }) => (
+                    <span>
+                      {hours > 0 ? `${zeroPad(hours)}:` : null}
+                      {minutes > 0 ? `${zeroPad(minutes)}:` : null}
+                      {zeroPad(seconds)}
+                    </span>
+                  )}
+                  onComplete={() => {
+                    setIsOn(false)
+                  }}
+                />
+                <MDFilledTonalButton onClick={() => void handleClickCallOff()}>
+                  Call it off
+                </MDFilledTonalButton>
+              </>
+            ) : (
+              <div>
+                {durationOptions.find(
+                  durationOption => durationOption.value === channel.duration,
+                )?.displayName ?? '1 Hour'}
+              </div>
+            )}
+          </div>
+          <ChannelNote
+            channel={channel}
+            isEditing={isEditing}
+            isUpdating={isUpdating}
+            currentNote={currentNote}
+            userIsChannelOwner={userIsChannelOwner}
+            onChangeCurrentNote={setCurrentNote}
+          />
+          <ChannelSubscribers
+            currentCapacity={currentCapacity}
+            channel={channel}
+            isEditing={isEditing}
+            isLoading={isLoading}
+            isUpdating={isUpdating}
+            onChangeCurrentCapacity={setCurrentCapacity}
+            setIsUpdating={setIsUpdating}
+          />
+          <div className='Channel-delete-section'>
+            <MDTextButton
+              aria-label='Delete channel'
+              className='Channel-button-delete'
+              disabled={isUpdating}
+              hasIcon
+              onClick={() => {
+                handleClickDelete()
+              }}
+            >
+              <MDIcon slot='icon'>delete</MDIcon> Delete
+            </MDTextButton>
+            <MDDialog open={isConfirmingDelete}>
+              <div slot='headline'>Delete Channel</div>
+              <div
+                className='Channel-delete-confirmation-content'
+                slot='content'
+              >
+                This channel
+                {channel.title === '' || channel.title == null
+                  ? ' '
+                  : `, ${channel.title}, `}
+                will be deleted forever. Are you sure?
+              </div>
+              <div slot='actions'>
+                <MDTextButton
+                  disabled={isUpdating}
+                  onClick={() => {
+                    setIsConfirmingDelete(false)
+                  }}
+                >
+                  Cancel
+                </MDTextButton>
+                <MDTextButton
+                  className='Channel-button-delete'
+                  disabled={isUpdating}
+                  onClick={() => void handleConfirmDelete()}
+                >
+                  Delete
+                </MDTextButton>
+              </div>
+            </MDDialog>
+          </div>
+        </>
+      ) : subscriptions.some(chan => chan.id === channel.id) &&
+        channel.deleted !== true ? (
+        <>
+          {isOn ? (
+            <div className='Channel-duration-display'>
+              <Countdown
+                date={expirationTime}
+                renderer={({ hours, minutes, seconds }) => (
+                  <span>
+                    {hours > 0 ? `${zeroPad(hours)}:` : null}
+                    {minutes > 0 ? `${zeroPad(minutes)}:` : null}
+                    {zeroPad(seconds)}
+                  </span>
+                )}
+                onComplete={() => {
+                  setIsOn(false)
+                }}
+              />
+            </div>
+          ) : null}
+          <ChannelNote
+            channel={channel}
+            isEditing={isEditing}
+            isUpdating={isUpdating}
+            currentNote={currentNote}
+            userIsChannelOwner={userIsChannelOwner}
+            onChangeCurrentNote={setCurrentNote}
+          />
+          <MDFilledTonalButton
+            className='Channel-subscribe-button'
+            disabled={isUpdating}
+            onClick={() => void handleClickUnsubscribe()}
+          >
+            Unsubscribe
+          </MDFilledTonalButton>
+        </>
+      ) : (
+        <>
+          <MDFilledButton
+            className='Channel-subscribe-button'
+            disabled={isUpdating || isChannelFull || userHasMaxSubscriptions}
+            onClick={() => void handleClickSubscribe()}
+          >
+            {isChannelFull ? 'Channel Full' : 'Subscribe'}
+          </MDFilledButton>
+          {userHasMaxSubscriptions ? (
+            <>
+              <p>Subscription limit reached</p>
+              <p>Unsubscribe from another channel to subscribe to a new one</p>
+            </>
+          ) : null}
+        </>
+      )}
+    </div>
+  )
+}
+
+export default Channel

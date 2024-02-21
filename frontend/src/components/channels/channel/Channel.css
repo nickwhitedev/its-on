@@ -1,0 +1,99 @@
+.Channel {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+  width: 20rem;
+  max-width: 90%;
+  min-width: 30%;
+}
+
+.Channel-button {
+  background-color: transparent;
+  border-radius: 50%;
+  padding: 0;
+  position: relative;
+  margin-bottom: 1.8rem;
+  font: inherit;
+  outline: inherit;
+  height: 60vh;
+  width: 60vh;
+  max-height: 80vw;
+  max-width: 80vw;
+  transition: background-color 0.5s ease-out;
+}
+
+.Channel-button.on {
+  background-color: rgba(24, 216, 255, 0.7);
+  color: inherit;
+  box-shadow: 0px 0px 25px 25px rgba(45, 216, 255, 0.7);
+  animation: pulsate 8s ease-out infinite;
+}
+
+.Channel-delete-section {
+  margin-bottom: 1.8rem;
+}
+
+.Channel-button-delete {
+  --md-sys-color-primary: var(--md-sys-color-error);
+}
+
+.Channel-delete-confirmation-content {
+  text-align: left;
+}
+
+.Channel-subscribe-button {
+  margin-bottom: 1.8rem;
+}
+
+@keyframes pulsate {
+  0% {
+    box-shadow: 0 0 0 0 rgba(24, 216, 255, 0.3);
+  }
+  30% {
+    box-shadow: 0 0 25px 25px rgba(24, 216, 255, 0.3);
+  }
+  70% {
+    box-shadow: 0 0 0 0 rgba(24, 216, 255, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(24, 216, 255, 0.3);
+  }
+}
+
+@-webkit-keyframes pulsate {
+  0% {
+    box-shadow: 0 0 0 0 rgba(24, 216, 255, 0.3);
+  }
+  30% {
+    box-shadow: 0 0 25px 25px rgba(24, 216, 255, 0.3);
+  }
+  70% {
+    box-shadow: 0 0 0 0 rgba(24, 216, 255, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(24, 216, 255, 0.3);
+  }
+}
+
+.Channel-button-image {
+  height: 60vh;
+  width: 60vh;
+  max-height: 80vw;
+  max-width: 80vw;
+}
+
+.Channel-select,
+.Channel-select md-select-option {
+  min-width: 10rem;
+}
+
+.Channel-duration-display {
+  display: flex;
+  flex-flow: column nowrap;
+  font-size: 1.5rem;
+}
+
+.Channel-duration-display > * {
+  margin-bottom: 1.8rem;
+}

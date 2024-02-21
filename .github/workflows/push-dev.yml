@@ -1,0 +1,272 @@
+name: Push Dev
+
+on:
+  push:
+    branches:
+      - 'dev'
+
+env:
+  AWS_REGION: us-east-1
+  CLERK_PUBLIC_KEY: pk_test_Y2hhcm1lZC1ncmFja2xlLTgxLmNsZXJrLmFjY291bnRzLmRldiQ
+  DEV_STACK_NAME: its-on-dev
+  PUSH_NOTIFICATION_PUBLIC_KEY: ${{ secrets.PUSH_NOTIFICATION_PUBLIC_KEY }}
+  PUSH_NOTIFICATION_PRIVATE_KEY: ${{ secrets.PUSH_NOTIFICATION_PRIVATE_KEY }}
+  SAM_TEMPLATE: template.yml
+  TESTING_ARTIFACTS_BUCKET: its-on-testing-artifacts
+  TESTING_CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::992382488292:role/aws-sam-cli-managed-dev-p-CloudFormationExecutionRo-DoShwApzYF47
+  TESTING_PIPELINE_EXECUTION_ROLE: arn:aws:iam::992382488292:role/aws-sam-cli-managed-dev-pipel-PipelineExecutionRole-fAuX9MNwbZ4E
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  test-backend:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      - run: yarn test-ci
+
+  lint-backend:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      - run: yarn lint
+
+  compile-backend:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      - run: yarn compile
+
+  test-frontend:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      - run: CI=true yarn test
+
+  lint-frontend:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      - run: yarn lint
+
+  compile-frontend:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      - run: tsc
+
+  build-and-package-dev-api:
+    if: github.ref == 'refs/heads/dev'
+    needs:
+      [
+        test-backend,
+        lint-backend,
+        compile-backend,
+        test-frontend,
+        lint-frontend,
+        compile-frontend,
+      ]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+      - uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
+      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      # Remove all unit tests to reduce the size of the package that will be ultimately uploaded to Lambda
+      - run: rm -rf ./__tests__
+      - run: yarn compile
+      - name: Build resources
+        run: |
+          yarn build \
+            --template ${SAM_TEMPLATE} \
+            --use-container \
+            --parameter-overrides \
+              ParameterKey=Env,ParameterValue=dev \
+              ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE} \
+              ParameterKey=PushNotificationPublicKey,ParameterValue=${PUSH_NOTIFICATION_PUBLIC_KEY} \
+              ParameterKey=PushNotificationPrivateKey,ParameterValue=${PUSH_NOTIFICATION_PRIVATE_KEY}
+
+      - name: Assume the testing pipeline user role
+        uses: aws-actions/configure-aws-credentials@v4.0.2
+        with:
+          role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
+          role-session-name: dev-packaging
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Upload artifacts to testing artifact buckets
+        run: |
+          sam package \
+            --s3-bucket ${TESTING_ARTIFACTS_BUCKET} \
+            --region ${AWS_REGION} \
+            --output-template-file packaged-dev.yml
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: packaged-dev.yml
+          path: backend/packaged-dev.yml
+          if-no-files-found: error
+
+  deploy-dev-api:
+    if: github.ref == 'refs/heads/dev'
+    needs: [build-and-package-dev-api]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    outputs:
+      web-endpoint: ${{ steps.set-env-vars.outputs.WebEndpoint }}
+      auth-endpoint: ${{ steps.set-env-vars.outputs.AuthEndpoint }}
+      api-endpoint: ${{ steps.set-env-vars.outputs.ApiEndpoint }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: packaged-dev.yml
+          path: backend
+
+      - name: Assume the testing pipeline user role
+        uses: aws-actions/configure-aws-credentials@v4.0.2
+        with:
+          role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
+          role-session-name: deploy-dev-api
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy to testing account
+        run: |
+          sam deploy \
+            --stack-name ${DEV_STACK_NAME} \
+            --template packaged-dev.yml \
+            --capabilities CAPABILITY_IAM \
+            --region ${AWS_REGION} \
+            --s3-bucket ${TESTING_ARTIFACTS_BUCKET} \
+            --no-fail-on-empty-changeset \
+            --role-arn ${TESTING_CLOUDFORMATION_EXECUTION_ROLE} \
+            --parameter-overrides \
+              ParameterKey=Env,ParameterValue=dev \
+              ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE} \
+              ParameterKey=PushNotificationPublicKey,ParameterValue=${PUSH_NOTIFICATION_PUBLIC_KEY} \
+              ParameterKey=PushNotificationPrivateKey,ParameterValue=${PUSH_NOTIFICATION_PRIVATE_KEY}
+
+      - name: Get stack outputs
+        id: set-env-vars
+        shell: bash
+        run: |
+          aws cloudformation describe-stacks \
+            --region us-east-1 \
+            --stack-name ${DEV_STACK_NAME} \
+            --output json \
+            --query \
+              'Stacks[0].Outputs' | \
+              jq -cr '.[] | "\(.OutputKey)=\(.OutputValue)"' | \
+              while read i; do
+                echo $i
+                echo $i >> "$GITHUB_OUTPUT"
+              done
+
+  deploy-dev-frontend:
+    if: github.ref == 'refs/heads/dev'
+    needs: [deploy-dev-api]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+      - name: Install dependencies
+        run: rm -rf node_modules && yarn install --frozen-lockfile
+      - name: Set environment variables
+        working-directory: frontend
+        run: |
+          echo "VITE_BASE_URL=\"${{ needs.deploy-dev-api.outputs.web-endpoint }}\"" >> .env.production
+          echo "VITE_AUTH_URL=\"${{ needs.deploy-dev-api.outputs.auth-endpoint }}\"" >> .env.production
+          echo "VITE_API_URL=\"${{ needs.deploy-dev-api.outputs.api-endpoint }}\"" >> .env.production
+          echo "VITE_CLERK_PUBLISHABLE_KEY=\"${{ env.CLERK_PUBLIC_KEY }}\"" >> .env.production
+      - name: Build frontend
+        run: CI=true yarn build
+
+      - name: Assume the testing pipeline user role
+        uses: aws-actions/configure-aws-credentials@v4.0.2
+        with:
+          role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
+          role-session-name: deploy-dev-frontend
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Clear frontend bucket
+        run: |
+          aws s3 rm s3://dev.itson.fyi --recursive
+      - name: Deploy frontend
+        run: |
+          aws s3 cp dist \
+            s3://dev.itson.fyi \
+            --recursive

@@ -1,0 +1,842 @@
+# This is the SAM template that represents the architecture of your serverless application
+# https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-template-basics.html
+
+# The AWSTemplateFormatVersion identifies the capabilities of the template
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/format-version-structure.html
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  its-on
+
+# Transform section specifies one or more macros that AWS CloudFormation uses to process your template
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Parameters:
+  Env:
+    Type: String
+    Default: local
+    Description: Environment name - used to populate stack names and subdomains
+  PipelineRole:
+    Type: String
+  PushNotificationPublicKey:
+    Type: String
+  PushNotificationPrivateKey:
+    Type: String
+
+Conditions:
+  IsProdEnv: !Equals [!Ref Env, prod]
+
+# Mappings:
+# If you're trying to refactor the urls here,
+# conditions don't work in the mappings section.
+# Just ask Bard.
+
+Globals:
+  Function:
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        CLERK_SECRET_KEY_NAME:
+          'Fn::If':
+            - IsProdEnv
+            - ItsOnClerkSecretKey
+            - ItsOnClerkDevSecretKey
+        CLERK_WEBHOOK_SECRET_NAME:
+          'Fn::If':
+            - IsProdEnv
+            - ItsOnClerkWebhookSecret
+            - ItsOnClerkDevWebhookSecret
+        ITS_ON_TABLE: !Ref ItsOnTable
+        JWKS_ENDPOINT: https://api.clerk.dev/v1/jwks
+        POWERTOOLS_LOG_LEVEL:
+          'Fn::If':
+            - IsProdEnv
+            - INFO
+            - DEBUG
+        POWERTOOLS_LOGGER_LOG_EVENT:
+          'Fn::If':
+            - IsProdEnv
+            - false
+            - true
+        POWERTOOLS_LOGGER_SAMPLE_RATE: 0.05
+        POWERTOOLS_METRICS_NAMESPACE: its-on
+        PUSH_NOTIFICATION_PUBLIC_KEY: !Ref PushNotificationPublicKey
+        PUSH_NOTIFICATION_PRIVATE_KEY: !Ref PushNotificationPrivateKey
+        WEB_URL:
+          'Fn::If':
+            - IsProdEnv
+            - https://itson.fyi
+            - !Sub https://${Env}.itson.fyi
+    Layers:
+      - !Ref ItsOnNodeModulesLambdaLayer
+      - !Ref ItsOnCommonLambdaLayer
+    MemorySize: 128
+    Runtime: nodejs20.x
+    Timeout: 100
+
+# Resources declares the AWS resources that you want to include in the stack
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
+Resources:
+  #Backend Resources
+  ItsOnApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref Env
+      Cors:
+        AllowCredentials: false
+        AllowHeaders: "'Authorization,*'"
+        AllowMethods: "'OPTIONS,POST,GET,PUT,DELETE'"
+        AllowOrigin: "'*'"
+        MaxAge: 600
+      Auth:
+        AddDefaultAuthorizerToCorsPreflight: false
+        Authorizers:
+          ItsOnLambdaTokenAuthorizer:
+            FunctionArn: !GetAtt ItsOnAuthFunction.Arn
+        DefaultAuthorizer: ItsOnLambdaTokenAuthorizer
+      Domain:
+        CertificateArn: arn:aws:acm:us-east-1:992382488292:certificate/197d9b24-eb88-4153-b506-f5816e4868c7
+        DomainName:
+          'Fn::If':
+            - IsProdEnv
+            - api.itson.fyi
+            - !Sub ${Env}.api.itson.fyi
+        Route53:
+          EvaluateTargetHealth: true
+          HostedZoneId: Z04756481IJC552VNI712
+      GatewayResponses:
+        DEFAULT_4XX:
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Origin: "'*'"
+        DEFAULT_5XX:
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Origin: "'*'"
+
+  ItsOnNodeModulesLambdaLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: node-modules
+      ContentUri: dist/node-modules-layer/
+      CompatibleRuntimes:
+        - nodejs20.x
+  ItsOnCommonLambdaLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: common
+      ContentUri: dist/common-layer/
+      CompatibleRuntimes:
+        - nodejs20.x
+
+  # Each Lambda function is defined by properties:
+  # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+
+  ItsOnAuthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/src/handlers/
+      Handler: authorizer.handler
+      Policies:
+        - AWSSecretsManagerGetSecretValuePolicy:
+            # TODO: Add prod secret if prod env
+            SecretArn: arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnClerkDevSecretKey-jZLzk2
+
+  # This is a Lambda function config associated with the source code: get-overview.mts
+  getOverviewLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/src/handlers/get-overview/
+      Description: Gets all of a user's data.
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ItsOnApi
+            Path: /
+            Method: GET
+      Handler: handler.handler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  getOverviewLambdaFunctionLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      RetentionInDays: 30
+      LogGroupName: !Join ['', ['/aws/lambda/', !Ref getOverviewLambdaFunction]]
+
+  # This is a Lambda function config associated with the source code: get-channel.mts
+  getChannelLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/src/handlers/channel/get-channel/
+      Description: Gets data related to a channel
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ItsOnApi
+            Path: /{channelID}
+            Method: GET
+      Handler: handler.handler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  getChannelLambdaFunctionLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      RetentionInDays: 30
+      LogGroupName: !Join ['', ['/aws/lambda/', !Ref getChannelLambdaFunction]]
+
+  # This is a Lambda function config associated with the source code: create-item.mts
+  createChannelLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/src/handlers/channel/create-channel/
+      Description: Creates a channel for a user
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ItsOnApi
+            Path: /channels
+            Method: POST
+      Handler: handler.handler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  createChannelLambdaFunctionLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      RetentionInDays: 30
+      LogGroupName:
+        !Join ['', ['/aws/lambda/', !Ref createChannelLambdaFunction]]
+
+  # This is a Lambda function config associated with the source code: update-item.mts
+  updateChannelLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/src/handlers/channel/update-channel/
+      Description: Updates a channel for a user
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ItsOnApi
+            Path: /{channelID}
+            Method: PUT
+      Handler: handler.handler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  updateChannelLambdaFunctionLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      RetentionInDays: 30
+      LogGroupName:
+        !Join ['', ['/aws/lambda/', !Ref updateChannelLambdaFunction]]
+
+  # This is a Lambda function config associated with the source code: its-on.mts
+  itsOnLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/src/handlers/channel/its-on/
+      Description: Turns a channel on for a user
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ItsOnApi
+            Path: /{channelID}/its-on
+            Method: POST
+      Handler: handler.handler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  itsOnLambdaFunctionLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      RetentionInDays: 30
+      LogGroupName: !Join ['', ['/aws/lambda/', !Ref itsOnLambdaFunction]]
+
+  # This is a Lambda function config associated with the source code: its-off.mts
+  itsOffLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/src/handlers/channel/its-off/
+      Description: Turns a channel off for a user
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ItsOnApi
+            Path: /{channelID}/its-off
+            Method: POST
+      Handler: handler.handler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  itsOffLambdaFunctionLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      RetentionInDays: 30
+      LogGroupName: !Join ['', ['/aws/lambda/', !Ref itsOffLambdaFunction]]
+
+  # This is a Lambda function config associated with the source code: delete-item.mts
+  deleteChannelLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/src/handlers/channel/delete-channel/
+      Description: Deletes a channel for a user
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ItsOnApi
+            Path: /{channelID}
+            Method: DELETE
+      Handler: handler.handler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  deleteChannelLambdaFunctionLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      RetentionInDays: 30
+      LogGroupName:
+        !Join ['', ['/aws/lambda/', !Ref deleteChannelLambdaFunction]]
+
+  # This is a Lambda function config associated with the source code: delete-item.mts
+  removeChannelSubscriberLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/src/handlers/channel/remove-channel-subscriber/
+      Description: Removes a channel's subscriber for a user
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ItsOnApi
+            Path: /{channelID}/subscribers/{subscriberID}
+            Method: DELETE
+      Handler: handler.handler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  removeChannelSubscriberLambdaFunctionLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      RetentionInDays: 30
+      LogGroupName:
+        !Join ['', ['/aws/lambda/', !Ref removeChannelSubscriberLambdaFunction]]
+
+  # This is a Lambda function config associated with the source code: subscribe.mts
+  subscribeLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/src/handlers/channel/subscribe/
+      Description: Subscribes a user to a channel
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ItsOnApi
+            Path: /{channelID}/subscribe
+            Method: POST
+      Handler: handler.handler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  subscribeLambdaFunctionLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      RetentionInDays: 30
+      LogGroupName: !Join ['', ['/aws/lambda/', !Ref subscribeLambdaFunction]]
+
+  # This is a Lambda function config associated with the source code: unsubscribe.mts
+  unsubscribeLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/src/handlers/channel/unsubscribe/
+      Description: Unsubscribes a user from a channel
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ItsOnApi
+            Path: /{channelID}/unsubscribe
+            Method: POST
+      Handler: handler.handler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  unsubscribeLambdaFunctionLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      RetentionInDays: 30
+      LogGroupName: !Join ['', ['/aws/lambda/', !Ref unsubscribeLambdaFunction]]
+
+  # This is a Lambda function config associated with the source code: get-notification-key.mts
+  getNotificationKeyLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/src/handlers/notifications/get-notification-key/
+      Description: Gets the public VAPID key to use for notifications
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ItsOnApi
+            Path: /notification-key
+            Method: GET
+      Handler: handler.handler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  getNotificationKeyLambdaFunctionLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      RetentionInDays: 30
+      LogGroupName:
+        !Join ['', ['/aws/lambda/', !Ref getNotificationKeyLambdaFunction]]
+
+  # This is a Lambda function config associated with the source code: enable-notifications.mts
+  enableNotificationsLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/src/handlers/notifications/enable-notifications/
+      Description: Enables notifications for a user
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ItsOnApi
+            Path: /enable-notifications
+            Method: POST
+      Handler: handler.handler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  enableNotificationsLambdaFunctionLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      RetentionInDays: 30
+      LogGroupName:
+        !Join ['', ['/aws/lambda/', !Ref enableNotificationsLambdaFunction]]
+
+  # This is a Lambda function config associated with the source code: disable-notifications.mts
+  disableNotificationsLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/src/handlers/notifications/disable-notifications/
+      Description: Disables notifications for a user
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ItsOnApi
+            Path: /disable-notifications
+            Method: POST
+      Handler: handler.handler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  disableNotificationsLambdaFunctionLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      RetentionInDays: 30
+      LogGroupName:
+        !Join ['', ['/aws/lambda/', !Ref disableNotificationsLambdaFunction]]
+
+  # This is a Lambda function config associated with the source code: subscribe-notifications.mts
+  subscribeNotificationsLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/src/handlers/notifications/subscribe-notifications/
+      Description: Register a user's notification subscription
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ItsOnApi
+            Path: /subscribe-notifications
+            Method: POST
+      Handler: handler.handler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  subscribeNotificationsLambdaFunctionLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      RetentionInDays: 30
+      LogGroupName:
+        !Join ['', ['/aws/lambda/', !Ref subscribeNotificationsLambdaFunction]]
+
+  # This is a Lambda function config associated with the source code: unsubscribe-notifications.mts
+  unsubscribeNotificationsLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/src/handlers/notifications/unsubscribe-notifications/
+      Description: Unregister a user's notification subscription
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ItsOnApi
+            Path: /unsubscribe-notifications
+            Method: POST
+      Handler: handler.handler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  unsubscribeNotificationsLambdaFunctionLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      RetentionInDays: 30
+      LogGroupName:
+        !Join [
+          '',
+          ['/aws/lambda/', !Ref unsubscribeNotificationsLambdaFunction],
+        ]
+
+  # This is a Lambda function config associated with the source code: update-profile.mts
+  updateProfileLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/src/handlers/user/update-profile/
+      Description: Updates a user's profile
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ItsOnApi
+            Path: /user
+            Method: PUT
+      Handler: handler.handler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  updateProfileLambdaFunctionLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      RetentionInDays: 30
+      LogGroupName:
+        !Join ['', ['/aws/lambda/', !Ref updateProfileLambdaFunction]]
+
+  # This is a Lambda function config associated with the source code: post-log.mts
+  postLogLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/src/handlers/post-log/
+      Description: Posts a log sent from the frontend
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ItsOnApi
+            Path: /log
+            Method: POST
+      Handler: handler.handler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  postLogLambdaFunctionLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      RetentionInDays: 30
+      LogGroupName: !Join ['', ['/aws/lambda/', !Ref postLogLambdaFunction]]
+
+  # This is a Lambda function config associated with the source code: auth-webhook.mts
+  authWebhookLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/src/handlers/auth-webhook/
+      Description: Handles auth webhook calls
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Auth:
+              Authorizer: NONE
+              OverrideApiAuth: true
+            RestApiId: !Ref ItsOnApi
+            Path: /auth-webhook
+            Method: POST
+      Handler: handler.handler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+        - AWSSecretsManagerGetSecretValuePolicy:
+            # TODO: Add prod secret if prod env 
+            SecretArn: arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnClerkDevWebhookSecret-kasu1B
+
+  authWebhookLambdaFunctionLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      RetentionInDays: 30
+      LogGroupName: !Join ['', ['/aws/lambda/', !Ref authWebhookLambdaFunction]]
+
+  tableStreamLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/src/handlers/table-stream/
+      Description: Handles write events from the ItsOnTable
+      Events:
+        TableStream:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt ItsOnTable.StreamArn
+            StartingPosition: LATEST
+            # BatchSize: 10
+            # MaximumBatchingWindowInSeconds: 10
+            # Enabled: true
+            # ParallelizationFactor: 1
+            # MaximumRetryAttempts: 10
+            # BisectBatchOnFunctionError: true
+            # MaximumRecordAgeInSeconds: 86400
+            # DestinationConfig:
+            #   OnFailure:
+            #     Type: SQS
+            #     Destination: !GetAtt MySqsQueue.Arn
+            # TumblingWindowInSeconds: 0
+            # FunctionResponseTypes:
+            #   - ReportBatchItemFailures
+      Handler: handler.handler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+
+  tableStreamLambdaFunctionLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      RetentionInDays: 30
+      LogGroupName: !Join ['', ['/aws/lambda/', !Ref tableStreamLambdaFunction]]
+
+  # DynamoDB table to store item: {id: &lt;ID&gt;, name: &lt;NAME&gt;}
+  ItsOnTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+      DeletionProtectionEnabled:
+        'Fn::If':
+          - IsProdEnv
+          - true
+          - false
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+      Tags:
+        - Key: project
+          Value: itson
+        - Key: env
+          Value: !Ref Env
+
+  # Front End Resources
+  ItsOnFrontendBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        'Fn::If':
+          - IsProdEnv
+          - itson.fyi
+          - !Sub ${Env}.itson.fyi
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: ObjectWriter
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: index.html
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+
+  ItsOnCloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        CacheBehaviors:
+          - AllowedMethods: [GET, HEAD]
+            # Managed CacheDisabled Policy
+            # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html#attaching-managed-cache-policies
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad
+            Compress: true
+            PathPattern: index.html
+            TargetOriginId: ItsOnFrontendBucket
+            ViewerProtocolPolicy: redirect-to-https
+        Comment: Cloudfront Distribution pointing to S3 bucket
+        CustomErrorResponses:
+          - ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: /
+        Origins:
+          - Id: ItsOnFrontendBucket
+            DomainName:
+              !Select [2, !Split ['/', !GetAtt ItsOnFrontendBucket.WebsiteURL]]
+            CustomOriginConfig:
+              HTTPPort: '80'
+              HTTPSPort: '443'
+              OriginProtocolPolicy: http-only
+          - Id: ItsOnApi
+            DomainName:
+              'Fn::If':
+                - IsProdEnv
+                - api.itson.fyi
+                - !Sub ${Env}.api.itson.fyi
+            CustomOriginConfig:
+              OriginProtocolPolicy: https-only
+        Enabled: true
+        HttpVersion: 'http2'
+        DefaultRootObject: index.html
+        Aliases:
+          - 'Fn::If':
+              - IsProdEnv
+              - itson.fyi
+              - !Sub ${Env}.itson.fyi
+        DefaultCacheBehavior:
+          AllowedMethods: [GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE]
+          # Managed CachingOptimized policy
+          # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html#attaching-managed-cache-policies
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+          Compress: true
+          TargetOriginId: ItsOnFrontendBucket
+          ViewerProtocolPolicy: redirect-to-https
+        PriceClass: PriceClass_All
+        ViewerCertificate:
+          AcmCertificateArn: arn:aws:acm:us-east-1:992382488292:certificate/197d9b24-eb88-4153-b506-f5816e4868c7
+          SslSupportMethod: sni-only
+
+  ItsOnFrontendBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      PolicyDocument:
+        Id: ItsOnFrontEndPolicy
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                - !Ref PipelineRole
+            Action: '*'
+            Resource:
+              - !Sub
+                - 'arn:aws:s3:::${Bucket}/*'
+                - Bucket: !Ref ItsOnFrontendBucket
+              - !Sub
+                - 'arn:aws:s3:::${Bucket}'
+                - Bucket: !Ref ItsOnFrontendBucket
+          - Sid: PublicReadForGetBucketObjects
+            Effect: Allow
+            Principal: '*'
+            Action: s3:GetObject
+            Resource:
+              - !Sub
+                - 'arn:aws:s3:::${Bucket}/*'
+                - Bucket: !Ref ItsOnFrontendBucket
+      Bucket: !Ref ItsOnFrontendBucket
+
+  # DNS
+  ItsOnDNSName:
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      HostedZoneId: Z04756481IJC552VNI712
+      RecordSets:
+        - Name:
+            'Fn::If':
+              - IsProdEnv
+              - itson.fyi
+              - !Sub ${Env}.itson.fyi
+          Type: A
+          AliasTarget:
+            HostedZoneId: Z2FDTNDATAQYW2
+            DNSName: !GetAtt ItsOnCloudFrontDistribution.DomainName
+        # TODO: Auth CName
+        # - Name:
+        #     'Fn::If':
+        #       - IsProdEnv
+        #       - auth.itson.fyi
+        #       - !Sub ${Env}-auth.itson.fyi
+        #   ResourceRecords:
+        #     - !GetAtt ItsOnUserPoolDomain.CloudFrontDistribution
+        #   TTL: 60
+        #   Type: CNAME
+
+Outputs:
+  ApiEndpoint:
+    Description: 'API Gateway endpoint URL for given env'
+    Value:
+      'Fn::If':
+        - IsProdEnv
+        - https://api.itson.fyi
+        - !Sub https://${Env}.api.itson.fyi
+  AuthEndpoint:
+    Description: 'Cognito Hosted UI endpoint URL for given env'
+    Value:
+      'Fn::If':
+        - IsProdEnv
+        - https://auth.itson.fyi
+        - !Sub https://${Env}-auth.itson.fyi
+  ItsOnFrontendBucketName:
+    Value:
+      'Fn::If':
+        - IsProdEnv
+        - itson.fyi
+        - !Sub ${Env}.itson.fyi
+  WebEndpoint:
+    Description: 'Web endpoint URL for given env (prod has no subdomain)'
+    Value:
+      'Fn::If':
+        - IsProdEnv
+        - https://itson.fyi
+        - !Sub https://${Env}.itson.fyi
+  Website:
+    Value: !GetAtt ItsOnCloudFrontDistribution.DomainName

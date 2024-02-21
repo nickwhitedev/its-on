@@ -1,0 +1,49 @@
+.App {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  height: 100%;
+  width: 100%;
+
+  --md-dialog-container-shape: 4px;
+}
+
+.App-header {
+  display: grid;
+  grid:
+    [row-start] 'notifications hero settings' [row-end]
+    / 3rem auto 3rem;
+  width: 100%;
+}
+
+.App-header > h1 {
+  cursor: default;
+  font-family: 'Pacifico', cursive;
+  grid-area: hero;
+  margin: 1rem 0;
+  place-self: center;
+  user-select: none;
+}
+
+.App-notifications {
+  display: flex;
+  grid-area: notifications;
+  margin: 1rem;
+  place-self: start start;
+}
+
+.App-settings {
+  display: flex;
+  grid-area: settings;
+  margin: 1rem;
+  place-self: start end;
+}
+
+.App-main {
+  display: flex;
+  flex: 1 1 auto;
+  flex-flow: column nowrap;
+  align-items: center;
+  width: 100%;
+}
