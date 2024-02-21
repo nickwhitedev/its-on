@@ -675,12 +675,12 @@
     mnemonist "0.38.3"
     tslib "^2.5.0"
 
-"@aws-sdk/lib-dynamodb@^3.511.0":
-  version "3.511.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/lib-dynamodb/-/lib-dynamodb-3.511.0.tgz#f92a9ffcae8a073eded79528d673bc2276a6c29e"
-  integrity sha512-5xURF5gR8dY+pg50Y7GYfNZdPLcIGato02HouUauqs36ScfftfCXEOSbJNNYlyImrMspRlJtefdiWPhekHILhw==
+"@aws-sdk/lib-dynamodb@^3.515.0":
+  version "3.515.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/lib-dynamodb/-/lib-dynamodb-3.515.0.tgz#9d8cccca21c63159051158d79e0be80bf46af091"
+  integrity sha512-nvrRFQoNiT67ih5c/lKU6nIdjFtx4TXSQkBnh89udSQErqqUhuNNLX4mPWaLPxMUYP/oORl61WeyNyPaaQdQrA==
   dependencies:
-    "@aws-sdk/util-dynamodb" "3.511.0"
+    "@aws-sdk/util-dynamodb" "3.515.0"
     "@smithy/smithy-client" "^2.3.1"
     "@smithy/types" "^2.9.1"
     tslib "^2.5.0"
@@ -854,10 +854,10 @@
     "@smithy/types" "^2.9.1"
     tslib "^2.5.0"
 
-"@aws-sdk/util-dynamodb@3.511.0":
-  version "3.511.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/util-dynamodb/-/util-dynamodb-3.511.0.tgz#c43049d0a1a7db032e7181e90ea772b3dc83194a"
-  integrity sha512-VADCpPre14/KfXzZ45UHegeUbuefYR7AdfRrcTTjbOFBf1jTF9QUYlc+I2tYnDJ0kCBSSTjuO8XwjMAMqrtjQQ==
+"@aws-sdk/util-dynamodb@3.515.0":
+  version "3.515.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/util-dynamodb/-/util-dynamodb-3.515.0.tgz#d59fead60ad2834fc75ea120e3e716b3064fb811"
+  integrity sha512-HCduLubTlkoxqggF7/Lx26ns+C+idXoXbI3F3y0+sIuBPUi3pDrIAjew8LkL7lmvM4D4frDuCdFOABPTOO6Eug==
   dependencies:
     tslib "^2.5.0"
 
@@ -2207,10 +2207,10 @@
   resolved "https://registry.yarnpkg.com/@tsconfig/node16/-/node16-1.0.4.tgz#0b92dcc0cc1c81f6f306a381f28e31b1a56536e9"
   integrity sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==
 
-"@types/aws-lambda@^8.10.131":
-  version "8.10.131"
-  resolved "https://registry.yarnpkg.com/@types/aws-lambda/-/aws-lambda-8.10.131.tgz#76fcd36e6a4a4666c7ea7503bf0e3e86c0a9cdb2"
-  integrity sha512-IWmFpqnVDvskYWnNSiu/qlRn80XlIOU0Gy5rKCl/NjhnI95pV8qIHs6L5b+bpHhyzuOSzjLgBcwgFSXrC1nZWA==
+"@types/aws-lambda@^8.10.134":
+  version "8.10.134"
+  resolved "https://registry.yarnpkg.com/@types/aws-lambda/-/aws-lambda-8.10.134.tgz#8f65d86736839889194f7892b7bec6b8a7ec6fc3"
+  integrity sha512-cfv422ivDMO+EeA3N4YcshbTHBL+5lLXe+Uz+4HXvIcsCuWvqNFpOs28ZprL8NA3qRCzt95ETiNAJDn4IcC/PA==
 
 "@types/babel__core@^7.1.14":
   version "7.20.4"
@@ -4487,10 +4487,10 @@ nanoid-dictionary@^5.0.0-beta.1:
   resolved "https://registry.yarnpkg.com/nanoid-dictionary/-/nanoid-dictionary-5.0.0-beta.1.tgz#f2a2aa05b04f7ac6a9327c62a96146e8aa1b025d"
   integrity sha512-xBkL9zzkNjzJ/UnmWyiOUDVX/COoi05eS0oU28RYKFFQhdnzO5dTOPbVZ/fCFgIOGr1zNinDHJ68mm/KQfcgcw==
 
-nanoid@*, nanoid@^5.0.4:
-  version "5.0.4"
-  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-5.0.4.tgz#d2b608d8169d7da669279127615535705aa52edf"
-  integrity sha512-vAjmBf13gsmhXSgBrtIclinISzFFy22WwCYoyilZlsrRXNIHSwgFQ1bEdjRwMT3aoadeIF6HMuDRlOxzfXV8ig==
+nanoid@*, nanoid@^5.0.5:
+  version "5.0.5"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-5.0.5.tgz#5112efb5c0caf4fc80680d66d303c65233a79fdd"
+  integrity sha512-/Veqm+QKsyMY3kqi4faWplnY1u+VuKO3dD2binyPIybP31DRO29bPF+1mszgLnrR2KqSLceFLBNw0zmvDzN1QQ==
 
 natural-compare@^1.4.0:
   version "1.4.0"
@@ -5038,10 +5038,10 @@ svix-fetch@^3.0.0:
     node-fetch "^2.6.1"
     whatwg-fetch "^3.4.1"
 
-svix@^1.17.0:
-  version "1.17.0"
-  resolved "https://registry.yarnpkg.com/svix/-/svix-1.17.0.tgz#80ea648904990ab69bd82e24802779d12fe092b9"
-  integrity sha512-gdeFc7JtTAwR8UFd2moRmwhRJ5Y3H+RsS1nvlxYBIpBKKJkoyulemH76J95tsFwkEq+KH1kp0o/iNHU+de/AbA==
+svix@^1.18.0:
+  version "1.18.0"
+  resolved "https://registry.yarnpkg.com/svix/-/svix-1.18.0.tgz#1db242200742f9fe4aea63c00674900e1891078f"
+  integrity sha512-JvF8ymN83erBaWjFcRvoCH+jesx8E6Ag2Sb2gDcN1g0g4xMZBuMIu3dX8NxI+laPdXiIdiQrFoWCs0xDf5w2mA==
   dependencies:
     "@stablelib/base64" "^1.0.0"
     es6-promise "^4.2.4"
