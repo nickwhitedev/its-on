@@ -7,16 +7,19 @@ on:
       - 'release**'
 
 env:
-  AWS_SES_DOMAIN_IDENTITY_ARN: ${{ secrets.AWS_SES_DOMAIN_IDENTITY_ARN }}
-  PIPELINE_USER_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  PIPELINE_USER_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: us-east-1
+  CLERK_PUBLIC_KEY: pk_test_Y2hhcm1lZC1ncmFja2xlLTgxLmNsZXJrLmFjY291bnRzLmRldiQ
   PUSH_NOTIFICATION_PUBLIC_KEY: ${{ secrets.PUSH_NOTIFICATION_PUBLIC_KEY }}
   PUSH_NOTIFICATION_PRIVATE_KEY: ${{ secrets.PUSH_NOTIFICATION_PRIVATE_KEY }}
   SAM_TEMPLATE: template.yml
-  TESTING_PIPELINE_EXECUTION_ROLE: arn:aws:iam::303579314896:role/aws-sam-cli-managed-dev-pipe-PipelineExecutionRole-1EXGMRU8M7PIU
-  TESTING_CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::303579314896:role/aws-sam-cli-managed-dev-p-CloudFormationExecutionR-13FN6CKHSS9UA
-  TESTING_ARTIFACTS_BUCKET: aws-sam-cli-managed-dev-pipeline-artifactsbucket-1awxr7qt59hmv
+  TESTING_ARTIFACTS_BUCKET: its-on-testing-artifacts
+  TESTING_CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::992382488292:role/aws-sam-cli-managed-dev-p-CloudFormationExecutionRo-DoShwApzYF47
+  TESTING_PIPELINE_EXECUTION_ROLE: arn:aws:iam::992382488292:role/aws-sam-cli-managed-dev-pipel-PipelineExecutionRole-fAuX9MNwbZ4E
   TESTING_REGION: us-east-1
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   test-backend:
@@ -158,13 +161,9 @@ jobs:
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
-          aws-access-key-id: ${{ env.PIPELINE_USER_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.TESTING_REGION }}
           role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
           role-session-name: branch-api-deployment
-          role-duration-seconds: 3600
-          role-skip-session-tagging: true
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Deploy to branch stack in the testing account
         shell: bash
@@ -211,30 +210,32 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18.x'
+
       - name: Install dependencies
         run: rm -rf node_modules && yarn install --frozen-lockfile
+
       - name: Set environment variables
         shell: bash
         run: |
-          echo "VITE_BASE_URL=\"${{needs.build-and-deploy-branch-api.outputs.web-endpoint}}\"" >> .env.production
-          echo "VITE_AUTH_URL=\"${{needs.build-and-deploy-branch-api.outputs.auth-endpoint}}\"" >> .env.production
-          echo "VITE_API_URL=\"${{needs.build-and-deploy-branch-api.outputs.api-endpoint}}\"" >> .env.production
-          echo "VITE_CLERK_PUBLISHABLE_KEY=\"pk_test_Y2hhcm1lZC1ncmFja2xlLTgxLmNsZXJrLmFjY291bnRzLmRldiQ\"" >> .env.production
+          echo "VITE_BASE_URL=\"${{ needs.build-and-deploy-branch-api.outputs.web-endpoint }}\"" >> .env.production
+          echo "VITE_AUTH_URL=\"${{ needs.build-and-deploy-branch-api.outputs.auth-endpoint }}\"" >> .env.production
+          echo "VITE_API_URL=\"${{ needs.build-and-deploy-branch-api.outputs.api-endpoint }}\"" >> .env.production
+          echo "VITE_CLERK_PUBLISHABLE_KEY=\"${{ env.CLERK_PUBLIC_KEY }}\"" >> .env.production
+
       - name: Build frontend
         run: CI=true yarn build
+
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
-          aws-access-key-id: ${{ env.PIPELINE_USER_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.TESTING_REGION }}
           role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
           role-session-name: branch-frontend-deployment
-          role-duration-seconds: 3600
-          role-skip-session-tagging: true
+          aws-region: ${{ env.AWS_REGION }}
+
       - name: Clear frontend bucket
         run: |
           aws s3 rm s3://$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]').itson.fyi --recursive
+
       - name: Deploy frontend
         run: |
           aws s3 cp dist \

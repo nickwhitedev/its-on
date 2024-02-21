@@ -3,10 +3,12 @@ name: Teardown
 on: delete
 
 env:
-  PIPELINE_USER_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  PIPELINE_USER_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  TESTING_PIPELINE_EXECUTION_ROLE: arn:aws:iam::303579314896:role/aws-sam-cli-managed-dev-pipe-PipelineExecutionRole-1EXGMRU8M7PIU
-  TESTING_REGION: us-east-1
+  AWS_REGION: us-east-1
+  TESTING_PIPELINE_EXECUTION_ROLE: arn:aws:iam::992382488292:role/aws-sam-cli-managed-dev-pipel-PipelineExecutionRole-fAuX9MNwbZ4E
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   destroy-frontend:
@@ -16,13 +18,9 @@ jobs:
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
-          aws-access-key-id: ${{ env.PIPELINE_USER_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.TESTING_REGION }}
           role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
           role-session-name: destroy-frontend
-          role-duration-seconds: 3600
-          role-skip-session-tagging: true
+          aws-region: ${{ env.AWS_REGION }}
       - name: echo ref
         env:
           BRANCH_NAME: ${{ github.event.ref }}
@@ -54,13 +52,9 @@ jobs:
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
-          aws-access-key-id: ${{ env.PIPELINE_USER_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ env.PIPELINE_USER_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.TESTING_REGION }}
           role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
           role-session-name: destroy-api
-          role-duration-seconds: 3600
-          role-skip-session-tagging: true
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Delete api stack
         env:
