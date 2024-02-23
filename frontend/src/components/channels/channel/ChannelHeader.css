@@ -61,6 +61,44 @@
   }
 }
 
+.ChannelHeader-button-close {
+  --md-icon-button-icon-color: var(--md-sys-color-error, red);
+  --_disabled-icon-color: var(--md-sys-color-error, red);
+  --_selected-focus-icon-color: var(--md-sys-color-error, red);
+  --_selected-hover-icon-color: var(--md-sys-color-error, red);
+  --_selected-hover-state-layer-color: var(--md-sys-color-error, red);
+  --_selected-icon-color: var(--md-sys-color-error, red);
+  --_selected-pressed-icon-color: var(--md-sys-color-error, red);
+  --_selected-pressed-state-layer-color: var(--md-sys-color-error, red);
+  --_focus-icon-color: var(--md-sys-color-error, red);
+  --_hover-icon-color: var(--md-sys-color-error, red);
+  --_hover-state-layer-color: var(--md-sys-color-error, red);
+  --_icon-color: var(--md-sys-color-error, red);
+  --_pressed-icon-color: var(--md-sys-color-error, red);
+  --_pressed-state-layer-color: var(--md-sys-color-error, red);
+  --_selected-pressed-state-layer-color: var(--md-sys-color-error, red);
+  --_selected-pressed-state-layer-color: var(--md-sys-color-error, red);
+}
+
+.ChannelHeader-button-save {
+  --md-icon-button-icon-color: var(--md-sys-color-success, green);
+  --_disabled-icon-color: var(--md-sys-color-success, green);
+  --_selected-focus-icon-color: var(--md-sys-color-success, green);
+  --_selected-hover-icon-color: var(--md-sys-color-success, green);
+  --_selected-hover-state-layer-color: var(--md-sys-color-success, green);
+  --_selected-icon-color: var(--md-sys-color-success, green);
+  --_selected-pressed-icon-color: var(--md-sys-color-success, green);
+  --_selected-pressed-state-layer-color: var(--md-sys-color-success, green);
+  --_focus-icon-color: var(--md-sys-color-success, green);
+  --_hover-icon-color: var(--md-sys-color-success, green);
+  --_hover-state-layer-color: var(--md-sys-color-success, green);
+  --_icon-color: var(--md-sys-color-success, green);
+  --_pressed-icon-color: var(--md-sys-color-success, green);
+  --_pressed-state-layer-color: var(--md-sys-color-success, green);
+  --_selected-pressed-state-layer-color: var(--md-sys-color-success, green);
+  --_selected-pressed-state-layer-color: var(--md-sys-color-success, green);
+}
+
 .ChannelHeader-edit {
   grid-area: edit;
   display: flex;

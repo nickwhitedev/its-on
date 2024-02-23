@@ -39,7 +39,7 @@ const ChannelHeader = ({
           <div className='ChannelHeader-save-wrapper'>
             {isEditing ? (
               <MDIconButton
-                className='ChannelHeader-button'
+                className='ChannelHeader-button ChannelHeader-button-close'
                 disabled={!channel.title || isUpdating}
                 onClick={() => {
                   setIsEditing(false)
@@ -100,7 +100,7 @@ const ChannelHeader = ({
         {userIsChannelOwner && isEditing ? (
           <div className='ChannelHeader-save-wrapper'>
             <MDIconButton
-              className='ChannelHeader-button'
+              className='ChannelHeader-button ChannelHeader-button-save'
               disabled={currentTitle === '' || isUpdating}
               onClick={() => void onSaveUpdates()}
             >
