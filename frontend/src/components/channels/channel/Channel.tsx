@@ -70,6 +70,7 @@ const Channel = ({ channelID }: Props) => {
 
   const userIsChannelOwner = channels.some(ch => ch.id === channelID)
 
+  // null means initial load hasn't started yet
   const [isLoading, setIsLoading] = useState<boolean | null>(null)
   const [isEditing, setIsEditing] = useState<boolean>(
     userIsChannelOwner && !channel?.title,
