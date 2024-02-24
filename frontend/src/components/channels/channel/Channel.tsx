@@ -1,46 +1,46 @@
 import './Channel.css'
 
-import { useEffect, useState } from 'react'
 import Countdown, { zeroPad } from 'react-countdown'
-import {
-  useChannels,
-  useChannelsDispatch,
-} from '../../../contexts/channels/channelsContext'
-import {
-  useSubscriptions,
-  useSubscriptionsDispatch,
-} from '../../../contexts/subscriptions/subscriptionsContext'
-import { useUser, useUserDispatch } from '../../../contexts/user/userContext'
 import {
   DEFAULT_USER_TIER,
   channelOnExpirationTime,
   durationOptions,
   isChannelOn,
 } from './channelUtils'
+import {
+  useChannels,
+  useChannelsDispatch,
+} from '../../../contexts/channels/channelsContext'
+import { useEffect, useState } from 'react'
+import {
+  useSubscriptions,
+  useSubscriptionsDispatch,
+} from '../../../contexts/subscriptions/subscriptionsContext'
+import { useUser, useUserDispatch } from '../../../contexts/user/userContext'
 
-import { useNavigate } from 'react-router-dom'
-import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
-import { useErrorDispatch } from '../../../contexts/error/errorContext'
-import { ErrorDispatchActionType } from '../../../contexts/error/errorReducer'
-import { SubscriptionsDispatchActionType } from '../../../contexts/subscriptions/subscriptionsReducer'
-import { UserDispatchActionType } from '../../../contexts/user/userReducer'
-import { useFetchApi } from '../../../utils/api'
-import { useSendLog } from '../../../utils/logging'
-import { useRequestNotificationPermissions } from '../../../utils/notifications'
-import { MS_IN_HOUR } from '../../../utils/time'
-import ItsOnIcon from '../../icons/ItsOnIcon'
-import MDDialog from '../../material/MDDialog'
-import MDIcon from '../../material/MDIcon'
-import MDRipple from '../../material/MDRipple'
-import MDFilledButton from '../../material/button/MDFilledButton'
-import MDFilledTonalButton from '../../material/button/MDFilledTonalButton'
-import MDTextButton from '../../material/button/MDTextButton'
-import MDCircularProgress from '../../material/progress/MDCircularProgress'
-import MDOutlinedSelect from '../../material/select/MDOutlinedSelect'
-import MDSelectOption from '../../material/select/MDSelectOption'
 import ChannelHeader from './ChannelHeader'
 import ChannelNote from './ChannelNote'
 import ChannelSubscribers from './subscribers/ChannelSubscribers'
+import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
+import { ErrorDispatchActionType } from '../../../contexts/error/errorReducer'
+import ItsOnIcon from '../../icons/ItsOnIcon'
+import MDCircularProgress from '../../material/progress/MDCircularProgress'
+import MDDialog from '../../material/MDDialog'
+import MDFilledButton from '../../material/button/MDFilledButton'
+import MDFilledTonalButton from '../../material/button/MDFilledTonalButton'
+import MDIcon from '../../material/MDIcon'
+import MDOutlinedSelect from '../../material/select/MDOutlinedSelect'
+import MDRipple from '../../material/MDRipple'
+import MDSelectOption from '../../material/select/MDSelectOption'
+import MDTextButton from '../../material/button/MDTextButton'
+import { MS_IN_HOUR } from '../../../utils/time'
+import { SubscriptionsDispatchActionType } from '../../../contexts/subscriptions/subscriptionsReducer'
+import { UserDispatchActionType } from '../../../contexts/user/userReducer'
+import { useErrorDispatch } from '../../../contexts/error/errorContext'
+import { useFetchApi } from '../../../utils/api'
+import { useNavigate } from 'react-router-dom'
+import { useRequestNotificationPermissions } from '../../../utils/notifications'
+import { useSendLog } from '../../../utils/logging'
 
 interface Props {
   channelID: string
@@ -70,7 +70,7 @@ const Channel = ({ channelID }: Props) => {
 
   const userIsChannelOwner = channels.some(ch => ch.id === channelID)
 
-  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [isLoading, setIsLoading] = useState<boolean | null>(null)
   const [isEditing, setIsEditing] = useState<boolean>(
     userIsChannelOwner && !channel?.title,
   )
@@ -107,7 +107,8 @@ const Channel = ({ channelID }: Props) => {
 
   useEffect(() => {
     // fetch channel
-    if (!isLoading) return
+    if (isLoading !== null) return
+    setIsLoading(true)
     void (async () => {
       let fetchedChannel: IChannel | null
       try {
@@ -138,6 +139,7 @@ const Channel = ({ channelID }: Props) => {
         setCurrentDuration(channel?.duration ?? MS_IN_HOUR)
         setCurrentNote(channel?.note ?? '')
         setCurrentTitle(channel?.title ?? '')
+        console.log('set current title: ', channel?.title ?? '')
       }
       setIsLoading(false)
     })()
@@ -171,7 +173,7 @@ const Channel = ({ channelID }: Props) => {
   }, [channelIsOn])
 
   if (channel == null) {
-    return isLoading ? (
+    return [true, null].includes(isLoading) ? (
       <MDCircularProgress
         className='Channel-loading'
         indeterminate
@@ -444,7 +446,7 @@ const Channel = ({ channelID }: Props) => {
             currentCapacity={currentCapacity}
             channel={channel}
             isEditing={isEditing}
-            isLoading={isLoading}
+            isLoading={[true, null].includes(isLoading)}
             isUpdating={isUpdating}
             onChangeCurrentCapacity={setCurrentCapacity}
             setIsUpdating={setIsUpdating}
