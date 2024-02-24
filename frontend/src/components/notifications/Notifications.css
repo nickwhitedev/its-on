@@ -9,6 +9,10 @@
   text-align: left;
 }
 
+.Notifications-headline {
+  justify-content: space-between;
+}
+
 .Notifications-list {
   text-align: left;
   background-color: var(--md-sys-color-surface-container-high);

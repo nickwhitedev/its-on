@@ -1,23 +1,24 @@
 import './Notifications.css'
 
 import { useCallback, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useErrorDispatch } from '../../contexts/error/errorContext'
-import { ErrorDispatchActionType } from '../../contexts/error/errorReducer'
-import { useSubscriptions } from '../../contexts/subscriptions/subscriptionsContext'
 import { useUser, useUserDispatch } from '../../contexts/user/userContext'
-import { UserDispatchActionType } from '../../contexts/user/userReducer'
-import { useFetchApi } from '../../utils/api'
-import { useSendLog } from '../../utils/logging'
-import { isChannelOn } from '../channels/channel/channelUtils'
+
+import { ErrorDispatchActionType } from '../../contexts/error/errorReducer'
 import MDDialog from '../material/MDDialog'
 import MDIcon from '../material/MDIcon'
-import MDSwitch from '../material/MDSwitch'
-import MDTextButton from '../material/button/MDTextButton'
 import MDIconButton from '../material/icon-button/MDIconButton'
 import MDList from '../material/list/MDList'
 import MDListItem from '../material/list/MDListItem'
-import AllowNotifications from './AllowNotifications'
+import MDSwitch from '../material/MDSwitch'
+import MDTextButton from '../material/button/MDTextButton'
+import { UserDispatchActionType } from '../../contexts/user/userReducer'
+import { isChannelOn } from '../channels/channel/channelUtils'
+import { useErrorDispatch } from '../../contexts/error/errorContext'
+import { useFetchApi } from '../../utils/api'
+import { useNavigate } from 'react-router-dom'
+import { useRequestNotificationPermissions } from '../../utils/notifications'
+import { useSendLog } from '../../utils/logging'
+import { useSubscriptions } from '../../contexts/subscriptions/subscriptionsContext'
 
 const Notifications = ({ className }: { className: string }) => {
   const user = useUser()
@@ -29,34 +30,54 @@ const Notifications = ({ className }: { className: string }) => {
   const navigate = useNavigate()
   const fetchApi = useFetchApi()
   const sendLog = useSendLog()
+  const requestNotificationPermissions = useRequestNotificationPermissions()
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
+  const [
+    deviceNotificationPermissionsUnrequested,
+    setDeviceNotificationPermissionsUnrequested,
+  ] = useState<boolean>(
+    'Notification' in window && Notification.permission === 'default',
+  )
 
-  const notificationsEnabled = user?.notificationsEnabled ?? true
+  const userNotificationsEnabled = user?.notificationsEnabled ?? true
+
   const onSubscriptions = subscriptions.filter(subscription =>
     isChannelOn(subscription),
   )
   const hasOnSubscriptions = onSubscriptions.length > 0
 
   const handleToggleNotifications = useCallback(async () => {
-    dispatchUser({
-      type: notificationsEnabled
-        ? UserDispatchActionType.NOTIFICATIONS_DISABLED
-        : UserDispatchActionType.NOTIFICATIONS_ENABLED,
-    })
+    const onlyEnableDeviceNotifications =
+      deviceNotificationPermissionsUnrequested && userNotificationsEnabled
+
+    if (deviceNotificationPermissionsUnrequested) {
+      try {
+        await requestNotificationPermissions({
+          registeredNotificationSubscriptions:
+            user?.notificationSubscriptions ?? {},
+        })
+        setDeviceNotificationPermissionsUnrequested(false)
+      } catch (error) {
+        await sendLog('AllowNotifications error', { error }, 'ERROR')
+        dispatchError({
+          type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
+        })
+      }
+    }
+
+    if (onlyEnableDeviceNotifications) {
+      return
+    }
+
     try {
       await fetchApi(
-        notificationsEnabled
+        userNotificationsEnabled
           ? '/disable-notifications'
           : '/enable-notifications',
         'POST',
       )
     } catch (error) {
-      dispatchUser({
-        type: notificationsEnabled
-          ? UserDispatchActionType.NOTIFICATIONS_ENABLED
-          : UserDispatchActionType.NOTIFICATIONS_DISABLED,
-      })
       await sendLog(
         'Notifications toggle notifications error',
         { error },
@@ -66,7 +87,21 @@ const Notifications = ({ className }: { className: string }) => {
         type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
       })
     }
-  }, [dispatchError, dispatchUser, fetchApi, notificationsEnabled, sendLog])
+    dispatchUser({
+      type: userNotificationsEnabled
+        ? UserDispatchActionType.NOTIFICATIONS_DISABLED
+        : UserDispatchActionType.NOTIFICATIONS_ENABLED,
+    })
+  }, [
+    deviceNotificationPermissionsUnrequested,
+    dispatchError,
+    dispatchUser,
+    fetchApi,
+    requestNotificationPermissions,
+    sendLog,
+    user?.notificationSubscriptions,
+    userNotificationsEnabled,
+  ])
 
   return (
     <div className={className}>
@@ -85,9 +120,20 @@ const Notifications = ({ className }: { className: string }) => {
           setIsDialogOpen(false)
         }}
       >
-        <div slot='headline'>Notifications</div>
+        <div
+          className='Notifications-headline'
+          slot='headline'
+        >
+          <span>Notifications</span>
+          <MDSwitch
+            selected={
+              !deviceNotificationPermissionsUnrequested &&
+              userNotificationsEnabled
+            }
+            onClick={() => void handleToggleNotifications()}
+          />
+        </div>
         <div slot='content'>
-          <AllowNotifications />
           <MDList className='Notifications-list'>
             {hasOnSubscriptions ? (
               <>
@@ -112,23 +158,6 @@ const Notifications = ({ className }: { className: string }) => {
                 No subscribed channels are on right now
               </MDListItem>
             )}
-            <MDListItem
-              type='button'
-              onClick={() => void handleToggleNotifications()}
-            >
-              <div slot='headline'>Notifications</div>
-              <div slot='end'>
-                <MDSwitch selected={notificationsEnabled} />
-              </div>
-              {notificationsEnabled &&
-              'Notification' in window &&
-              Notification.permission === 'denied' ? (
-                <div slot='supporting-text'>
-                  Notifications are disabled on this device. Go to device
-                  settings.
-                </div>
-              ) : null}
-            </MDListItem>
           </MDList>
         </div>
         <div slot='actions'>
