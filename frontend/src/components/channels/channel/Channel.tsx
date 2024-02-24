@@ -140,7 +140,6 @@ const Channel = ({ channelID }: Props) => {
         setCurrentDuration(channel?.duration ?? MS_IN_HOUR)
         setCurrentNote(channel?.note ?? '')
         setCurrentTitle(channel?.title ?? '')
-        console.log('set current title: ', channel?.title ?? '')
       }
       setIsLoading(false)
     })()
