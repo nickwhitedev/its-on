@@ -1,10 +1,10 @@
+import { CacheFirst, NetworkFirst, NetworkOnly } from 'workbox-strategies'
 import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching'
 import { registerRoute, setDefaultHandler } from 'workbox-routing'
-import { CacheFirst, NetworkFirst, NetworkOnly } from 'workbox-strategies'
 
 import { CacheableResponsePlugin } from 'workbox-cacheable-response/CacheableResponsePlugin'
-import { clientsClaim } from 'workbox-core'
 import { ExpirationPlugin } from 'workbox-expiration'
+import { clientsClaim } from 'workbox-core'
 
 declare let self: ServiceWorkerGlobalScope
 
@@ -77,21 +77,29 @@ self.addEventListener('activate', () => {
 self.addEventListener('push', function (event) {
   const data = (event.data?.json() ?? {
     title: "It's On!",
-    options: { body: '', data: { url: 'https://itson.fyi' } },
+    options: {
+      badge: 'https://itson.fyi/maskable-icon-512x512.png',
+      body: '',
+      data: { url: 'https://itson.fyi' },
+    },
   }) as {
     title: string
     options: {
+      badge: string
       body: string
       data: {
         url: string
       }
+      icon: string
     }
   }
 
   event.waitUntil(
     self.registration.showNotification(data.title, {
+      badge: data.options.badge,
       body: data.options.body,
       data: data.options.data,
+      icon: data.options.icon,
     }),
   )
 })
