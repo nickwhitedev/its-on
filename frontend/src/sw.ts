@@ -78,7 +78,7 @@ self.addEventListener('push', function (event) {
   const data = (event.data?.json() ?? {
     title: "It's On!",
     options: {
-      badge: 'https://itson.fyi/maskable-icon-512x512.png',
+      badge: 'https://itson.fyi/maskable-icon-196x196.png',
       body: '',
       data: { url: 'https://itson.fyi' },
     },
