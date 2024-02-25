@@ -9,7 +9,7 @@ export default defineConfig({
       // favicons: [[64, 'favicon.ico']],
     },
     maskable: {
-      sizes: [512],
+      sizes: [192],
     },
     apple: {
       sizes: [180],
