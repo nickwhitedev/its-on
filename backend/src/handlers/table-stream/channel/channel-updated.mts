@@ -48,7 +48,6 @@ const sendUserNotification = async ({
       JSON.stringify({
         title: `${channelTitle} • ${channelOwner}`,
         options: {
-          badge: `${WEB_URL}/maskable-icon-196x196.png`,
           body: channelNote,
           data: {
             url: `${WEB_URL}/${channelID}`,
