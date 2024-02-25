@@ -30,6 +30,7 @@ const ChannelNote = ({
           maxLength={200}
           placeholder="Let's meet at my place"
           rows={4}
+          supportingText='Leave a note or instructions for your subscribers'
           type='textarea'
           value={currentNote}
           onInput={(event: Event) => {
