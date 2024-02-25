@@ -1,6 +1,8 @@
 import { LoaderFunctionArgs } from '@remix-run/router/dist/utils'
 import HomeBody from '../../components/HomeBody'
 import Channels from '../../components/channels/Channels'
+import PrivacyPolicy from '../../components/legal/PrivacyPolicy'
+import TermsOfUse from '../../components/legal/TermsOfUse'
 import Subscriptions from '../../components/subscriptions/Subscriptions'
 import ChannelRouteHandler from './channels/ChannelRouteHandler'
 
@@ -23,6 +25,14 @@ const appRouter = [
       return { channelID: params.channelID ?? null }
     },
     path: ':channelID',
+  },
+  {
+    element: <TermsOfUse />,
+    path: 'terms',
+  },
+  {
+    element: <PrivacyPolicy />,
+    path: 'privacy',
   },
 ]
 

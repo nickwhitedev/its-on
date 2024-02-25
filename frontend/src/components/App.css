@@ -18,7 +18,7 @@
 }
 
 .App-header > h1 {
-  cursor: default;
+  cursor: pointer;
   font-family: 'Pacifico', cursive;
   grid-area: hero;
   margin: 1rem 0;

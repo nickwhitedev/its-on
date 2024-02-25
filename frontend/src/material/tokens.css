@@ -102,6 +102,26 @@
   --md-ref-palette-error98: #fff8f7;
   --md-ref-palette-error99: #fffbff;
   --md-ref-palette-error100: #ffffff;
+  /* success */
+  --md-ref-palette-success0: #000000; /* Black (0%) */
+--md-ref-palette-success10: #0c3200; /* 10% */
+--md-ref-palette-success20: #184400; /* 20% */
+--md-ref-palette-success25: #204e01; /* 25% */
+--md-ref-palette-success30: #285802; /* 30% */
+--md-ref-palette-success35: #306302; /* 35% */
+--md-ref-palette-success40: #386d03; /* 40% */
+--md-ref-palette-success45: #407704; /* 45% */
+--md-ref-palette-success50: #008000; /* Your desired green (50%) */
+--md-ref-palette-success55: #33aa33; /* 55% */
+--md-ref-palette-success60: #44aa44; /* 60% */
+--md-ref-palette-success70: #66cc66; /* 70% */
+--md-ref-palette-success80: #88dd88; /* 80% */
+--md-ref-palette-success90: #99dd99; /* 90% */
+--md-ref-palette-success95: #99ff99; /* 95% */
+--md-ref-palette-success98: #bbffbb; /* 98% */
+--md-ref-palette-success99: #ddffdd; /* 99% */
+--md-ref-palette-success100: #ffffff; /* White (100%) */
+
   /* light */
   /* --md-sys-color-primary-light: #315da8;
   --md-sys-color-on-primary-light: #ffffff;
@@ -171,6 +191,10 @@
   --md-sys-color-on-error-light: #ffffff;
   --md-sys-color-error-container-light: #ffdad6;
   --md-sys-color-on-error-container-light: #410002;
+  --md-sys-color-success-light: #386d03;
+  --md-sys-color-on-success-light: #ffffff;
+  --md-sys-color-success-container-light: #bbffbb;
+  --md-sys-color-on-success-container-light: #184400;
   /* dark */
   /* --md-sys-color-primary-dark: #adc6ff;
   --md-sys-color-on-primary-dark: #002e69;
@@ -240,6 +264,10 @@
   --md-sys-color-on-error-dark: #690005;
   --md-sys-color-error-container-dark: #93000a;
   --md-sys-color-on-error-container-dark: #ffdad6;
+  --md-sys-color-success-dark: #bbffbb;
+  --md-sys-color-on-success-dark: #285802;
+  --md-sys-color-success-container-dark: #407704;
+  --md-sys-color-on-success-container-dark: #ddffdd;
   /* base typescale */
   --my-brand-font: 'Nunito', sans-serif;
   --my-headline-font: 'Pacifico', cursive;

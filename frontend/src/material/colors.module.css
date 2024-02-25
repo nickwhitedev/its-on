@@ -94,6 +94,30 @@
 .on-error-container-text {
   color: var(--md-sys-color-on-error-container);
 }
+.success {
+  background-color: var(--md-sys-color-success);
+}
+.success-text {
+  color: var(--md-sys-color-success);
+}
+.success-container {
+  background-color: var(--md-sys-color-success-container);
+}
+.success-container-text {
+  color: var(--md-sys-color-success-container);
+}
+.on-success {
+  background-color: var(--md-sys-color-on-success);
+}
+.on-success-text {
+  color: var(--md-sys-color-on-success);
+}
+.on-success-container {
+  background-color: var(--md-sys-color-on-success-container);
+}
+.on-success-container-text {
+  color: var(--md-sys-color-on-success-container);
+}
 .background {
   background-color: var(--md-sys-color-background);
 }

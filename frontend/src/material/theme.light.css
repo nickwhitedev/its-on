@@ -60,4 +60,10 @@
   --md-sys-color-on-error-container: var(
     --md-sys-color-on-error-container-light
   );
+  --md-sys-color-success: var(--md-sys-color-success-light);
+  --md-sys-color-on-success: var(--md-sys-color-on-success-light);
+  --md-sys-color-success-container: var(--md-sys-color-success-container-light);
+  --md-sys-color-on-success-container: var(
+    --md-sys-color-on-success-container-light
+  );
 }
