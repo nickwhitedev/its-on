@@ -374,19 +374,23 @@ const Channel = ({ channelID }: Props) => {
       />
       {userIsChannelOwner ? (
         <>
-          <button
-            aria-label='Turn on channel'
-            className={`Channel-button ${isOn ? 'on' : ''}`}
-            disabled={isEditing || isUpdating}
-            onClick={() => void handleClickItsOn()}
-          >
-            <MDRipple />
-            <ItsOnIcon className='Channel-button-image' />
-          </button>
+          {isEditing ? null : (
+            <button
+              aria-label='Turn on channel'
+              className={`Channel-button ${isOn ? 'on' : ''}`}
+              disabled={isUpdating}
+              onClick={() => void handleClickItsOn()}
+            >
+              <MDRipple />
+              <ItsOnIcon className='Channel-button-image' />
+            </button>
+          )}
           <div className='Channel-duration-display'>
             {isEditing ? (
               <MDOutlinedSelect
                 className='Channel-select'
+                label='Duration'
+                supportingText='How long is it on?'
                 value={`${currentDuration}`}
                 onChange={(event: Event) => {
                   const newDuration = Number(
@@ -413,9 +417,10 @@ const Channel = ({ channelID }: Props) => {
                   date={expirationTime}
                   renderer={({ hours, minutes, seconds }) => (
                     <span>
-                      {hours > 0 ? `${zeroPad(hours)}:` : null}
-                      {minutes > 0 ? `${zeroPad(minutes)}:` : null}
-                      {zeroPad(seconds)}
+                      {`${zeroPad(hours)}:${zeroPad(minutes)}`}
+                      {hours === 0 && minutes === 0
+                        ? `:${zeroPad(seconds)}`
+                        : null}
                     </span>
                   )}
                   onComplete={() => {
