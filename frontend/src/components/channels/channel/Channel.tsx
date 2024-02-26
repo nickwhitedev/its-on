@@ -509,9 +509,10 @@ const Channel = ({ channelID }: Props) => {
                 date={expirationTime}
                 renderer={({ hours, minutes, seconds }) => (
                   <span>
-                    {hours > 0 ? `${zeroPad(hours)}:` : null}
-                    {minutes > 0 ? `${zeroPad(minutes)}:` : null}
-                    {zeroPad(seconds)}
+                    {`${zeroPad(hours)}:${zeroPad(minutes)}`}
+                    {hours === 0 && minutes === 0
+                      ? `:${zeroPad(seconds)}`
+                      : null}
                   </span>
                 )}
                 onComplete={() => {
