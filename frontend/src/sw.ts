@@ -95,6 +95,7 @@ self.addEventListener('push', function (event) {
 
   event.waitUntil(
     self.registration.showNotification(data.title, {
+      badge: './monochrome-icon-96.png',
       body: data.options.body,
       data: data.options.data,
     }),
