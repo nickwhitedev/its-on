@@ -98,6 +98,7 @@ self.addEventListener('push', function (event) {
       badge: './monochrome-icon-96.png',
       body: data.options.body,
       data: data.options.data,
+      icon: './icon-64.png',
     }),
   )
 })

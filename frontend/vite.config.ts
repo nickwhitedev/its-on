@@ -75,11 +75,18 @@ export default defineConfig({
         ],
         screenshots: [
           {
-            src: 'screenshot-1.png',
+            src: 'screenshots/screenshot-1.png',
             sizes: '1440x2865',
             type: 'image/png',
             form_factor: 'narrow',
-            label: "Homescreen of It's On",
+            label: "It's On",
+          },
+          {
+            src: 'screenshots/screenshot-wide-1.png',
+            sizes: '1280x720',
+            type: 'image/png',
+            form_factor: 'wide',
+            label: "It's On",
           },
         ],
       },
