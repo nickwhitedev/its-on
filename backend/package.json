@@ -11,7 +11,7 @@
     "@aws-sdk/client-secrets-manager": "^3.515.0",
     "@aws-sdk/lib-dynamodb": "^3.518.0",
     "@clerk/clerk-sdk-node": "^4.13.8",
-    "@middy/core": "^5.2.3",
+    "@middy/core": "^5.2.4",
     "esbuild": "^0.20.0",
     "jsonwebtoken": "^9.0.2",
     "jwks-rsa": "^3.1.0",
