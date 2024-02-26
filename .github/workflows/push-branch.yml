@@ -5,6 +5,8 @@ on:
     branches:
       - 'feature**'
       - 'release**'
+      - 'hotfix**'
+      - 'bugfix**'
 
 env:
   AWS_REGION: us-east-1
