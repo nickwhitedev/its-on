@@ -95,9 +95,10 @@ self.addEventListener('push', function (event) {
 
   event.waitUntil(
     self.registration.showNotification(data.title, {
-      body: data.options.body,
+      badge: './monochrome-icon-192.png',
+      body: `test ${data.options.body}`,
       data: data.options.data,
-      icon: './maskable-icon-192x192.png',
+      icon: './monochrome-icon-192.png',
     }),
   )
 })
