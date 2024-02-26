@@ -10,6 +10,7 @@ import { channelDisplayTitle } from './channelUtils'
 interface Props {
   channel: IChannel
   isEditing: boolean
+  isLoading: boolean
   isUpdating: boolean
   isOn: boolean
   currentTitle: string
@@ -23,6 +24,7 @@ interface Props {
 const ChannelHeader = ({
   channel,
   isEditing,
+  isLoading,
   isUpdating,
   isOn,
   currentTitle,
@@ -74,7 +76,7 @@ const ChannelHeader = ({
       {isEditing ? (
         <MDOutlinedTextField
           className={'ChannelHeader-input'}
-          disabled={isUpdating}
+          disabled={isLoading || isUpdating}
           label='Title'
           maxLength={40}
           rows={1}
