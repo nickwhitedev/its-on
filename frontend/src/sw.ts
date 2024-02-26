@@ -95,6 +95,7 @@ self.addEventListener('push', function (event) {
 
   event.waitUntil(
     self.registration.showNotification(data.title, {
+      badge: './maskable-icon-192x192.png',
       body: data.options.body,
       data: data.options.data,
       icon: './maskable-icon-192x192.png',

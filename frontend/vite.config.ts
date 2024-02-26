@@ -24,24 +24,34 @@ export default defineConfig({
         orientation: 'portrait-primary',
         icons: [
           {
-            src: 'pwa-192x192.png',
+            src: 'icon-192.png',
             sizes: '192x192',
             type: 'image/png',
           },
           {
-            src: 'pwa-512x512.png',
+            src: 'icon-512.png',
             sizes: '512x512',
             type: 'image/png',
           },
           {
-            src: 'pwa-512x512.png',
+            src: 'icon-512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any',
           },
           {
-            src: 'maskable-icon-192x192.png',
+            src: 'icon-high-res.svg',
+            sizes: 'any',
+          },
+          {
+            src: 'monochrome-icon-192.png',
             sizes: '192x192',
+            type: 'image/png',
+            purpose: 'monochrome',
+          },
+          {
+            src: 'icon-512.png',
+            sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable',
           },
