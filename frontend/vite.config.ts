@@ -17,6 +17,7 @@ export default defineConfig({
         name: "It's On",
         short_name: "It's On",
         description: "Always know when it's on",
+        categories: ['social'],
         display: 'standalone',
         start_url: '/',
         theme_color: '#131313',
@@ -50,10 +51,30 @@ export default defineConfig({
             purpose: 'monochrome',
           },
           {
+            src: 'monochrome-icon-high-res.svg',
+            sizes: 'any',
+            purpose: 'monochrome',
+          },
+          {
             src: 'icon-512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable',
+          },
+          {
+            src: 'icon-high-res.svg',
+            sizes: 'any',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
+        ],
+        screenshots: [
+          {
+            src: 'screenshot-1.png',
+            sizes: '1440x2865',
+            type: 'image/png',
+            form_factor: 'narrow',
+            label: "Homescreen of It's On",
           },
         ],
       },
@@ -62,13 +83,6 @@ export default defineConfig({
       workbox: {
         cleanupOutdatedCaches: true,
       },
-      // Promotional - not supported by vite types?
-      // screenshots: [
-      //   src: 'pwa-512x512.png',
-      //   sizes: '512x512',
-      //   type: 'image/png',
-      // ],
-      // categories: ['social'],
     }),
   ],
 })
