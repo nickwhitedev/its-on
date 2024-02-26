@@ -97,6 +97,7 @@ const Channel = ({ channelID }: Props) => {
     (user?.subscriptionCount ?? 0) >= (user?.tier ?? DEFAULT_USER_TIER)
 
   const channelIsOn = channel != null && isChannelOn(channel)
+  const channelIsLoading = isLoading !== false
 
   useEffect(() => {
     // Set page title
@@ -173,7 +174,7 @@ const Channel = ({ channelID }: Props) => {
   }, [channelIsOn])
 
   if (channel == null) {
-    return [true, null].includes(isLoading) ? (
+    return channelIsLoading ? (
       <MDCircularProgress
         className='Channel-loading'
         indeterminate
@@ -363,6 +364,7 @@ const Channel = ({ channelID }: Props) => {
       <ChannelHeader
         channel={channel}
         isEditing={isEditing}
+        isLoading={channelIsLoading}
         isUpdating={isUpdating}
         isOn={isOn}
         currentTitle={currentTitle}
@@ -389,6 +391,7 @@ const Channel = ({ channelID }: Props) => {
             {isEditing ? (
               <MDOutlinedSelect
                 className='Channel-select'
+                disabled={isUpdating || channelIsLoading}
                 label='Duration'
                 supportingText='How long is it on?'
                 value={`${currentDuration}`}
@@ -442,6 +445,7 @@ const Channel = ({ channelID }: Props) => {
           <ChannelNote
             channel={channel}
             isEditing={isEditing}
+            isLoading={channelIsLoading}
             isUpdating={isUpdating}
             currentNote={currentNote}
             userIsChannelOwner={userIsChannelOwner}
@@ -451,7 +455,7 @@ const Channel = ({ channelID }: Props) => {
             currentCapacity={currentCapacity}
             channel={channel}
             isEditing={isEditing}
-            isLoading={[true, null].includes(isLoading)}
+            isLoading={channelIsLoading}
             isUpdating={isUpdating}
             onChangeCurrentCapacity={setCurrentCapacity}
             setIsUpdating={setIsUpdating}
@@ -509,9 +513,10 @@ const Channel = ({ channelID }: Props) => {
                 date={expirationTime}
                 renderer={({ hours, minutes, seconds }) => (
                   <span>
-                    {hours > 0 ? `${zeroPad(hours)}:` : null}
-                    {minutes > 0 ? `${zeroPad(minutes)}:` : null}
-                    {zeroPad(seconds)}
+                    {`${zeroPad(hours)}:${zeroPad(minutes)}`}
+                    {hours === 0 && minutes === 0
+                      ? `:${zeroPad(seconds)}`
+                      : null}
                   </span>
                 )}
                 onComplete={() => {
@@ -523,6 +528,7 @@ const Channel = ({ channelID }: Props) => {
           <ChannelNote
             channel={channel}
             isEditing={isEditing}
+            isLoading={channelIsLoading}
             isUpdating={isUpdating}
             currentNote={currentNote}
             userIsChannelOwner={userIsChannelOwner}
@@ -540,7 +546,12 @@ const Channel = ({ channelID }: Props) => {
         <>
           <MDFilledButton
             className='Channel-subscribe-button'
-            disabled={isUpdating || isChannelFull || userHasMaxSubscriptions}
+            disabled={
+              channelIsLoading ||
+              isUpdating ||
+              isChannelFull ||
+              userHasMaxSubscriptions
+            }
             onClick={() => void handleClickSubscribe()}
           >
             {isChannelFull ? 'Channel Full' : 'Subscribe'}
