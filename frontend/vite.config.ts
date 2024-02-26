@@ -25,6 +25,11 @@ export default defineConfig({
         orientation: 'portrait-primary',
         icons: [
           {
+            src: 'icon-64.png',
+            sizes: '64x64',
+            type: 'image/png',
+          },
+          {
             src: 'icon-192.png',
             sizes: '192x192',
             type: 'image/png',
