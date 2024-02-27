@@ -35,7 +35,7 @@ Conditions:
 Globals:
   Function:
     Architectures:
-      - x86_64
+      - arm64
     Environment:
       Variables:
         CLERK_SECRET_KEY_NAME:
@@ -72,9 +72,9 @@ Globals:
     Layers:
       - !Ref ItsOnNodeModulesLambdaLayer
       - !Ref ItsOnCommonLambdaLayer
-    MemorySize: 128
+    MemorySize: 512
     Runtime: nodejs20.x
-    Timeout: 100
+    Timeout: 300
 
 # Resources declares the AWS resources that you want to include in the stack
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
