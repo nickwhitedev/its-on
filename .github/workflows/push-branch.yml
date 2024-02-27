@@ -153,7 +153,6 @@ jobs:
       - run: |
           yarn build \
             --template ${SAM_TEMPLATE} \
-            --use-container \
             --parameter-overrides \
               ParameterKey=Env,ParameterValue=$(echo ${GITHUB_REF##*/} | tr -cd '[a-zA-Z0-9-]') \
               ParameterKey=PipelineRole,ParameterValue=${TESTING_PIPELINE_EXECUTION_ROLE} \
