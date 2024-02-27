@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "fyi.itson.twa",
+      "sha256_cert_fingerprints": [
+        "DC:49:7A:22:36:1C:D0:41:8C:BE:D6:A5:BA:42:FA:E8:3B:3D:DC:A8:4C:6A:A4:8F:A8:FB:F5:18:E8:E4:B6:73"
+      ]
+    }
+  }
+]

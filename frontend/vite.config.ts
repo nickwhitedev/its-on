@@ -14,6 +14,7 @@ export default defineConfig({
         type: 'module',
       },
       manifest: {
+        id: 'itson',
         name: "It's On",
         short_name: "It's On",
         description: "Always know when it's on",
@@ -23,6 +24,11 @@ export default defineConfig({
         theme_color: '#131313',
         background_color: '#131313',
         orientation: 'portrait-primary',
+        dir: 'ltr',
+        prefer_related_applications: false,
+        launch_handler: {
+          client_mode: ['navigate-existing', 'auto'],
+        },
         icons: [
           {
             src: 'icon-64.png',
