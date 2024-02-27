@@ -147,7 +147,6 @@ jobs:
         run: |
           yarn build \
             --template ${SAM_TEMPLATE} \
-            --use-container \
             --parameter-overrides \
               ParameterKey=Env,ParameterValue=prod \
               ParameterKey=PipelineRole,ParameterValue=${PROD_PIPELINE_EXECUTION_ROLE} \
