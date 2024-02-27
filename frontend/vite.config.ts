@@ -62,6 +62,12 @@ export default defineConfig({
             purpose: 'monochrome',
           },
           {
+            src: 'monochrome-icon-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'monochrome',
+          },
+          {
             src: 'monochrome-icon-high-res.svg',
             sizes: 'any',
             purpose: 'monochrome',
