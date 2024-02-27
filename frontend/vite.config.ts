@@ -81,11 +81,32 @@ export default defineConfig({
         ],
         screenshots: [
           {
-            src: 'screenshots/screenshot-1.png',
-            sizes: '1440x2865',
+            src: 'screenshots/screenshot-channel-light.png',
+            sizes: '1080x1920',
             type: 'image/png',
             form_factor: 'narrow',
-            label: "It's On",
+            label: "It's On - Channel (light mode)",
+          },
+          {
+            src: 'screenshots/screenshot-channels-light.png',
+            sizes: '1080x1920',
+            type: 'image/png',
+            form_factor: 'narrow',
+            label: "It's On - Channels (light mode)",
+          },
+          {
+            src: 'screenshots/screenshot-channel-dark.png',
+            sizes: '1080x1920',
+            type: 'image/png',
+            form_factor: 'narrow',
+            label: "It's On - Channel (dark mode)",
+          },
+          {
+            src: 'screenshots/screenshot-channels-dark.png',
+            sizes: '1080x1920',
+            type: 'image/png',
+            form_factor: 'narrow',
+            label: "It's On - Channels (dark mode)",
           },
           {
             src: 'screenshots/screenshot-wide-1.png',
