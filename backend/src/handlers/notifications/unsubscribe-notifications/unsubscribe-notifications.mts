@@ -62,10 +62,6 @@ const unsubscribeNotifications = async (
           '#subscriptions': 'subscriptions',
           '#subscriptionID': subscription.endpoint,
         },
-        ConditionExpression: '#subscriptions.#subscriptionID = :subscriptionID',
-        ExpressionAttributeValues: {
-          ':subscriptionID': subscription.endpoint,
-        },
       }),
     )
     logger.debug('Success - user profile updated', { ddbResponse })

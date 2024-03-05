@@ -11,7 +11,7 @@ import { Logger } from '@aws-lambda-powertools/logger'
 import { MetricUnit, Metrics } from '@aws-lambda-powertools/metrics'
 import { KeysAndAttributes } from '@aws-sdk/client-dynamodb'
 import { DynamoDBRecord } from 'aws-lambda'
-import webPush, { PushSubscription } from 'web-push'
+import webPush, { PushSubscription, WebPushError } from 'web-push'
 import {
   DYNAMODB_TABLE_NAME,
   PUSH_NOTIFICATION_PRIVATE_KEY,
@@ -50,7 +50,7 @@ const sendUserNotification = async ({
     notificationSubscription,
   ) as PushSubscription
   try {
-    const sendNotificationResponse = await sendNotification(
+    await sendNotification(
       pushSubscription,
       JSON.stringify({
         title: `${channelTitle} • ${channelOwner}`,
@@ -70,39 +70,45 @@ const sendUserNotification = async ({
         },
       },
     )
-
-    if (sendNotificationResponse.statusCode === 410) {
-      try {
-        const ddbResponse = await ddbDocClient.send(
-          new UpdateCommand({
-            Key: {
-              pk: userIDPK,
-              sk: 'notificationSubscriptions',
-            },
-            ReturnValues: 'ALL_NEW',
-            TableName: DYNAMODB_TABLE_NAME,
-            UpdateExpression: 'REMOVE #subscriptions.#subscriptionID',
-            ExpressionAttributeNames: {
-              '#subscriptions': 'subscriptions',
-              '#subscriptionID': notificationSubscriptionEndpoint,
-            },
-            ConditionExpression:
-              '#subscriptions.#subscriptionID = :subscriptionID',
-            ExpressionAttributeValues: {
-              ':subscriptionID': notificationSubscriptionEndpoint,
-            },
-          }),
-        )
-        logger.debug('Delete user notification subscription', { ddbResponse })
-      } catch (error) {
-        logger.error(
-          'Delete user notification subscription error',
-          error as Error,
-        )
-      }
-    }
   } catch (error) {
-    logger.error('Notification Send Error: ', error as Error)
+    if (error instanceof WebPushError) {
+      if (error.statusCode === 410) {
+        try {
+          const ddbResponse = await ddbDocClient.send(
+            new UpdateCommand({
+              Key: {
+                pk: userIDPK,
+                sk: 'notificationSubscriptions',
+              },
+              ReturnValues: 'ALL_NEW',
+              TableName: DYNAMODB_TABLE_NAME,
+              UpdateExpression: 'REMOVE #subscriptions.#subscriptionID',
+              ExpressionAttributeNames: {
+                '#subscriptions': 'subscriptions',
+                '#subscriptionID': notificationSubscriptionEndpoint,
+              },
+            }),
+          )
+          logger.debug('Delete user notification subscription', { ddbResponse })
+        } catch (ddbError) {
+          logger.error(
+            'Delete user notification subscription error',
+            ddbError as Error,
+          )
+        }
+      } else {
+        logger.error('Notification Send WebPushError: ', {
+          body: error.body,
+          cause: error.cause,
+          message: error.message,
+          name: error.name,
+          stack: error.stack,
+          statusCode: error.statusCode,
+        })
+      }
+    } else {
+      logger.error('Notification Send Error: ', error as Error)
+    }
   }
 }
 
