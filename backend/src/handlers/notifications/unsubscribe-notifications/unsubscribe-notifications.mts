@@ -15,7 +15,8 @@ const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
 
 interface IPayload {
-  subscription: PushSubscription
+  subscription?: PushSubscription
+  userID?: string
 }
 
 /**
@@ -34,22 +35,20 @@ const unsubscribeNotifications = async (
 
   const eventPath = event.path
 
-  const userID = (event.requestContext.authorizer?.sub ?? '') as string
-
   if (event.body == null) {
-    return createResponse({
-      eventPath,
-      responseBody: {
-        message:
-          'Request body must contain subscription as an instance of PushSubscription',
-      },
-      statusCode: 400,
-    })
+    return createParams400Response(eventPath)
   }
 
-  const subscription = (JSON.parse(event.body) as IPayload).subscription
+  const requestBody = JSON.parse(event.body) as IPayload
+  const userID = requestBody.userID
+  const subscription = requestBody.subscription
+
+  if ([undefined, ''].includes(userID) || subscription == null) {
+    return createParams400Response(eventPath)
+  }
 
   try {
+    logger.debug('subscription.endpoint: ', subscription.endpoint)
     const ddbResponse = await ddbDocClient.send(
       new UpdateCommand({
         Key: {
@@ -81,5 +80,15 @@ const unsubscribeNotifications = async (
     statusCode: 200,
   })
 }
+
+const createParams400Response = (eventPath: string) =>
+  createResponse({
+    eventPath,
+    responseBody: {
+      message:
+        'Request body must contain userID and subscription as an instance of PushSubscription',
+    },
+    statusCode: 400,
+  })
 
 export default unsubscribeNotifications
