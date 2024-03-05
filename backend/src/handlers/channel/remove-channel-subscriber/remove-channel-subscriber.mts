@@ -9,7 +9,7 @@ import {
 } from 'aws-lambda'
 
 import { Logger } from '@aws-lambda-powertools/logger'
-import { MetricUnits, Metrics } from '@aws-lambda-powertools/metrics'
+import { MetricUnit, Metrics } from '@aws-lambda-powertools/metrics'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
 import { getChannel, getUserInfo } from '/opt/nodejs/dynamo.mjs'
@@ -110,7 +110,7 @@ const removeChannelSubscriber = async (
     })
   }
 
-  metrics.addMetric('subscriberRemoved', MetricUnits.Count, 1)
+  metrics.addMetric('subscriberRemoved', MetricUnit.Count, 1)
 
   return createResponse({
     eventPath,

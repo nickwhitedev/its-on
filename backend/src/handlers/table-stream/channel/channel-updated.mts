@@ -7,7 +7,7 @@ import {
 } from '@aws-sdk/lib-dynamodb'
 
 import { Logger } from '@aws-lambda-powertools/logger'
-import { MetricUnits, Metrics } from '@aws-lambda-powertools/metrics'
+import { MetricUnit, Metrics } from '@aws-lambda-powertools/metrics'
 import { KeysAndAttributes } from '@aws-sdk/client-dynamodb'
 import { DynamoDBRecord } from 'aws-lambda'
 import webPush, { PushSubscription } from 'web-push'
@@ -319,7 +319,7 @@ export const handleChannelUpdated = async ({
           )
           metrics.addMetric(
             'notificationSent',
-            MetricUnits.Count,
+            MetricUnit.Count,
             subscriberNotificationSubscriptions.length,
           )
         } catch (error) {

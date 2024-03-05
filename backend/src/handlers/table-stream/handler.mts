@@ -1,5 +1,6 @@
 import { Logger, injectLambdaContext } from '@aws-lambda-powertools/logger'
-import { Metrics, logMetrics } from '@aws-lambda-powertools/metrics'
+import { Metrics } from '@aws-lambda-powertools/metrics'
+import { logMetrics } from '@aws-lambda-powertools/metrics/middleware'
 import middy from '@middy/core'
 import { DynamoDBStreamEvent } from 'aws-lambda'
 import processTableStream from './table-stream.mjs'
