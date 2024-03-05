@@ -5,7 +5,7 @@ import {
 } from 'aws-lambda'
 
 import { Logger } from '@aws-lambda-powertools/logger'
-import { MetricUnits, Metrics } from '@aws-lambda-powertools/metrics'
+import { MetricUnit, Metrics } from '@aws-lambda-powertools/metrics'
 import { LogLevel } from 'esbuild'
 import { createResponse } from '/opt/nodejs/response.mjs'
 
@@ -46,7 +46,7 @@ const postLog = async (
     logger.info({ logLevel, userID, ...log })
   }
 
-  metrics.addMetric('frontendLogs', MetricUnits.Count, 1)
+  metrics.addMetric('frontendLogs', MetricUnit.Count, 1)
 
   return new Promise(resolve => {
     resolve(

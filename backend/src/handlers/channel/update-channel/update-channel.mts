@@ -7,7 +7,7 @@ import {
 import { getChannel, getUserInfo } from '/opt/nodejs/dynamo.mjs'
 
 import { Logger } from '@aws-lambda-powertools/logger'
-import { MetricUnits, Metrics } from '@aws-lambda-powertools/metrics'
+import { MetricUnit, Metrics } from '@aws-lambda-powertools/metrics'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
 import { createResponse } from '/opt/nodejs/response.mjs'
@@ -114,7 +114,7 @@ const updateChannel = async (
       }),
     )
     logger.debug('Success - item updated', { ddbResponse })
-    metrics.addMetric('channelUpdated', MetricUnits.Count, 1)
+    metrics.addMetric('channelUpdated', MetricUnit.Count, 1)
     return createResponse({
       eventPath,
       responseBody: { message: 'Updated' },
