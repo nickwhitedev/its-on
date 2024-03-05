@@ -4,6 +4,7 @@ import {
   DynamoDBDocumentClient,
   PutCommand,
   QueryCommand,
+  UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
 
 import { Logger } from '@aws-lambda-powertools/logger'
@@ -27,23 +28,29 @@ const sendUserNotification = async ({
   channelNote,
   channelOwner,
   channelTitle,
-  notificationSubscription,
-  TTL,
+  ddbDocClient,
   logger,
+  notificationSubscription,
+  notificationSubscriptionEndpoint,
+  TTL,
+  userIDPK,
 }: {
   channelID: string
   channelNote: string
   channelOwner: string
   channelTitle: string
-  notificationSubscription: string
-  TTL: number
+  ddbDocClient: DynamoDBDocumentClient
   logger: Logger
+  notificationSubscription: string
+  notificationSubscriptionEndpoint: string
+  TTL: number
+  userIDPK: string
 }) => {
   const pushSubscription = JSON.parse(
     notificationSubscription,
   ) as PushSubscription
   try {
-    await sendNotification(
+    const sendNotificationResponse = await sendNotification(
       pushSubscription,
       JSON.stringify({
         title: `${channelTitle} • ${channelOwner}`,
@@ -63,6 +70,37 @@ const sendUserNotification = async ({
         },
       },
     )
+
+    if (sendNotificationResponse.statusCode === 410) {
+      try {
+        const ddbResponse = await ddbDocClient.send(
+          new UpdateCommand({
+            Key: {
+              pk: userIDPK,
+              sk: 'notificationSubscriptions',
+            },
+            ReturnValues: 'ALL_NEW',
+            TableName: DYNAMODB_TABLE_NAME,
+            UpdateExpression: 'REMOVE #subscriptions.#subscriptionID',
+            ExpressionAttributeNames: {
+              '#subscriptions': 'subscriptions',
+              '#subscriptionID': notificationSubscriptionEndpoint,
+            },
+            ConditionExpression:
+              '#subscriptions.#subscriptionID = :subscriptionID',
+            ExpressionAttributeValues: {
+              ':subscriptionID': notificationSubscriptionEndpoint,
+            },
+          }),
+        )
+        logger.debug('Delete user notification subscription', { ddbResponse })
+      } catch (error) {
+        logger.error(
+          'Delete user notification subscription error',
+          error as Error,
+        )
+      }
+    }
   } catch (error) {
     logger.error('Notification Send Error: ', error as Error)
   }
@@ -73,29 +111,34 @@ const sendUserNotifications = async ({
   channelNote,
   channelOwner,
   channelTitle,
+  ddbDocClient,
+  logger,
   notificationSubscriptions,
   TTL,
-  logger,
 }: {
   channelID: string
   channelNote: string
   channelOwner: string
   channelTitle: string
+  ddbDocClient: DynamoDBDocumentClient
+  logger: Logger
   notificationSubscriptions: IDynamoUserNotificationSubscriptionsItem
   TTL: number
-  logger: Logger
 }) => {
   await Promise.all(
-    Object.values(notificationSubscriptions.subscriptions).map(
-      async notificationSubscription => {
+    Object.entries(notificationSubscriptions.subscriptions).map(
+      async ([notificationSubscriptionEndpoint, notificationSubscription]) => {
         await sendUserNotification({
           channelID,
           channelNote,
           channelOwner,
           channelTitle,
-          notificationSubscription,
-          TTL,
+          ddbDocClient,
           logger,
+          notificationSubscription,
+          notificationSubscriptionEndpoint,
+          TTL,
+          userIDPK: notificationSubscriptions.pk,
         })
       },
     ),
@@ -310,9 +353,10 @@ export const handleChannelUpdated = async ({
                   channelNote: channelInfo.note ?? '',
                   channelOwner: channelInfo.owner ?? 'unknown',
                   channelTitle: channelInfo.title ?? 'Untitled Channel',
+                  ddbDocClient,
+                  logger,
                   notificationSubscriptions,
                   TTL: (channelInfo.lastOnDuration ?? MS_IN_HOUR) * 1000,
-                  logger,
                 })
               },
             ),

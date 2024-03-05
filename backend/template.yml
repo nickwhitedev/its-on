@@ -515,6 +515,9 @@ Resources:
         Api:
           Type: Api
           Properties:
+            Auth:
+              Authorizer: NONE
+              OverrideApiAuth: true
             RestApiId: !Ref ItsOnApi
             Path: /unsubscribe-notifications
             Method: POST
@@ -813,16 +816,6 @@ Resources:
           AliasTarget:
             HostedZoneId: Z2FDTNDATAQYW2
             DNSName: !GetAtt ItsOnCloudFrontDistribution.DomainName
-        # TODO: Auth CName
-        # - Name:
-        #     'Fn::If':
-        #       - IsProdEnv
-        #       - auth.itson.fyi
-        #       - !Sub ${Env}-auth.itson.fyi
-        #   ResourceRecords:
-        #     - !GetAtt ItsOnUserPoolDomain.CloudFrontDistribution
-        #   TTL: 60
-        #   Type: CNAME
 
 Outputs:
   ApiEndpoint:
@@ -832,13 +825,6 @@ Outputs:
         - IsProdEnv
         - https://api.itson.fyi
         - !Sub https://${Env}.api.itson.fyi
-  AuthEndpoint:
-    Description: 'Cognito Hosted UI endpoint URL for given env'
-    Value:
-      'Fn::If':
-        - IsProdEnv
-        - https://auth.itson.fyi
-        - !Sub https://${Env}-auth.itson.fyi
   ItsOnFrontendBucketName:
     Value:
       'Fn::If':

@@ -1,4 +1,5 @@
 import {
+  DeleteCommand,
   DynamoDBDocumentClient,
   QueryCommand,
   QueryCommandOutput,
@@ -21,6 +22,22 @@ export const handleUserDeleted = async ({
   logger,
 }: Params) => {
   const pk = record.dynamodb?.Keys?.pk?.S
+
+  // delete user notification subscriptions
+  try {
+    const ddbResponse = await ddbDocClient.send(
+      new DeleteCommand({
+        Key: {
+          pk: pk,
+          sk: 'notificationSubscriptions',
+        },
+        TableName: DYNAMODB_TABLE_NAME,
+      }),
+    )
+    logger.debug('Delete user notification subscriptions', { ddbResponse })
+  } catch (error) {
+    logger.error('Delete user notification subscriptions error', error as Error)
+  }
 
   // get and delete user channels
   let lastEvaluatedKey: Record<string, unknown> | undefined
