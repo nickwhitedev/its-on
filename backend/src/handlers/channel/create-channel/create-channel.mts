@@ -10,7 +10,7 @@ import {
 import { getChannel, getUserInfo } from '/opt/nodejs/dynamo.mjs'
 
 import { Logger } from '@aws-lambda-powertools/logger'
-import { MetricUnits, Metrics } from '@aws-lambda-powertools/metrics'
+import { MetricUnit, Metrics } from '@aws-lambda-powertools/metrics'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { customAlphabet } from 'nanoid'
 import { alphanumeric } from 'nanoid-dictionary'
@@ -131,7 +131,7 @@ const createChannel = async (
     })
   }
 
-  metrics.addMetric('channelCreated', MetricUnits.Count, 1)
+  metrics.addMetric('channelCreated', MetricUnit.Count, 1)
 
   return createResponse({
     eventPath,

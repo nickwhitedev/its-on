@@ -5,7 +5,7 @@ import {
 } from 'aws-lambda'
 
 import { Logger } from '@aws-lambda-powertools/logger'
-import { MetricUnits, Metrics } from '@aws-lambda-powertools/metrics'
+import { MetricUnit, Metrics } from '@aws-lambda-powertools/metrics'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import {
   GetSecretValueCommand,
@@ -110,7 +110,7 @@ const authWebhook = async (
           }),
         )
         logger.debug('Success - user deleted', { ddbResponse })
-        metrics.addMetric('userDelete', MetricUnits.Count, 1)
+        metrics.addMetric('userDelete', MetricUnit.Count, 1)
       } catch (error) {
         logger.error('Error', error as Error)
         return createResponse({

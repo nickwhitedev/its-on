@@ -4,13 +4,14 @@ import {
   DynamoDBDocumentClient,
   PutCommand,
   QueryCommand,
+  UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
 
 import { Logger } from '@aws-lambda-powertools/logger'
-import { MetricUnits, Metrics } from '@aws-lambda-powertools/metrics'
+import { MetricUnit, Metrics } from '@aws-lambda-powertools/metrics'
 import { KeysAndAttributes } from '@aws-sdk/client-dynamodb'
 import { DynamoDBRecord } from 'aws-lambda'
-import webPush, { PushSubscription } from 'web-push'
+import webPush, { PushSubscription, WebPushError } from 'web-push'
 import {
   DYNAMODB_TABLE_NAME,
   PUSH_NOTIFICATION_PRIVATE_KEY,
@@ -27,17 +28,23 @@ const sendUserNotification = async ({
   channelNote,
   channelOwner,
   channelTitle,
-  notificationSubscription,
-  TTL,
+  ddbDocClient,
   logger,
+  notificationSubscription,
+  notificationSubscriptionEndpoint,
+  TTL,
+  userIDPK,
 }: {
   channelID: string
   channelNote: string
   channelOwner: string
   channelTitle: string
-  notificationSubscription: string
-  TTL: number
+  ddbDocClient: DynamoDBDocumentClient
   logger: Logger
+  notificationSubscription: string
+  notificationSubscriptionEndpoint: string
+  TTL: number
+  userIDPK: string
 }) => {
   const pushSubscription = JSON.parse(
     notificationSubscription,
@@ -64,7 +71,44 @@ const sendUserNotification = async ({
       },
     )
   } catch (error) {
-    logger.error('Notification Send Error: ', error as Error)
+    if (error instanceof WebPushError) {
+      if (error.statusCode === 410) {
+        try {
+          const ddbResponse = await ddbDocClient.send(
+            new UpdateCommand({
+              Key: {
+                pk: userIDPK,
+                sk: 'notificationSubscriptions',
+              },
+              ReturnValues: 'ALL_NEW',
+              TableName: DYNAMODB_TABLE_NAME,
+              UpdateExpression: 'REMOVE #subscriptions.#subscriptionID',
+              ExpressionAttributeNames: {
+                '#subscriptions': 'subscriptions',
+                '#subscriptionID': notificationSubscriptionEndpoint,
+              },
+            }),
+          )
+          logger.debug('Delete user notification subscription', { ddbResponse })
+        } catch (ddbError) {
+          logger.error(
+            'Delete user notification subscription error',
+            ddbError as Error,
+          )
+        }
+      } else {
+        logger.error('Notification Send WebPushError: ', {
+          body: error.body,
+          cause: error.cause,
+          message: error.message,
+          name: error.name,
+          stack: error.stack,
+          statusCode: error.statusCode,
+        })
+      }
+    } else {
+      logger.error('Notification Send Error: ', error as Error)
+    }
   }
 }
 
@@ -73,29 +117,34 @@ const sendUserNotifications = async ({
   channelNote,
   channelOwner,
   channelTitle,
+  ddbDocClient,
+  logger,
   notificationSubscriptions,
   TTL,
-  logger,
 }: {
   channelID: string
   channelNote: string
   channelOwner: string
   channelTitle: string
+  ddbDocClient: DynamoDBDocumentClient
+  logger: Logger
   notificationSubscriptions: IDynamoUserNotificationSubscriptionsItem
   TTL: number
-  logger: Logger
 }) => {
   await Promise.all(
-    Object.values(notificationSubscriptions.subscriptions).map(
-      async notificationSubscription => {
+    Object.entries(notificationSubscriptions.subscriptions).map(
+      async ([notificationSubscriptionEndpoint, notificationSubscription]) => {
         await sendUserNotification({
           channelID,
           channelNote,
           channelOwner,
           channelTitle,
-          notificationSubscription,
-          TTL,
+          ddbDocClient,
           logger,
+          notificationSubscription,
+          notificationSubscriptionEndpoint,
+          TTL,
+          userIDPK: notificationSubscriptions.pk,
         })
       },
     ),
@@ -310,16 +359,17 @@ export const handleChannelUpdated = async ({
                   channelNote: channelInfo.note ?? '',
                   channelOwner: channelInfo.owner ?? 'unknown',
                   channelTitle: channelInfo.title ?? 'Untitled Channel',
+                  ddbDocClient,
+                  logger,
                   notificationSubscriptions,
                   TTL: (channelInfo.lastOnDuration ?? MS_IN_HOUR) * 1000,
-                  logger,
                 })
               },
             ),
           )
           metrics.addMetric(
             'notificationSent',
-            MetricUnits.Count,
+            MetricUnit.Count,
             subscriberNotificationSubscriptions.length,
           )
         } catch (error) {

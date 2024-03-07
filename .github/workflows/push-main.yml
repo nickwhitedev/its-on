@@ -255,7 +255,6 @@ jobs:
         working-directory: backend
     outputs:
       web-endpoint: ${{ steps.set-env-vars.outputs.WebEndpoint }}
-      auth-endpoint: ${{ steps.set-env-vars.outputs.AuthEndpoint }}
       api-endpoint: ${{ steps.set-env-vars.outputs.ApiEndpoint }}
     # Configure GitHub Action Environment to have a manual approval step before deployment to production
     # https://docs.github.com/en/actions/reference/environments
@@ -328,7 +327,6 @@ jobs:
         working-directory: frontend
         run: |
           echo "VITE_BASE_URL=\"${{ needs.deploy-prod-api.outputs.web-endpoint }}\"" >> .env.production
-          echo "VITE_AUTH_URL=\"${{ needs.deploy-prod-api.outputs.auth-endpoint }}\"" >> .env.production
           echo "VITE_API_URL=\"${{ needs.deploy-prod-api.outputs.api-endpoint }}\"" >> .env.production
           echo "VITE_CLERK_PUBLISHABLE_KEY=\"${{ env.CLERK_PUBLIC_KEY }}\"" >> .env.production
       - name: Build frontend
