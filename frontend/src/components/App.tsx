@@ -82,7 +82,7 @@ const App = () => {
         <SignedIn>
           <div className='App-settings'>
             <UserButton
-              afterSignOutUrl={`${baseUrl}?${signedOutURLParams.toString()}`}
+              afterSignOutUrl={`${baseUrl}/?${signedOutURLParams.toString()}`}
               userProfileMode='modal'
             />
           </div>
