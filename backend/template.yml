@@ -65,6 +65,11 @@ Globals:
         POWERTOOLS_METRICS_NAMESPACE: its-on
         PUSH_NOTIFICATION_PUBLIC_KEY: !Ref PushNotificationPublicKey
         PUSH_NOTIFICATION_PRIVATE_KEY: !Ref PushNotificationPrivateKey
+        STRIPE_API_SECRET_KEY_NAME:
+          'Fn::If':
+            - IsProdEnv
+            - ItsOnStripeApiSecretKey
+            - ItsOnStripeApiDevSecretKey
         WEB_URL:
           'Fn::If':
             - IsProdEnv

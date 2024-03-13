@@ -38,6 +38,7 @@ if (rootElement != null) {
               : '#1b1b1b',
           },
         }}
+        supportEmail='support@itson.fyi'
       >
         <AppContextProvider>
           <RouterProvider router={router} />
