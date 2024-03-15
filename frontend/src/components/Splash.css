@@ -17,10 +17,6 @@
   margin: 1.8rem 0;
   font: inherit;
   outline: inherit;
-  height: 60vh;
-  width: 60vh;
-  max-height: 80vw;
-  max-width: 100%;
   transition: background-color 0.5s ease-out;
 }
 
