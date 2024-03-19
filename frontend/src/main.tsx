@@ -26,6 +26,7 @@ if (rootElement != null) {
             ? dark
             : undefined,
           layout: {
+            helpPageUrl: `${baseUrl}/support`,
             termsPageUrl: `${baseUrl}/terms`,
             privacyPageUrl: `${baseUrl}/privacy`,
           },
