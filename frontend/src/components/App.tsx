@@ -17,11 +17,11 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useError } from '../contexts/error/errorContext'
 import { apiUrl, baseUrl } from '../utils/urls'
 import Home from './Home'
-import PrivacyPolicy from './legal/PrivacyPolicy'
 import TermsOfUse from './legal/TermsOfUse'
 import MDTextButton from './material/button/MDTextButton'
 import MDCircularProgress from './material/progress/MDCircularProgress'
 import Splash from './Splash'
+import Support from './support/Support'
 
 const App = () => {
   const error = useError()
@@ -97,7 +97,9 @@ const App = () => {
             {pathname === '/terms' ? (
               <TermsOfUse />
             ) : pathname === '/privacy' ? (
-              <PrivacyPolicy />
+              <TermsOfUse />
+            ) : pathname === '/support' ? (
+              <Support />
             ) : (
               <>
                 <SignInButton mode='modal'>
