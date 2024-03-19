@@ -75,10 +75,10 @@
   resolved "https://registry.yarnpkg.com/@aws-lambda-powertools/commons/-/commons-1.18.1.tgz#fcfdef39639105a7b2b5363e4bcade9d277f5468"
   integrity sha512-gFRgQ2GJDghKvf+fXvT0kQVftgOT05W+hCa7RkfZj6HSjVAO+9DZZeJL3JK1HcsLAjWRj7W9ra0/MqB3Abf+PQ==
 
-"@aws-lambda-powertools/commons@^2.0.2":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@aws-lambda-powertools/commons/-/commons-2.0.2.tgz#e2b8d31e7bfdc067ed0cf3e96f1c1266850d8b39"
-  integrity sha512-5fHXZwol2LVb+UGwNPHVIZfeAgztyLaAABNvVlDqzrkpwlbfEAEBRxQN9I/vgm4NNJC7+hZHqk0ca+R4JHZBGQ==
+"@aws-lambda-powertools/commons@^2.0.3":
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/@aws-lambda-powertools/commons/-/commons-2.0.3.tgz#daa2d05c4a247c5e158d33a7138ed59f3058ef30"
+  integrity sha512-ZuVYhzCkqlMFjAe0mgtNzgIFIJnnd9kZtWO50+YWXhtYK5o9LPHb2drKh8y4mSCIbbaJnbGxMUwas+j1UZl2Uw==
 
 "@aws-lambda-powertools/logger@^1.18.1":
   version "1.18.1"
@@ -88,12 +88,12 @@
     "@aws-lambda-powertools/commons" "^1.18.1"
     lodash.merge "^4.6.2"
 
-"@aws-lambda-powertools/metrics@^2.0.2":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@aws-lambda-powertools/metrics/-/metrics-2.0.2.tgz#316734b005abbfedd20b991aff48ece308b6a88d"
-  integrity sha512-MEFbUzlA7NPJ72T3NJZD1cK/nqwQKZkdTZQT1bEu5/LOatAgSYUWjo1SP1lNe7WAe1n2pEKqCTeCsQd3FG46Mg==
+"@aws-lambda-powertools/metrics@^2.0.3":
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/@aws-lambda-powertools/metrics/-/metrics-2.0.3.tgz#3732708e4e92c9fa04db3cfddc194bea836707bf"
+  integrity sha512-l1XPRCp4tcpyIygzFw1o0tUjzx7W1zg6EJQj6nXjF2UiV31DPSjucjGryHzscyFgh3ut8HZRTKgjAiwzZq/JfQ==
   dependencies:
-    "@aws-lambda-powertools/commons" "^2.0.2"
+    "@aws-lambda-powertools/commons" "^2.0.3"
 
 "@aws-sdk/client-dynamodb@^3.529.1":
   version "3.529.1"
