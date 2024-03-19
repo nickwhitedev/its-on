@@ -4,6 +4,7 @@ import Channels from '../../components/channels/Channels'
 import PrivacyPolicy from '../../components/legal/PrivacyPolicy'
 import TermsOfUse from '../../components/legal/TermsOfUse'
 import Subscriptions from '../../components/subscriptions/Subscriptions'
+import Support from '../../components/support/Support'
 import ChannelRouteHandler from './channels/ChannelRouteHandler'
 
 const appRouter = [
@@ -33,6 +34,10 @@ const appRouter = [
   {
     element: <PrivacyPolicy />,
     path: 'privacy',
+  },
+  {
+    element: <Support />,
+    path: 'support',
   },
 ]
 
