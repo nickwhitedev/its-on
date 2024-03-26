@@ -1,4 +1,5 @@
-import { Logger, injectLambdaContext } from '@aws-lambda-powertools/logger'
+import { Logger } from '@aws-lambda-powertools/logger'
+import { injectLambdaContext } from '@aws-lambda-powertools/logger/middleware';
 import { Metrics } from '@aws-lambda-powertools/metrics'
 import { logMetrics } from '@aws-lambda-powertools/metrics/middleware'
 import middy from '@middy/core'

@@ -5,7 +5,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@aws-lambda-powertools/logger": "^1.18.1",
+    "@aws-lambda-powertools/logger": "^2.0.3",
     "@aws-lambda-powertools/metrics": "^2.0.3",
     "@aws-sdk/client-dynamodb": "^3.529.1",
     "@aws-sdk/client-secrets-manager": "^3.540.0",
