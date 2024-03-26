@@ -8,11 +8,11 @@
     "@aws-lambda-powertools/logger": "^1.18.1",
     "@aws-lambda-powertools/metrics": "^2.0.3",
     "@aws-sdk/client-dynamodb": "^3.529.1",
-    "@aws-sdk/client-secrets-manager": "^3.521.0",
+    "@aws-sdk/client-secrets-manager": "^3.540.0",
     "@aws-sdk/lib-dynamodb": "^3.525.0",
     "@clerk/clerk-sdk-node": "^4.13.11",
     "@middy/core": "^5.2.6",
-    "esbuild": "^0.20.1",
+    "esbuild": "^0.20.2",
     "jsonwebtoken": "^9.0.2",
     "jwks-rsa": "^3.1.0",
     "nanoid": "^5.0.6",
@@ -25,7 +25,7 @@
     "@types/jest": "^29.5.12",
     "@types/nanoid": "^3.0.0",
     "@types/nanoid-dictionary": "^4.2.2",
-    "@types/node": "^20.11.29",
+    "@types/node": "^20.11.30",
     "@types/web-push": "^3.6.2",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^6.21.0",
@@ -38,7 +38,7 @@
     "ts-jest": "^29.1.2",
     "ts-jest-resolver": "^2.0.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.4.2"
+    "typescript": "^5.4.3"
   },
   "scripts": {
     "build": "sam build",
