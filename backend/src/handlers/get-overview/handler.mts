@@ -1,4 +1,5 @@
-import { Logger, injectLambdaContext } from '@aws-lambda-powertools/logger'
+import { Logger } from '@aws-lambda-powertools/logger'
+import { injectLambdaContext } from '@aws-lambda-powertools/logger/middleware';
 import middy from '@middy/core'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import getOverview from './get-overview.mjs'
