@@ -7,12 +7,14 @@ import {
   SignedOut,
   SignInButton,
   UserButton,
-  useUser,
+  useUser as useClerkUser,
 } from '@clerk/clerk-react'
+import { useUser } from '../contexts/user/userContext'
+
 import ErrorSnackbar from './errors/ErrorSnackbar'
 import Notifications from './notifications/Notifications'
 
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useError } from '../contexts/error/errorContext'
 import { apiUrl, baseUrl } from '../utils/urls'
@@ -22,17 +24,35 @@ import MDTextButton from './material/button/MDTextButton'
 import MDCircularProgress from './material/progress/MDCircularProgress'
 import Splash from './Splash'
 import Support from './support/Support'
+import MDIcon from './material/MDIcon'
+import MDList from './material/list/MDList'
+import MDListItem from './material/list/MDListItem'
+import MDSwitch from './material/MDSwitch'
+import MDFilledButton from './material/button/MDFilledButton'
+import {
+  getIsNotificationPermissionRequestable,
+  useRequestNotificationPermissions,
+  useToggleNotifications,
+} from '../utils/notifications'
 
 const App = () => {
   const error = useError()
   const location = useLocation()
   const navigate = useNavigate()
-  const { user } = useUser()
+  const requestNotificationPermissions = useRequestNotificationPermissions()
+  const toggleNotifications = useToggleNotifications()
+  const { user: clerkUser } = useClerkUser()
+  const user = useUser()
 
   const { pathname, search } = location
 
   const urlParams = useMemo(() => new URLSearchParams(search), [search])
   const urlParamsAction = urlParams.get('action')
+
+  const [
+    deviceNotificationPermissionsRequested,
+    setDeviceNotificationPermissionsRequested,
+  ] = useState<boolean>(false)
 
   useEffect(() => {
     void (async () => {
@@ -61,7 +81,7 @@ const App = () => {
   const signedOutURLParams = new URLSearchParams()
   for (const [key, value] of Object.entries({
     action: 'signedOut',
-    userID: user?.id ?? '',
+    userID: clerkUser?.id ?? '',
   })) {
     signedOutURLParams.append(key, value)
   }
@@ -84,7 +104,52 @@ const App = () => {
             <UserButton
               afterSignOutUrl={`${baseUrl}/?${signedOutURLParams.toString()}`}
               userProfileMode='modal'
-            />
+            >
+              <UserButton.UserProfilePage
+                label='Notifications'
+                url='/notification-settings'
+                labelIcon={<MDIcon>notifications</MDIcon>}
+              >
+                <div>
+                  <h1>Notifications</h1>
+                  <MDList>
+                    <MDListItem>
+                      <div slot='headline'>This Device</div>
+                      <div slot='supporting-text'>{}</div>
+                      <MDFilledButton
+                        slot='end'
+                        disabled={
+                          !getIsNotificationPermissionRequestable() ||
+                          deviceNotificationPermissionsRequested
+                        }
+                        onClick={() =>
+                          void requestNotificationPermissions({
+                            registeredNotificationSubscriptions:
+                              user?.notificationSubscriptions ?? {},
+                            onPermissionSubmitted: () => {
+                              setDeviceNotificationPermissionsRequested(true)
+                            },
+                          })
+                        }
+                      >
+                        Enable
+                      </MDFilledButton>
+                    </MDListItem>
+                    <MDListItem>
+                      <div slot='headline'>All Notifications</div>
+                      <div slot='supporting-text'>
+                        Turn on/off notifications on all devices
+                      </div>
+                      <MDSwitch
+                        slot='end'
+                        selected={user?.notificationsEnabled ?? true}
+                        onClick={() => void toggleNotifications()}
+                      />
+                    </MDListItem>
+                  </MDList>
+                </div>
+              </UserButton.UserProfilePage>
+            </UserButton>
           </div>
         </SignedIn>
       </header>

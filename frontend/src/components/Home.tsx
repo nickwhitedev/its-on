@@ -75,12 +75,7 @@ const Home = () => {
   }, [dispatchChannels, dispatchSubscriptions, dispatchUser, fetchApi])
 
   useEffect(() => {
-    if (
-      !isLoading &&
-      'Notification' in window &&
-      Notification.permission === 'granted' &&
-      (userContext?.notificationsEnabled ?? true)
-    ) {
+    if (!isLoading) {
       void registerNotificationSubscription({
         registeredNotificationSubscriptions:
           userContext?.notificationSubscriptions ?? {},
@@ -160,10 +155,7 @@ const Home = () => {
       </MDTabs>
       <div className='Home-content'>
         {isLoading ? (
-          <MDCircularProgress
-            className='Home-loading'
-            indeterminate
-          />
+          <MDCircularProgress className='Home-loading' indeterminate />
         ) : hasOverviewError ? (
           <div>
             <p>Something went wrong...</p>
