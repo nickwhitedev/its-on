@@ -40,6 +40,10 @@
   place-self: start end;
 }
 
+.App-settings-list {
+  background: none;
+}
+
 .App-main {
   display: flex;
   flex: 1 1 auto;

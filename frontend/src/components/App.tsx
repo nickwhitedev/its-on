@@ -31,6 +31,7 @@ import MDSwitch from './material/MDSwitch'
 import MDFilledButton from './material/button/MDFilledButton'
 import {
   getIsNotificationPermissionRequestable,
+  getNotificationPermission,
   useRequestNotificationPermissions,
   useToggleNotifications,
 } from '../utils/notifications'
@@ -49,10 +50,16 @@ const App = () => {
   const urlParams = useMemo(() => new URLSearchParams(search), [search])
   const urlParamsAction = urlParams.get('action')
 
+  const [deviceNotificationPermission, setDeviceNotificationPermission] =
+    useState<string>(getNotificationPermission())
+
   const [
     deviceNotificationPermissionsRequested,
     setDeviceNotificationPermissionsRequested,
   ] = useState<boolean>(false)
+
+  const [isLoadingToggleNotifications, setIsLoadingToggleNotifications] =
+    useState<boolean>(false)
 
   useEffect(() => {
     void (async () => {
@@ -112,39 +119,66 @@ const App = () => {
               >
                 <div>
                   <h1>Notifications</h1>
-                  <MDList>
+                  <MDList className='App-settings-list'>
                     <MDListItem>
                       <div slot='headline'>This Device</div>
-                      <div slot='supporting-text'>{}</div>
+                      <div slot='supporting-text'>
+                        {deviceNotificationPermission === 'granted'
+                          ? 'Notifications are enabled on this device'
+                          : deviceNotificationPermission === 'denied'
+                          ? 'Go to device settings to enable notifications'
+                          : 'Enable notifications on this device'}
+                      </div>
                       <MDFilledButton
                         slot='end'
                         disabled={
                           !getIsNotificationPermissionRequestable() ||
-                          deviceNotificationPermissionsRequested
+                          deviceNotificationPermissionsRequested ||
+                          !(user?.notificationsEnabled ?? true)
                         }
                         onClick={() =>
                           void requestNotificationPermissions({
                             registeredNotificationSubscriptions:
                               user?.notificationSubscriptions ?? {},
-                            onPermissionSubmitted: () => {
+                            onPermissionSubmitted: (
+                              isPermissionGranted: boolean,
+                            ) => {
                               setDeviceNotificationPermissionsRequested(true)
+                              setDeviceNotificationPermission(
+                                isPermissionGranted ? 'granted' : 'denied',
+                              )
                             },
                           })
                         }
                       >
-                        Enable
+                        {deviceNotificationPermission === 'granted'
+                          ? 'Enabled'
+                          : deviceNotificationPermission === 'denied'
+                          ? 'Disabled'
+                          : 'Enable'}
                       </MDFilledButton>
                     </MDListItem>
                     <MDListItem>
                       <div slot='headline'>All Notifications</div>
                       <div slot='supporting-text'>
-                        Turn on/off notifications on all devices
+                        Turn {user?.notificationsEnabled ?? true ? 'off' : 'on'}{' '}
+                        notifications on all devices
                       </div>
-                      <MDSwitch
-                        slot='end'
-                        selected={user?.notificationsEnabled ?? true}
-                        onClick={() => void toggleNotifications()}
-                      />
+                      {isLoadingToggleNotifications ? (
+                        <MDCircularProgress indeterminate slot='end' />
+                      ) : (
+                        <MDSwitch
+                          slot='end'
+                          selected={user?.notificationsEnabled ?? true}
+                          onClick={() => {
+                            void (async () => {
+                              setIsLoadingToggleNotifications(true)
+                              await toggleNotifications()
+                              setIsLoadingToggleNotifications(false)
+                            })()
+                          }}
+                        />
+                      )}
                     </MDListItem>
                   </MDList>
                 </div>

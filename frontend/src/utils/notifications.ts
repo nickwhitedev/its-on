@@ -17,7 +17,7 @@ interface registerNotificationSubscriptionParams {
 //   window.webkit != null,
 // )
 
-const getNotificationPermission = () => {
+export const getNotificationPermission = () => {
   if ('Notification' in window) {
     return Notification.permission
   }
