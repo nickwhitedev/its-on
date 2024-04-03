@@ -139,10 +139,10 @@
     tslib "^2.5.0"
     uuid "^9.0.1"
 
-"@aws-sdk/client-secrets-manager@^3.540.0":
-  version "3.540.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/client-secrets-manager/-/client-secrets-manager-3.540.0.tgz#b5be29da151cb088132b8c8bce26fadd094065d0"
-  integrity sha512-bobnFYxHR1RLqqQCQ0EETFETUEcLKSMeEgmDU7xsNPmzvx/3iWNMbXsMvikRrkuWFcsPIr2ofEGU2epvSHrTuA==
+"@aws-sdk/client-secrets-manager@^3.543.0":
+  version "3.543.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/client-secrets-manager/-/client-secrets-manager-3.543.0.tgz#7c0695f53081c61c879aefa19ccbb9d0feebde53"
+  integrity sha512-aTSsCv9UbKLilOmU3jeeu0wL9b96Uf8aZCpb/kO59dZ6a10/TB/l1VbsJjgFTkz4II4CaGnZF9Cy7PlRoVLr/g==
   dependencies:
     "@aws-crypto/sha256-browser" "3.0.0"
     "@aws-crypto/sha256-js" "3.0.0"
@@ -1835,10 +1835,10 @@
   resolved "https://registry.yarnpkg.com/@js-sdsl/ordered-map/-/ordered-map-4.4.2.tgz#9299f82874bab9e4c7f9c48d865becbfe8d6907c"
   integrity sha512-iUKgm52T8HOE/makSxjqoWhe95ZJA1/G1sYsGev2JDKUSS14KAgg1LHb+Ba+IPow0xflbnSkOsZcO08C7w1gYw==
 
-"@middy/core@^5.2.6":
-  version "5.2.6"
-  resolved "https://registry.yarnpkg.com/@middy/core/-/core-5.2.6.tgz#f4c6822914afb780c215b47b9ea8e36d86088d2f"
-  integrity sha512-FDbI52lKd4/Ba2GZ0JZoezJ4ImqI4rs16DzCSixeislzXpd457rG5E6cT3KUeKEvFGLGYNC8Gq1WU0Swlbvbyg==
+"@middy/core@^5.3.2":
+  version "5.3.2"
+  resolved "https://registry.yarnpkg.com/@middy/core/-/core-5.3.2.tgz#fb9c907a0c7d63b081405e6f84e3e945cc65fee6"
+  integrity sha512-g1PonDsJI/t6DldRD/MijnE9kQBWYDZRfGkqJv/Dy+TXyTJmsmk6k/znx+RgqZYlpz1QodWi+6gzRsjPuvM8ew==
   dependencies:
     "@datastream/core" "0.0.35"
 
@@ -2721,10 +2721,10 @@
     "@types/node" "*"
     form-data "^3.0.0"
 
-"@types/node@*", "@types/node@^20.11.30":
-  version "20.11.30"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.11.30.tgz#9c33467fc23167a347e73834f788f4b9f399d66f"
-  integrity sha512-dHM6ZxwlmuZaRmUPfv1p+KrdD1Dci04FbdEm/9wEMouFqxYoFl5aMkt0VMAUtYRQDyYvD41WJLukhq/ha3YuTw==
+"@types/node@*", "@types/node@^20.12.2":
+  version "20.12.2"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.12.2.tgz#9facdd11102f38b21b4ebedd9d7999663343d72e"
+  integrity sha512-zQ0NYO87hyN6Xrclcqp7f8ZbXNbRfoGWNcMvHTPQp9UUrwI0mI7XBz+cu7/W6/VClYo2g63B0cjull/srU7LgQ==
   dependencies:
     undici-types "~5.26.4"
 
