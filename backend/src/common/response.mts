@@ -29,7 +29,11 @@ export const createResponse = ({
   }
 
   return {
-    body: JSON.stringify(responseBody),
+    body: JSON.stringify(responseBody, (_key, value) =>
+      // https://stackoverflow.com/a/46491780 Use a replacer function to handle Sets
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      value instanceof Set ? [...value] : value,
+    ),
     headers: CORS_HEADERS,
     statusCode: statusCode,
   }

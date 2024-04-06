@@ -69,7 +69,7 @@ interface IDynamoStreamUserImage {
  * DynamoDB guarantees nothing but keys.
  */
 interface IUserNotificationSubscriptions {
-  subscriptions: Record<string, PushSubscription>
+  tokens: Set<string>
 }
 
 /**

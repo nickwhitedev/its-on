@@ -7,7 +7,6 @@ import {
 
 import { Logger } from '@aws-lambda-powertools/logger'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { PushSubscription } from 'web-push'
 import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
 import { createResponse } from '/opt/nodejs/response.mjs'
 
@@ -15,7 +14,7 @@ const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
 
 interface IPayload {
-  subscription: PushSubscription
+  token: string
 }
 
 /**
@@ -40,14 +39,13 @@ const subscribeNotifications = async (
     return createResponse({
       eventPath,
       responseBody: {
-        message:
-          'Request body must contain subscription as an instance of PushSubscription',
+        message: 'Request body must contain token: string',
       },
       statusCode: 400,
     })
   }
 
-  const subscription = (JSON.parse(event.body) as IPayload).subscription
+  const token = (JSON.parse(event.body) as IPayload).token
 
   try {
     const ddbResponse = await ddbDocClient.send(
@@ -58,76 +56,23 @@ const subscribeNotifications = async (
         },
         ReturnValues: 'ALL_NEW',
         TableName: DYNAMODB_TABLE_NAME,
-        UpdateExpression: 'SET #subscriptions.#subscriptionID = :subscription',
+        UpdateExpression: 'ADD #tokens :token',
         ExpressionAttributeNames: {
-          '#subscriptions': 'subscriptions',
-          '#subscriptionID': subscription.endpoint,
+          '#tokens': 'tokens',
         },
         ExpressionAttributeValues: {
-          ':subscription': JSON.stringify(subscription),
+          ':token': new Set([token]),
         },
       }),
     )
     logger.debug('Success - user profile updated', { ddbResponse })
   } catch (error) {
-    if (
-      error instanceof Error &&
-      error.name === 'ValidationException' &&
-      error.message ===
-        'The document path provided in the update expression is invalid for update'
-    ) {
-      // If one of the attributes has not yet been created,
-      //   create them as empty maps...
-      const ddbEmptyMapResponse = await ddbDocClient.send(
-        new UpdateCommand({
-          Key: {
-            pk: `user#${userID}`,
-            sk: 'notificationSubscriptions',
-          },
-          ReturnValues: 'ALL_NEW',
-          TableName: DYNAMODB_TABLE_NAME,
-          UpdateExpression: 'SET #subscriptions = :emptyMap',
-          ExpressionAttributeNames: {
-            '#subscriptions': 'subscriptions',
-          },
-          ExpressionAttributeValues: {
-            ':emptyMap': {},
-          },
-        }),
-      )
-      logger.debug('Success - empty map added', {
-        ddbResponse: ddbEmptyMapResponse,
-      })
-
-      // ...then retry the updates
-      const ddbResponse = await ddbDocClient.send(
-        new UpdateCommand({
-          Key: {
-            pk: `user#${userID}`,
-            sk: 'notificationSubscriptions',
-          },
-          ReturnValues: 'ALL_NEW',
-          TableName: DYNAMODB_TABLE_NAME,
-          UpdateExpression:
-            'SET #subscriptions.#subscriptionID = :subscription',
-          ExpressionAttributeNames: {
-            '#subscriptions': 'subscriptions',
-            '#subscriptionID': subscription.endpoint,
-          },
-          ExpressionAttributeValues: {
-            ':subscription': JSON.stringify(subscription),
-          },
-        }),
-      )
-      logger.debug('Success - user profile updated', { ddbResponse })
-    } else {
-      logger.error('Error', error as Error)
-      return createResponse({
-        eventPath,
-        responseBody: { message: 'Something went wrong' },
-        statusCode: 400,
-      })
-    }
+    logger.error('Error', error as Error)
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'Something went wrong' },
+      statusCode: 400,
+    })
   }
 
   return createResponse({

@@ -402,32 +402,6 @@ Resources:
       RetentionInDays: 30
       LogGroupName: !Join ['', ['/aws/lambda/', !Ref unsubscribeLambdaFunction]]
 
-  # This is a Lambda function config associated with the source code: get-notification-key.mts
-  getNotificationKeyLambdaFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: dist/src/handlers/notifications/get-notification-key/
-      Description: Gets the public VAPID key to use for notifications
-      Events:
-        Api:
-          Type: Api
-          Properties:
-            RestApiId: !Ref ItsOnApi
-            Path: /notification-key
-            Method: GET
-      Handler: handler.handler
-      Policies:
-        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
-        - DynamoDBCrudPolicy:
-            TableName: !Ref ItsOnTable
-
-  getNotificationKeyLambdaFunctionLogGroup:
-    Type: 'AWS::Logs::LogGroup'
-    Properties:
-      RetentionInDays: 30
-      LogGroupName:
-        !Join ['', ['/aws/lambda/', !Ref getNotificationKeyLambdaFunction]]
-
   # This is a Lambda function config associated with the source code: enable-notifications.mts
   enableNotificationsLambdaFunction:
     Type: AWS::Serverless::Function

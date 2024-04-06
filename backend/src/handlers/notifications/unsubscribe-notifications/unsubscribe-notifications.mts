@@ -7,7 +7,6 @@ import {
 
 import { Logger } from '@aws-lambda-powertools/logger'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { PushSubscription } from 'web-push'
 import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
 import { createResponse } from '/opt/nodejs/response.mjs'
 
@@ -15,7 +14,7 @@ const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
 
 interface IPayload {
-  subscription?: PushSubscription
+  token?: string
   userID?: string
 }
 
@@ -41,14 +40,14 @@ const unsubscribeNotifications = async (
 
   const requestBody = JSON.parse(event.body) as IPayload
   const userID = requestBody.userID
-  const subscription = requestBody.subscription
+  const token = requestBody.token
 
-  if ([undefined, ''].includes(userID) || subscription == null) {
+  if ([undefined, ''].includes(userID) || token == null) {
     return createParams400Response(eventPath)
   }
 
   try {
-    logger.debug('subscription.endpoint: ', subscription.endpoint)
+    logger.debug('token: ', token)
     const ddbResponse = await ddbDocClient.send(
       new UpdateCommand({
         Key: {
@@ -57,10 +56,12 @@ const unsubscribeNotifications = async (
         },
         ReturnValues: 'ALL_NEW',
         TableName: DYNAMODB_TABLE_NAME,
-        UpdateExpression: 'REMOVE #subscriptions.#subscriptionID',
+        UpdateExpression: 'DELETE #tokens :token',
         ExpressionAttributeNames: {
-          '#subscriptions': 'subscriptions',
-          '#subscriptionID': subscription.endpoint,
+          '#tokens': 'tokens',
+        },
+        ExpressionAttributeValues: {
+          ':token': new Set([token]),
         },
       }),
     )
