@@ -1,32 +1,81 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useUser, useUserDispatch } from '../contexts/user/userContext'
 import { useFetchApi } from './api'
-import { urlBase64ToUint8Array } from './encoding'
 import { useSendLog } from './logging'
 import { useErrorDispatch } from '../contexts/error/errorContext'
 import { ErrorDispatchActionType } from '../contexts/error/errorReducer'
 import { UserDispatchActionType } from '../contexts/user/userReducer'
+import { WebkitEvent } from '../components/window/window'
+import { getToken } from 'firebase/messaging'
+import { messaging } from '../firebase-config'
 
 interface registerNotificationSubscriptionParams {
-  registeredNotificationSubscriptions: Record<string, PushSubscription>
+  registeredNotificationSubscriptions: string[]
   permissionGranted?: boolean
   onPermissionSubmitted?: (isPermissionGranted: boolean) => void
 }
 
-// const [iOSPushCapability, setIOSPushCapability] = useState<boolean>(
-//   window.webkit != null,
-// )
+export const useGetNotificationPermission = (): (() =>
+  | 'granted'
+  | 'denied'
+  | 'default') => {
+  const [iOSNotificationPermission, setIOSNotificationPermission] = useState<
+    'granted' | 'denied' | 'default'
+  >('default')
 
-export const getNotificationPermission = () => {
-  if ('Notification' in window) {
-    return Notification.permission
+  useEffect(() => {
+    const parseWebkitPermissionState = (event: WebkitEvent) => {
+      switch (event.detail) {
+        case 'notDetermined':
+          setIOSNotificationPermission('default')
+          break
+        case 'denied':
+          setIOSNotificationPermission('denied')
+          break
+        case 'authorized':
+        case 'ephemeral':
+        case 'provisional':
+          setIOSNotificationPermission('granted')
+          break
+        case 'unknown':
+        default:
+          break
+      }
+    }
+
+    if (window.webkit != null) {
+      // @ts-expect-error webkit event types are not expected event listener types
+      window.addEventListener(
+        'push-permission-state',
+        parseWebkitPermissionState,
+      )
+      window.webkit.messageHandlers['push-permission-state'].postMessage(
+        'push-permission-state',
+      )
+      return () => {
+        // @ts-expect-error webkit event types are not expected event listener types
+        removeEventListener('push-permission-state', parseWebkitPermissionState)
+      }
+    }
+  }, [])
+
+  return useCallback((): 'granted' | 'denied' | 'default' => {
+    if (window.webkit != null) {
+      return iOSNotificationPermission
+    } else if ('Notification' in window) {
+      return Notification.permission
+    } else {
+      return 'denied'
+    }
+  }, [iOSNotificationPermission])
+}
+
+export const useGetIsNotificationPermissionRequestable =
+  (): (() => boolean) => {
+    const getNotificationPermission = useGetNotificationPermission()
+
+    return () => getNotificationPermission() === 'default'
   }
-  return 'denied'
-}
-
-export const getIsNotificationPermissionRequestable = () => {
-  return getNotificationPermission() === 'default'
-}
 
 /**
  * Hook for registering a notification subscription with the backend.
@@ -37,6 +86,38 @@ export const useRegisterNotificationSubscription = (): (({
 }: registerNotificationSubscriptionParams) => Promise<void>) => {
   const fetchApi = useFetchApi()
   const user = useUser()
+  const getNotificationPermission = useGetNotificationPermission()
+  const sendLog = useSendLog()
+
+  const [savedNotificationTokens, setSavedNotificationTokens] = useState<
+    string[]
+  >([])
+
+  const saveNotificationToken = useCallback(
+    (token: string) => {
+      if (!Object.keys(savedNotificationTokens).includes(token)) {
+        void fetchApi('/subscribe-notifications', 'POST', {
+          token,
+        })
+      }
+    },
+    [fetchApi, savedNotificationTokens],
+  )
+
+  useEffect(() => {
+    const setPushTokenFromEvent = (event: WebkitEvent) => {
+      saveNotificationToken(JSON.stringify(event.detail))
+    }
+    if (window.webkit != null) {
+      // @ts-expect-error webkit event types are not expected event listener types
+      window.addEventListener('push-token', setPushTokenFromEvent)
+
+      return () => {
+        // @ts-expect-error webkit event types are not expected event listener types
+        removeEventListener('push-token', setPushTokenFromEvent)
+      }
+    }
+  }, [saveNotificationToken])
 
   return useCallback(
     async ({
@@ -50,32 +131,35 @@ export const useRegisterNotificationSubscription = (): (({
       ) {
         return
       }
-      const registration = await navigator.serviceWorker.ready
-      let notificationSubscription =
-        await registration.pushManager.getSubscription()
+      setSavedNotificationTokens(registeredNotificationSubscriptions)
 
-      if (notificationSubscription == null) {
-        const response: { publicKey: string } = await fetchApi(
-          '/notification-key',
-        )
-        const convertedVapidKey = urlBase64ToUint8Array(response.publicKey)
-        notificationSubscription = await registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: convertedVapidKey,
-        })
+      if (window.webkit != null) {
+        window.webkit.messageHandlers['push-token'].postMessage('push-token')
+        return
       }
 
-      if (
-        !Object.keys(registeredNotificationSubscriptions).includes(
-          notificationSubscription.endpoint,
-        )
-      ) {
-        await fetchApi('/subscribe-notifications', 'POST', {
-          subscription: notificationSubscription,
+      let token
+      try {
+        token = await getToken(messaging, {
+          vapidKey: import.meta.env.VITE_PUSH_NOTIFICATION_PUBLIC_KEY as string,
         })
+      } catch (error) {
+        await sendLog(
+          'An error occurred while retrieving push notification token. ',
+          { error },
+          'ERROR',
+        )
+        return
       }
+
+      saveNotificationToken(token)
     },
-    [fetchApi, user?.notificationsEnabled],
+    [
+      getNotificationPermission,
+      saveNotificationToken,
+      sendLog,
+      user?.notificationsEnabled,
+    ],
   )
 }
 
@@ -83,7 +167,68 @@ export const useRegisterNotificationSubscription = (): (({
  * Hook for requesting and registering notification permissions.
  */
 export const useRequestNotificationPermissions = () => {
+  const getIsNotificationPermissionRequestable =
+    useGetIsNotificationPermissionRequestable()
   const registerNotificationSubscription = useRegisterNotificationSubscription()
+
+  const [iOSNotificationPermission, setIOSNotificationPermission] = useState<
+    'granted' | 'denied' | 'default'
+  >('default')
+
+  const [onPermissionSubmittedFunction, setOnPermissionSubmittedFunction] =
+    useState<(isPermissionGranted: boolean) => void>(() => {
+      return
+    })
+  const [
+    registeredNotificationPushSubscriptions,
+    setRegisteredNotificationPushSubscriptions,
+  ] = useState<string[]>([])
+
+  useEffect(() => {
+    const pushWebkitNotificationPermissionRequest = (event: WebkitEvent) => {
+      switch (event.detail) {
+        case 'granted':
+          setIOSNotificationPermission('granted')
+          break
+        default:
+          setIOSNotificationPermission('denied')
+          break
+      }
+
+      if (iOSNotificationPermission !== 'granted') {
+        onPermissionSubmittedFunction(false)
+        return
+      }
+      onPermissionSubmittedFunction(true)
+
+      void registerNotificationSubscription({
+        registeredNotificationSubscriptions:
+          registeredNotificationPushSubscriptions,
+        permissionGranted: true,
+      })
+    }
+
+    if (window.webkit != null) {
+      // @ts-expect-error webkit event types are not expected event listener types
+      window.addEventListener(
+        'push-permission-request',
+        pushWebkitNotificationPermissionRequest,
+      )
+    }
+
+    return () => {
+      removeEventListener(
+        'push-permission-request',
+        // @ts-expect-error webkit event types are not expected event listener types
+        pushWebkitNotificationPermissionRequest,
+      )
+    }
+  }, [
+    iOSNotificationPermission,
+    onPermissionSubmittedFunction,
+    registerNotificationSubscription,
+    registeredNotificationPushSubscriptions,
+  ])
 
   return useCallback(
     async ({
@@ -95,7 +240,17 @@ export const useRequestNotificationPermissions = () => {
       if (!getIsNotificationPermissionRequestable()) {
         return
       }
+      setRegisteredNotificationPushSubscriptions(
+        registeredNotificationSubscriptions,
+      )
+      setOnPermissionSubmittedFunction(onPermissionSubmitted)
 
+      if (window.webkit != null) {
+        window.webkit.messageHandlers['push-permission-request'].postMessage(
+          'push-permission-request',
+        )
+        return
+      }
       const permission = await Notification.requestPermission()
 
       if (permission !== 'granted') {
@@ -109,7 +264,7 @@ export const useRequestNotificationPermissions = () => {
         permissionGranted: true,
       })
     },
-    [registerNotificationSubscription],
+    [getIsNotificationPermissionRequestable, registerNotificationSubscription],
   )
 }
 

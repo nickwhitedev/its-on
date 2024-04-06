@@ -6,7 +6,7 @@ import {
   QueryCommand,
   UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
-
+import admin from 'firebase-admin'
 import { Logger } from '@aws-lambda-powertools/logger'
 import { MetricUnit, Metrics } from '@aws-lambda-powertools/metrics'
 import { KeysAndAttributes } from '@aws-sdk/client-dynamodb'
@@ -20,6 +20,10 @@ import {
 } from '/opt/nodejs/constants.mjs'
 import { batchWrite } from '/opt/nodejs/dynamo.mjs'
 import { MS_IN_HOUR } from '/opt/nodejs/time.mjs'
+import {
+  GetSecretValueCommand,
+  SecretsManagerClient,
+} from '@aws-sdk/client-secrets-manager'
 
 const { sendNotification } = webPush
 
@@ -168,6 +172,20 @@ export const handleChannelUpdated = async ({
     record.dynamodb?.Keys?.pk?.S ?? '',
     record.dynamodb?.Keys?.sk?.S ?? '',
   ]
+
+  const iOSFirebaseServiceAccountSecret = await new SecretsManagerClient({
+    region: 'us-east-1',
+  }).send(
+    new GetSecretValueCommand({
+      SecretId: process.env.FIREBASE_IOS_SERVICE_ACCOUNT_SECRET_NAME,
+    }),
+  )
+
+  admin.initializeApp({
+    credential: admin.credential.cert(
+      iOSFirebaseServiceAccountSecret.SecretString ?? '',
+    ),
+  })
 
   const channelID = sk.substring(sk.indexOf('#') + 1)
 

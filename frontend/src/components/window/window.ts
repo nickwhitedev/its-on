@@ -1,14 +1,14 @@
 export interface IWebkitAPI {
-  messageHandlers: {
-    webkit?: {
-      messageHandlers: Record<
-        string,
-        {
-          postMessage: (data: string) => void
-        }
-      >
+  messageHandlers: Record<
+    string,
+    {
+      postMessage: (data: string) => void
     }
-  }
+  >
+}
+
+export interface WebkitEvent {
+  detail: string
 }
 
 declare global {

@@ -48,6 +48,7 @@ Globals:
             - IsProdEnv
             - ItsOnClerkWebhookSecret
             - ItsOnClerkDevWebhookSecret
+        FIREBASE_IOS_SERVICE_ACCOUNT_SECRET_NAME: ItsOnIOSFirebaseServiceAccount
         ITS_ON_TABLE: !Ref ItsOnTable
         JWKS_ENDPOINT: https://api.clerk.dev/v1/jwks
         POWERTOOLS_LOG_LEVEL:
