@@ -3,6 +3,7 @@ import {
   PutCommand,
   QueryCommand,
 } from '@aws-sdk/lib-dynamodb'
+
 import { Logger } from '@aws-lambda-powertools/logger'
 import { Metrics } from '@aws-lambda-powertools/metrics'
 import { DynamoDBRecord } from 'aws-lambda'
