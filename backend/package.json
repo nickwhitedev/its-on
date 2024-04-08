@@ -15,7 +15,7 @@
     "esbuild": "^0.20.2",
     "jsonwebtoken": "^9.0.2",
     "jwks-rsa": "^3.1.0",
-    "nanoid": "^5.0.6",
+    "nanoid": "^5.0.7",
     "nanoid-dictionary": "^5.0.0-beta.1",
     "svix": "^1.21.0",
     "web-push": "^3.6.7"
