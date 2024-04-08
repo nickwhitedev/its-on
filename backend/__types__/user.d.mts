@@ -83,7 +83,7 @@ interface IUserNotificationSubscriptions {
 interface IDynamoUserNotificationSubscriptionsItem {
   pk: string
   sk: string
-  subscriptions: Record<string, string>
+  tokens: Set<string>
 }
 
 /**
@@ -100,7 +100,7 @@ interface IDynamoStreamUserNotificationSubscriptionsImage {
   sk: {
     S: string
   }
-  subscriptions: {
-    M: Record<string, { S: string }>
+  tokens: {
+    SS: Set<string>
   }
 }

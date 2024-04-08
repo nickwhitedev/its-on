@@ -1,159 +1,19 @@
 import {
-  BatchGetCommand,
-  BatchGetCommandOutput,
   DynamoDBDocumentClient,
   PutCommand,
   QueryCommand,
-  UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
-import admin from 'firebase-admin'
 import { Logger } from '@aws-lambda-powertools/logger'
-import { MetricUnit, Metrics } from '@aws-lambda-powertools/metrics'
-import { KeysAndAttributes } from '@aws-sdk/client-dynamodb'
+import { Metrics } from '@aws-lambda-powertools/metrics'
 import { DynamoDBRecord } from 'aws-lambda'
-import webPush, { PushSubscription, WebPushError } from 'web-push'
-import {
-  DYNAMODB_TABLE_NAME,
-  PUSH_NOTIFICATION_PRIVATE_KEY,
-  PUSH_NOTIFICATION_PUBLIC_KEY,
-  WEB_URL,
-} from '/opt/nodejs/constants.mjs'
+import { DYNAMODB_TABLE_NAME, WEB_URL } from '/opt/nodejs/constants.mjs'
 import { batchWrite } from '/opt/nodejs/dynamo.mjs'
 import { MS_IN_HOUR } from '/opt/nodejs/time.mjs'
 import {
-  GetSecretValueCommand,
-  SecretsManagerClient,
-} from '@aws-sdk/client-secrets-manager'
-
-const { sendNotification } = webPush
-
-const sendUserNotification = async ({
-  channelID,
-  channelNote,
-  channelOwner,
-  channelTitle,
-  ddbDocClient,
-  logger,
-  notificationSubscription,
-  notificationSubscriptionEndpoint,
-  TTL,
-  userIDPK,
-}: {
-  channelID: string
-  channelNote: string
-  channelOwner: string
-  channelTitle: string
-  ddbDocClient: DynamoDBDocumentClient
-  logger: Logger
-  notificationSubscription: string
-  notificationSubscriptionEndpoint: string
-  TTL: number
-  userIDPK: string
-}) => {
-  const pushSubscription = JSON.parse(
-    notificationSubscription,
-  ) as PushSubscription
-  try {
-    await sendNotification(
-      pushSubscription,
-      JSON.stringify({
-        title: `${channelTitle} • ${channelOwner}`,
-        options: {
-          body: channelNote,
-          data: {
-            url: `${WEB_URL}/${channelID}`,
-          },
-        },
-      }),
-      {
-        TTL,
-        vapidDetails: {
-          subject: 'mailto:contact@itson.fyi',
-          privateKey: PUSH_NOTIFICATION_PRIVATE_KEY,
-          publicKey: PUSH_NOTIFICATION_PUBLIC_KEY,
-        },
-      },
-    )
-  } catch (error) {
-    if (error instanceof WebPushError) {
-      if (error.statusCode === 410) {
-        try {
-          const ddbResponse = await ddbDocClient.send(
-            new UpdateCommand({
-              Key: {
-                pk: userIDPK,
-                sk: 'notificationSubscriptions',
-              },
-              ReturnValues: 'ALL_NEW',
-              TableName: DYNAMODB_TABLE_NAME,
-              UpdateExpression: 'REMOVE #subscriptions.#subscriptionID',
-              ExpressionAttributeNames: {
-                '#subscriptions': 'subscriptions',
-                '#subscriptionID': notificationSubscriptionEndpoint,
-              },
-            }),
-          )
-          logger.debug('Delete user notification subscription', { ddbResponse })
-        } catch (ddbError) {
-          logger.error(
-            'Delete user notification subscription error',
-            ddbError as Error,
-          )
-        }
-      } else {
-        logger.error('Notification Send WebPushError: ', {
-          body: error.body,
-          cause: error.cause,
-          message: error.message,
-          name: error.name,
-          stack: error.stack,
-          statusCode: error.statusCode,
-        })
-      }
-    } else {
-      logger.error('Notification Send Error: ', error as Error)
-    }
-  }
-}
-
-const sendUserNotifications = async ({
-  channelID,
-  channelNote,
-  channelOwner,
-  channelTitle,
-  ddbDocClient,
-  logger,
-  notificationSubscriptions,
-  TTL,
-}: {
-  channelID: string
-  channelNote: string
-  channelOwner: string
-  channelTitle: string
-  ddbDocClient: DynamoDBDocumentClient
-  logger: Logger
-  notificationSubscriptions: IDynamoUserNotificationSubscriptionsItem
-  TTL: number
-}) => {
-  await Promise.all(
-    Object.entries(notificationSubscriptions.subscriptions).map(
-      async ([notificationSubscriptionEndpoint, notificationSubscription]) => {
-        await sendUserNotification({
-          channelID,
-          channelNote,
-          channelOwner,
-          channelTitle,
-          ddbDocClient,
-          logger,
-          notificationSubscription,
-          notificationSubscriptionEndpoint,
-          TTL,
-          userIDPK: notificationSubscriptions.pk,
-        })
-      },
-    ),
-  )
-}
+  getMessagingChannelTopic,
+  initializeFirebase,
+} from '/opt/nodejs/firebase.mjs'
+import { getMessaging } from 'firebase-admin/messaging'
 
 interface Params {
   record: DynamoDBRecord
@@ -166,27 +26,13 @@ export const handleChannelUpdated = async ({
   record,
   ddbDocClient,
   logger,
-  metrics,
 }: Params) => {
   const [pk, sk] = [
     record.dynamodb?.Keys?.pk?.S ?? '',
     record.dynamodb?.Keys?.sk?.S ?? '',
   ]
 
-  const iOSFirebaseServiceAccountSecret = await new SecretsManagerClient({
-    region: 'us-east-1',
-  }).send(
-    new GetSecretValueCommand({
-      SecretId: process.env.FIREBASE_IOS_SERVICE_ACCOUNT_SECRET_NAME,
-    }),
-  )
-
-  admin.initializeApp({
-    credential: admin.credential.cert(
-      iOSFirebaseServiceAccountSecret.SecretString ?? '',
-    ),
-  })
-
+  const channelOwnerID = pk.substring(pk.indexOf('#') + 1)
   const channelID = sk.substring(sk.indexOf('#') + 1)
 
   const channelInfo: IDynamoChannelItem = {
@@ -322,79 +168,42 @@ export const handleChannelUpdated = async ({
         return
       }
     }
-
-    // Send notifications if it's on
-    if (
-      !channelInfo.canceled &&
-      (channelInfo.lastOn ?? 0) >
-        (oldChannelInfo.lastOn ?? 0) + (oldChannelInfo.lastOnDuration ?? 0)
-    ) {
-      let unprocessedKeys:
-        | Record<
-            string,
-            Omit<KeysAndAttributes, 'Keys'> & {
-              Keys: Record<string, unknown>[] | undefined
-            }
-          >
-        | undefined = {
-        [DYNAMODB_TABLE_NAME]: {
-          Keys: subscribers.map(({ sk: subscriberSK }) => ({
-            pk: `user#${subscriberSK.substring(subscriberSK.indexOf('#') + 1)}`,
-            sk: 'notificationSubscriptions',
-          })),
-        },
-      }
-      let getBatchCount = 0
-      do {
-        logger.debug(`Start Get batch ${++getBatchCount}`)
-
-        let subscriberNotificationSubscriptions: IDynamoUserNotificationSubscriptionsItem[]
-
-        try {
-          const ddbResponse: BatchGetCommandOutput = await ddbDocClient.send(
-            new BatchGetCommand({
-              RequestItems: unprocessedKeys,
-            }),
-          )
-          subscriberNotificationSubscriptions = (ddbResponse.Responses?.[
-            DYNAMODB_TABLE_NAME
-          ] ?? []) as IDynamoUserNotificationSubscriptionsItem[]
-          unprocessedKeys = ddbResponse.UnprocessedKeys
-          logger.debug('Get subscriber notification subscriptions', {
-            subscriptions: subscriberNotificationSubscriptions,
-          })
-        } catch (error) {
-          logger.error('Get public channel subscribers error', error as Error)
-          return
-        }
-
-        try {
-          await Promise.all(
-            subscriberNotificationSubscriptions.map(
-              async notificationSubscriptions => {
-                await sendUserNotifications({
-                  channelID,
-                  channelNote: channelInfo.note ?? '',
-                  channelOwner: channelInfo.owner ?? 'unknown',
-                  channelTitle: channelInfo.title ?? 'Untitled Channel',
-                  ddbDocClient,
-                  logger,
-                  notificationSubscriptions,
-                  TTL: (channelInfo.lastOnDuration ?? MS_IN_HOUR) * 1000,
-                })
-              },
-            ),
-          )
-          metrics.addMetric(
-            'notificationSent',
-            MetricUnit.Count,
-            subscriberNotificationSubscriptions.length,
-          )
-        } catch (error) {
-          logger.error('Notification Send Error', error as Error)
-        }
-      } while ((unprocessedKeys?.[DYNAMODB_TABLE_NAME]?.Keys ?? []).length > 0)
-    }
   } while (lastEvaluatedKey != null && Object.keys(lastEvaluatedKey).length > 0)
+
+  // Send notifications if it's on
+  if (
+    !channelInfo.canceled &&
+    (channelInfo.lastOn ?? 0) >
+      (oldChannelInfo.lastOn ?? 0) + (oldChannelInfo.lastOnDuration ?? 0)
+  ) {
+    try {
+      await initializeFirebase()
+    } catch (error) {
+      logger.error('Failed to initialize Firebase', error as Error)
+    }
+
+    await getMessaging().send({
+      apns: {
+        headers: {
+          'apns-expiration': `${Math.floor(
+            (Date.now() + (channelInfo.duration ?? MS_IN_HOUR * 12)) / 1000,
+          )}`,
+        },
+      },
+      data: {
+        url: `${WEB_URL}/${channelID}`,
+      },
+      notification: {
+        title: `${channelInfo.title ?? 'Untitled Channel'} • ${
+          channelInfo.owner ?? 'unknown'
+        }`,
+        body: channelInfo.note ?? '',
+      },
+      topic: getMessagingChannelTopic({ channelID, channelOwnerID }),
+      webpush: {
+        headers: { ttl: `${channelInfo.duration ?? (MS_IN_HOUR * 12) / 1000}` },
+      },
+    })
+  }
   logger.debug('Finished updating items successfully')
 }
