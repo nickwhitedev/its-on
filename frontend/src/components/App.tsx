@@ -30,8 +30,8 @@ import MDListItem from './material/list/MDListItem'
 import MDSwitch from './material/MDSwitch'
 import MDFilledButton from './material/button/MDFilledButton'
 import {
-  getIsNotificationPermissionRequestable,
-  getNotificationPermission,
+  useGetIsNotificationPermissionRequestable,
+  useGetNotificationPermission,
   useRequestNotificationPermissions,
   useToggleNotifications,
 } from '../utils/notifications'
@@ -42,6 +42,9 @@ const App = () => {
   const navigate = useNavigate()
   const requestNotificationPermissions = useRequestNotificationPermissions()
   const toggleNotifications = useToggleNotifications()
+  const getNotificationPermission = useGetNotificationPermission()
+  const getIsNotificationPermissionRequestable =
+    useGetIsNotificationPermissionRequestable()
   const { user: clerkUser } = useClerkUser()
   const user = useUser()
 
@@ -138,8 +141,8 @@ const App = () => {
                         }
                         onClick={() =>
                           void requestNotificationPermissions({
-                            registeredNotificationSubscriptions:
-                              user?.notificationSubscriptions ?? {},
+                            registeredNotificationTokens:
+                              user?.notificationTokens ?? {},
                             onPermissionSubmitted: (
                               isPermissionGranted: boolean,
                             ) => {

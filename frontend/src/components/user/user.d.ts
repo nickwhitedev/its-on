@@ -1,9 +1,16 @@
+type TNotificationTokens = Record<
+  string,
+  { lastUpdated: number; token: string }
+>
+
 interface IUser {
   channelCount?: number
   id?: string
-  notificationSubscriptions?: Record<string, PushSubscription>
+  lastNewSubscriberNotification?: number
+  notificationTokens?: TNotificationTokens
   notificationsEnabled?: boolean
   subscriptionCount?: number
+  subscriptionTopics?: Set<string>
   tier?: number
   username?: string
 }

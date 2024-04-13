@@ -10,7 +10,7 @@ import { getToken } from 'firebase/messaging'
 import { messaging } from '../firebase-config'
 
 interface registerNotificationSubscriptionParams {
-  registeredNotificationSubscriptions: string[]
+  registeredNotificationSubscriptions: Set<string>
   permissionGranted?: boolean
   onPermissionSubmitted?: (isPermissionGranted: boolean) => void
 }
@@ -90,8 +90,8 @@ export const useRegisterNotificationSubscription = (): (({
   const sendLog = useSendLog()
 
   const [savedNotificationTokens, setSavedNotificationTokens] = useState<
-    string[]
-  >([])
+    Set<string>
+  >(new Set([]))
 
   const saveNotificationToken = useCallback(
     (token: string) => {
@@ -182,7 +182,7 @@ export const useRequestNotificationPermissions = () => {
   const [
     registeredNotificationPushSubscriptions,
     setRegisteredNotificationPushSubscriptions,
-  ] = useState<string[]>([])
+  ] = useState<Set<string>>(new Set([]))
 
   useEffect(() => {
     const pushWebkitNotificationPermissionRequest = (event: WebkitEvent) => {

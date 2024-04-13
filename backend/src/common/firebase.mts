@@ -27,5 +27,9 @@ export const getMessagingChannelTopic = ({
   channelID: string
   channelOwnerID: string
 }): string => {
-  return `${channelOwnerID}#${channelID}`
+  return `user-${channelOwnerID}_channel-${channelID}`
+}
+
+export const getUserTopic = (userID: string): string => {
+  return `user-${userID}`
 }

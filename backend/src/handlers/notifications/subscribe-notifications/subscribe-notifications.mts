@@ -9,6 +9,9 @@ import { Logger } from '@aws-lambda-powertools/logger'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
 import { createResponse } from '/opt/nodejs/response.mjs'
+import { getUserInfo } from '/opt/nodejs/dynamo.mjs'
+import { getUserTopic, initializeFirebase } from '/opt/nodejs/firebase.mjs'
+import { getMessaging } from 'firebase-admin/messaging'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -73,6 +76,24 @@ const subscribeNotifications = async (
       responseBody: { message: 'Something went wrong' },
       statusCode: 400,
     })
+  }
+
+  // Subscribe to all subscription topics and user topic with the new token
+  try {
+    await initializeFirebase()
+    const userInfo = await getUserInfo({ ddbDocClient, userID })
+    await Promise.all([
+      getMessaging().subscribeToTopic(token, getUserTopic(userID)),
+      ...Array.from(userInfo?.subscriptionTopics ?? new Set([])).map(
+        subscriptionTopic =>
+          getMessaging().subscribeToTopic(token, subscriptionTopic),
+      ),
+    ])
+  } catch (error) {
+    logger.error(
+      "Failed to subscribe token to user's subscriptions",
+      error as Error,
+    )
   }
 
   return createResponse({

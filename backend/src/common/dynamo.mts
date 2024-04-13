@@ -46,44 +46,6 @@ export const getUserInfo = async ({
   return ddbResponse.Item as IDynamoUserItem | undefined
 }
 
-interface GetUserNotificationSubscriptionTokensParams {
-  ddbDocClient: DynamoDBDocumentClient
-  userID: string
-}
-
-/**
- * Gets the logged in user's info.
- */
-export const getUserNotificationSubscriptions = async ({
-  ddbDocClient,
-  userID,
-}: GetUserNotificationSubscriptionTokensParams): Promise<
-  IUserNotificationSubscriptions | undefined
-> => {
-  let ddbResponse
-  try {
-    ddbResponse = await ddbDocClient.send(
-      new GetCommand({
-        TableName: DYNAMODB_TABLE_NAME,
-        Key: {
-          pk: `user#${userID}`,
-          sk: 'notificationSubscriptions',
-        },
-      }),
-    )
-  } catch (error) {
-    console.error(
-      'Dynamo get error',
-      error instanceof Error ? error.stack : 'Unknown Type',
-    )
-    throw new Error(
-      'Dynamo Get Error',
-      error instanceof Error ? error : undefined,
-    )
-  }
-  return ddbResponse.Item as IUserNotificationSubscriptions | undefined
-}
-
 interface GetChannelParams {
   channelID: string
   ddbDocClient: DynamoDBDocumentClient

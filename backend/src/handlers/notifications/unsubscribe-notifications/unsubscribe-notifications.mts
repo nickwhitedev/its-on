@@ -9,6 +9,9 @@ import { Logger } from '@aws-lambda-powertools/logger'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
 import { createResponse } from '/opt/nodejs/response.mjs'
+import { getUserTopic, initializeFirebase } from '/opt/nodejs/firebase.mjs'
+import { getMessaging } from 'firebase-admin/messaging'
+import { getUserInfo } from '/opt/nodejs/dynamo.mjs'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -39,7 +42,7 @@ const unsubscribeNotifications = async (
   }
 
   const requestBody = JSON.parse(event.body) as IPayload
-  const userID = requestBody.userID
+  const userID = requestBody.userID ?? ''
   const token = requestBody.token
 
   if ([undefined, ''].includes(userID) || token == null) {
@@ -73,6 +76,24 @@ const unsubscribeNotifications = async (
       responseBody: { message: 'Something went wrong' },
       statusCode: 400,
     })
+  }
+
+  // Subscribe to all subscription topics and user topic with the new token
+  try {
+    await initializeFirebase()
+    const userInfo = await getUserInfo({ ddbDocClient, userID })
+    await Promise.all([
+      getMessaging().unsubscribeFromTopic(token, getUserTopic(userID)),
+      ...Array.from(userInfo?.subscriptionTopics ?? new Set([])).map(
+        subscriptionTopic =>
+          getMessaging().unsubscribeFromTopic(token, subscriptionTopic),
+      ),
+    ])
+  } catch (error) {
+    logger.error(
+      "Failed to unsubscribe token to user's subscriptions",
+      error as Error,
+    )
   }
 
   return createResponse({

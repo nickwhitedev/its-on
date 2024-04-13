@@ -2,16 +2,12 @@ import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 
 import { Logger } from '@aws-lambda-powertools/logger'
 import { DynamoDBRecord } from 'aws-lambda'
-import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
-import {
-  getChannel,
-  getUserNotificationSubscriptions,
-} from '/opt/nodejs/dynamo.mjs'
-import {
-  getMessagingChannelTopic,
-  initializeFirebase,
-} from '/opt/nodejs/firebase.mjs'
+import { DYNAMODB_TABLE_NAME, WEB_URL } from '/opt/nodejs/constants.mjs'
+import { getChannel, getUserInfo } from '/opt/nodejs/dynamo.mjs'
+import { getUserTopic, initializeFirebase } from '/opt/nodejs/firebase.mjs'
 import { getMessaging } from 'firebase-admin/messaging'
+import { MS_IN_HOUR } from '/opt/nodejs/time.mjs'
+import { getNewSubscriberNotificationCooldown } from '/opt/nodejs/channel.mjs'
 
 interface Params {
   record: DynamoDBRecord
@@ -24,65 +20,89 @@ export const handleChannelSubscriberAdded = async ({
   ddbDocClient,
   logger,
 }: Params) => {
-  await initializeFirebase()
+  try {
+    await initializeFirebase()
+  } catch (error) {
+    logger.error('Failed to initialize Firebase', error as Error)
+  }
 
   const subscriberPK = record.dynamodb?.Keys?.pk?.S ?? ''
   const channelID = subscriberPK.substring(subscriberPK.indexOf('#') + 1)
 
-  const subscriberSK = record.dynamodb?.Keys?.sk?.S ?? ''
-  const subscriberID = subscriberSK.substring(subscriberSK.indexOf('#') + 1)
-
   const channel = await getChannel({ channelID, ddbDocClient })
   const channelOwnerID = channel?.ownerID ?? ''
 
-  // Increment channel's subscriber count (if channel still exists)
   if (
     (await getChannel({
       channelID,
       ddbDocClient,
       userID: channelOwnerID,
-    })) != null
+    })) == null
   ) {
-    try {
-      const ddbResponse = await ddbDocClient.send(
-        new UpdateCommand({
-          Key: {
-            pk: `user#${channelOwnerID}`,
-            sk: `channel#${channelID}`,
-          },
-          ReturnValues: 'ALL_NEW',
-          TableName: DYNAMODB_TABLE_NAME,
-          UpdateExpression: 'ADD #subscriberCount :subscriberCount',
-          ExpressionAttributeNames: {
-            '#subscriberCount': 'subscriberCount',
-          },
-          ExpressionAttributeValues: {
-            ':subscriberCount': 1,
-          },
-        }),
-      )
-      logger.debug('Success - subscriber count updated', { ddbResponse })
-    } catch (error) {
-      logger.error('Subscriber count increment error', error as Error)
-    }
+    return
+  }
 
-    // Subscribe user to channel notification topic
-    try {
-      const subscriberNotificationSubscriptions =
-        await getUserNotificationSubscriptions({
-          ddbDocClient,
-          userID: subscriberID,
-        })
-      if (subscriberNotificationSubscriptions != null) {
-        await getMessaging().subscribeToTopic(
-          Array.from(subscriberNotificationSubscriptions.tokens),
-          getMessagingChannelTopic({ channelID, channelOwnerID }),
-        )
-      } else {
-        logger.warn('Subscriber has no notification subscription tokens saved')
-      }
-    } catch (error) {
-      logger.error('Subscribe user to channel topic failed', error as Error)
+  // Increment channel's subscriber count
+  try {
+    const ddbResponse = await ddbDocClient.send(
+      new UpdateCommand({
+        Key: {
+          pk: `user#${channelOwnerID}`,
+          sk: `channel#${channelID}`,
+        },
+        ReturnValues: 'ALL_NEW',
+        TableName: DYNAMODB_TABLE_NAME,
+        UpdateExpression: 'ADD #subscriberCount :subscriberCount',
+        ExpressionAttributeNames: {
+          '#subscriberCount': 'subscriberCount',
+        },
+        ExpressionAttributeValues: {
+          ':subscriberCount': 1,
+        },
+      }),
+    )
+    logger.debug('Success - subscriber count updated', { ddbResponse })
+  } catch (error) {
+    logger.error('Subscriber count increment error', error as Error)
+  }
+
+  // Notifify channel owner of new subscriber
+  try {
+    const channelOwnerInfo = await getUserInfo({
+      ddbDocClient,
+      userID: channelOwnerID,
+    })
+    if (
+      Date.now() - (channelOwnerInfo?.lastNewSubscriberNotification ?? 0) >
+      getNewSubscriberNotificationCooldown(channel?.subscriberCount ?? 0)
+    ) {
+      await getMessaging().send({
+        apns: {
+          headers: {
+            'apns-expiration': `${Math.floor(
+              (Date.now() + MS_IN_HOUR * 24) / 1000,
+            )}`,
+          },
+        },
+        data: {
+          url: `${WEB_URL}/${channelID}`,
+        },
+        notification: {
+          title: 'New subscriber',
+          body: `${channel?.title ?? 'One of your channels'} has a new subscriber`,
+        },
+        topic: getUserTopic(channelOwnerID),
+        webpush: {
+          headers: {
+            ttl: `${(MS_IN_HOUR * 24) / 1000}`,
+          },
+        },
+      })
     }
+  } catch (error) {
+    logger.error(
+      'Failed to notify channel owner of new subscriber',
+      error as Error,
+    )
   }
 }
