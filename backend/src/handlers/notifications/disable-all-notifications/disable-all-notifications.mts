@@ -16,7 +16,7 @@ const ddbDocClient = DynamoDBDocumentClient.from(client)
 /**
  * Disables notifications for a user
  */
-const disableNotifications = async (
+const disableAllNotifications = async (
   event: APIGatewayProxyEvent,
   _context: Context,
   logger: Logger,
@@ -66,4 +66,4 @@ const disableNotifications = async (
   })
 }
 
-export default disableNotifications
+export default disableAllNotifications

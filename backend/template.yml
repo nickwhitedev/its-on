@@ -402,18 +402,18 @@ Resources:
       RetentionInDays: 30
       LogGroupName: !Join ['', ['/aws/lambda/', !Ref unsubscribeLambdaFunction]]
 
-  # This is a Lambda function config associated with the source code: enable-notifications.mts
-  enableNotificationsLambdaFunction:
+  # This is a Lambda function config associated with the source code: enable-all-notifications.mts
+  enableAllNotificationsLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: dist/src/handlers/notifications/enable-notifications/
+      CodeUri: dist/src/handlers/notifications/enable-all-notifications/
       Description: Enables notifications for a user
       Events:
         Api:
           Type: Api
           Properties:
             RestApiId: !Ref ItsOnApi
-            Path: /enable-notifications
+            Path: /enable-all-notifications
             Method: POST
       Handler: handler.handler
       Policies:
@@ -421,25 +421,25 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
 
-  enableNotificationsLambdaFunctionLogGroup:
+  enableAllNotificationsLambdaFunctionLogGroup:
     Type: 'AWS::Logs::LogGroup'
     Properties:
       RetentionInDays: 30
       LogGroupName:
-        !Join ['', ['/aws/lambda/', !Ref enableNotificationsLambdaFunction]]
+        !Join ['', ['/aws/lambda/', !Ref enableAllNotificationsLambdaFunction]]
 
-  # This is a Lambda function config associated with the source code: disable-notifications.mts
-  disableNotificationsLambdaFunction:
+  # This is a Lambda function config associated with the source code: disable-all-notifications.mts
+  disableAllNotificationsLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: dist/src/handlers/notifications/disable-notifications/
+      CodeUri: dist/src/handlers/notifications/disable-all-notifications/
       Description: Disables notifications for a user
       Events:
         Api:
           Type: Api
           Properties:
             RestApiId: !Ref ItsOnApi
-            Path: /disable-notifications
+            Path: /disable-all-notifications
             Method: POST
       Handler: handler.handler
       Policies:
@@ -447,25 +447,25 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
 
-  disableNotificationsLambdaFunctionLogGroup:
+  disableAllNotificationsLambdaFunctionLogGroup:
     Type: 'AWS::Logs::LogGroup'
     Properties:
       RetentionInDays: 30
       LogGroupName:
-        !Join ['', ['/aws/lambda/', !Ref disableNotificationsLambdaFunction]]
+        !Join ['', ['/aws/lambda/', !Ref disableAllNotificationsLambdaFunction]]
 
-  # This is a Lambda function config associated with the source code: subscribe-notifications.mts
-  subscribeNotificationsLambdaFunction:
+  # This is a Lambda function config associated with the source code: enable-device-notifications.mts
+  enableDeviceNotificationsLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: dist/src/handlers/notifications/subscribe-notifications/
+      CodeUri: dist/src/handlers/notifications/enable-device-notifications/
       Description: Register a user's notification subscription
       Events:
         Api:
           Type: Api
           Properties:
             RestApiId: !Ref ItsOnApi
-            Path: /subscribe-notifications
+            Path: /enable-device-notifications
             Method: POST
       Handler: handler.handler
       Policies:
@@ -473,18 +473,21 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
 
-  subscribeNotificationsLambdaFunctionLogGroup:
+  enableDeviceNotificationsLambdaFunctionLogGroup:
     Type: 'AWS::Logs::LogGroup'
     Properties:
       RetentionInDays: 30
       LogGroupName:
-        !Join ['', ['/aws/lambda/', !Ref subscribeNotificationsLambdaFunction]]
+        !Join [
+          '',
+          ['/aws/lambda/', !Ref enableDeviceNotificationsLambdaFunction],
+        ]
 
-  # This is a Lambda function config associated with the source code: unsubscribe-notifications.mts
-  unsubscribeNotificationsLambdaFunction:
+  # This is a Lambda function config associated with the source code: disable-device-notifications.mts
+  disableDeviceNotificationsLambdaFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: dist/src/handlers/notifications/unsubscribe-notifications/
+      CodeUri: dist/src/handlers/notifications/disable-device-notifications/
       Description: Unregister a user's notification subscription
       Events:
         Api:
@@ -494,7 +497,7 @@ Resources:
               Authorizer: NONE
               OverrideApiAuth: true
             RestApiId: !Ref ItsOnApi
-            Path: /unsubscribe-notifications
+            Path: /disable-device-notifications
             Method: POST
       Handler: handler.handler
       Policies:
@@ -502,14 +505,14 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
 
-  unsubscribeNotificationsLambdaFunctionLogGroup:
+  disableDeviceNotificationsLambdaFunctionLogGroup:
     Type: 'AWS::Logs::LogGroup'
     Properties:
       RetentionInDays: 30
       LogGroupName:
         !Join [
           '',
-          ['/aws/lambda/', !Ref unsubscribeNotificationsLambdaFunction],
+          ['/aws/lambda/', !Ref disableDeviceNotificationsLambdaFunction],
         ]
 
   # This is a Lambda function config associated with the source code: update-profile.mts

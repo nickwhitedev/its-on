@@ -8,7 +8,7 @@
 interface IUser {
   channelCount: number
   lastNewSubscriberNotification?: number
-  notificationTokens: Record<string, { lastUpdated: number; token: string }>
+  notificationTokens: Record<string, { lastUpdated: number }>
   notificationsEnabled: boolean
   subscriptionCount: number
   subscriptionTopics?: Set<string>
@@ -26,7 +26,7 @@ interface IUser {
 interface IDynamoUserItem {
   channelCount: number
   lastNewSubscriberNotification?: number
-  notificationTokens: Record<string, { lastUpdated: number; token: string }>
+  notificationTokens: Record<string, { lastUpdated: number }>
   notificationsEnabled: boolean
   pk: string
   sk: string
@@ -56,7 +56,6 @@ interface IDynamoStreamUserImage {
       {
         M: {
           lastUpdated: { N: number }
-          token: { S: string }
         }
       }
     >

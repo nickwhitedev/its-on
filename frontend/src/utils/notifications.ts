@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useUser, useUserDispatch } from '../contexts/user/userContext'
-import { useFetchApi } from './api'
-import { useSendLog } from './logging'
-import { useErrorDispatch } from '../contexts/error/errorContext'
+
 import { ErrorDispatchActionType } from '../contexts/error/errorReducer'
 import { UserDispatchActionType } from '../contexts/user/userReducer'
 import { WebkitEvent } from '../components/window/window'
 import { getToken } from 'firebase/messaging'
 import { messaging } from '../firebase-config'
+import { useErrorDispatch } from '../contexts/error/errorContext'
+import { useFetchApi } from './api'
+import { useSendLog } from './logging'
 
 interface registerNotificationSubscriptionParams {
   registeredNotificationSubscriptions: Set<string>
@@ -96,7 +97,7 @@ export const useRegisterNotificationSubscription = (): (({
   const saveNotificationToken = useCallback(
     (token: string) => {
       if (!Object.keys(savedNotificationTokens).includes(token)) {
-        void fetchApi('/subscribe-notifications', 'POST', {
+        void fetchApi('/enable-device-notifications', 'POST', {
           token,
         })
       }
@@ -281,8 +282,8 @@ export const useToggleNotifications = () => {
     try {
       await fetchApi(
         userNotificationsEnabled
-          ? '/disable-notifications'
-          : '/enable-notifications',
+          ? '/disable-all-notifications'
+          : '/enable-all-notifications',
         'POST',
       )
     } catch (error) {

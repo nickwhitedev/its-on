@@ -24,7 +24,7 @@ interface IPayload {
 /**
  * Removes a user's notification subscription from their profile in Dynamo DB
  */
-const unsubscribeNotifications = async (
+const disableDeviceNotifications = async (
   event: APIGatewayProxyEvent,
   _context: Context,
   logger: Logger,
@@ -113,4 +113,4 @@ const createParams400Response = (eventPath: string) =>
     statusCode: 400,
   })
 
-export default unsubscribeNotifications
+export default disableDeviceNotifications
