@@ -68,10 +68,7 @@ const Subscriptions = () => {
                   type='button'
                   onClick={() => void handleClickUnsubscribe(channel.id)}
                 >
-                  <MDIcon
-                    className='red'
-                    slot='start'
-                  >
+                  <MDIcon className='red' slot='start'>
                     delete
                   </MDIcon>
                   <div slot='headline'>
