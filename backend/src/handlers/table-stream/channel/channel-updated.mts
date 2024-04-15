@@ -192,9 +192,6 @@ export const handleChannelUpdated = async ({
             )}`,
           },
         },
-        data: {
-          url: `${WEB_URL}/${channelID}`,
-        },
         notification: {
           title: `${channelInfo.title ?? 'Untitled Channel'} • ${
             channelInfo.owner ?? 'unknown'

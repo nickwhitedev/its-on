@@ -85,9 +85,6 @@ export const handleChannelSubscriberAdded = async ({
             )}`,
           },
         },
-        data: {
-          url: `${WEB_URL}/${channelID}`,
-        },
         notification: {
           title: 'New subscriber',
           body: `${channel?.title ?? 'One of your channels'} has a new subscriber`,
