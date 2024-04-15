@@ -3,10 +3,7 @@ import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 import { Logger } from '@aws-lambda-powertools/logger'
 import { DynamoDBRecord } from 'aws-lambda'
 import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
-import {
-  getUserInfo,
-  getUserNotificationSubscriptions,
-} from '/opt/nodejs/dynamo.mjs'
+import { getUserInfo } from '/opt/nodejs/dynamo.mjs'
 import {
   getMessagingChannelTopic,
   initializeFirebase,
@@ -38,10 +35,16 @@ export const handleSubscriptionAdded = async ({
 
   const channelOwnerID = record.dynamodb?.NewImage?.ownerID?.S ?? ''
 
+  const userInfo = await getUserInfo({ ddbDocClient, userID })
+
   // Increment user's subscription count (if user still exists)
-  if ((await getUserInfo({ ddbDocClient, userID })) == null) {
+  if (userInfo == null) {
     return
   }
+
+  const channelTopic = getMessagingChannelTopic({ channelID, channelOwnerID })
+
+  // Increase user's subscription count
   try {
     const ddbResponse = await ddbDocClient.send(
       new UpdateCommand({
@@ -59,9 +62,7 @@ export const handleSubscriptionAdded = async ({
         },
         ExpressionAttributeValues: {
           ':subscriptionCount': 1,
-          ':subscriptionTopic': new Set([
-            getMessagingChannelTopic({ channelID, channelOwnerID }),
-          ]),
+          ':subscriptionTopic': new Set([channelTopic]),
         },
       }),
     )
@@ -72,16 +73,9 @@ export const handleSubscriptionAdded = async ({
 
   // Subscribe user to channel notification topic
   try {
-    const subscriberNotificationSubscriptions =
-      await getUserNotificationSubscriptions({
-        ddbDocClient,
-        userID,
-      })
-    if (subscriberNotificationSubscriptions != null) {
-      await getMessaging().subscribeToTopic(
-        Array.from(subscriberNotificationSubscriptions.tokens),
-        getMessagingChannelTopic({ channelID, channelOwnerID }),
-      )
+    const notificationTokens = Object.keys(userInfo.notificationTokens ?? {})
+    if (notificationTokens.length > 0) {
+      await getMessaging().subscribeToTopic(notificationTokens, channelTopic)
     } else {
       logger.warn('Subscriber has no notification subscription tokens saved')
     }

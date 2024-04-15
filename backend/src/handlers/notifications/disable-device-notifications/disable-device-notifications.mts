@@ -55,16 +55,14 @@ const disableDeviceNotifications = async (
       new UpdateCommand({
         Key: {
           pk: `user#${userID}`,
-          sk: 'notificationSubscriptions',
+          sk: 'profile',
         },
         ReturnValues: 'ALL_NEW',
         TableName: DYNAMODB_TABLE_NAME,
-        UpdateExpression: 'DELETE #tokens :token',
+        UpdateExpression: 'REMOVE #notificationTokens.#token',
         ExpressionAttributeNames: {
-          '#tokens': 'tokens',
-        },
-        ExpressionAttributeValues: {
-          ':token': new Set([token]),
+          '#notificationTokens': 'notificationTokens',
+          '#token': token,
         },
       }),
     )
@@ -78,7 +76,7 @@ const disableDeviceNotifications = async (
     })
   }
 
-  // Subscribe to all subscription topics and user topic with the new token
+  // Unsubscribe from all subscription topics and user topic for token
   try {
     await initializeFirebase()
     const userInfo = await getUserInfo({ ddbDocClient, userID })

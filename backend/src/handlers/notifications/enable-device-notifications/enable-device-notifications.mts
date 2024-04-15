@@ -55,16 +55,17 @@ const enableDeviceNotifications = async (
       new UpdateCommand({
         Key: {
           pk: `user#${userID}`,
-          sk: 'notificationSubscriptions',
+          sk: 'profile',
         },
         ReturnValues: 'ALL_NEW',
         TableName: DYNAMODB_TABLE_NAME,
-        UpdateExpression: 'ADD #tokens :token',
+        UpdateExpression: 'SET #notificationTokens.#token = :tokenData',
         ExpressionAttributeNames: {
-          '#tokens': 'tokens',
+          '#notificationTokens': 'notificationTokens',
+          '#token': token,
         },
         ExpressionAttributeValues: {
-          ':token': new Set([token]),
+          ':tokenData': { lastUpdated: Date.now() },
         },
       }),
     )
@@ -78,22 +79,24 @@ const enableDeviceNotifications = async (
     })
   }
 
-  // Subscribe to all subscription topics and user topic with the new token
-  try {
-    await initializeFirebase()
-    const userInfo = await getUserInfo({ ddbDocClient, userID })
-    await Promise.all([
-      getMessaging().subscribeToTopic(token, getUserTopic(userID)),
-      ...Array.from(userInfo?.subscriptionTopics ?? new Set([])).map(
-        subscriptionTopic =>
-          getMessaging().subscribeToTopic(token, subscriptionTopic),
-      ),
-    ])
-  } catch (error) {
-    logger.error(
-      "Failed to subscribe token to user's subscriptions",
-      error as Error,
-    )
+  const userInfo = await getUserInfo({ ddbDocClient, userID })
+  if (userInfo?.notificationsEnabled ?? true) {
+    // Subscribe to all subscription topics and user topic with the new token
+    try {
+      await initializeFirebase()
+      await Promise.all([
+        getMessaging().subscribeToTopic(token, getUserTopic(userID)),
+        ...Array.from(userInfo?.subscriptionTopics ?? new Set([])).map(
+          subscriptionTopic =>
+            getMessaging().subscribeToTopic(token, subscriptionTopic),
+        ),
+      ])
+    } catch (error) {
+      logger.error(
+        "Failed to subscribe token to user's subscriptions",
+        error as Error,
+      )
+    }
   }
 
   return createResponse({

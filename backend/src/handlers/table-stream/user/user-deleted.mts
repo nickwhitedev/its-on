@@ -1,5 +1,4 @@
 import {
-  DeleteCommand,
   DynamoDBDocumentClient,
   QueryCommand,
   QueryCommandOutput,
@@ -9,6 +8,8 @@ import {
 import { Logger } from '@aws-lambda-powertools/logger'
 import { DynamoDBRecord } from 'aws-lambda'
 import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
+import { getUserTopic, initializeFirebase } from '/opt/nodejs/firebase.mjs'
+import { getMessaging } from 'firebase-admin/messaging'
 
 interface Params {
   record: DynamoDBRecord
@@ -22,22 +23,6 @@ export const handleUserDeleted = async ({
   logger,
 }: Params) => {
   const pk = record.dynamodb?.Keys?.pk?.S
-
-  // delete user notification subscriptions
-  try {
-    const ddbResponse = await ddbDocClient.send(
-      new DeleteCommand({
-        Key: {
-          pk: pk,
-          sk: 'notificationSubscriptions',
-        },
-        TableName: DYNAMODB_TABLE_NAME,
-      }),
-    )
-    logger.debug('Delete user notification subscriptions', { ddbResponse })
-  } catch (error) {
-    logger.error('Delete user notification subscriptions error', error as Error)
-  }
 
   // get and delete user channels
   let lastEvaluatedKey: Record<string, unknown> | undefined
@@ -202,5 +187,29 @@ export const handleUserDeleted = async ({
       }
     }
   } while (lastEvaluatedKey != null && Object.keys(lastEvaluatedKey).length > 0)
+
+  // Unsubscribe from all subscription topics and user topic for all tokens
+  try {
+    const userID = pk?.substring(pk.indexOf('#') + 1) ?? ''
+    await initializeFirebase()
+    await Promise.all([
+      ...Object.keys(
+        record.dynamodb?.OldImage?.notificationTokens?.M ?? {},
+      ).map(token => [
+        getMessaging().unsubscribeFromTopic(token, getUserTopic(userID)),
+        ...Array.from(
+          record.dynamodb?.OldImage?.subscriptionTopics?.SS ?? new Set([]),
+        ).map(subscriptionTopic =>
+          getMessaging().unsubscribeFromTopic(token, subscriptionTopic),
+        ),
+      ]),
+    ])
+  } catch (error) {
+    logger.error(
+      "Failed to unsubscribe token to user's subscriptions",
+      error as Error,
+    )
+  }
+
   logger.debug('Finished deleting items successfully')
 }

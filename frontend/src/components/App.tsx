@@ -3,38 +3,38 @@ import './App.css'
 import {
   ClerkLoaded,
   ClerkLoading,
+  SignInButton,
   SignedIn,
   SignedOut,
-  SignInButton,
   UserButton,
   useUser as useClerkUser,
 } from '@clerk/clerk-react'
-import { useUser } from '../contexts/user/userContext'
-
-import ErrorSnackbar from './errors/ErrorSnackbar'
-import Notifications from './notifications/Notifications'
-
-import { useEffect, useMemo, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { useError } from '../contexts/error/errorContext'
-import { apiUrl, baseUrl } from '../utils/urls'
-import Home from './Home'
-import TermsOfUse from './legal/TermsOfUse'
-import MDTextButton from './material/button/MDTextButton'
-import MDCircularProgress from './material/progress/MDCircularProgress'
-import Splash from './Splash'
-import Support from './support/Support'
-import MDIcon from './material/MDIcon'
-import MDList from './material/list/MDList'
-import MDListItem from './material/list/MDListItem'
-import MDSwitch from './material/MDSwitch'
-import MDFilledButton from './material/button/MDFilledButton'
 import {
+  useDisableDeviceNotifications,
   useGetIsNotificationPermissionRequestable,
   useGetNotificationPermission,
   useRequestNotificationPermissions,
   useToggleNotifications,
 } from '../utils/notifications'
+import { useEffect, useMemo, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+
+import ErrorSnackbar from './errors/ErrorSnackbar'
+import Home from './Home'
+import MDCircularProgress from './material/progress/MDCircularProgress'
+import MDFilledButton from './material/button/MDFilledButton'
+import MDIcon from './material/MDIcon'
+import MDList from './material/list/MDList'
+import MDListItem from './material/list/MDListItem'
+import MDSwitch from './material/MDSwitch'
+import MDTextButton from './material/button/MDTextButton'
+import Notifications from './notifications/Notifications'
+import Splash from './Splash'
+import Support from './support/Support'
+import TermsOfUse from './legal/TermsOfUse'
+import { baseUrl } from '../utils/urls'
+import { useError } from '../contexts/error/errorContext'
+import { useUser } from '../contexts/user/userContext'
 
 const App = () => {
   const error = useError()
@@ -45,6 +45,8 @@ const App = () => {
   const getNotificationPermission = useGetNotificationPermission()
   const getIsNotificationPermissionRequestable =
     useGetIsNotificationPermissionRequestable()
+  const disableDeviceNotifications = useDisableDeviceNotifications()
+
   const { user: clerkUser } = useClerkUser()
   const user = useUser()
 
@@ -68,25 +70,14 @@ const App = () => {
     void (async () => {
       if (urlParamsAction === 'signedOut') {
         try {
-          const registration = await navigator.serviceWorker.ready
-          const subscription = await registration.pushManager.getSubscription()
-          if (subscription != null) {
-            await subscription.unsubscribe()
-            void fetch(`${apiUrl}/unsubscribe-notifications`, {
-              body: JSON.stringify({
-                userID: urlParams.get('userID') ?? '',
-                subscription,
-              }),
-              method: 'POST',
-            })
-          }
+          await disableDeviceNotifications()
         } catch {
           // empty
         }
         navigate('/')
       }
     })()
-  }, [navigate, urlParams, urlParamsAction])
+  }, [disableDeviceNotifications, navigate, urlParams, urlParamsAction])
 
   const signedOutURLParams = new URLSearchParams()
   for (const [key, value] of Object.entries({
@@ -141,7 +132,7 @@ const App = () => {
                         }
                         onClick={() =>
                           void requestNotificationPermissions({
-                            registeredNotificationTokens:
+                            savedNotificationTokens:
                               user?.notificationTokens ?? {},
                             onPermissionSubmitted: (
                               isPermissionGranted: boolean,
@@ -168,7 +159,10 @@ const App = () => {
                         notifications on all devices
                       </div>
                       {isLoadingToggleNotifications ? (
-                        <MDCircularProgress indeterminate slot='end' />
+                        <MDCircularProgress
+                          indeterminate
+                          slot='end'
+                        />
                       ) : (
                         <MDSwitch
                           slot='end'

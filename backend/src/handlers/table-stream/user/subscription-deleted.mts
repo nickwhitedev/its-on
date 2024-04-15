@@ -3,10 +3,7 @@ import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 import { Logger } from '@aws-lambda-powertools/logger'
 import { DynamoDBRecord } from 'aws-lambda'
 import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
-import {
-  getUserInfo,
-  getUserNotificationSubscriptions,
-} from '/opt/nodejs/dynamo.mjs'
+import { getUserInfo } from '/opt/nodejs/dynamo.mjs'
 import { getMessaging } from 'firebase-admin/messaging'
 import {
   getMessagingChannelTopic,
@@ -38,11 +35,15 @@ export const handleSubscriptionDeleted = async ({
 
   const channelOwnerID = record.dynamodb?.OldImage?.ownerID?.S ?? ''
 
-  if ((await getUserInfo({ ddbDocClient, userID })) == null) {
+  const userInfo = await getUserInfo({ ddbDocClient, userID })
+
+  if (userInfo == null) {
     return
   }
 
-  // Reduce user's subscription count (if user still exists)
+  const channelTopic = getMessagingChannelTopic({ channelID, channelOwnerID })
+
+  // Reduce user's subscription count
   try {
     const ddbResponse = await ddbDocClient.send(
       new UpdateCommand({
@@ -60,9 +61,7 @@ export const handleSubscriptionDeleted = async ({
         },
         ExpressionAttributeValues: {
           ':subscriptionCount': -1,
-          ':subscriptionTopic': new Set([
-            getMessagingChannelTopic({ channelID, channelOwnerID }),
-          ]),
+          ':subscriptionTopic': new Set([channelTopic]),
         },
       }),
     )
@@ -73,15 +72,11 @@ export const handleSubscriptionDeleted = async ({
 
   // Unsubscribe user from channel notification topic
   try {
-    const subscriberNotificationSubscriptions =
-      await getUserNotificationSubscriptions({
-        ddbDocClient,
-        userID,
-      })
-    if (subscriberNotificationSubscriptions != null) {
+    const notificationTokens = Object.keys(userInfo.notificationTokens ?? {})
+    if (notificationTokens.length > 0) {
       await getMessaging().unsubscribeFromTopic(
-        Array.from(subscriberNotificationSubscriptions.tokens),
-        getMessagingChannelTopic({ channelID, channelOwnerID }),
+        notificationTokens,
+        channelTopic,
       )
     } else {
       logger.warn('Subscriber has no notification subscription tokens saved')
