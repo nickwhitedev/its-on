@@ -181,7 +181,7 @@ export const useEnableDeviceNotifications = (): (({
 export const useDisableDeviceNotifications = (): (() => Promise<void>) => {
   const fetchApi = useFetchApi()
   const user = useUser()
-  const sendLog = useSendLog()
+  // const sendLog = useSendLog()
   const getIsNotificationPermissionRequestable =
     useGetIsNotificationPermissionRequestable()
 
