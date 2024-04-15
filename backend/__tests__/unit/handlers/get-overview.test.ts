@@ -83,6 +83,8 @@ describe('Test getOverviewHandler', () => {
           subscriptionCount: 2,
           tier: 10,
           username: 'testie',
+          notificationTokens: {},
+          subscriptionTopics: ['user-_channel-someID2'],
         },
       }),
     }
