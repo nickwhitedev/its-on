@@ -241,7 +241,7 @@ export const useDisableDeviceNotifications = (): (() => Promise<void>) => {
     // }
 
     deleteNotificationToken(token)
-  }, [deleteNotificationToken, getIsNotificationPermissionRequestable, sendLog])
+  }, [deleteNotificationToken, getIsNotificationPermissionRequestable])
 }
 
 /**
