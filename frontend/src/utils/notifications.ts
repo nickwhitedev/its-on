@@ -89,7 +89,7 @@ export const useEnableDeviceNotifications = (): (({
   const fetchApi = useFetchApi()
   const user = useUser()
   const getNotificationPermission = useGetNotificationPermission()
-  // const sendLog = useSendLog()
+  const sendLog = useSendLog()
 
   const [currentSavedNotificationTokens, setCurrentSavedNotificationTokens] =
     useState<Record<string, { lastUpdated: number }>>({})
@@ -143,33 +143,26 @@ export const useEnableDeviceNotifications = (): (({
         return
       }
 
-      // let token
-      // try {
-      // eslint-disable-next-line no-console
-      console.log(
-        'notifications: useEnableDeviceNotifications: getToken: before',
-      )
-      const token = await getToken(messaging, {
-        vapidKey: import.meta.env.VITE_PUSH_NOTIFICATION_PUBLIC_KEY as string,
-      })
-      // eslint-disable-next-line no-console
-      console.log(
-        'notifications: useEnableDeviceNotifications: getToken: after',
-      )
-      // } catch (error) {
-      //   await sendLog(
-      //     'An error occurred while retrieving push notification token. ',
-      //     { error },
-      //     'ERROR',
-      //   )
-      //   return
-      // }
+      let token
+      try {
+        token = await getToken(messaging, {
+          vapidKey: import.meta.env.VITE_PUSH_NOTIFICATION_PUBLIC_KEY as string,
+        })
+      } catch (error) {
+        await sendLog(
+          'An error occurred while retrieving push notification token. ',
+          { error },
+          'ERROR',
+        )
+        return
+      }
 
       saveNotificationToken(token)
     },
     [
       getNotificationPermission,
       saveNotificationToken,
+      sendLog,
       user?.notificationsEnabled,
     ],
   )
@@ -181,7 +174,7 @@ export const useEnableDeviceNotifications = (): (({
 export const useDisableDeviceNotifications = (): (() => Promise<void>) => {
   const fetchApi = useFetchApi()
   const user = useUser()
-  // const sendLog = useSendLog()
+  const sendLog = useSendLog()
   const getIsNotificationPermissionRequestable =
     useGetIsNotificationPermissionRequestable()
 
@@ -220,25 +213,19 @@ export const useDisableDeviceNotifications = (): (() => Promise<void>) => {
       return
     }
 
-    // let token
-    // try {
-    // eslint-disable-next-line no-console
-    console.log(
-      'notifications: useDisableDeviceNotifications: getToken: before',
-    )
-    const token = await getToken(messaging, {
-      vapidKey: import.meta.env.VITE_PUSH_NOTIFICATION_PUBLIC_KEY as string,
-    })
-    // eslint-disable-next-line no-console
-    console.log('notifications: useDisableDeviceNotifications: getToken: after')
-    // } catch (error) {
-    //   await sendLog(
-    //     'An error occurred while retrieving push notification token. ',
-    //     { error },
-    //     'ERROR',
-    //   )
-    //   return
-    // }
+    let token
+    try {
+      token = await getToken(messaging, {
+        vapidKey: import.meta.env.VITE_PUSH_NOTIFICATION_PUBLIC_KEY as string,
+      })
+    } catch (error) {
+      await sendLog(
+        'An error occurred while retrieving push notification token. ',
+        { error },
+        'ERROR',
+      )
+      return
+    }
 
     deleteNotificationToken(token)
   }, [deleteNotificationToken, getIsNotificationPermissionRequestable])
