@@ -93,6 +93,9 @@ export const handleChannelSubscriberAdded = async ({
         },
         topic: getUserTopic(channelOwnerID),
         webpush: {
+          fcmOptions: {
+            link: `${WEB_URL}/${channelID}`,
+          },
           headers: {
             ttl: `${(MS_IN_HOUR * 24) / 1000}`,
           },

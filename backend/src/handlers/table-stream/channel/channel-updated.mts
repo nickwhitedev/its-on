@@ -201,6 +201,9 @@ export const handleChannelUpdated = async ({
       },
       topic: getMessagingChannelTopic({ channelID, channelOwnerID }),
       webpush: {
+        fcmOptions: {
+          link: `${WEB_URL}/${channelID}`,
+        },
         headers: { ttl: `${channelInfo.duration ?? (MS_IN_HOUR * 12) / 1000}` },
       },
     })

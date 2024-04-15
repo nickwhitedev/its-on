@@ -63,7 +63,6 @@ const getOverview = async (
         notificationsEnabled: true,
         notificationTokens: {},
         subscriptionCount: 0,
-        subscriptionTopics: new Set([]),
         tier: 5,
         username: (event.requestContext.authorizer?.username ?? '') as string,
       }
