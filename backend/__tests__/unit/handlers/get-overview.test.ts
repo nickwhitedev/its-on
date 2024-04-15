@@ -1,15 +1,16 @@
-import { Logger } from '@aws-lambda-powertools/logger'
 import {
   DynamoDBDocumentClient,
   PutCommand,
   QueryCommand,
 } from '@aws-sdk/lib-dynamodb'
+
 import { APIGatewayProxyEvent } from 'aws-lambda'
+import { CORS_HEADERS } from '../../../src/common/constants.mjs'
+import { Logger } from '@aws-lambda-powertools/logger'
+import getOverview from '../../../src/handlers/get-overview/get-overview.mjs'
 import { mockClient } from 'aws-sdk-client-mock'
 import mockContext from '../../../__mocks__/mock-context.js'
 import mockEvent from '../../../__mocks__/mock-event.js'
-import { CORS_HEADERS } from '../../../src/common/constants.mjs'
-import getOverview from '../../../src/handlers/get-overview/get-overview.mjs'
 
 describe('Test getOverviewHandler', () => {
   const ddbMock = mockClient(DynamoDBDocumentClient)
@@ -109,8 +110,11 @@ describe('Test getOverviewHandler', () => {
       body: JSON.stringify({
         profile: {
           channelCount: 0,
+          lastNewSubscriberNotification: 0,
           notificationsEnabled: true,
+          notificationTokens: {},
           subscriptionCount: 0,
+          subscriptionTopics: [],
           tier: 5,
           username: 'test_user',
         },
