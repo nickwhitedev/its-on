@@ -96,7 +96,11 @@ export const useEnableDeviceNotifications = (): (({
 
   const saveNotificationToken = useCallback(
     (token: string) => {
-      if (!Object.keys(currentSavedNotificationTokens).includes(token) || currentSavedNotificationTokens[token].lastUpdated < Date.now() - MS_IN_DAY * 14) {
+      if (
+        !Object.keys(currentSavedNotificationTokens).includes(token) ||
+        currentSavedNotificationTokens[token].lastUpdated <
+          Date.now() - MS_IN_DAY * 14
+      ) {
         void fetchApi('/enable-device-notifications', 'POST', {
           token,
         })
@@ -171,6 +175,8 @@ export const useDisableDeviceNotifications = (): (() => Promise<void>) => {
   const fetchApi = useFetchApi()
   const user = useUser()
   const sendLog = useSendLog()
+  const getIsNotificationPermissionRequestable =
+    useGetIsNotificationPermissionRequestable()
 
   const deleteNotificationToken = useCallback(
     (token: string) => {
@@ -198,6 +204,10 @@ export const useDisableDeviceNotifications = (): (() => Promise<void>) => {
   }, [deleteNotificationToken])
 
   return useCallback(async (): Promise<void> => {
+    if (getIsNotificationPermissionRequestable()) {
+      return
+    }
+
     if (window.webkit != null) {
       window.webkit.messageHandlers['push-token'].postMessage('push-token')
       return
@@ -218,7 +228,7 @@ export const useDisableDeviceNotifications = (): (() => Promise<void>) => {
     }
 
     deleteNotificationToken(token)
-  }, [deleteNotificationToken, sendLog])
+  }, [deleteNotificationToken, getIsNotificationPermissionRequestable, sendLog])
 }
 
 /**
