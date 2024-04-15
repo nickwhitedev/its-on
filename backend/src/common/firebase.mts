@@ -15,7 +15,9 @@ export const initializeFirebase = async () => {
 
   admin.initializeApp({
     credential: admin.credential.cert(
-      firebaseServiceAccountSecret.SecretString ?? '',
+      JSON.parse(
+        firebaseServiceAccountSecret.SecretString ?? '{}',
+      ) as admin.ServiceAccount,
     ),
   })
 }
