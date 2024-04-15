@@ -185,6 +185,7 @@ export const handleChannelUpdated = async ({
 
     try {
       const topic = getMessagingChannelTopic({ channelID, channelOwnerID })
+      const channelURL = `${WEB_URL}/${channelID}`
       const messageID = await getMessaging().send({
         apns: {
           headers: {
@@ -192,24 +193,33 @@ export const handleChannelUpdated = async ({
               (Date.now() + (channelInfo.duration ?? MS_IN_HOUR * 12)) / 1000,
             )}`,
           },
-        },
-        notification: {
-          title: `${channelInfo.title ?? 'Untitled Channel'} • ${
-            channelInfo.owner ?? 'unknown'
-          }`,
-          body: channelInfo.note ?? '',
+          payload: {
+            aps: {
+              alert: {
+                body: channelInfo.note ?? '',
+                title: `${channelInfo.title ?? 'Untitled Channel'} • ${
+                  channelInfo.owner ?? 'unknown'
+                }`,
+              },
+            },
+          },
         },
         topic,
         webpush: {
           fcmOptions: {
-            link: `${WEB_URL}/${channelID}`,
+            link: channelURL,
           },
           headers: {
             ttl: `${channelInfo.duration ?? (MS_IN_HOUR * 12) / 1000}`,
           },
           notification: {
             badge: '/monochrome-icon-96.png',
-            icon: '/icon-64.png',
+            body: channelInfo.note ?? '',
+            data: { url: channelURL },
+            icon: '/icon-512.png',
+            title: `${channelInfo.title ?? 'Untitled Channel'} • ${
+              channelInfo.owner ?? 'unknown'
+            }`,
           },
         },
       })
