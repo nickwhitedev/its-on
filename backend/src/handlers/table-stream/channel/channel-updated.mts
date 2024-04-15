@@ -9,7 +9,10 @@ import { DynamoDBRecord } from 'aws-lambda'
 import { DYNAMODB_TABLE_NAME, WEB_URL } from '/opt/nodejs/constants.mjs'
 import { batchWrite } from '/opt/nodejs/dynamo.mjs'
 import { MS_IN_HOUR } from '/opt/nodejs/time.mjs'
-import { getMessagingChannelTopic } from '/opt/nodejs/firebase.mjs'
+import {
+  getMessagingChannelTopic,
+  initializeFirebase,
+} from '/opt/nodejs/firebase.mjs'
 import { getMessaging } from 'firebase-admin/messaging'
 
 interface Params {
@@ -173,31 +176,43 @@ export const handleChannelUpdated = async ({
     (channelInfo.lastOn ?? 0) >
       (oldChannelInfo.lastOn ?? 0) + (oldChannelInfo.lastOnDuration ?? 0)
   ) {
-    await getMessaging().send({
-      apns: {
-        headers: {
-          'apns-expiration': `${Math.floor(
-            (Date.now() + (channelInfo.duration ?? MS_IN_HOUR * 12)) / 1000,
-          )}`,
+    try {
+      await initializeFirebase()
+    } catch (error) {
+      logger.error('Failed to initialize Firebase', error as Error)
+    }
+
+    try {
+      await getMessaging().send({
+        apns: {
+          headers: {
+            'apns-expiration': `${Math.floor(
+              (Date.now() + (channelInfo.duration ?? MS_IN_HOUR * 12)) / 1000,
+            )}`,
+          },
         },
-      },
-      data: {
-        url: `${WEB_URL}/${channelID}`,
-      },
-      notification: {
-        title: `${channelInfo.title ?? 'Untitled Channel'} • ${
-          channelInfo.owner ?? 'unknown'
-        }`,
-        body: channelInfo.note ?? '',
-      },
-      topic: getMessagingChannelTopic({ channelID, channelOwnerID }),
-      webpush: {
-        fcmOptions: {
-          link: `${WEB_URL}/${channelID}`,
+        data: {
+          url: `${WEB_URL}/${channelID}`,
         },
-        headers: { ttl: `${channelInfo.duration ?? (MS_IN_HOUR * 12) / 1000}` },
-      },
-    })
+        notification: {
+          title: `${channelInfo.title ?? 'Untitled Channel'} • ${
+            channelInfo.owner ?? 'unknown'
+          }`,
+          body: channelInfo.note ?? '',
+        },
+        topic: getMessagingChannelTopic({ channelID, channelOwnerID }),
+        webpush: {
+          fcmOptions: {
+            link: `${WEB_URL}/${channelID}`,
+          },
+          headers: {
+            ttl: `${channelInfo.duration ?? (MS_IN_HOUR * 12) / 1000}`,
+          },
+        },
+      })
+    } catch (error) {
+      logger.error('Error sending notifications', error as Error)
+    }
   }
   logger.debug('Finished updating items successfully')
 }

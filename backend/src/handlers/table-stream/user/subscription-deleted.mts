@@ -5,7 +5,10 @@ import { DynamoDBRecord } from 'aws-lambda'
 import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
 import { getUserInfo } from '/opt/nodejs/dynamo.mjs'
 import { getMessaging } from 'firebase-admin/messaging'
-import { getMessagingChannelTopic } from '/opt/nodejs/firebase.mjs'
+import {
+  getMessagingChannelTopic,
+  initializeFirebase,
+} from '/opt/nodejs/firebase.mjs'
 
 interface Params {
   record: DynamoDBRecord
@@ -18,6 +21,12 @@ export const handleSubscriptionDeleted = async ({
   ddbDocClient,
   logger,
 }: Params) => {
+  try {
+    await initializeFirebase()
+  } catch (error) {
+    logger.error('Failed to initialize Firebase', error as Error)
+  }
+
   const subscriptionPK = record.dynamodb?.Keys?.pk?.S ?? ''
   const userID = subscriptionPK.substring(subscriptionPK.indexOf('#') + 1)
 

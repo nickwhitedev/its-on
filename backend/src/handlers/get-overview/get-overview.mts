@@ -12,7 +12,7 @@ import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
 import { createResponse } from '/opt/nodejs/response.mjs'
 import { serializeQueryResponse } from '/opt/nodejs/serialize.mjs'
 import { MS_IN_DAY } from '/opt/nodejs/time.mjs'
-import { getUserTopic } from '/opt/nodejs/firebase.mjs'
+import { getUserTopic, initializeFirebase } from '/opt/nodejs/firebase.mjs'
 import { getMessaging } from 'firebase-admin/messaging'
 
 const client = new DynamoDBClient({})
@@ -100,6 +100,7 @@ const getOverview = async (
 
     if (expiredTokens.length > 0) {
       try {
+        await initializeFirebase()
         await Promise.all([
           ...expiredTokens.map(([token, _tokenData]) => [
             getMessaging().unsubscribeFromTopic(token, getUserTopic(userID)),
