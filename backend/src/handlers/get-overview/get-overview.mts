@@ -3,6 +3,7 @@ import {
   DynamoDBDocumentClient,
   PutCommand,
   QueryCommand,
+  UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
@@ -10,6 +11,9 @@ import { APIGatewayProxyEvent, Context } from 'aws-lambda'
 import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
 import { createResponse } from '/opt/nodejs/response.mjs'
 import { serializeQueryResponse } from '/opt/nodejs/serialize.mjs'
+import { MS_IN_DAY } from '/opt/nodejs/time.mjs'
+import { getUserTopic, initializeFirebase } from '/opt/nodejs/firebase.mjs'
+import { getMessaging } from 'firebase-admin/messaging'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -55,7 +59,9 @@ const getOverview = async (
     if (!('profile' in data)) {
       const userAttributes = {
         channelCount: 0,
+        lastNewSubscriberNotification: 0,
         notificationsEnabled: true,
+        notificationTokens: {},
         subscriptionCount: 0,
         tier: 5,
         username: (event.requestContext.authorizer?.username ?? '') as string,
@@ -85,6 +91,40 @@ const getOverview = async (
           responseBody: { message: 'Something went wrong' },
           statusCode: 400,
         })
+      }
+    }
+
+    const expiredTokens = Object.entries(
+      data.profile?.notificationTokens ?? {},
+    ).filter(([_token, tokenData]) => tokenData.lastUpdated < MS_IN_DAY - 30)
+
+    if (expiredTokens.length > 0) {
+      try {
+        await initializeFirebase()
+        await Promise.all([
+          ...expiredTokens.map(([token, _tokenData]) => [
+            getMessaging().unsubscribeFromTopic(token, getUserTopic(userID)),
+            ...Array.from(data.profile?.subscriptionTopics ?? new Set([])).map(
+              subscriptionTopic =>
+                getMessaging().unsubscribeFromTopic(token, subscriptionTopic),
+            ),
+          ]),
+        ])
+
+        const ddbResponse = await ddbDocClient.send(
+          new UpdateCommand({
+            Key: {
+              pk: `user#${userID}`,
+              sk: 'profile',
+            },
+            ReturnValues: 'ALL_NEW',
+            TableName: DYNAMODB_TABLE_NAME,
+            UpdateExpression: `REMOVE ${expiredTokens.map(([token, _tokenData]) => `notificationTokens.${token}`).join(', ')}`,
+          }),
+        )
+        logger.debug('Stale tokens deleted', { ddbResponse })
+      } catch (error) {
+        logger.error('Stale token deletion failed', error as Error)
       }
     }
 

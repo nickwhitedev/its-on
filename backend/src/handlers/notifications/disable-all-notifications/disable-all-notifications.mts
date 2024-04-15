@@ -9,6 +9,9 @@ import { Logger } from '@aws-lambda-powertools/logger'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
 import { createResponse } from '/opt/nodejs/response.mjs'
+import { getUserTopic, initializeFirebase } from '/opt/nodejs/firebase.mjs'
+import { getUserInfo } from '/opt/nodejs/dynamo.mjs'
+import { getMessaging } from 'firebase-admin/messaging'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -16,7 +19,7 @@ const ddbDocClient = DynamoDBDocumentClient.from(client)
 /**
  * Disables notifications for a user
  */
-const disableNotifications = async (
+const disableAllNotifications = async (
   event: APIGatewayProxyEvent,
   _context: Context,
   logger: Logger,
@@ -59,6 +62,26 @@ const disableNotifications = async (
     })
   }
 
+  // Unsubscribe from all subscription topics and user topic for all tokens
+  try {
+    await initializeFirebase()
+    const userInfo = await getUserInfo({ ddbDocClient, userID })
+    await Promise.all([
+      ...Object.keys(userInfo?.notificationTokens ?? {}).map(token => [
+        getMessaging().unsubscribeFromTopic(token, getUserTopic(userID)),
+        ...Array.from(userInfo?.subscriptionTopics ?? new Set([])).map(
+          subscriptionTopic =>
+            getMessaging().unsubscribeFromTopic(token, subscriptionTopic),
+        ),
+      ]),
+    ])
+  } catch (error) {
+    logger.error(
+      "Failed to unsubscribe token from user's subscriptions",
+      error as Error,
+    )
+  }
+
   return createResponse({
     eventPath,
     responseBody: { message: 'Notifications disabled' },
@@ -66,4 +89,4 @@ const disableNotifications = async (
   })
 }
 
-export default disableNotifications
+export default disableAllNotifications

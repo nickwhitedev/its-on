@@ -17,6 +17,7 @@
     "@lit/react": "^1.0.4",
     "@material/web": "^1.4.0",
     "clientjs": "^0.2.1",
+    "firebase": "^10.10.0",
     "lit": "^3.1.0",
     "pulltorefreshjs": "^0.1.22",
     "react": "^18.2.0",

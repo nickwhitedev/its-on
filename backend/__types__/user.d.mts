@@ -7,8 +7,11 @@
  */
 interface IUser {
   channelCount: number
+  lastNewSubscriberNotification?: number
+  notificationTokens?: Record<string, { lastUpdated: number }>
   notificationsEnabled: boolean
   subscriptionCount: number
+  subscriptionTopics?: Set<string>
   tier: number
   username: string
 }
@@ -22,10 +25,13 @@ interface IUser {
  */
 interface IDynamoUserItem {
   channelCount: number
+  lastNewSubscriberNotification?: number
+  notificationTokens?: Record<string, { lastUpdated: number }>
   notificationsEnabled: boolean
   pk: string
   sk: string
   subscriptionCount: number
+  subscriptionTopics?: Set<string>
   tier: number
   username: string
 }
@@ -41,6 +47,19 @@ interface IDynamoStreamUserImage {
   channelCount: {
     N: number
   }
+  lastNewSubscriberNotification?: {
+    N: number
+  }
+  notificationTokens?: {
+    M: Record<
+      string,
+      {
+        M: {
+          lastUpdated: { N: number }
+        }
+      }
+    >
+  }
   notificationsEnabled: {
     B: boolean
   }
@@ -53,54 +72,13 @@ interface IDynamoStreamUserImage {
   subscriptionCount: {
     N: number
   }
+  subscriptionTopics?: {
+    SS: Set<string>
+  }
   tier: {
     N: number
   }
   username: {
     S: string
-  }
-}
-
-/**
- * Represents a UserNotificationSubscription object
- *
- * Make attributes required to check for code completeness.
- * Leave attributes optional for null-safety.
- * DynamoDB guarantees nothing but keys.
- */
-interface IUserNotificationSubscriptions {
-  subscriptions: Record<string, PushSubscription>
-}
-
-/**
- * Represents a user notification subscription item that has been parsed from
- * DynamoDB
- *
- * Make attributes required to check for code completeness.
- * Leave attributes optional for null-safety.
- * DynamoDB guarantees nothing but keys.
- */
-interface IDynamoUserNotificationSubscriptionsItem {
-  pk: string
-  sk: string
-  subscriptions: Record<string, string>
-}
-
-/**
- * Represents a user notification subscription item in raw DynamoDB form
- *
- * Make attributes required to check for code completeness.
- * Leave attributes optional for null-safety.
- * DynamoDB guarantees nothing but keys.
- */
-interface IDynamoStreamUserNotificationSubscriptionsImage {
-  pk: {
-    S: string
-  }
-  sk: {
-    S: string
-  }
-  subscriptions: {
-    M: Record<string, { S: string }>
   }
 }

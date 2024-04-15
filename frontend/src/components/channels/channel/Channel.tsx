@@ -332,8 +332,7 @@ const Channel = ({ channelID }: Props) => {
 
     if (user?.notificationsEnabled ?? true) {
       await requestNotificationPermissions({
-        registeredNotificationSubscriptions:
-          user?.notificationSubscriptions ?? {},
+        savedNotificationTokens: user?.notificationTokens ?? {},
       })
     }
   }

@@ -7,22 +7,24 @@ import {
 
 import { Logger } from '@aws-lambda-powertools/logger'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { PushSubscription } from 'web-push'
 import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
 import { createResponse } from '/opt/nodejs/response.mjs'
+import { getUserTopic, initializeFirebase } from '/opt/nodejs/firebase.mjs'
+import { getMessaging } from 'firebase-admin/messaging'
+import { getUserInfo } from '/opt/nodejs/dynamo.mjs'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
 
 interface IPayload {
-  subscription?: PushSubscription
+  token?: string
   userID?: string
 }
 
 /**
  * Removes a user's notification subscription from their profile in Dynamo DB
  */
-const unsubscribeNotifications = async (
+const disableDeviceNotifications = async (
   event: APIGatewayProxyEvent,
   _context: Context,
   logger: Logger,
@@ -40,27 +42,28 @@ const unsubscribeNotifications = async (
   }
 
   const requestBody = JSON.parse(event.body) as IPayload
-  const userID = requestBody.userID
-  const subscription = requestBody.subscription
+  const userID = requestBody.userID ?? ''
+  const token = requestBody.token
+  const userInfo = await getUserInfo({ ddbDocClient, userID })
 
-  if ([undefined, ''].includes(userID) || subscription == null) {
+  if ([undefined, ''].includes(userID) || token == null) {
     return createParams400Response(eventPath)
   }
 
   try {
-    logger.debug('subscription.endpoint: ', subscription.endpoint)
+    logger.debug('token: ', token)
     const ddbResponse = await ddbDocClient.send(
       new UpdateCommand({
         Key: {
           pk: `user#${userID}`,
-          sk: 'notificationSubscriptions',
+          sk: 'profile',
         },
         ReturnValues: 'ALL_NEW',
         TableName: DYNAMODB_TABLE_NAME,
-        UpdateExpression: 'REMOVE #subscriptions.#subscriptionID',
+        UpdateExpression: 'REMOVE #notificationTokens.#token',
         ExpressionAttributeNames: {
-          '#subscriptions': 'subscriptions',
-          '#subscriptionID': subscription.endpoint,
+          '#notificationTokens': 'notificationTokens',
+          '#token': token,
         },
       }),
     )
@@ -72,6 +75,23 @@ const unsubscribeNotifications = async (
       responseBody: { message: 'Something went wrong' },
       statusCode: 400,
     })
+  }
+
+  // Unsubscribe from all subscription topics and user topic for token
+  try {
+    await initializeFirebase()
+    await Promise.all([
+      getMessaging().unsubscribeFromTopic(token, getUserTopic(userID)),
+      ...Array.from(userInfo?.subscriptionTopics ?? new Set([])).map(
+        subscriptionTopic =>
+          getMessaging().unsubscribeFromTopic(token, subscriptionTopic),
+      ),
+    ])
+  } catch (error) {
+    logger.error(
+      "Failed to unsubscribe token to user's subscriptions",
+      error as Error,
+    )
   }
 
   return createResponse({
@@ -91,4 +111,4 @@ const createParams400Response = (eventPath: string) =>
     statusCode: 400,
   })
 
-export default unsubscribeNotifications
+export default disableDeviceNotifications

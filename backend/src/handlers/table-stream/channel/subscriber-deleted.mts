@@ -17,7 +17,6 @@ export const handleChannelSubscriberDeleted = async ({
   logger,
 }: Params) => {
   const subscriberPK = record.dynamodb?.Keys?.pk?.S ?? ''
-
   const channelID = subscriberPK.substring(subscriberPK.indexOf('#') + 1)
 
   const channel = await getChannel({ channelID, ddbDocClient })
