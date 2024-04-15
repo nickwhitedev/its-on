@@ -32,6 +32,8 @@ interface OverviewData {
 const Home = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [hasOverviewError, setHasOverviewError] = useState<boolean>(false)
+  const [isEnablingDeviceNotifications, setIsEnablingDeviceNotifications] =
+    useState<boolean>(true)
 
   const userContext = useUser()
   const clerkUser = useClerkUser()
@@ -43,7 +45,7 @@ const Home = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const fetchApi = useFetchApi()
-  const registerNotificationSubscription = useEnableDeviceNotifications()
+  const enableDeviceNotifications = useEnableDeviceNotifications()
 
   const isChannelsRoute = location.pathname.startsWith('/channels')
   const isSubscriptionsRoute = location.pathname.startsWith('/subscriptions')
@@ -72,16 +74,17 @@ const Home = () => {
   }, [dispatchChannels, dispatchSubscriptions, dispatchUser, fetchApi])
 
   useEffect(() => {
-    if (!isLoading) {
-      void registerNotificationSubscription({
+    if (!isLoading && isEnablingDeviceNotifications) {
+      void enableDeviceNotifications({
         savedNotificationTokens: userContext?.notificationTokens ?? {},
       })
+      setIsEnablingDeviceNotifications(false)
     }
   }, [
     isLoading,
-    registerNotificationSubscription,
+    enableDeviceNotifications,
     userContext?.notificationTokens,
-    userContext?.notificationsEnabled,
+    isEnablingDeviceNotifications,
   ])
 
   useEffect(() => {
@@ -151,10 +154,7 @@ const Home = () => {
       </MDTabs>
       <div className='Home-content'>
         {isLoading ? (
-          <MDCircularProgress
-            className='Home-loading'
-            indeterminate
-          />
+          <MDCircularProgress className='Home-loading' indeterminate />
         ) : hasOverviewError ? (
           <div>
             <p>Something went wrong...</p>
