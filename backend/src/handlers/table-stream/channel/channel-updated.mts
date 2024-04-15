@@ -209,6 +209,10 @@ export const handleChannelUpdated = async ({
           headers: {
             ttl: `${channelInfo.duration ?? (MS_IN_HOUR * 12) / 1000}`,
           },
+          notification: {
+            badge: '/monochrome-icon-96.png',
+            icon: '/icon-64.png',
+          },
         },
       })
       logger.debug('Message sent to notification topic', { topic, messageID })
