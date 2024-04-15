@@ -1,23 +1,24 @@
 import './Home.css'
 
-import { useUser as useClerkUser } from '@clerk/clerk-react'
-import PullToRefresh from 'pulltorefreshjs'
-import { useCallback, useEffect, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { useChannelsDispatch } from '../contexts/channels/channelsContext'
-import { ChannelsDispatchActionType } from '../contexts/channels/channelsReducer'
-import { useSubscriptionsDispatch } from '../contexts/subscriptions/subscriptionsContext'
-import { SubscriptionsDispatchActionType } from '../contexts/subscriptions/subscriptionsReducer'
+import { useCallback, useEffect, useState } from 'react'
 import { useUser, useUserDispatch } from '../contexts/user/userContext'
-import { UserDispatchActionType } from '../contexts/user/userReducer'
-import { useFetchApi } from '../utils/api'
-import client from '../utils/client'
-import { useRegisterNotificationSubscription } from '../utils/notifications'
+
+import { ChannelsDispatchActionType } from '../contexts/channels/channelsReducer'
 import ItsOnIcon from './icons/ItsOnIcon'
-import MDIcon from './material/MDIcon'
 import MDCircularProgress from './material/progress/MDCircularProgress'
+import MDIcon from './material/MDIcon'
 import MDPrimaryTab from './material/tabs/MDPrimaryTab'
 import MDTabs from './material/tabs/MDTabs'
+import PullToRefresh from 'pulltorefreshjs'
+import { SubscriptionsDispatchActionType } from '../contexts/subscriptions/subscriptionsReducer'
+import { UserDispatchActionType } from '../contexts/user/userReducer'
+import client from '../utils/client'
+import { useChannelsDispatch } from '../contexts/channels/channelsContext'
+import { useUser as useClerkUser } from '@clerk/clerk-react'
+import { useEnableDeviceNotifications } from '../utils/notifications'
+import { useFetchApi } from '../utils/api'
+import { useSubscriptionsDispatch } from '../contexts/subscriptions/subscriptionsContext'
 
 interface OverviewData {
   channels?: IChannel[]
@@ -31,6 +32,8 @@ interface OverviewData {
 const Home = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [hasOverviewError, setHasOverviewError] = useState<boolean>(false)
+  const [isEnablingDeviceNotifications, setIsEnablingDeviceNotifications] =
+    useState<boolean>(true)
 
   const userContext = useUser()
   const clerkUser = useClerkUser()
@@ -42,7 +45,7 @@ const Home = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const fetchApi = useFetchApi()
-  const registerNotificationSubscription = useRegisterNotificationSubscription()
+  const enableDeviceNotifications = useEnableDeviceNotifications()
 
   const isChannelsRoute = location.pathname.startsWith('/channels')
   const isSubscriptionsRoute = location.pathname.startsWith('/subscriptions')
@@ -62,11 +65,7 @@ const Home = () => {
       })
       dispatchUser({
         type: UserDispatchActionType.SYNCED,
-        user: {
-          ...response.profile,
-          notificationSubscriptions:
-            response.notificationSubscriptions?.subscriptions ?? {},
-        },
+        user: response.profile,
       })
     } catch (error) {
       setHasOverviewError(true)
@@ -75,22 +74,17 @@ const Home = () => {
   }, [dispatchChannels, dispatchSubscriptions, dispatchUser, fetchApi])
 
   useEffect(() => {
-    if (
-      !isLoading &&
-      'Notification' in window &&
-      Notification.permission === 'granted' &&
-      (userContext?.notificationsEnabled ?? true)
-    ) {
-      void registerNotificationSubscription({
-        registeredNotificationSubscriptions:
-          userContext?.notificationSubscriptions ?? {},
+    if (!isLoading && isEnablingDeviceNotifications) {
+      void enableDeviceNotifications({
+        savedNotificationTokens: userContext?.notificationTokens ?? {},
       })
+      setIsEnablingDeviceNotifications(false)
     }
   }, [
     isLoading,
-    registerNotificationSubscription,
-    userContext?.notificationSubscriptions,
-    userContext?.notificationsEnabled,
+    enableDeviceNotifications,
+    userContext?.notificationTokens,
+    isEnablingDeviceNotifications,
   ])
 
   useEffect(() => {
@@ -160,10 +154,7 @@ const Home = () => {
       </MDTabs>
       <div className='Home-content'>
         {isLoading ? (
-          <MDCircularProgress
-            className='Home-loading'
-            indeterminate
-          />
+          <MDCircularProgress className='Home-loading' indeterminate />
         ) : hasOverviewError ? (
           <div>
             <p>Something went wrong...</p>

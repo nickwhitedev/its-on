@@ -76,8 +76,8 @@ export const getChannel = async ({
             userID == null || copyType === ChannelCopyTypeEnum.PUBLIC
               ? 'info'
               : copyType === ChannelCopyTypeEnum.SUBSCRIBER
-              ? `subscription#${channelID}`
-              : `channel#${channelID}`,
+                ? `subscription#${channelID}`
+                : `channel#${channelID}`,
         },
       }),
     )

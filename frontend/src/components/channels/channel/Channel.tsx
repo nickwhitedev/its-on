@@ -72,6 +72,7 @@ const Channel = ({ channelID }: Props) => {
 
   // null means initial load hasn't started yet
   const [isLoading, setIsLoading] = useState<boolean | null>(null)
+  const [isReloading, setIsReloading] = useState<boolean>(false)
   const [isEditing, setIsEditing] = useState<boolean>(
     userIsChannelOwner && !channel?.title,
   )
@@ -109,7 +110,7 @@ const Channel = ({ channelID }: Props) => {
 
   useEffect(() => {
     // fetch channel
-    if (isLoading !== null) return
+    if (isLoading !== null && !isReloading) return
     setIsLoading(true)
     void (async () => {
       let fetchedChannel: IChannel | null
@@ -143,6 +144,7 @@ const Channel = ({ channelID }: Props) => {
         setCurrentTitle(channel?.title ?? '')
       }
       setIsLoading(false)
+      setIsReloading(false)
     })()
   }, [
     channel?.duration,
@@ -155,6 +157,7 @@ const Channel = ({ channelID }: Props) => {
     dispatchSubscriptions,
     fetchApi,
     isLoading,
+    isReloading,
     sendLog,
     subscriptions,
     user?.tier,
@@ -175,10 +178,7 @@ const Channel = ({ channelID }: Props) => {
 
   if (channel == null) {
     return channelIsLoading ? (
-      <MDCircularProgress
-        className='Channel-loading'
-        indeterminate
-      />
+      <MDCircularProgress className='Channel-loading' indeterminate />
     ) : (
       <h4>Channel not found</h4>
     )
@@ -328,12 +328,11 @@ const Channel = ({ channelID }: Props) => {
       })
     }
     setIsUpdating(false)
-    setIsLoading(true)
+    setIsReloading(true)
 
     if (user?.notificationsEnabled ?? true) {
       await requestNotificationPermissions({
-        registeredNotificationSubscriptions:
-          user?.notificationSubscriptions ?? {},
+        savedNotificationTokens: user?.notificationTokens ?? {},
       })
     }
   }
@@ -356,7 +355,7 @@ const Channel = ({ channelID }: Props) => {
       })
     }
     setIsUpdating(false)
-    setIsLoading(true)
+    setIsReloading(true)
   }
 
   return (

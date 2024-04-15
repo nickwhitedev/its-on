@@ -32,10 +32,3 @@ export const handleRemoveEvent = async ({
     await handleChannelSubscriberDeleted({ record, ddbDocClient, logger })
   }
 }
-;`
-what do i have here? Whats my idea? its the counts. I want to keep track of the counts with dynamodb streams. 
-Which counts do I have? 
-- channel subscribers (channel#id, subscriber#id) insert and delete
-- channels (user#id, channel#id) insert and delete
-- subscriptions (user#id, subscription#id) insert and delete
-`

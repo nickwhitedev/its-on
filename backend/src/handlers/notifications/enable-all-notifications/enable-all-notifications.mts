@@ -9,6 +9,9 @@ import { Logger } from '@aws-lambda-powertools/logger'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
 import { createResponse } from '/opt/nodejs/response.mjs'
+import { getUserTopic, initializeFirebase } from '/opt/nodejs/firebase.mjs'
+import { getMessaging } from 'firebase-admin/messaging'
+import { getUserInfo } from '/opt/nodejs/dynamo.mjs'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
@@ -16,7 +19,7 @@ const ddbDocClient = DynamoDBDocumentClient.from(client)
 /**
  * Enables notifications for a user
  */
-const enableNotifications = async (
+const enableAllNotifications = async (
   event: APIGatewayProxyEvent,
   _context: Context,
   logger: Logger,
@@ -59,6 +62,26 @@ const enableNotifications = async (
     })
   }
 
+  // Subscribe to all subscription topics and user topic with all tokens
+  try {
+    await initializeFirebase()
+    const userInfo = await getUserInfo({ ddbDocClient, userID })
+    await Promise.all([
+      ...Object.keys(userInfo?.notificationTokens ?? {}).map(token => [
+        getMessaging().subscribeToTopic(token, getUserTopic(userID)),
+        ...Array.from(userInfo?.subscriptionTopics ?? new Set([])).map(
+          subscriptionTopic =>
+            getMessaging().subscribeToTopic(token, subscriptionTopic),
+        ),
+      ]),
+    ])
+  } catch (error) {
+    logger.error(
+      "Failed to subscribe token to user's subscriptions",
+      error as Error,
+    )
+  }
+
   return createResponse({
     eventPath,
     responseBody: { message: 'Notifications enabled' },
@@ -66,4 +89,4 @@ const enableNotifications = async (
   })
 }
 
-export default enableNotifications
+export default enableAllNotifications
