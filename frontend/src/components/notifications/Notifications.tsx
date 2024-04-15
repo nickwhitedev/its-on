@@ -1,8 +1,5 @@
 import './Notifications.css'
 
-import { useState } from 'react'
-import { useUser } from '../../contexts/user/userContext'
-
 import MDDialog from '../material/MDDialog'
 import MDIcon from '../material/MDIcon'
 import MDIconButton from '../material/icon-button/MDIconButton'
@@ -12,7 +9,9 @@ import MDTextButton from '../material/button/MDTextButton'
 import { isChannelOn } from '../channels/channel/channelUtils'
 import { useNavigate } from 'react-router-dom'
 import { useRequestNotificationPermissions } from '../../utils/notifications'
+import { useState } from 'react'
 import { useSubscriptions } from '../../contexts/subscriptions/subscriptionsContext'
+import { useUser } from '../../contexts/user/userContext'
 
 const Notifications = ({ className }: { className: string }) => {
   const user = useUser()
@@ -35,8 +34,7 @@ const Notifications = ({ className }: { className: string }) => {
         onClick={() => {
           setIsDialogOpen(previous => !previous)
           void requestNotificationPermissions({
-            registeredNotificationSubscriptions:
-              user?.notificationSubscriptions ?? {},
+            savedNotificationTokens: user?.notificationTokens ?? {},
           })
         }}
       >
@@ -49,7 +47,10 @@ const Notifications = ({ className }: { className: string }) => {
           setIsDialogOpen(false)
         }}
       >
-        <div className='Notifications-headline' slot='headline'>
+        <div
+          className='Notifications-headline'
+          slot='headline'
+        >
           <span>Notifications</span>
         </div>
         <div slot='content'>

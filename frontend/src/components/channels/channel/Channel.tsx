@@ -175,7 +175,10 @@ const Channel = ({ channelID }: Props) => {
 
   if (channel == null) {
     return channelIsLoading ? (
-      <MDCircularProgress className='Channel-loading' indeterminate />
+      <MDCircularProgress
+        className='Channel-loading'
+        indeterminate
+      />
     ) : (
       <h4>Channel not found</h4>
     )
@@ -329,8 +332,7 @@ const Channel = ({ channelID }: Props) => {
 
     if (user?.notificationsEnabled ?? true) {
       await requestNotificationPermissions({
-        registeredNotificationSubscriptions:
-          user?.notificationSubscriptions ?? {},
+        savedNotificationTokens: user?.notificationTokens ?? {},
       })
     }
   }

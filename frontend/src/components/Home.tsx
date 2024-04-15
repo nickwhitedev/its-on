@@ -63,11 +63,7 @@ const Home = () => {
       })
       dispatchUser({
         type: UserDispatchActionType.SYNCED,
-        user: {
-          ...response.profile,
-          notificationSubscriptions:
-            response.notificationSubscriptions?.subscriptions ?? {},
-        },
+        user: response.profile,
       })
     } catch (error) {
       setHasOverviewError(true)
@@ -78,14 +74,13 @@ const Home = () => {
   useEffect(() => {
     if (!isLoading) {
       void registerNotificationSubscription({
-        registeredNotificationSubscriptions:
-          userContext?.notificationSubscriptions ?? {},
+        savedNotificationTokens: userContext?.notificationTokens ?? {},
       })
     }
   }, [
     isLoading,
     registerNotificationSubscription,
-    userContext?.notificationSubscriptions,
+    userContext?.notificationTokens,
     userContext?.notificationsEnabled,
   ])
 
