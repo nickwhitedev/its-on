@@ -77,6 +77,7 @@ export const handleChannelSubscriberAdded = async ({
       getNewSubscriberNotificationCooldown(channel?.subscriberCount ?? 0)
     ) {
       const topic = getUserTopic(channelOwnerID)
+      const channelURL = `${WEB_URL}/${channelID}`
       const messageID = await getMessaging().send({
         apns: {
           headers: {
@@ -84,10 +85,14 @@ export const handleChannelSubscriberAdded = async ({
               (Date.now() + MS_IN_HOUR * 24) / 1000,
             )}`,
           },
-        },
-        notification: {
-          title: 'New subscriber',
-          body: `${channel?.title ?? 'One of your channels'} has a new subscriber`,
+          payload: {
+            aps: {
+              alert: {
+                body: `${channel?.title ?? 'One of your channels'} has a new subscriber`,
+                title: 'New subscriber',
+              },
+            },
+          },
         },
         topic,
         webpush: {
@@ -99,7 +104,10 @@ export const handleChannelSubscriberAdded = async ({
           },
           notification: {
             badge: '/monochrome-icon-96.png',
+            body: `${channel?.title ?? 'One of your channels'} has a new subscriber`,
+            data: { url: channelURL },
             icon: '/icon-64.png',
+            title: 'New subscriber',
           },
         },
       })
