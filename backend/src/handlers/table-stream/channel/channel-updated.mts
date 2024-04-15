@@ -183,7 +183,8 @@ export const handleChannelUpdated = async ({
     }
 
     try {
-      await getMessaging().send({
+      const topic = getMessagingChannelTopic({ channelID, channelOwnerID })
+      const messageID = await getMessaging().send({
         apns: {
           headers: {
             'apns-expiration': `${Math.floor(
@@ -200,7 +201,7 @@ export const handleChannelUpdated = async ({
           }`,
           body: channelInfo.note ?? '',
         },
-        topic: getMessagingChannelTopic({ channelID, channelOwnerID }),
+        topic,
         webpush: {
           fcmOptions: {
             link: `${WEB_URL}/${channelID}`,
@@ -210,6 +211,7 @@ export const handleChannelUpdated = async ({
           },
         },
       })
+      logger.debug('Message sent to notification topic', { topic, messageID })
     } catch (error) {
       logger.error('Error sending notifications', error as Error)
     }

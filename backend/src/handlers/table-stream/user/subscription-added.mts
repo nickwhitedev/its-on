@@ -58,7 +58,7 @@ export const handleSubscriptionAdded = async ({
           'ADD #subscriptionCount :subscriptionCount, #subscriptionTopics :subscriptionTopic',
         ExpressionAttributeNames: {
           '#subscriptionCount': 'subscriptionCount',
-          '#subscriptionTopics': 'subscriptionTopic',
+          '#subscriptionTopics': 'subscriptionTopics',
         },
         ExpressionAttributeValues: {
           ':subscriptionCount': 1,

@@ -76,7 +76,8 @@ export const handleChannelSubscriberAdded = async ({
       Date.now() - (channelOwnerInfo?.lastNewSubscriberNotification ?? 0) >
       getNewSubscriberNotificationCooldown(channel?.subscriberCount ?? 0)
     ) {
-      await getMessaging().send({
+      const topic = getUserTopic(channelOwnerID)
+      const messageID = await getMessaging().send({
         apns: {
           headers: {
             'apns-expiration': `${Math.floor(
@@ -91,7 +92,7 @@ export const handleChannelSubscriberAdded = async ({
           title: 'New subscriber',
           body: `${channel?.title ?? 'One of your channels'} has a new subscriber`,
         },
-        topic: getUserTopic(channelOwnerID),
+        topic,
         webpush: {
           fcmOptions: {
             link: `${WEB_URL}/${channelID}`,
@@ -101,7 +102,9 @@ export const handleChannelSubscriberAdded = async ({
           },
         },
       })
+      logger.debug('Message sent to notification topic', { topic, messageID })
     }
+    logger.debug('Subscriber notification skipped')
   } catch (error) {
     logger.error(
       'Failed to notify channel owner of new subscriber',
