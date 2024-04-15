@@ -9,7 +9,7 @@ import { Logger } from '@aws-lambda-powertools/logger'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
 import { createResponse } from '/opt/nodejs/response.mjs'
-import { getUserTopic, initializeFirebase } from '/opt/nodejs/firebase.mjs'
+import { getUserTopic } from '/opt/nodejs/firebase.mjs'
 import { getMessaging } from 'firebase-admin/messaging'
 import { getUserInfo } from '/opt/nodejs/dynamo.mjs'
 
@@ -78,7 +78,6 @@ const disableDeviceNotifications = async (
 
   // Unsubscribe from all subscription topics and user topic for token
   try {
-    await initializeFirebase()
     const userInfo = await getUserInfo({ ddbDocClient, userID })
     await Promise.all([
       getMessaging().unsubscribeFromTopic(token, getUserTopic(userID)),

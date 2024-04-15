@@ -8,7 +8,7 @@ import {
 import { Logger } from '@aws-lambda-powertools/logger'
 import { DynamoDBRecord } from 'aws-lambda'
 import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
-import { getUserTopic, initializeFirebase } from '/opt/nodejs/firebase.mjs'
+import { getUserTopic } from '/opt/nodejs/firebase.mjs'
 import { getMessaging } from 'firebase-admin/messaging'
 
 interface Params {
@@ -191,7 +191,6 @@ export const handleUserDeleted = async ({
   // Unsubscribe from all subscription topics and user topic for all tokens
   try {
     const userID = pk?.substring(pk.indexOf('#') + 1) ?? ''
-    await initializeFirebase()
     await Promise.all([
       ...Object.keys(
         record.dynamodb?.OldImage?.notificationTokens?.M ?? {},

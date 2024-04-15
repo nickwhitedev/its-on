@@ -4,7 +4,7 @@ import { Logger } from '@aws-lambda-powertools/logger'
 import { DynamoDBRecord } from 'aws-lambda'
 import { DYNAMODB_TABLE_NAME, WEB_URL } from '/opt/nodejs/constants.mjs'
 import { getChannel, getUserInfo } from '/opt/nodejs/dynamo.mjs'
-import { getUserTopic, initializeFirebase } from '/opt/nodejs/firebase.mjs'
+import { getUserTopic } from '/opt/nodejs/firebase.mjs'
 import { getMessaging } from 'firebase-admin/messaging'
 import { MS_IN_HOUR } from '/opt/nodejs/time.mjs'
 import { getNewSubscriberNotificationCooldown } from '/opt/nodejs/channel.mjs'
@@ -20,12 +20,6 @@ export const handleChannelSubscriberAdded = async ({
   ddbDocClient,
   logger,
 }: Params) => {
-  try {
-    await initializeFirebase()
-  } catch (error) {
-    logger.error('Failed to initialize Firebase', error as Error)
-  }
-
   const subscriberPK = record.dynamodb?.Keys?.pk?.S ?? ''
   const channelID = subscriberPK.substring(subscriberPK.indexOf('#') + 1)
 

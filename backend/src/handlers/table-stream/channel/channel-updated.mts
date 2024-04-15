@@ -9,10 +9,7 @@ import { DynamoDBRecord } from 'aws-lambda'
 import { DYNAMODB_TABLE_NAME, WEB_URL } from '/opt/nodejs/constants.mjs'
 import { batchWrite } from '/opt/nodejs/dynamo.mjs'
 import { MS_IN_HOUR } from '/opt/nodejs/time.mjs'
-import {
-  getMessagingChannelTopic,
-  initializeFirebase,
-} from '/opt/nodejs/firebase.mjs'
+import { getMessagingChannelTopic } from '/opt/nodejs/firebase.mjs'
 import { getMessaging } from 'firebase-admin/messaging'
 
 interface Params {
@@ -176,12 +173,6 @@ export const handleChannelUpdated = async ({
     (channelInfo.lastOn ?? 0) >
       (oldChannelInfo.lastOn ?? 0) + (oldChannelInfo.lastOnDuration ?? 0)
   ) {
-    try {
-      await initializeFirebase()
-    } catch (error) {
-      logger.error('Failed to initialize Firebase', error as Error)
-    }
-
     await getMessaging().send({
       apns: {
         headers: {
