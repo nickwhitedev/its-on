@@ -100,6 +100,10 @@ export const handleChannelSubscriberAdded = async ({
           headers: {
             ttl: `${(MS_IN_HOUR * 24) / 1000}`,
           },
+          notification: {
+            badge: '/monochrome-icon-96.png',
+            icon: '/icon-64.png',
+          },
         },
       })
       logger.debug('Message sent to notification topic', { topic, messageID })
