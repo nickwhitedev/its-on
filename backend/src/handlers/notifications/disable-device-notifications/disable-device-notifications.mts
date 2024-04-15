@@ -44,6 +44,7 @@ const disableDeviceNotifications = async (
   const requestBody = JSON.parse(event.body) as IPayload
   const userID = requestBody.userID ?? ''
   const token = requestBody.token
+  const userInfo = await getUserInfo({ ddbDocClient, userID })
 
   if ([undefined, ''].includes(userID) || token == null) {
     return createParams400Response(eventPath)
@@ -79,7 +80,6 @@ const disableDeviceNotifications = async (
   // Unsubscribe from all subscription topics and user topic for token
   try {
     await initializeFirebase()
-    const userInfo = await getUserInfo({ ddbDocClient, userID })
     await Promise.all([
       getMessaging().unsubscribeFromTopic(token, getUserTopic(userID)),
       ...Array.from(userInfo?.subscriptionTopics ?? new Set([])).map(
