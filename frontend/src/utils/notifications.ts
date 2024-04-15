@@ -283,9 +283,9 @@ export const useRequestNotificationPermissions = () => {
     }
 
     return () => {
-      // @ts-expect-error webkit event types are not expected event listener types
       removeEventListener(
         'push-permission-request',
+        // @ts-expect-error webkit event types are not expected event listener types
         pushWebkitNotificationPermissionRequest,
       )
     }
