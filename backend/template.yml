@@ -147,6 +147,8 @@ Resources:
                 - IsProdEnv
                 - arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnClerkSecretKey-Fm0hXJ
                 - arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnClerkDevSecretKey-jZLzk2
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnIOSFirebaseServiceAccount-pjnCqi
 
   # This is a Lambda function config associated with the source code: get-overview.mts
   getOverviewLambdaFunction:
@@ -166,6 +168,8 @@ Resources:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnIOSFirebaseServiceAccount-pjnCqi
 
   getOverviewLambdaFunctionLogGroup:
     Type: 'AWS::Logs::LogGroup'
@@ -191,6 +195,8 @@ Resources:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnIOSFirebaseServiceAccount-pjnCqi
 
   getChannelLambdaFunctionLogGroup:
     Type: 'AWS::Logs::LogGroup'
@@ -216,6 +222,8 @@ Resources:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnIOSFirebaseServiceAccount-pjnCqi
 
   createChannelLambdaFunctionLogGroup:
     Type: 'AWS::Logs::LogGroup'
@@ -242,6 +250,8 @@ Resources:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnIOSFirebaseServiceAccount-pjnCqi
 
   updateChannelLambdaFunctionLogGroup:
     Type: 'AWS::Logs::LogGroup'
@@ -268,6 +278,8 @@ Resources:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnIOSFirebaseServiceAccount-pjnCqi
 
   itsOnLambdaFunctionLogGroup:
     Type: 'AWS::Logs::LogGroup'
@@ -293,6 +305,8 @@ Resources:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnIOSFirebaseServiceAccount-pjnCqi
 
   itsOffLambdaFunctionLogGroup:
     Type: 'AWS::Logs::LogGroup'
@@ -318,6 +332,8 @@ Resources:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnIOSFirebaseServiceAccount-pjnCqi
 
   deleteChannelLambdaFunctionLogGroup:
     Type: 'AWS::Logs::LogGroup'
@@ -344,6 +360,8 @@ Resources:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnIOSFirebaseServiceAccount-pjnCqi
 
   removeChannelSubscriberLambdaFunctionLogGroup:
     Type: 'AWS::Logs::LogGroup'
@@ -370,6 +388,8 @@ Resources:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnIOSFirebaseServiceAccount-pjnCqi
 
   subscribeLambdaFunctionLogGroup:
     Type: 'AWS::Logs::LogGroup'
@@ -395,6 +415,8 @@ Resources:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnIOSFirebaseServiceAccount-pjnCqi
 
   unsubscribeLambdaFunctionLogGroup:
     Type: 'AWS::Logs::LogGroup'
@@ -420,6 +442,8 @@ Resources:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnIOSFirebaseServiceAccount-pjnCqi
 
   enableAllNotificationsLambdaFunctionLogGroup:
     Type: 'AWS::Logs::LogGroup'
@@ -446,6 +470,8 @@ Resources:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnIOSFirebaseServiceAccount-pjnCqi
 
   disableAllNotificationsLambdaFunctionLogGroup:
     Type: 'AWS::Logs::LogGroup'
@@ -472,6 +498,8 @@ Resources:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnIOSFirebaseServiceAccount-pjnCqi
 
   enableDeviceNotificationsLambdaFunctionLogGroup:
     Type: 'AWS::Logs::LogGroup'
@@ -504,6 +532,8 @@ Resources:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnIOSFirebaseServiceAccount-pjnCqi
 
   disableDeviceNotificationsLambdaFunctionLogGroup:
     Type: 'AWS::Logs::LogGroup'
@@ -533,6 +563,8 @@ Resources:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnIOSFirebaseServiceAccount-pjnCqi
 
   updateProfileLambdaFunctionLogGroup:
     Type: 'AWS::Logs::LogGroup'
@@ -559,6 +591,8 @@ Resources:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnIOSFirebaseServiceAccount-pjnCqi
 
   postLogLambdaFunctionLogGroup:
     Type: 'AWS::Logs::LogGroup'
@@ -593,6 +627,8 @@ Resources:
                 - IsProdEnv
                 - arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnClerkWebhookSecret-zev5G4
                 - arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnClerkDevWebhookSecret-kasu1B
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnIOSFirebaseServiceAccount-pjnCqi
 
   authWebhookLambdaFunctionLogGroup:
     Type: 'AWS::Logs::LogGroup'
@@ -630,6 +666,8 @@ Resources:
         # Give Create/Read/Update/Delete Permissions to the ItsOnTable
         - DynamoDBCrudPolicy:
             TableName: !Ref ItsOnTable
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnIOSFirebaseServiceAccount-pjnCqi
 
   tableStreamLambdaFunctionLogGroup:
     Type: 'AWS::Logs::LogGroup'
