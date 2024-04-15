@@ -114,7 +114,6 @@ describe('Test getOverviewHandler', () => {
           notificationsEnabled: true,
           notificationTokens: {},
           subscriptionCount: 0,
-          subscriptionTopics: [],
           tier: 5,
           username: 'test_user',
         },
