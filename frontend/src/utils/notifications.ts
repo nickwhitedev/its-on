@@ -111,7 +111,7 @@ export const useEnableDeviceNotifications = (): (({
 
   useEffect(() => {
     const setPushTokenFromEvent = (event: WebkitEvent) => {
-      saveNotificationToken(JSON.stringify(event.detail))
+      saveNotificationToken(event.detail)
     }
     if (window.webkit != null) {
       // @ts-expect-error webkit event types are not expected event listener types
@@ -190,7 +190,7 @@ export const useDisableDeviceNotifications = (): (() => Promise<void>) => {
 
   useEffect(() => {
     const setPushTokenFromEvent = (event: WebkitEvent) => {
-      deleteNotificationToken(JSON.stringify(event.detail))
+      deleteNotificationToken(event.detail)
     }
     if (window.webkit != null) {
       // @ts-expect-error webkit event types are not expected event listener types
