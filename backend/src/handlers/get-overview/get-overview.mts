@@ -138,6 +138,7 @@ const getOverview = async (
 
     if (
       data.profile != null &&
+      (data.subscriptions?.length ?? 0) > 0 &&
       data.subscriptions?.length !== data.profile.subscriptionTopics?.size
     ) {
       // Sync subscription topics
@@ -158,7 +159,7 @@ const getOverview = async (
             },
             ReturnValues: 'ALL_NEW',
             TableName: DYNAMODB_TABLE_NAME,
-            UpdateExpression: 'SET #subscriptionTopics :subscriptionTopics',
+            UpdateExpression: 'SET #subscriptionTopics = :subscriptionTopics',
             ExpressionAttributeNames: {
               '#subscriptionTopics': 'subscriptionTopics',
             },
