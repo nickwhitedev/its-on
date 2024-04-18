@@ -38,6 +38,8 @@
 
 .App-settings {
   display: flex;
+  align-items: center;
+  justify-content: center;
   grid-area: settings;
   margin: 1rem;
   place-self: start end;
