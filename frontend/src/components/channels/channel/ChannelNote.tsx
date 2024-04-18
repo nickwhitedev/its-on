@@ -21,7 +21,8 @@ const ChannelNote = ({
   userIsChannelOwner,
   onChangeCurrentNote,
 }: Props) => {
-  return userIsChannelOwner || (channel.note?.length ?? 0) > 0 ? (
+  return (userIsChannelOwner && isEditing) ||
+    (channel.note?.length ?? 0) > 0 ? (
     <div className='ChannelNote'>
       <div></div>
       {userIsChannelOwner && isEditing ? (

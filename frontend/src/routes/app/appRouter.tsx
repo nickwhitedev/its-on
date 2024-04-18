@@ -6,6 +6,7 @@ import TermsOfUse from '../../components/legal/TermsOfUse'
 import Subscriptions from '../../components/subscriptions/Subscriptions'
 import Support from '../../components/support/Support'
 import ChannelRouteHandler from './channels/ChannelRouteHandler'
+import Profile from '../../components/user/Profile'
 
 const appRouter = [
   {
@@ -26,6 +27,10 @@ const appRouter = [
       return { channelID: params.channelID ?? null }
     },
     path: ':channelID',
+  },
+  {
+    element: <Profile />,
+    path: 'profile',
   },
   {
     element: <TermsOfUse />,
