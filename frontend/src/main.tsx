@@ -32,6 +32,10 @@ if (rootElement != null) {
           },
           variables: {
             colorPrimary: '#17c1e8',
+            colorNeutral: window.matchMedia('(prefers-color-scheme: dark)')
+              .matches
+              ? '#e2e2e2'
+              : '#1b1b1b',
           },
         }}
       >
