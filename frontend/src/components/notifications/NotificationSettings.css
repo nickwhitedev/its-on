@@ -1,0 +1,17 @@
+.NotificationSettings-heading {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+  box-sizing: border-box;
+  color: rgb(33, 33, 38);
+  margin: 0;
+  padding: 0px 0px 1rem;
+  font-family: inherit;
+  letter-spacing: normal;
+  font-weight: 700;
+  font-size: 1.0625rem;
+  line-height: 1.41176;
+}
+
+.NotificationSettings-list {
+  background: none;
+  text-align: left;
+}
