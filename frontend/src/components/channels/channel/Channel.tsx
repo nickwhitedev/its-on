@@ -123,10 +123,15 @@ const Channel = ({ channelID }: Props) => {
         fetchedChannel = await fetchApi<IChannel>(`/${channelID}`)
       } catch (error) {
         fetchedChannel = null
-        await sendLog('Fetch channel error', { error }, 'ERROR')
-        dispatchError({
-          type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
-        })
+        if (
+          (error as { cause?: { responseCode?: number } }).cause
+            ?.responseCode !== 404
+        ) {
+          await sendLog('Fetch channel error', { error }, 'ERROR')
+          dispatchError({
+            type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
+          })
+        }
       }
       if (fetchedChannel != null && channelID in channels) {
         // User owns channel
