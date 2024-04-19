@@ -38,7 +38,7 @@ import { SubscriptionsDispatchActionType } from '../../../contexts/subscriptions
 import { UserDispatchActionType } from '../../../contexts/user/userReducer'
 import { useErrorDispatch } from '../../../contexts/error/errorContext'
 import { useFetchApi } from '../../../utils/api'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useRequestNotificationPermissions } from '../../../utils/notifications'
 import { useSendLog } from '../../../utils/logging'
 
@@ -48,6 +48,7 @@ interface Props {
 
 const Channel = ({ channelID }: Props) => {
   const navigate = useNavigate()
+  const { pathname } = useLocation()
   const fetchApi = useFetchApi()
   const requestNotificationPermissions = useRequestNotificationPermissions()
   const sendLog = useSendLog()
@@ -102,11 +103,15 @@ const Channel = ({ channelID }: Props) => {
 
   useEffect(() => {
     // Set page title
-    document.title = channel?.title ?? "It's On"
+    if (channel?.title != null && channel.owner != null && pathname !== '/') {
+      document.title = `It's On - ${channel.title} by ${channel.owner}`
+    } else {
+      document.title = "It's On"
+    }
     return () => {
       document.title = "It's On"
     }
-  }, [channel])
+  }, [channel, pathname])
 
   useEffect(() => {
     // fetch channel
@@ -118,10 +123,15 @@ const Channel = ({ channelID }: Props) => {
         fetchedChannel = await fetchApi<IChannel>(`/${channelID}`)
       } catch (error) {
         fetchedChannel = null
-        await sendLog('Fetch channel error', { error }, 'ERROR')
-        dispatchError({
-          type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
-        })
+        if (
+          (error as { cause?: { responseCode?: number } }).cause
+            ?.responseCode !== 404
+        ) {
+          await sendLog('Fetch channel error', { error }, 'ERROR')
+          dispatchError({
+            type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
+          })
+        }
       }
       if (fetchedChannel != null && channelID in channels) {
         // User owns channel
