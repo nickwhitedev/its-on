@@ -96,19 +96,21 @@ const App = () => {
             ) : pathname === '/support' ? (
               <Support />
             ) : (
-              <div>
-                <SignInButton mode='modal'>
-                  <MDOutlinedButton className='App-auth-button'>
-                    Sign In
-                  </MDOutlinedButton>
-                </SignInButton>
-                <SignUpButton mode='modal'>
-                  <MDFilledTonalButton className='App-auth-button'>
-                    Sign Up
-                  </MDFilledTonalButton>
-                </SignUpButton>
+              <>
+                <div>
+                  <SignInButton mode='modal'>
+                    <MDOutlinedButton className='App-auth-button'>
+                      Sign In
+                    </MDOutlinedButton>
+                  </SignInButton>
+                  <SignUpButton mode='modal'>
+                    <MDFilledTonalButton className='App-auth-button'>
+                      Sign Up
+                    </MDFilledTonalButton>
+                  </SignUpButton>
+                </div>
                 <Splash />
-              </div>
+              </>
             )}
           </SignedOut>
           <SignedIn>

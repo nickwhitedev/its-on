@@ -12,6 +12,8 @@ import { useRequestNotificationPermissions } from '../../utils/notifications'
 import { useState } from 'react'
 import { useSubscriptions } from '../../contexts/subscriptions/subscriptionsContext'
 import { useUser } from '../../contexts/user/userContext'
+import { updatesChannelUrl } from '../../utils/urls'
+import { UPDATES_CHANNEL_ID } from '../../utils/constants'
 
 const Notifications = ({ className }: { className: string }) => {
   const user = useUser()
@@ -26,6 +28,10 @@ const Notifications = ({ className }: { className: string }) => {
     isChannelOn(subscription),
   )
   const hasOnSubscriptions = onSubscriptions.length > 0
+
+  const isSubscribedToUpdatesChannel = subscriptions.some(
+    subscription => subscription.id === UPDATES_CHANNEL_ID,
+  )
 
   return (
     <div className={className}>
@@ -47,10 +53,7 @@ const Notifications = ({ className }: { className: string }) => {
           setIsDialogOpen(false)
         }}
       >
-        <div
-          className='Notifications-headline'
-          slot='headline'
-        >
+        <div className='Notifications-headline' slot='headline'>
           <span>Notifications</span>
         </div>
         <div slot='content'>
@@ -81,6 +84,9 @@ const Notifications = ({ className }: { className: string }) => {
           </MDList>
         </div>
         <div slot='actions'>
+          {!isSubscribedToUpdatesChannel ? (
+            <MDTextButton href={updatesChannelUrl}>Updates</MDTextButton>
+          ) : null}
           <MDTextButton
             onClick={() => {
               setIsDialogOpen(false)
