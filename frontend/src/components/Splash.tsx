@@ -1,19 +1,27 @@
 import './Splash.css'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import ItsOnIcon from './icons/ItsOnIcon'
 import MDRipple from './material/MDRipple'
 import StoreBadge from 'react-store-badge'
 import { SignInButton, SignUpButton } from '@clerk/clerk-react'
 import MDOutlinedButton from './material/button/MDOutlinedButton'
 import MDFilledTonalButton from './material/button/MDFilledTonalButton'
-import { browserName } from 'detect-browser'
+import { useGetBrowserDisplayName } from '../utils/browser'
 
 const Splash = () => {
-  const browser = browserName(navigator.userAgent) ?? 'browser'
+  const getBrowserDisplayName = useGetBrowserDisplayName()
 
   const [isOn, setIsOn] = useState<boolean>(false)
-  const [useOnWeb, setUseOnWeb] = useState<boolean>(false)
+  const [isUsingOnWeb, setIsUsingOnWeb] = useState<boolean>(false)
+  const [browserDisplayName, setBrowserDisplayName] =
+    useState<string>('Browser')
+
+  useEffect(() => {
+    void (async () => {
+      setBrowserDisplayName(await getBrowserDisplayName())
+    })()
+  }, [getBrowserDisplayName])
 
   const isUsingApp =
     (('standalone' in window.navigator && window.navigator.standalone) ||
@@ -28,15 +36,15 @@ const Splash = () => {
           appStoreUrl='https://apps.apple.com/us/app/its-on/id6479501094'
         />
       ) : null}
-      {!isUsingApp && !useOnWeb ? (
+      {!isUsingApp && !isUsingOnWeb ? (
         <>
           <MDOutlinedButton
             className='Splash-auth-button'
             onClick={() => {
-              setUseOnWeb(true)
+              setIsUsingOnWeb(true)
             }}
           >
-            Use on {browser[0].toUpperCase() + browser.slice(1)}
+            Use on {browserDisplayName}
           </MDOutlinedButton>
         </>
       ) : (
