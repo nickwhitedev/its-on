@@ -3,8 +3,6 @@ import './App.css'
 import {
   ClerkLoaded,
   ClerkLoading,
-  SignInButton,
-  SignUpButton,
   SignedIn,
   SignedOut,
   UserButton,
@@ -23,8 +21,6 @@ import Support from './support/Support'
 import TermsOfUse from './legal/TermsOfUse'
 import { baseUrl } from '../utils/urls'
 import { useError } from '../contexts/error/errorContext'
-import MDOutlinedButton from './material/button/MDOutlinedButton'
-import MDFilledTonalButton from './material/button/MDFilledTonalButton'
 
 const App = () => {
   const error = useError()
@@ -96,21 +92,7 @@ const App = () => {
             ) : pathname === '/support' ? (
               <Support />
             ) : (
-              <>
-                <div>
-                  <SignInButton mode='modal'>
-                    <MDOutlinedButton className='App-auth-button'>
-                      Sign In
-                    </MDOutlinedButton>
-                  </SignInButton>
-                  <SignUpButton mode='modal'>
-                    <MDFilledTonalButton className='App-auth-button'>
-                      Sign Up
-                    </MDFilledTonalButton>
-                  </SignUpButton>
-                </div>
-                <Splash />
-              </>
+              <Splash />
             )}
           </SignedOut>
           <SignedIn>
