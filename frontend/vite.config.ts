@@ -25,10 +25,22 @@ export default defineConfig({
         background_color: '#131313',
         orientation: 'portrait-primary',
         dir: 'ltr',
-        prefer_related_applications: false,
+        prefer_related_applications: true,
+        related_applications: [
+          {
+            platform: 'play',
+            url: 'https://play.google.com/store/apps/details?id=fyi.itson.twa',
+            id: 'fyi.itson.twa',
+          },
+          {
+            platform: 'itunes',
+            url: 'https://apps.apple.com/us/app/its-on/id6479501094',
+          },
+        ],
         launch_handler: {
-          client_mode: ['navigate-existing', 'auto'],
+          client_mode: ['auto'],
         },
+        scope: '.',
         icons: [
           {
             src: 'icon-64.png',
