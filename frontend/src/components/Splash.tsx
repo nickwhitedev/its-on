@@ -1,15 +1,66 @@
 import './Splash.css'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import ItsOnIcon from './icons/ItsOnIcon'
 import MDRipple from './material/MDRipple'
 import StoreBadge from 'react-store-badge'
+import { SignInButton, SignUpButton } from '@clerk/clerk-react'
+import MDOutlinedButton from './material/button/MDOutlinedButton'
+import MDFilledTonalButton from './material/button/MDFilledTonalButton'
+import { useGetBrowserDisplayName } from '../utils/browser'
 
 const Splash = () => {
+  const getBrowserDisplayName = useGetBrowserDisplayName()
+
   const [isOn, setIsOn] = useState<boolean>(false)
+  const [isUsingOnWeb, setIsUsingOnWeb] = useState<boolean>(false)
+  const [browserDisplayName, setBrowserDisplayName] =
+    useState<string>('Browser')
+
+  useEffect(() => {
+    void (async () => {
+      setBrowserDisplayName(await getBrowserDisplayName())
+    })()
+  }, [getBrowserDisplayName])
+
+  const isUsingApp =
+    (('standalone' in window.navigator && window.navigator.standalone) ||
+      window.matchMedia('(display-mode: standalone)').matches) == true
 
   return (
     <div className='Splash'>
+      {!isUsingApp ? (
+        <StoreBadge
+          name='Its On'
+          googlePlayUrl='https://play.google.com/store/apps/details?id=fyi.itson.twa'
+          appStoreUrl='https://apps.apple.com/us/app/its-on/id6479501094'
+        />
+      ) : null}
+      {!isUsingApp && !isUsingOnWeb ? (
+        <>
+          <MDOutlinedButton
+            className='Splash-auth-button'
+            onClick={() => {
+              setIsUsingOnWeb(true)
+            }}
+          >
+            Use on {browserDisplayName}
+          </MDOutlinedButton>
+        </>
+      ) : (
+        <div>
+          <SignInButton mode='modal'>
+            <MDOutlinedButton className='Splash-auth-button'>
+              Sign In
+            </MDOutlinedButton>
+          </SignInButton>
+          <SignUpButton mode='modal'>
+            <MDFilledTonalButton className='Splash-auth-button'>
+              Sign Up
+            </MDFilledTonalButton>
+          </SignUpButton>
+        </div>
+      )}
       <button
         aria-label={isOn ? 'Turn off channel' : 'Turn on channel'}
         className={`Splash-button ${isOn ? 'on' : ''}`}
@@ -20,14 +71,6 @@ const Splash = () => {
         <MDRipple />
         <ItsOnIcon className='Splash-button-image' />
       </button>
-      {('standalone' in window.navigator && window.navigator.standalone) ||
-      window.matchMedia('(display-mode: standalone)').matches ? null : (
-        <StoreBadge
-          name='Its On'
-          googlePlayUrl='https://play.google.com/store/apps/details?id=fyi.itson.twa'
-          appStoreUrl='https://apps.apple.com/us/app/its-on/id6479501094'
-        />
-      )}
       <p>
         It&apos;s On is a way to send low-pressure invites to small groups of
         people.

@@ -63,3 +63,7 @@
   max-height: 80vw;
   max-width: 80vw;
 }
+
+.Splash-auth-button {
+  margin: 1rem 0.5rem 0;
+}

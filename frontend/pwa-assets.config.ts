@@ -1,7 +1,7 @@
 import { defineConfig } from '@vite-pwa/assets-generator/config'
 
 export default defineConfig({
-  images: ['public/its-on.svg'],
+  images: ['public/icon-high-res.svg'],
   // images: ['public/favicon-light.svg'], // Used to generate favicon.ico
   preset: {
     transparent: {

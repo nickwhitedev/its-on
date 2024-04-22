@@ -1,0 +1,20 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appID": "RSCAAP7LXR.fyi.itson",
+        "components": [
+          {
+            "/": "*",
+            "comment": "Match all urls"
+          }
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      "RSCAAP7LXR.fyi.itson"
+    ]
+  }
+}
