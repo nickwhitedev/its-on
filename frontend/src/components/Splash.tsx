@@ -36,7 +36,7 @@ const Splash = () => {
               setUseOnWeb(true)
             }}
           >
-            Use in {browser[0].toUpperCase() + browser.slice(1)}
+            Use on {browser[0].toUpperCase() + browser.slice(1)}
           </MDOutlinedButton>
         </>
       ) : (
