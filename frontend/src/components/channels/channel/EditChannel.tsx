@@ -16,6 +16,7 @@ import { DEFAULT_USER_TIER, durationOptions } from './channelUtils'
 import MDOutlinedButton from '../../material/button/MDOutlinedButton'
 import { useUser } from '../../../contexts/user/userContext'
 import { Tooltip } from 'react-tooltip'
+import DeleteChannelButton from './DeleteChannelButton'
 
 interface Props {
   channel: IChannel
@@ -197,6 +198,11 @@ const EditChannel = ({ channel, isLoading, onClose }: Props) => {
           <MDIcon slot='icon'>done</MDIcon> Save
         </MDOutlinedButton>
       </div>
+      <DeleteChannelButton
+        channel={channel}
+        isUpdating={isUpdating}
+        setIsUpdating={setIsUpdating}
+      />
     </div>
   )
 }
