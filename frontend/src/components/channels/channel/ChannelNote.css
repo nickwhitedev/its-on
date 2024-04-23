@@ -11,9 +11,3 @@
 .ChannelNote-note {
   grid-area: note;
 }
-
-.ChannelNote-input {
-  grid-area: note;
-  resize: both;
-  text-align: left;
-}
