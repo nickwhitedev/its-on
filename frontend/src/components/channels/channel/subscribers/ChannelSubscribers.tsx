@@ -31,7 +31,7 @@ const ChannelSubscribers = ({
           <div slot='headline'>Subscribers</div>
           <div slot='trailing-supporting-text'>
             {subscriberCount}
-            {channel.capacity == null ? null : <> / channel.capacity</>}
+            {channel.capacity == null ? null : <> / {channel.capacity}</>}
           </div>
         </MDListItem>
         {isLoading ? (
