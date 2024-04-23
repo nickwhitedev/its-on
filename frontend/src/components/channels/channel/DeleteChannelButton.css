@@ -1,0 +1,7 @@
+.DeleteChannelButton-button {
+  --md-sys-color-primary: var(--md-sys-color-error);
+}
+
+.DeleteChannelButton-confirmation-content {
+  text-align: left;
+}

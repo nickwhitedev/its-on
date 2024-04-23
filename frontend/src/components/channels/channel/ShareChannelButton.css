@@ -6,6 +6,11 @@
   position: relative;
 }
 
+.ShareChannelButton.large {
+  height: 4rem;
+  justify-content: start;
+}
+
 .ShareChannelButton-copied {
   cursor: default;
   font-size: 0.7rem;

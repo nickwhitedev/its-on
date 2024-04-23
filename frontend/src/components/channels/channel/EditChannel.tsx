@@ -2,7 +2,6 @@ import './EditChannel.css'
 
 import { useState } from 'react'
 import MDOutlinedSelect from '../../material/select/MDOutlinedSelect'
-import MDIconButton from '../../material/icon-button/MDIconButton'
 import MDIcon from '../../material/MDIcon'
 import MDOutlinedTextField from '../../material/text-field/MDOutlinedTextField'
 import { useChannelsDispatch } from '../../../contexts/channels/channelsContext'
@@ -94,38 +93,18 @@ const EditChannel = ({ channel, isLoading, onClose }: Props) => {
 
   return (
     <div className='EditChannel'>
-      <div className='EditChannel-header'>
-        <MDIconButton
-          className='EditChannel-header-button-close'
-          disabled={!channel.title || isUpdating}
-          onClick={onClose}
-        >
-          <MDIcon>close</MDIcon>
-        </MDIconButton>
-        <MDOutlinedTextField
-          className={'EditChannel-header-title-input'}
-          disabled={isLoading || isUpdating}
-          label='Title'
-          maxLength={40}
-          rows={1}
-          type='textarea'
-          value={currentTitle}
-          onInput={(event: Event) => {
-            setCurrentTitle(
-              (event.target as unknown as { value: string }).value,
-            )
-          }}
-        />
-        <div className='EditChannel-header-save-wrapper'>
-          <MDIconButton
-            className='EditChannel-header-button-save'
-            disabled={currentTitle === '' || isUpdating}
-            onClick={() => void saveUpdates()}
-          >
-            <MDIcon>done</MDIcon>
-          </MDIconButton>
-        </div>
-      </div>
+      <MDOutlinedTextField
+        className={'EditChannel-header-title-input'}
+        disabled={isLoading || isUpdating}
+        label='Title'
+        maxLength={40}
+        rows={1}
+        type='textarea'
+        value={currentTitle}
+        onInput={(event: Event) => {
+          setCurrentTitle((event.target as unknown as { value: string }).value)
+        }}
+      />
 
       <div className='EditChannel-options'>
         <MDOutlinedTextField
@@ -149,7 +128,8 @@ const EditChannel = ({ channel, isLoading, onClose }: Props) => {
           onChange={handleChangeCapacity}
         >
           <a
-            slot='leading-icon'
+            className='EditChannel-capacity-info-anchor'
+            slot='trailing-icon'
             data-tooltip-id='EditChannel-capacity-tooltip'
             // TODO: Monetization: Remove Coming Soon language
             data-tooltip-content={`Coming Soon: Upgrade to increase past ${userTier}`}
