@@ -29,9 +29,7 @@ import MDDialog from '../../material/MDDialog'
 import MDFilledButton from '../../material/button/MDFilledButton'
 import MDFilledTonalButton from '../../material/button/MDFilledTonalButton'
 import MDIcon from '../../material/MDIcon'
-import MDOutlinedSelect from '../../material/select/MDOutlinedSelect'
 import MDRipple from '../../material/MDRipple'
-import MDSelectOption from '../../material/select/MDSelectOption'
 import MDTextButton from '../../material/button/MDTextButton'
 import { MS_IN_HOUR } from '../../../utils/time'
 import { SubscriptionsDispatchActionType } from '../../../contexts/subscriptions/subscriptionsReducer'
@@ -41,6 +39,8 @@ import { useFetchApi } from '../../../utils/api'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useRequestNotificationPermissions } from '../../../utils/notifications'
 import { useSendLog } from '../../../utils/logging'
+import EditChannel from './EditChannel'
+import DeleteChannelButton from './DeleteChannelButton'
 
 interface Props {
   channelID: string
@@ -228,42 +228,6 @@ const Channel = ({ channelID }: Props) => {
     }
   }
 
-  const handleResetFormState = () => {
-    setCurrentCapacity(user?.tier ?? DEFAULT_USER_TIER)
-    setCurrentDuration(channel.duration ?? MS_IN_HOUR)
-    setCurrentNote(channel.note ?? '')
-    setCurrentTitle(channel.title ?? '')
-  }
-
-  const handleSaveUpdates = async () => {
-    setIsUpdating(true)
-
-    try {
-      const channelUpdates = {
-        capacity: currentCapacity,
-        duration: currentDuration,
-        note: currentNote,
-        title: currentTitle,
-      }
-      await fetchApi(`/${channel.id}`, 'PUT', channelUpdates)
-      dispatchChannels({
-        type: ChannelsDispatchActionType.CHANGED,
-        channel: {
-          ...channel,
-          ...channelUpdates,
-        },
-      })
-    } catch (error) {
-      await sendLog('Channel update error', { error }, 'ERROR')
-      dispatchError({
-        type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
-      })
-    }
-
-    setIsUpdating(false)
-    setIsEditing(false)
-  }
-
   const handleClickCallOff = async () => {
     dispatchChannels({
       type: ChannelsDispatchActionType.CHANGED,
@@ -370,207 +334,138 @@ const Channel = ({ channelID }: Props) => {
 
   return (
     <div className='Channel'>
-      <ChannelHeader
-        channel={channel}
-        isEditing={isEditing}
-        isLoading={channelIsLoading}
-        isUpdating={isUpdating}
-        isOn={isOn}
-        currentTitle={currentTitle}
-        userIsChannelOwner={userIsChannelOwner}
-        onResetFormState={handleResetFormState}
-        onSaveUpdates={handleSaveUpdates}
-        onChangeCurrentTitle={setCurrentTitle}
-        setIsEditing={setIsEditing}
-      />
-      {userIsChannelOwner ? (
-        <>
-          {isEditing ? null : (
-            <button
-              aria-label='Turn on channel'
-              className={`Channel-button ${isOn ? 'on' : ''}`}
-              disabled={isUpdating}
-              onClick={() => void handleClickItsOn()}
-            >
-              <MDRipple />
-              <ItsOnIcon className='Channel-button-image' />
-            </button>
-          )}
-          <div className='Channel-duration-display'>
-            {isEditing ? (
-              <MDOutlinedSelect
-                className='Channel-select'
-                disabled={isUpdating || channelIsLoading}
-                label='Duration'
-                supportingText='How long is it on?'
-                value={`${currentDuration}`}
-                onChange={(event: Event) => {
-                  const newDuration = Number(
-                    (event.target as EventTarget & HTMLSelectElement).value,
-                  )
-                  if (isNaN(newDuration)) return
-                  setCurrentDuration(newDuration)
-                }}
-              >
-                {durationOptions.map(durationOption => (
-                  <MDSelectOption
-                    disabled={isUpdating}
-                    key={durationOption.value}
-                    selected={durationOption.value === currentDuration}
-                    value={`${durationOption.value}`}
-                  >
-                    <div slot='headline'>{durationOption.displayName}</div>
-                  </MDSelectOption>
-                ))}
-              </MDOutlinedSelect>
-            ) : isOn ? (
-              <>
-                <Countdown
-                  date={expirationTime}
-                  renderer={({ hours, minutes, seconds }) => (
-                    <span>
-                      {`${zeroPad(hours)}:${zeroPad(minutes)}`}
-                      {hours === 0 && minutes === 0
-                        ? `:${zeroPad(seconds)}`
-                        : null}
-                    </span>
-                  )}
-                  onComplete={() => {
-                    setIsOn(false)
-                  }}
-                />
-                <MDFilledTonalButton onClick={() => void handleClickCallOff()}>
-                  Call it off
-                </MDFilledTonalButton>
-              </>
-            ) : (
-              <div>
-                {durationOptions.find(
-                  durationOption => durationOption.value === channel.duration,
-                )?.displayName ?? '1 Hour'}
-              </div>
-            )}
-          </div>
-          <ChannelNote
-            channel={channel}
-            isEditing={isEditing}
-            isLoading={channelIsLoading}
-            isUpdating={isUpdating}
-            currentNote={currentNote}
-            userIsChannelOwner={userIsChannelOwner}
-            onChangeCurrentNote={setCurrentNote}
-          />
-          <ChannelSubscribers
-            currentCapacity={currentCapacity}
-            channel={channel}
-            isEditing={isEditing}
-            isLoading={channelIsLoading}
-            isUpdating={isUpdating}
-            onChangeCurrentCapacity={setCurrentCapacity}
-            setIsUpdating={setIsUpdating}
-          />
-          <div className='Channel-delete-section'>
-            <MDTextButton
-              aria-label='Delete channel'
-              className='Channel-button-delete'
-              disabled={isUpdating}
-              hasIcon
-              onClick={() => {
-                handleClickDelete()
-              }}
-            >
-              <MDIcon slot='icon'>delete</MDIcon> Delete
-            </MDTextButton>
-            <MDDialog open={isConfirmingDelete}>
-              <div slot='headline'>Delete Channel</div>
-              <div
-                className='Channel-delete-confirmation-content'
-                slot='content'
-              >
-                This channel
-                {channel.title === '' || channel.title == null
-                  ? ' '
-                  : `, ${channel.title}, `}
-                will be deleted forever. Are you sure?
-              </div>
-              <div slot='actions'>
-                <MDTextButton
-                  disabled={isUpdating}
-                  onClick={() => {
-                    setIsConfirmingDelete(false)
-                  }}
-                >
-                  Cancel
-                </MDTextButton>
-                <MDTextButton
-                  className='Channel-button-delete'
-                  disabled={isUpdating}
-                  onClick={() => void handleConfirmDelete()}
-                >
-                  Delete
-                </MDTextButton>
-              </div>
-            </MDDialog>
-          </div>
-        </>
-      ) : subscriptions.some(chan => chan.id === channel.id) &&
-        channel.deleted !== true ? (
-        <>
-          {isOn ? (
-            <div className='Channel-duration-display'>
-              <Countdown
-                date={expirationTime}
-                renderer={({ hours, minutes, seconds }) => (
-                  <span>
-                    {`${zeroPad(hours)}:${zeroPad(minutes)}`}
-                    {hours === 0 && minutes === 0
-                      ? `:${zeroPad(seconds)}`
-                      : null}
-                  </span>
-                )}
-                onComplete={() => {
-                  setIsOn(false)
-                }}
-              />
-            </div>
-          ) : null}
-          <ChannelNote
-            channel={channel}
-            isEditing={isEditing}
-            isLoading={channelIsLoading}
-            isUpdating={isUpdating}
-            currentNote={currentNote}
-            userIsChannelOwner={userIsChannelOwner}
-            onChangeCurrentNote={setCurrentNote}
-          />
-          <MDFilledTonalButton
-            className='Channel-subscribe-button'
-            disabled={isUpdating}
-            onClick={() => void handleClickUnsubscribe()}
-          >
-            Unsubscribe
-          </MDFilledTonalButton>
-        </>
+      {userIsChannelOwner && isEditing ? (
+        <EditChannel
+          channel={channel}
+          isLoading={channelIsLoading}
+          onClose={() => {
+            setIsEditing(false)
+          }}
+        />
       ) : (
         <>
-          <MDFilledButton
-            className='Channel-subscribe-button'
-            disabled={
-              channelIsLoading ||
-              isUpdating ||
-              isChannelFull ||
-              userHasMaxSubscriptions
-            }
-            onClick={() => void handleClickSubscribe()}
-          >
-            {isChannelFull ? 'Channel Full' : 'Subscribe'}
-          </MDFilledButton>
-          {userHasMaxSubscriptions ? (
+          <ChannelHeader
+            channel={channel}
+            isUpdating={isUpdating}
+            isOn={isOn}
+            userIsChannelOwner={userIsChannelOwner}
+            setIsEditing={setIsEditing}
+          />
+          {userIsChannelOwner ? (
             <>
-              <p>Subscription limit reached</p>
-              <p>Unsubscribe from another channel to subscribe to a new one</p>
+              <button
+                aria-label='Turn on channel'
+                className={`Channel-button ${isOn ? 'on' : ''}`}
+                disabled={isUpdating}
+                onClick={() => void handleClickItsOn()}
+              >
+                <MDRipple />
+                <ItsOnIcon className='Channel-button-image' />
+              </button>
+              <div className='Channel-duration-display'>
+                {isOn ? (
+                  <>
+                    <Countdown
+                      date={expirationTime}
+                      renderer={({ hours, minutes, seconds }) => (
+                        <span>
+                          {`${zeroPad(hours)}:${zeroPad(minutes)}`}
+                          {hours === 0 && minutes === 0
+                            ? `:${zeroPad(seconds)}`
+                            : null}
+                        </span>
+                      )}
+                      onComplete={() => {
+                        setIsOn(false)
+                      }}
+                    />
+                    <MDFilledTonalButton
+                      onClick={() => void handleClickCallOff()}
+                    >
+                      Call it off
+                    </MDFilledTonalButton>
+                  </>
+                ) : (
+                  <div>
+                    {durationOptions.find(
+                      durationOption =>
+                        durationOption.value === channel.duration,
+                    )?.displayName ?? '1 Hour'}
+                  </div>
+                )}
+              </div>
+              <ChannelNote channel={channel} />
+              <ChannelSubscribers
+                currentCapacity={currentCapacity}
+                channel={channel}
+                isEditing={isEditing}
+                isLoading={channelIsLoading}
+                isUpdating={isUpdating}
+                onChangeCurrentCapacity={setCurrentCapacity}
+                setIsUpdating={setIsUpdating}
+              />
+              <div className='Channel-delete-section'>
+                <DeleteChannelButton
+                  channel={channel}
+                  isUpdating={isUpdating}
+                  setIsUpdating={setIsUpdating}
+                />
+              </div>
             </>
-          ) : null}
+          ) : subscriptions.some(chan => chan.id === channel.id) &&
+            channel.deleted !== true ? (
+            <>
+              {isOn ? (
+                <div className='Channel-duration-display'>
+                  <Countdown
+                    date={expirationTime}
+                    renderer={({ hours, minutes, seconds }) => (
+                      <span>
+                        {`${zeroPad(hours)}:${zeroPad(minutes)}`}
+                        {hours === 0 && minutes === 0
+                          ? `:${zeroPad(seconds)}`
+                          : null}
+                      </span>
+                    )}
+                    onComplete={() => {
+                      setIsOn(false)
+                    }}
+                  />
+                </div>
+              ) : null}
+              <ChannelNote channel={channel} />
+              <MDFilledTonalButton
+                className='Channel-subscribe-button'
+                disabled={isUpdating}
+                onClick={() => void handleClickUnsubscribe()}
+              >
+                Unsubscribe
+              </MDFilledTonalButton>
+            </>
+          ) : (
+            <>
+              <MDFilledButton
+                className='Channel-subscribe-button'
+                disabled={
+                  channelIsLoading ||
+                  isUpdating ||
+                  isChannelFull ||
+                  userHasMaxSubscriptions
+                }
+                onClick={() => void handleClickSubscribe()}
+              >
+                {isChannelFull ? 'Channel Full' : 'Subscribe'}
+              </MDFilledButton>
+              {userHasMaxSubscriptions ? (
+                <>
+                  <p>Subscription limit reached</p>
+                  <p>
+                    Unsubscribe from another channel to subscribe to a new one
+                  </p>
+                </>
+              ) : null}
+            </>
+          )}
         </>
       )}
     </div>
