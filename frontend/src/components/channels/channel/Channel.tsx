@@ -25,18 +25,14 @@ import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsR
 import { ErrorDispatchActionType } from '../../../contexts/error/errorReducer'
 import ItsOnIcon from '../../icons/ItsOnIcon'
 import MDCircularProgress from '../../material/progress/MDCircularProgress'
-import MDDialog from '../../material/MDDialog'
 import MDFilledButton from '../../material/button/MDFilledButton'
 import MDFilledTonalButton from '../../material/button/MDFilledTonalButton'
-import MDIcon from '../../material/MDIcon'
 import MDRipple from '../../material/MDRipple'
-import MDTextButton from '../../material/button/MDTextButton'
-import { MS_IN_HOUR } from '../../../utils/time'
 import { SubscriptionsDispatchActionType } from '../../../contexts/subscriptions/subscriptionsReducer'
 import { UserDispatchActionType } from '../../../contexts/user/userReducer'
 import { useErrorDispatch } from '../../../contexts/error/errorContext'
 import { useFetchApi } from '../../../utils/api'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { useRequestNotificationPermissions } from '../../../utils/notifications'
 import { useSendLog } from '../../../utils/logging'
 import EditChannel from './EditChannel'
@@ -47,7 +43,6 @@ interface Props {
 }
 
 const Channel = ({ channelID }: Props) => {
-  const navigate = useNavigate()
   const { pathname } = useLocation()
   const fetchApi = useFetchApi()
   const requestNotificationPermissions = useRequestNotificationPermissions()
@@ -78,16 +73,6 @@ const Channel = ({ channelID }: Props) => {
     userIsChannelOwner && !channel?.title,
   )
   const [isUpdating, setIsUpdating] = useState<boolean>(false)
-  const [isConfirmingDelete, setIsConfirmingDelete] = useState<boolean>(false)
-
-  const [currentCapacity, setCurrentCapacity] = useState<number>(
-    user?.tier ?? DEFAULT_USER_TIER,
-  )
-  const [currentDuration, setCurrentDuration] = useState<number>(
-    channel?.duration ?? MS_IN_HOUR,
-  )
-  const [currentNote, setCurrentNote] = useState<string>(channel?.note ?? '')
-  const [currentTitle, setCurrentTitle] = useState<string>(channel?.title ?? '')
 
   const [isOn, setIsOn] = useState<boolean>(false)
   const expirationTime = channel == null ? 0 : channelOnExpirationTime(channel)
@@ -148,10 +133,6 @@ const Channel = ({ channelID }: Props) => {
       } else {
         // Channel doesn't exist or is a public channel
         setChannel(fetchedChannel)
-        setCurrentCapacity(user?.tier ?? DEFAULT_USER_TIER)
-        setCurrentDuration(channel?.duration ?? MS_IN_HOUR)
-        setCurrentNote(channel?.note ?? '')
-        setCurrentTitle(channel?.title ?? '')
       }
       setIsLoading(false)
       setIsReloading(false)
@@ -253,32 +234,6 @@ const Channel = ({ channelID }: Props) => {
         },
       })
     }
-  }
-
-  const handleClickDelete = () => {
-    setIsConfirmingDelete(true)
-  }
-
-  const handleConfirmDelete = async () => {
-    setIsUpdating(true)
-    try {
-      await fetchApi(`/${channel.id}`, 'DELETE')
-      dispatchChannels({
-        type: ChannelsDispatchActionType.DELETED,
-        id: channel.id,
-      })
-      dispatchUser({
-        type: UserDispatchActionType.CHANNEL_COUNT_DECREASED,
-      })
-      navigate('/channels')
-    } catch (error) {
-      await sendLog('Channel delete error', { error }, 'ERROR')
-      dispatchError({
-        type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
-      })
-    }
-    setIsConfirmingDelete(false)
-    setIsUpdating(false)
   }
 
   const handleClickSubscribe = async () => {
@@ -396,12 +351,9 @@ const Channel = ({ channelID }: Props) => {
               </div>
               <ChannelNote channel={channel} />
               <ChannelSubscribers
-                currentCapacity={currentCapacity}
                 channel={channel}
-                isEditing={isEditing}
                 isLoading={channelIsLoading}
                 isUpdating={isUpdating}
-                onChangeCurrentCapacity={setCurrentCapacity}
                 setIsUpdating={setIsUpdating}
               />
               <div className='Channel-delete-section'>
