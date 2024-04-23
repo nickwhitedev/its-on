@@ -1,6 +1,5 @@
 import './ChannelHeader.css'
 
-import ItsOnIcon from '../../icons/ItsOnIcon'
 import MDIcon from '../../material/MDIcon'
 import MDIconButton from '../../material/icon-button/MDIconButton'
 import ShareChannelButton from './ShareChannelButton'
@@ -17,7 +16,6 @@ interface Props {
 const ChannelHeader = ({
   channel,
   isUpdating,
-  isOn,
   userIsChannelOwner,
   setIsEditing,
 }: Props) => {
