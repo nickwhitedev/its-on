@@ -1,19 +1,8 @@
-
-
 .ChannelSubscribers {
   border-radius: 12px;
   position: relative;
   width: 100%;
   text-align: left;
-  margin-bottom: 1.8rem;
-}
-
-.ChannelSubscribers-capacity-input {
-  --md-outlined-text-field-leading-space: 7px;
-  --md-outlined-text-field-top-space: 4px;
-  --md-outlined-text-field-bottom-space: 4px;
-  --md-outlined-text-field-trailing-space: 4px;
-  --md-outlined-text-field-input-text-size: 0.6875rem;
 }
 
 .ChannelSubscribers-list {

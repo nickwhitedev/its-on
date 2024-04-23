@@ -1,6 +1,5 @@
 import './ChannelHeader.css'
 
-import ItsOnIcon from '../../icons/ItsOnIcon'
 import MDIcon from '../../material/MDIcon'
 import MDIconButton from '../../material/icon-button/MDIconButton'
 import ShareChannelButton from './ShareChannelButton'
@@ -17,7 +16,6 @@ interface Props {
 const ChannelHeader = ({
   channel,
   isUpdating,
-  isOn,
   userIsChannelOwner,
   setIsEditing,
 }: Props) => {
@@ -25,7 +23,7 @@ const ChannelHeader = ({
     <div className={`ChannelHeader ${userIsChannelOwner ? 'editable' : ''}`}>
       <div className='ChannelHeader-edit'>
         {userIsChannelOwner ? (
-          <div className='ChannelHeader-save-wrapper'>
+          <div className='ChannelHeader-edit-wrapper'>
             <MDIconButton
               className='ChannelHeader-button'
               disabled={false}
@@ -36,16 +34,7 @@ const ChannelHeader = ({
               <MDIcon>edit</MDIcon>
             </MDIconButton>
           </div>
-        ) : (
-          <MDIcon
-            className={
-              isOn ? 'ChannelHeader-icon-on' : 'ChannelHeader-icon-off'
-            }
-            slot='start'
-          >
-            <ItsOnIcon />
-          </MDIcon>
-        )}
+        ) : null}
       </div>
 
       <div className='ChannelHeader-title'>
@@ -56,11 +45,13 @@ const ChannelHeader = ({
       </div>
 
       <div className='ChannelHeader-share'>
-        <ShareChannelButton
-          channel={channel}
-          isUpdating={isUpdating}
-          size='small'
-        />
+        {userIsChannelOwner ? (
+          <ShareChannelButton
+            channel={channel}
+            isUpdating={isUpdating}
+            size='small'
+          />
+        ) : null}
       </div>
     </div>
   )
