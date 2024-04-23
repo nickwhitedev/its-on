@@ -33,7 +33,7 @@ const ShareChannelButton = ({ channel, isUpdating, size }: Props) => {
   }
 
   return (
-    <div className='ShareChannelButton'>
+    <div className={`ShareChannelButton ${size === 'large' ? 'large' : ''}`}>
       {size === 'small' ? (
         <MDIconButton
           aria-label='Share'
@@ -58,13 +58,13 @@ const ShareChannelButton = ({ channel, isUpdating, size }: Props) => {
           <MDIcon slot='icon'>share</MDIcon>
         </MDFilledButton>
       )}
-      <span
+      <div
         className={`ShareChannelButton-copied secondary-text ${
           channelCopied ? '' : 'hidden'
         }`}
       >
         Copied!
-      </span>
+      </div>
     </div>
   )
 }

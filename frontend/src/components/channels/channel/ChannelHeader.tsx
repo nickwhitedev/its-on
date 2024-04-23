@@ -25,7 +25,7 @@ const ChannelHeader = ({
     <div className={`ChannelHeader ${userIsChannelOwner ? 'editable' : ''}`}>
       <div className='ChannelHeader-edit'>
         {userIsChannelOwner ? (
-          <div className='ChannelHeader-save-wrapper'>
+          <div className='ChannelHeader-edit-wrapper'>
             <MDIconButton
               className='ChannelHeader-button'
               disabled={false}

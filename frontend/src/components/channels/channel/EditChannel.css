@@ -42,10 +42,13 @@
   font-size: 1rem;
 }
 
-.EditChannel-duration-select,
-.EditChannel-duration-select md-select-option {
+.EditChannel-duration-select {
   min-width: 10rem;
   margin-bottom: 1.8rem;
+}
+
+.EditChannel-duration-select md-select-option {
+  min-width: 10rem;
 }
 
 .EditChannel-save-section {

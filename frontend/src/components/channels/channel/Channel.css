@@ -34,14 +34,6 @@
   margin-bottom: 1.8rem;
 }
 
-.Channel-button-delete {
-  --md-sys-color-primary: var(--md-sys-color-error);
-}
-
-.Channel-delete-confirmation-content {
-  text-align: left;
-}
-
 .Channel-subscribe-button {
   margin-bottom: 1.8rem;
 }
@@ -81,11 +73,6 @@
   width: 60vh;
   max-height: 80vw;
   max-width: 80vw;
-}
-
-.Channel-select,
-.Channel-select md-select-option {
-  min-width: 10rem;
 }
 
 .Channel-duration-display {

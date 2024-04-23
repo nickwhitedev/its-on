@@ -1,3 +1,5 @@
+import './DeleteChannelButton.css'
+
 import { useState } from 'react'
 import MDTextButton from '../../material/button/MDTextButton'
 import MDIcon from '../../material/MDIcon'
@@ -55,7 +57,7 @@ const DeleteChannelButton = ({ channel, isUpdating, setIsUpdating }: Props) => {
     <div className='DeleteChannelButton'>
       <MDTextButton
         aria-label='Delete channel'
-        className='Channel-button-delete'
+        className='DeleteChannelButton-button'
         disabled={isUpdating}
         hasIcon
         onClick={() => {
@@ -66,7 +68,10 @@ const DeleteChannelButton = ({ channel, isUpdating, setIsUpdating }: Props) => {
       </MDTextButton>
       <MDDialog open={isConfirmingDelete}>
         <div slot='headline'>Delete Channel</div>
-        <div className='Channel-delete-confirmation-content' slot='content'>
+        <div
+          className='DeleteChannelButton-confirmation-content'
+          slot='content'
+        >
           This channel
           {channel.title === '' || channel.title == null
             ? ' '
@@ -83,7 +88,7 @@ const DeleteChannelButton = ({ channel, isUpdating, setIsUpdating }: Props) => {
             Cancel
           </MDTextButton>
           <MDTextButton
-            className='Channel-button-delete'
+            className='DeleteChannelButton-button'
             disabled={isUpdating}
             onClick={() => void handleConfirmDelete()}
           >
