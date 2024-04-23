@@ -36,16 +36,7 @@ const ChannelHeader = ({
               <MDIcon>edit</MDIcon>
             </MDIconButton>
           </div>
-        ) : (
-          <MDIcon
-            className={
-              isOn ? 'ChannelHeader-icon-on' : 'ChannelHeader-icon-off'
-            }
-            slot='start'
-          >
-            <ItsOnIcon />
-          </MDIcon>
-        )}
+        ) : null}
       </div>
 
       <div className='ChannelHeader-title'>
@@ -56,11 +47,13 @@ const ChannelHeader = ({
       </div>
 
       <div className='ChannelHeader-share'>
-        <ShareChannelButton
-          channel={channel}
-          isUpdating={isUpdating}
-          size='small'
-        />
+        {userIsChannelOwner ? (
+          <ShareChannelButton
+            channel={channel}
+            isUpdating={isUpdating}
+            size='small'
+          />
+        ) : null}
       </div>
     </div>
   )

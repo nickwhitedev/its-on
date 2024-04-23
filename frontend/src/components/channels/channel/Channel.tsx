@@ -367,6 +367,13 @@ const Channel = ({ channelID }: Props) => {
           ) : subscriptions.some(chan => chan.id === channel.id) &&
             channel.deleted !== true ? (
             <>
+              <button
+                aria-label='Turn on channel'
+                className={`Channel-button ${isOn ? 'on' : ''}`}
+                disabled={!isOn}
+              >
+                <ItsOnIcon className='Channel-button-image' />
+              </button>
               {isOn ? (
                 <div className='Channel-duration-display'>
                   <Countdown
