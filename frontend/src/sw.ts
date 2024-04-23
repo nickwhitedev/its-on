@@ -73,9 +73,3 @@ self.addEventListener('install', () => void self.skipWaiting())
 self.addEventListener('activate', () => {
   clientsClaim()
 })
-
-self.addEventListener('visibilitychange', function () {
-  if (document.visibilityState === 'visible') {
-    window.location.reload()
-  }
-})
