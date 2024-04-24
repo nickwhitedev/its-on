@@ -4,7 +4,7 @@ const Support = () => {
       <h3>Support</h3>
       <p>
         If you need help using It&apos;s On, send a message to at{' '}
-        <a href='mailto:help@itson.fyi'>help@itson.fyi</a>
+        <a href='mailto:support@itson.fyi'>support@itson.fyi</a>
       </p>
       <p>
         To leave feedback, send an email to{' '}

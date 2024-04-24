@@ -10,13 +10,6 @@ const Profile = () => {
     <div className='Profile'>
       <UserProfile>
         <UserProfile.Page
-          label='Upgrade'
-          url='/upgrade'
-          labelIcon={<MDIcon className='Profile-button-icon'>upgrade</MDIcon>}
-        >
-          <StripePricingTable />
-        </UserProfile.Page>
-        <UserProfile.Page
           label='Notifications'
           url='/notification-settings'
           labelIcon={
@@ -24,6 +17,13 @@ const Profile = () => {
           }
         >
           <NotificationSettings />
+        </UserProfile.Page>
+        <UserProfile.Page
+          label='Upgrade'
+          url='/upgrade'
+          labelIcon={<MDIcon className='Profile-button-icon'>upgrade</MDIcon>}
+        >
+          <StripePricingTable />
         </UserProfile.Page>
       </UserProfile>
     </div>
