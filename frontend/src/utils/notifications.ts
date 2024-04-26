@@ -17,6 +17,10 @@ interface EnableDeviceNotificationsParams {
   onPermissionSubmitted?: (isPermissionGranted: boolean) => void
 }
 
+const hasIOSPushHandlers =
+  window.webkit?.messageHandlers?.['push-permission-request'] &&
+  window.webkit.messageHandlers['push-permission-state']
+
 export const useGetNotificationPermission = (): (() =>
   | 'granted'
   | 'denied'
@@ -45,13 +49,13 @@ export const useGetNotificationPermission = (): (() =>
       }
     }
 
-    if (window.webkit != null) {
+    if (hasIOSPushHandlers) {
       // @ts-expect-error webkit event types are not expected event listener types
       window.addEventListener(
         'push-permission-state',
         parseWebkitPermissionState,
       )
-      window.webkit.messageHandlers['push-permission-state'].postMessage(
+      window.webkit?.messageHandlers?.['push-permission-state']?.postMessage(
         'push-permission-state',
       )
       return () => {
@@ -62,7 +66,7 @@ export const useGetNotificationPermission = (): (() =>
   }, [])
 
   return useCallback((): 'granted' | 'denied' | 'default' => {
-    if (window.webkit != null) {
+    if (hasIOSPushHandlers) {
       return iOSNotificationPermission
     } else if ('Notification' in window) {
       return Notification.permission
@@ -113,7 +117,7 @@ export const useEnableDeviceNotifications = (): (({
     const setPushTokenFromEvent = (event: WebkitEvent) => {
       saveNotificationToken(event.detail)
     }
-    if (window.webkit != null) {
+    if (hasIOSPushHandlers) {
       // @ts-expect-error webkit event types are not expected event listener types
       window.addEventListener('push-token', setPushTokenFromEvent)
 
@@ -138,8 +142,10 @@ export const useEnableDeviceNotifications = (): (({
       }
       setCurrentSavedNotificationTokens(savedNotificationTokens)
 
-      if (window.webkit != null) {
-        window.webkit.messageHandlers['push-token'].postMessage('push-token')
+      if (hasIOSPushHandlers) {
+        window.webkit?.messageHandlers?.['push-token']?.postMessage(
+          'push-token',
+        )
         return
       }
 
@@ -192,7 +198,7 @@ export const useDisableDeviceNotifications = (): (() => Promise<void>) => {
     const setPushTokenFromEvent = (event: WebkitEvent) => {
       deleteNotificationToken(event.detail)
     }
-    if (window.webkit != null) {
+    if (hasIOSPushHandlers) {
       // @ts-expect-error webkit event types are not expected event listener types
       window.addEventListener('push-token', setPushTokenFromEvent)
 
@@ -208,8 +214,8 @@ export const useDisableDeviceNotifications = (): (() => Promise<void>) => {
       return
     }
 
-    if (window.webkit != null) {
-      window.webkit.messageHandlers['push-token'].postMessage('push-token')
+    if (hasIOSPushHandlers) {
+      window.webkit?.messageHandlers?.['push-token']?.postMessage('push-token')
       return
     }
 
@@ -274,7 +280,7 @@ export const useRequestNotificationPermissions = () => {
       })
     }
 
-    if (window.webkit != null) {
+    if (hasIOSPushHandlers) {
       // @ts-expect-error webkit event types are not expected event listener types
       window.addEventListener(
         'push-permission-request',
@@ -309,10 +315,10 @@ export const useRequestNotificationPermissions = () => {
       setSavedNotificationTokens(savedNotificationTokens)
       setOnPermissionSubmittedFunction(onPermissionSubmitted)
 
-      if (window.webkit != null) {
-        window.webkit.messageHandlers['push-permission-request'].postMessage(
-          'push-permission-request',
-        )
+      if (hasIOSPushHandlers) {
+        window.webkit?.messageHandlers?.[
+          'push-permission-request'
+        ]?.postMessage('push-permission-request')
         return
       }
       const permission = await Notification.requestPermission()
