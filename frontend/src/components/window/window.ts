@@ -1,5 +1,5 @@
 export interface IWebkitAPI {
-  messageHandlers: Record<
+  messageHandlers?: Record<
     string,
     {
       postMessage: (data: string) => void
