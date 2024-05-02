@@ -15,6 +15,7 @@ env:
   PUSH_NOTIFICATION_PUBLIC_KEY: ${{ secrets.PUSH_NOTIFICATION_PUBLIC_KEY }}
   PUSH_NOTIFICATION_PRIVATE_KEY: ${{ secrets.PUSH_NOTIFICATION_PRIVATE_KEY }}
   SAM_TEMPLATE: template.yml
+  STRIPE_PUBLIC_KEY: ${{ secrets.STRIPE_PROD_PUBLIC_KEY }}
   TESTING_STACK_NAME: its-on-test
   TESTING_ARTIFACTS_BUCKET: its-on-testing-artifacts
   TESTING_CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::992382488292:role/aws-sam-cli-managed-dev-p-CloudFormationExecutionRo-DoShwApzYF47
@@ -329,6 +330,7 @@ jobs:
           echo "VITE_BASE_URL=\"${{ needs.deploy-prod-api.outputs.web-endpoint }}\"" >> .env.production
           echo "VITE_API_URL=\"${{ needs.deploy-prod-api.outputs.api-endpoint }}\"" >> .env.production
           echo "VITE_CLERK_PUBLISHABLE_KEY=\"${{ env.CLERK_PUBLIC_KEY }}\"" >> .env.production
+          echo "VITE_STRIPE_PUBLIC_KEY=`"${{ env.STRIPE_PUBLIC_KEY }}`"" >> .env.production
       - name: Build frontend
         run: CI=true yarn build
       - name: Assume the prod pipeline user role

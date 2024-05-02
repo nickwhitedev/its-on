@@ -8,10 +8,9 @@ import { RouterProvider } from 'react-router-dom'
 import AppContextProvider from './contexts/AppContextProvider'
 import router from './routes/router'
 import { baseUrl } from './utils/urls'
+import { CLERK_PUBLISHABLE_KEY, useDarkTheme } from './utils/constants'
 
-const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string
-
-if (!PUBLISHABLE_KEY) {
+if (!CLERK_PUBLISHABLE_KEY) {
   throw new Error('Missing Publishable Key')
 }
 const rootElement = document.getElementById('root')
@@ -20,11 +19,9 @@ if (rootElement != null) {
   ReactDOM.createRoot(rootElement).render(
     <React.StrictMode>
       <ClerkProvider
-        publishableKey={PUBLISHABLE_KEY}
+        publishableKey={CLERK_PUBLISHABLE_KEY}
         appearance={{
-          baseTheme: window.matchMedia('(prefers-color-scheme: dark)').matches
-            ? dark
-            : undefined,
+          baseTheme: useDarkTheme ? dark : undefined,
           layout: {
             helpPageUrl: `${baseUrl}/support`,
             termsPageUrl: `${baseUrl}/terms`,
@@ -32,10 +29,7 @@ if (rootElement != null) {
           },
           variables: {
             colorPrimary: '#17c1e8',
-            colorNeutral: window.matchMedia('(prefers-color-scheme: dark)')
-              .matches
-              ? '#e2e2e2'
-              : '#1b1b1b',
+            colorNeutral: useDarkTheme ? '#e2e2e2' : '#1b1b1b',
           },
         }}
         supportEmail='support@itson.fyi'
