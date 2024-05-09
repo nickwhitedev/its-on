@@ -70,6 +70,11 @@ Globals:
             - IsProdEnv
             - ItsOnStripeApiSecretKey
             - ItsOnStripeApiDevSecretKey
+        STRIPE_WEBHOOK_ENDPOINT_SECRET_KEY_NAME:
+          'Fn::If':
+            - IsProdEnv
+            - ItsOnStripeWebhookEndpointSecretKey
+            - ItsOnStripeDevWebhookEndpointSecretKey
         WEB_URL:
           'Fn::If':
             - IsProdEnv

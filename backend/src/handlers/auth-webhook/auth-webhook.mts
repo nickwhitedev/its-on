@@ -103,7 +103,7 @@ const authWebhook = async (
         const ddbResponse = await ddbDocClient.send(
           new DeleteCommand({
             Key: {
-              pk: `user#${id}`,
+              pk: `user#${id ?? ''}`,
               sk: `profile`,
             },
             TableName: DYNAMODB_TABLE_NAME,

@@ -11,9 +11,7 @@ import {
   GetSecretValueCommand,
   SecretsManagerClient,
 } from '@aws-sdk/client-secrets-manager'
-import { DeleteCommand, DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb'
-import { WebhookEvent } from '@clerk/clerk-sdk-node'
-import { Webhook } from 'svix'
+import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
 import { createResponse } from '/opt/nodejs/response.mjs'
 import Stripe from 'stripe'
@@ -48,7 +46,22 @@ const stripeWebhook = async (
   const stripeSecretKey = stripeSecret.SecretString ?? ''
 
   if (!stripeSecretKey) {
-    throw new Error('Webhook secret not found')
+    throw new Error('Stripe secret not found')
+  }
+
+  const stripeWebhookEndpointSecret = await new SecretsManagerClient({
+    region: 'us-east-1',
+  }).send(
+    new GetSecretValueCommand({
+      SecretId: process.env.STRIPE_WEBHOOK_ENDPOINT_SECRET_KEY_NAME,
+    }),
+  )
+
+  const stripeWebhookEndpointSecretKey =
+    stripeWebhookEndpointSecret.SecretString ?? ''
+
+  if (!stripeWebhookEndpointSecretKey) {
+    throw new Error('Stripe webhook endpoint secret not found')
   }
 
   const stripe = new Stripe(stripeSecretKey)
@@ -57,71 +70,83 @@ const stripeWebhook = async (
   const headers = event.headers
   const payload = event.body ?? ''
 
-  // Get the Svix headers for verification
-  const svix_id = headers['svix-id']
-  const svix_timestamp = headers['svix-timestamp']
-  const svix_signature = headers['svix-signature']
+  const signature = headers['stripe-signature'] ?? ''
 
-  // If there are missing Svix headers, error out
-  if (!svix_id || !svix_timestamp || !svix_signature) {
-    const message = 'Webhook verification failed - Missing Svix headers'
-    logger.error(message)
-    return createResponse({
-      eventPath,
-      responseBody: { message },
-      statusCode: 400,
-    })
-  }
+  let stripeEvent
 
-  // Initiate Svix
-  const webhook = new Webhook(webhookSecret)
-
-  let webhookEvent: WebhookEvent
-
-  // Attempt to verify the incoming webhook
-  // If successful, the payload will be available from 'webhookEvent'
-  // If the verification fails, error out and  return error code
   try {
-    webhookEvent = webhook.verify(payload, {
-      'svix-id': svix_id,
-      'svix-timestamp': svix_timestamp,
-      'svix-signature': svix_signature,
-    }) as WebhookEvent
+    stripeEvent = stripe.webhooks.constructEvent(
+      payload,
+      signature,
+      stripeWebhookEndpointSecretKey,
+    )
   } catch (error) {
-    logger.error('Error', error as Error)
+    const message = `Webhook Error: ${(error as Error).message}`
+    logger.error(message, error as Error)
     return createResponse({
       eventPath,
-      responseBody: { message: 'Webhook verification failed' },
+      responseBody: { error: error as Error, message },
       statusCode: 400,
     })
   }
 
-  const eventType = webhookEvent.type
+  switch (stripeEvent.type) {
+    case 'checkout.session.completed': {
+      const paymentIntent = stripeEvent.data.object
+      const userID = paymentIntent.client_reference_id
+      if (userID == null) {
+        logger.error(
+          'Stripe Webhook checkout.session.completed Error: client_reference_id not given',
+        )
+        break
+      }
+      // Retrieve the session. If you require line items in the response, you may include them by expanding line_items.
+      const sessionWithLineItems = await stripe.checkout.sessions.retrieve(
+        paymentIntent.id,
+        {
+          expand: ['line_items'],
+        },
+      )
+      const lineItems = sessionWithLineItems.line_items
+      if (lineItems == null) {
+        logger.error(
+          'Stripe Webhook checkout.session.completed Error: No line items given',
+        )
+        break
+      }
 
-  if (eventType === 'user.deleted') {
-    const { id, deleted } = webhookEvent.data
-    if (deleted) {
       try {
+        lineItems.data.map(lineItem => {
+          logger.debug(lineItem.id)
+        })
         const ddbResponse = await ddbDocClient.send(
-          new DeleteCommand({
+          new UpdateCommand({
             Key: {
-              pk: `user#${id}`,
+              pk: `user#${userID}`,
               sk: `profile`,
             },
+            ReturnValues: 'ALL_NEW',
             TableName: DYNAMODB_TABLE_NAME,
+            UpdateExpression: 'SET #tier = :tier',
+            ExpressionAttributeNames: {
+              '#tier': 'tier',
+            },
+            ExpressionAttributeValues: {
+              ':tier': 5, // FIXME: use webhook data to set this
+            },
           }),
         )
-        logger.debug('Success - user deleted', { ddbResponse })
-        metrics.addMetric('userDelete', MetricUnit.Count, 1)
+        metrics.addMetric('successfulPurchase', MetricUnit.Count, 1)
+        logger.debug('Success - payment processed for user', { ddbResponse })
       } catch (error) {
-        logger.error('Error', error as Error)
-        return createResponse({
-          eventPath,
-          responseBody: { message: 'User deletion failed' },
-          statusCode: 400,
-        })
+        logger.error('User Update DynamoDB Error', error as Error)
+        break
       }
+      logger.info('PaymentIntent was successful!')
+      break
     }
+    default:
+      logger.warn(`Unhandled stripeEvent type ${stripeEvent.type}`)
   }
 
   return new Promise(resolve => {
