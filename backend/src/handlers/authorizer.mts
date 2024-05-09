@@ -271,7 +271,7 @@ class AuthPolicy {
         'Invalid resource path: ' +
           resource +
           '. Path should match ' +
-          this.pathRegex,
+          this.pathRegex.toString(),
       )
     }
 

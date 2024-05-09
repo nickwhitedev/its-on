@@ -1,6 +1,6 @@
-import { useAuth } from '@clerk/clerk-react'
 import { APIError } from './errors/apiError'
 import { apiUrl } from './urls'
+import { useAuth } from '@clerk/clerk-react'
 
 /**
  * Hook for fetching an its-on api endpoint.
@@ -16,7 +16,7 @@ export const useFetchApi = (): (<T>(
     const response = await fetch(`${apiUrl}${uri}`, {
       ...(body != null ? { body: JSON.stringify(body) } : {}),
       headers: {
-        Authorization: `Bearer ${await getToken()}`,
+        Authorization: `Bearer ${(await getToken()) ?? ''}`,
         'Content-Type': 'application/json',
       },
       method,

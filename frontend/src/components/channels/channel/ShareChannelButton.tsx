@@ -1,11 +1,11 @@
 import './ShareChannelButton.css'
 
-import { useState } from 'react'
-import { baseUrl } from '../../../utils/urls'
-import MDIcon from '../../material/MDIcon'
 import MDFilledButton from '../../material/button/MDFilledButton'
+import MDIcon from '../../material/MDIcon'
 import MDIconButton from '../../material/icon-button/MDIconButton'
+import { baseUrl } from '../../../utils/urls'
 import { channelDisplayTitle } from './channelUtils'
+import { useState } from 'react'
 
 interface Props {
   channel: IChannel
@@ -23,7 +23,9 @@ const ShareChannelButton = ({ channel, isUpdating, size }: Props) => {
     try {
       await navigator.share({
         title: `It's On - ${displayTitle}`,
-        text: `Check out the channel, ${displayTitle}, by ${channel.owner}`,
+        text: `Check out the channel, ${displayTitle}, by ${
+          channel.owner ?? 'Unknown'
+        }`,
         url: channelURL,
       })
     } catch (error) {

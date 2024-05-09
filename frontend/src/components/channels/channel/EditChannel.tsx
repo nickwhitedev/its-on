@@ -1,22 +1,23 @@
 import './EditChannel.css'
 
-import { useState } from 'react'
-import MDOutlinedSelect from '../../material/select/MDOutlinedSelect'
-import MDIcon from '../../material/MDIcon'
-import MDOutlinedTextField from '../../material/text-field/MDOutlinedTextField'
-import { useChannelsDispatch } from '../../../contexts/channels/channelsContext'
-import { useFetchApi } from '../../../utils/api'
+import { DEFAULT_USER_TIER, durationOptions } from './channelUtils'
+
 import { ChannelsDispatchActionType } from '../../../contexts/channels/channelsReducer'
-import { useErrorDispatch } from '../../../contexts/error/errorContext'
-import { useSendLog } from '../../../utils/logging'
+import DeleteChannelButton from './DeleteChannelButton'
 import { ErrorDispatchActionType } from '../../../contexts/error/errorReducer'
+import MDIcon from '../../material/MDIcon'
+import MDOutlinedButton from '../../material/button/MDOutlinedButton'
+import MDOutlinedSelect from '../../material/select/MDOutlinedSelect'
+import MDOutlinedTextField from '../../material/text-field/MDOutlinedTextField'
 import MDSelectOption from '../../material/select/MDSelectOption'
 import { MS_IN_HOUR } from '../../../utils/time'
-import { DEFAULT_USER_TIER, durationOptions } from './channelUtils'
-import MDOutlinedButton from '../../material/button/MDOutlinedButton'
-import { useUser } from '../../../contexts/user/userContext'
 import { Tooltip } from 'react-tooltip'
-import DeleteChannelButton from './DeleteChannelButton'
+import { useChannelsDispatch } from '../../../contexts/channels/channelsContext'
+import { useErrorDispatch } from '../../../contexts/error/errorContext'
+import { useFetchApi } from '../../../utils/api'
+import { useSendLog } from '../../../utils/logging'
+import { useState } from 'react'
+import { useUser } from '../../../contexts/user/userContext'
 
 interface Props {
   channel: IChannel
@@ -47,7 +48,7 @@ const EditChannel = ({ channel, isLoading, onClose }: Props) => {
   const [currentNote, setCurrentNote] = useState<string>(channel.note ?? '')
 
   const [newCapacity, setNewCapacity] = useState<string>(
-    `${channel.capacity ?? userTier}`,
+    (channel.capacity ?? userTier).toLocaleString(),
   )
 
   const handleChangeCapacity = () => {
@@ -113,17 +114,17 @@ const EditChannel = ({ channel, isLoading, onClose }: Props) => {
           disabled={isUpdating}
           error={Number(newCapacity) > userTier}
           label='Channel Size'
-          max={`${userTier}`}
-          min={`${subscriberCount}`}
+          max={userTier.toLocaleString()}
+          min={subscriberCount.toLocaleString()}
           step='1'
           supportingText='Subscriber limit'
           type='number'
           value={newCapacity}
           onInput={event => {
             setNewCapacity(
-              `${Math.floor(
+              Math.floor(
                 Number((event.target as EventTarget & HTMLSelectElement).value),
-              )}`,
+              ).toLocaleString(),
             )
           }}
           onChange={handleChangeCapacity}
@@ -133,7 +134,7 @@ const EditChannel = ({ channel, isLoading, onClose }: Props) => {
             slot='trailing-icon'
             data-tooltip-id='EditChannel-capacity-tooltip'
             // TODO: Monetization: Remove Coming Soon language
-            data-tooltip-content={`Coming Soon: Upgrade to increase past ${userTier}`}
+            data-tooltip-content={`Coming Soon: Upgrade to increase past ${userTier.toLocaleString()}`}
           >
             <MDIcon className='EditChannel-capacity-info-icon'>info</MDIcon>
           </a>
@@ -145,7 +146,7 @@ const EditChannel = ({ channel, isLoading, onClose }: Props) => {
           disabled={isUpdating || isLoading}
           label='Channel Duration'
           supportingText='How long it stays on'
-          value={`${currentDuration}`}
+          value={currentDuration.toLocaleString()}
           onChange={(event: Event) => {
             const newDuration = Number(
               (event.target as EventTarget & HTMLSelectElement).value,
@@ -159,7 +160,7 @@ const EditChannel = ({ channel, isLoading, onClose }: Props) => {
               disabled={isUpdating}
               key={durationOption.value}
               selected={durationOption.value === currentDuration}
-              value={`${durationOption.value}`}
+              value={durationOption.value.toLocaleString()}
             >
               <div slot='headline'>{durationOption.displayName}</div>
             </MDSelectOption>

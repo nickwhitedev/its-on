@@ -81,9 +81,9 @@ export const handleChannelSubscriberAdded = async ({
       const messageID = await getMessaging().send({
         apns: {
           headers: {
-            'apns-expiration': `${Math.floor(
+            'apns-expiration': Math.floor(
               (Date.now() + MS_IN_HOUR * 24) / 1000,
-            )}`,
+            ).toString(),
           },
           payload: {
             aps: {
@@ -100,7 +100,7 @@ export const handleChannelSubscriberAdded = async ({
             link: `${WEB_URL}/${channelID}`,
           },
           headers: {
-            ttl: `${(MS_IN_HOUR * 24) / 1000}`,
+            ttl: ((MS_IN_HOUR * 24) / 1000).toString(),
           },
           notification: {
             badge: '/monochrome-icon-96.png',

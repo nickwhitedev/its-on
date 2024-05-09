@@ -25,13 +25,6 @@ export const STRIPE_10_OWNED_DARK_PRICING_TABLE_ID = import.meta.env
 export const STRIPE_BASE_DARK_PRICING_TABLE_ID = import.meta.env
   .VITE_STRIPE_BASE_DARK_PRICING_TABLE_ID as string
 
-export const ACCESS_TOKEN_KEY = 'accessToken'
-export const ID_TOKEN_KEY = 'idToken'
-export const REFRESH_TOKEN_KEY = 'refreshToken'
-
-export const PKCE_STATE_KEY = 'pkceState'
-export const PKCE_VERIFIER_KEY = 'pkceVerifier'
-
 export const TIER_INFINITE = -1
 export const TIER_5 = 5
 export const TIER_10 = 10
