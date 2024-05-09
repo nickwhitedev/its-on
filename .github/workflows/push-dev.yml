@@ -250,7 +250,7 @@ jobs:
           echo "VITE_BASE_URL=\"${{ needs.deploy-dev-api.outputs.web-endpoint }}\"" >> .env.production
           echo "VITE_API_URL=\"${{ needs.deploy-dev-api.outputs.api-endpoint }}\"" >> .env.production
           echo "VITE_CLERK_PUBLISHABLE_KEY=\"${{ env.CLERK_PUBLIC_KEY }}\"" >> .env.production
-          echo "VITE_STRIPE_PUBLIC_KEY=`"${{ env.STRIPE_PUBLIC_KEY }}`"" >> .env.production
+          echo "VITE_STRIPE_PUBLIC_KEY=\"${{ env.STRIPE_PUBLIC_KEY }}\"" >> .env.production
       - name: Build frontend
         run: CI=true yarn build
 
