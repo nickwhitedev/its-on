@@ -16,14 +16,15 @@ import { WebhookEvent } from '@clerk/clerk-sdk-node'
 import { Webhook } from 'svix'
 import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
 import { createResponse } from '/opt/nodejs/response.mjs'
+import Stripe from 'stripe'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
 
 /**
- * Handles a auth events
+ * Handles events from stripe
  */
-const authWebhook = async (
+const stripeWebhook = async (
   event: APIGatewayProxyEvent,
   _context: Context,
   logger: Logger,
@@ -36,20 +37,21 @@ const authWebhook = async (
   }
   const eventPath = event.path
 
-  // Check if the 'Signing Secret' from the Clerk Dashboard was correctly provided
-  const secretKey = await new SecretsManagerClient({
+  const stripeSecret = await new SecretsManagerClient({
     region: 'us-east-1',
   }).send(
     new GetSecretValueCommand({
-      SecretId: process.env.CLERK_WEBHOOK_SECRET_NAME,
+      SecretId: process.env.STRIPE_API_SECRET_KEY_NAME,
     }),
   )
 
-  const webhookSecret = secretKey.SecretString ?? ''
+  const stripeSecretKey = stripeSecret.SecretString ?? ''
 
-  if (!webhookSecret) {
+  if (!stripeSecretKey) {
     throw new Error('Webhook secret not found')
   }
+
+  const stripe = new Stripe(stripeSecretKey)
 
   // Grab the headers and body
   const headers = event.headers
@@ -135,4 +137,4 @@ const authWebhook = async (
   })
 }
 
-export default authWebhook
+export default stripeWebhook

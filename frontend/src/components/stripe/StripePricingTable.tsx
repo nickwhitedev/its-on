@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react'
-import { useUser } from '../../contexts/user/userContext'
 import {
   STRIPE_10_OWNED_DARK_PRICING_TABLE_ID,
   STRIPE_10_OWNED_LIGHT_PRICING_TABLE_ID,
@@ -18,10 +17,19 @@ import {
   useDarkTheme,
 } from '../../utils/constants'
 
-const renderPricingTable = (tableID: string) => {
+import { useUser } from '../../contexts/user/userContext'
+
+const renderPricingTable = ({
+  tableID,
+  userID,
+}: {
+  tableID: string
+  userID: string
+}) => {
   return React.createElement('stripe-pricing-table', {
     'pricing-table-id': tableID,
     'publishable-key': STRIPE_PUBLIC_KEY,
+    'client-reference-id': userID,
   })
 }
 
@@ -32,6 +40,7 @@ const StripePricingTable = () => {
   const user = useUser()
 
   const currentTier = user?.tier ?? TIER_5
+  const userID = user?.id ?? ''
 
   useEffect(() => {
     const script = document.createElement('script')
@@ -45,29 +54,33 @@ const StripePricingTable = () => {
   }, [])
 
   if (currentTier === TIER_INFINITE || currentTier >= TIER_100) {
-    return renderPricingTable(
-      useDarkTheme
+    return renderPricingTable({
+      tableID: useDarkTheme
         ? STRIPE_ALL_OWNED_DARK_PRICING_TABLE_ID
         : STRIPE_ALL_OWNED_LIGHT_PRICING_TABLE_ID,
-    )
+      userID,
+    })
   } else if (currentTier >= TIER_25) {
-    return renderPricingTable(
-      useDarkTheme
+    return renderPricingTable({
+      tableID: useDarkTheme
         ? STRIPE_25_OWNED_DARK_PRICING_TABLE_ID
         : STRIPE_25_OWNED_LIGHT_PRICING_TABLE_ID,
-    )
+      userID,
+    })
   } else if (currentTier >= TIER_10) {
-    return renderPricingTable(
-      useDarkTheme
+    return renderPricingTable({
+      tableID: useDarkTheme
         ? STRIPE_10_OWNED_DARK_PRICING_TABLE_ID
         : STRIPE_10_OWNED_LIGHT_PRICING_TABLE_ID,
-    )
+      userID,
+    })
   } else {
-    return renderPricingTable(
-      useDarkTheme
+    return renderPricingTable({
+      tableID: useDarkTheme
         ? STRIPE_BASE_DARK_PRICING_TABLE_ID
         : STRIPE_BASE_LIGHT_PRICING_TABLE_ID,
-    )
+      userID,
+    })
   }
 }
 
