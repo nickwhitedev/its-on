@@ -952,29 +952,29 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@clerk/backend@1.1.2":
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/@clerk/backend/-/backend-1.1.2.tgz#db933db646923eeda923a428e971451af4b7a662"
-  integrity sha512-WWq7sRQ6UVQgpOrX4AgT4MsxLWFY+UqQ308yl3SYuLKHJhltXJ2p/NBu31V7tzb45QCejMbqlk91dXgA8QvI5A==
+"@clerk/backend@1.1.4":
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/@clerk/backend/-/backend-1.1.4.tgz#c68bbb498df803e09b7b07fb5e5d1f3ee5394bb7"
+  integrity sha512-3Tgsh5JIuEX8UePlxf5ULl4DqSr5MKastuyMZ+HjytD4hqG7GALQILUNFCLIJGhvwpnaYnK5ZfQ/T2CH/G445A==
   dependencies:
-    "@clerk/shared" "2.0.2"
+    "@clerk/shared" "2.1.0"
     cookie "0.5.0"
     snakecase-keys "5.4.4"
     tslib "2.4.1"
 
-"@clerk/clerk-sdk-node@^5.0.4":
-  version "5.0.4"
-  resolved "https://registry.yarnpkg.com/@clerk/clerk-sdk-node/-/clerk-sdk-node-5.0.4.tgz#e256d7a488ed8abf3eb508d8ada574b6c68d0c54"
-  integrity sha512-nDEerHLpUBK4BGHgPVBF/d7bmVd5MIHgJESFfiWuIFaWXQsaPO6UdoVYLYA+H+RC11qEzjAECnfus6C7kkaRJw==
+"@clerk/clerk-sdk-node@^5.0.6":
+  version "5.0.6"
+  resolved "https://registry.yarnpkg.com/@clerk/clerk-sdk-node/-/clerk-sdk-node-5.0.6.tgz#44d5924b8441efd55539a3d66b6cd7aaf1580ff3"
+  integrity sha512-O4OLQZiGQZV8Y82S2FzKd4UD+XWgSDIRa9uo0hbCRnJ7jSiZqqwMYqik4nIrCILZ8wkbbFwgRdXTQ+Dovx0LeA==
   dependencies:
-    "@clerk/backend" "1.1.2"
-    "@clerk/shared" "2.0.2"
+    "@clerk/backend" "1.1.4"
+    "@clerk/shared" "2.1.0"
     tslib "2.4.1"
 
-"@clerk/shared@2.0.2":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@clerk/shared/-/shared-2.0.2.tgz#19423474fa7ab5a601f73fb10d2e678ce12d8f49"
-  integrity sha512-uQXbBJyUV6B4y/cKIgKypVmCdCh7pHeQYbASCKI3RzlsC3FPyopy0hTlAIvXJqjulPYBfRUI1w2FDRJzpEk3sw==
+"@clerk/shared@2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@clerk/shared/-/shared-2.1.0.tgz#4c48c3844d16dd0ab1bb1e4e81d60125b216278e"
+  integrity sha512-8BwfjHFUHLtvFJzFFFvk66+maXb+EZlrf1NZ2GiRz6pOfT0VoYLK7MzLrY5GtHilNRtsvuTVlzg8Xxvn06AP6g==
   dependencies:
     glob-to-regexp "0.4.1"
     js-cookie "3.0.1"
