@@ -12,7 +12,11 @@ import {
   SecretsManagerClient,
 } from '@aws-sdk/client-secrets-manager'
 import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
-import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
+import {
+  DYNAMODB_TABLE_NAME,
+  SKUS_TO_TIERS,
+  UNLIMITED_SUBSCRIPTION_SKU,
+} from '/opt/nodejs/constants.mjs'
 import { createResponse } from '/opt/nodejs/response.mjs'
 import Stripe from 'stripe'
 
@@ -116,8 +120,23 @@ const stripeWebhook = async (
       }
 
       try {
-        lineItems.data.map(lineItem => {
-          logger.debug(lineItem.id)
+        let newTier = 5
+        let isSubscription = false as boolean
+        lineItems.data.forEach(lineItem => {
+          const sku = lineItem.price?.metadata.sku ?? ''
+          if (sku === UNLIMITED_SUBSCRIPTION_SKU) {
+            isSubscription = true
+          } else if (Object.keys(SKUS_TO_TIERS).includes(sku)) {
+            newTier = Math.max(
+              newTier,
+              SKUS_TO_TIERS[sku as keyof typeof SKUS_TO_TIERS],
+            )
+          } else {
+            logger.error(
+              'Stripe Webhook checkout.session.completed Error: sku not recognized',
+            )
+            throw new Error('sku not recognized')
+          }
         })
         const ddbResponse = await ddbDocClient.send(
           new UpdateCommand({
@@ -129,17 +148,17 @@ const stripeWebhook = async (
             TableName: DYNAMODB_TABLE_NAME,
             UpdateExpression: 'SET #tier = :tier',
             ExpressionAttributeNames: {
-              '#tier': 'tier',
+              '#tier': isSubscription ? 'unlimited' : 'tier',
             },
             ExpressionAttributeValues: {
-              ':tier': 5, // FIXME: use webhook data to set this
+              ':tier': isSubscription ? true : newTier,
             },
           }),
         )
         metrics.addMetric('successfulPurchase', MetricUnit.Count, 1)
         logger.debug('Success - payment processed for user', { ddbResponse })
       } catch (error) {
-        logger.error('User Update DynamoDB Error', error as Error)
+        logger.error('Payment processing error', error as Error)
         break
       }
       logger.info('PaymentIntent was successful!')
