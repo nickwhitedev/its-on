@@ -108,7 +108,7 @@ const stripeWebhook = async (
         },
       )
       const lineItems = sessionWithLineItems.line_items
-      if (lineItems == null) {
+      if (lineItems == null || lineItems.data.length === 0) {
         logger.error(
           'Stripe Webhook checkout.session.completed Error: No line items given',
         )
