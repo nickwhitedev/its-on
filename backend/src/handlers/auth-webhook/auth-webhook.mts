@@ -21,7 +21,7 @@ const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
 
 /**
- * Handles a auth events
+ * Handles auth events
  */
 const authWebhook = async (
   event: APIGatewayProxyEvent,
