@@ -230,6 +230,9 @@ jobs:
           echo "VITE_STRIPE_10_OWNED_DARK_PRICING_TABLE_ID=\"${{ vars.STRIPE_10_OWNED_DARK_PRICING_TABLE_ID }}\"" >> .env.production
           echo "VITE_STRIPE_BASE_DARK_PRICING_TABLE_ID=\"${{ vars.STRIPE_BASE_DARK_PRICING_TABLE_ID }}\"" >> .env.production
 
+      - name: echo env var
+        run: echo "${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}"
+
       - name: Build frontend
         run: CI=true yarn build
 
