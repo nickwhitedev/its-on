@@ -28,7 +28,7 @@ export const handleUserDeleted = async ({
   let lastEvaluatedKey: Record<string, unknown> | undefined
   let queryBatchCount = 0
   do {
-    logger.debug(`Start Query batch ${++queryBatchCount}`)
+    logger.debug(`Start Query batch ${(++queryBatchCount).toString()}`)
 
     let channels: IDynamoChannelItem[]
 
@@ -80,7 +80,7 @@ export const handleUserDeleted = async ({
           }),
         )
         logger.debug(
-          `Successful batch delete user channels - batch ${++batchCount}`,
+          `Successful batch delete user channels - batch ${(++batchCount).toString()}`,
         )
       } catch (error) {
         logger.error('batch delete user channels failed', error as Error)
@@ -92,7 +92,7 @@ export const handleUserDeleted = async ({
   lastEvaluatedKey = undefined
   queryBatchCount = 0
   do {
-    logger.debug(`Start Query batch ${++queryBatchCount}`)
+    logger.debug(`Start Query batch ${(++queryBatchCount).toString()}`)
 
     let subscriptions: IDynamoChannelItem[]
 
@@ -150,7 +150,7 @@ export const handleUserDeleted = async ({
           }),
         )
         logger.debug(
-          `Successful transact delete - batch ${++subscriberBatchCount}`,
+          `Successful transact delete - batch ${(++subscriberBatchCount).toString()}`,
         )
       } catch (error) {
         logger.error('batch delete user channels failed', error as Error)
@@ -180,7 +180,7 @@ export const handleUserDeleted = async ({
           }),
         )
         logger.debug(
-          `Successful transact delete - batch ${++subscriptionBatchCount}`,
+          `Successful transact delete - batch ${(++subscriptionBatchCount).toString()}`,
         )
       } catch (error) {
         logger.error('batch delete user channels failed', error as Error)

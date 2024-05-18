@@ -45,13 +45,16 @@ const processTableStream = async (
         break
       }
       default:
-        logger.warn(`Unhandled dynamo event: ${record.eventName}`, {
-          record,
-        })
+        logger.warn(
+          `Unhandled dynamo event: ${record.eventID ?? 'undefined'}`,
+          {
+            record,
+          },
+        )
         return
     }
   }
-  return `Successfully processed ${event.Records.length} records.`
+  return `Successfully processed ${event.Records.length.toString()} records.`
 }
 
 export default processTableStream

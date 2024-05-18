@@ -101,7 +101,7 @@ export const handleChannelUpdated = async ({
   let lastEvaluatedKey: Record<string, unknown> | undefined
   let queryBatchCount = 0
   do {
-    logger.debug(`Start Query batch ${++queryBatchCount}`)
+    logger.debug(`Start Query batch ${(++queryBatchCount).toString()}`)
 
     let subscribers: IDynamoChannelSubscriber[]
 
@@ -163,7 +163,9 @@ export const handleChannelUpdated = async ({
           },
           ddbDocClient,
         })
-        logger.debug(`Successful batch write - batch ${++batchCount}`)
+        logger.debug(
+          `Successful batch write - batch ${(++batchCount).toString()}`,
+        )
       } catch (error) {
         logger.error('batch write failed', error as Error)
         return
@@ -189,9 +191,9 @@ export const handleChannelUpdated = async ({
       const messageID = await getMessaging().send({
         apns: {
           headers: {
-            'apns-expiration': `${Math.floor(
+            'apns-expiration': Math.floor(
               (Date.now() + (channelInfo.duration ?? MS_IN_HOUR * 12)) / 1000,
-            )}`,
+            ).toString(),
           },
           payload: {
             aps: {
@@ -210,7 +212,7 @@ export const handleChannelUpdated = async ({
             link: channelURL,
           },
           headers: {
-            ttl: `${channelInfo.duration ?? (MS_IN_HOUR * 12) / 1000}`,
+            ttl: (channelInfo.duration ?? (MS_IN_HOUR * 12) / 1000).toString(),
           },
           notification: {
             badge: '/monochrome-icon-96.png',

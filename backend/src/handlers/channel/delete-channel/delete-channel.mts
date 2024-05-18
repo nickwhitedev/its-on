@@ -39,7 +39,7 @@ const deleteChannel = async (
       new DeleteCommand({
         Key: {
           pk: `user#${userID}`,
-          sk: `channel#${channelID}`,
+          sk: `channel#${channelID ?? ''}`,
         },
         TableName: DYNAMODB_TABLE_NAME,
       }),

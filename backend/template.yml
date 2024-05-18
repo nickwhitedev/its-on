@@ -65,6 +65,16 @@ Globals:
         POWERTOOLS_METRICS_NAMESPACE: its-on
         PUSH_NOTIFICATION_PUBLIC_KEY: !Ref PushNotificationPublicKey
         PUSH_NOTIFICATION_PRIVATE_KEY: !Ref PushNotificationPrivateKey
+        STRIPE_API_SECRET_KEY_NAME:
+          'Fn::If':
+            - IsProdEnv
+            - ItsOnStripeApiSecretKey
+            - ItsOnStripeApiDevSecretKey
+        STRIPE_WEBHOOK_ENDPOINT_SECRET_KEY_NAME:
+          'Fn::If':
+            - IsProdEnv
+            - ItsOnStripeWebhookEndpointSecretKey
+            - ItsOnStripeDevWebhookEndpointSecretKey
         WEB_URL:
           'Fn::If':
             - IsProdEnv
@@ -635,6 +645,43 @@ Resources:
     Properties:
       RetentionInDays: 30
       LogGroupName: !Join ['', ['/aws/lambda/', !Ref authWebhookLambdaFunction]]
+
+  # This is a Lambda function config associated with the source code: stripe-webhook.mts
+  stripeWebhookLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/src/handlers/stripe-webhook/
+      Description: Handles stripe webhook calls
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Auth:
+              Authorizer: NONE
+              OverrideApiAuth: true
+            RestApiId: !Ref ItsOnApi
+            Path: /stripe-webhook
+            Method: POST
+      Handler: handler.handler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn:
+              'Fn::If':
+                - IsProdEnv
+                - arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnClerkWebhookSecret-zev5G4
+                - arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnClerkDevWebhookSecret-kasu1B
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnIOSFirebaseServiceAccount-pjnCqi
+
+  stripeWebhookLambdaFunctionLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      RetentionInDays: 30
+      LogGroupName:
+        !Join ['', ['/aws/lambda/', !Ref stripeWebhookLambdaFunction]]
 
   tableStreamLambdaFunction:
     Type: AWS::Serverless::Function

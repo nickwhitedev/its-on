@@ -1,9 +1,9 @@
 import '@testing-library/jest-dom'
-import crypto from 'crypto'
+
 import { TextEncoder } from 'util'
-import { vi } from 'vitest'
 import createFetchMock from 'vitest-fetch-mock'
-import { PKCE_STATE_KEY, PKCE_VERIFIER_KEY } from '../src/utils/constants'
+import crypto from 'crypto'
+import { vi } from 'vitest'
 
 global.TextEncoder = TextEncoder
 
@@ -18,5 +18,16 @@ const fetchMocker = createFetchMock(vi)
 // sets globalThis.fetch and globalThis.fetchMock to our mocked version
 fetchMocker.enableMocks()
 
-window.localStorage.setItem(PKCE_STATE_KEY, 'some-state')
-window.localStorage.setItem(PKCE_VERIFIER_KEY, 'some-verifier')
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: vi.fn().mockImplementation((query: string) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(), // deprecated
+    removeListener: vi.fn(), // deprecated
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
+})

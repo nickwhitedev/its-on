@@ -73,9 +73,12 @@ const createChannel = async (
       })
     }
     if (channelIDIsTaken) {
-      logger.warn(`Collision detected. Generating id #${++channelIDAttempt}`, {
-        shortName: 'channelIDCollision',
-      })
+      logger.warn(
+        `Collision detected. Generating id #${(++channelIDAttempt).toString()}`,
+        {
+          shortName: 'channelIDCollision',
+        },
+      )
       channelID = nanoid()
     }
   } while (channelIDIsTaken)
