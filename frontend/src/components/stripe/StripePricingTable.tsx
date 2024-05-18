@@ -4,8 +4,6 @@ import {
   STRIPE_10_OWNED_LIGHT_PRICING_TABLE_ID,
   STRIPE_25_OWNED_DARK_PRICING_TABLE_ID,
   STRIPE_25_OWNED_LIGHT_PRICING_TABLE_ID,
-  STRIPE_ALL_OWNED_DARK_PRICING_TABLE_ID,
-  STRIPE_ALL_OWNED_LIGHT_PRICING_TABLE_ID,
   STRIPE_BASE_DARK_PRICING_TABLE_ID,
   STRIPE_BASE_LIGHT_PRICING_TABLE_ID,
   STRIPE_PUBLIC_KEY,
@@ -54,12 +52,14 @@ const StripePricingTable = () => {
   }, [])
 
   if (currentTier === TIER_INFINITE || currentTier >= TIER_100) {
-    return renderPricingTable({
-      tableID: useDarkTheme
-        ? STRIPE_ALL_OWNED_DARK_PRICING_TABLE_ID
-        : STRIPE_ALL_OWNED_LIGHT_PRICING_TABLE_ID,
-      userID,
-    })
+    // TODO: Add subscription
+    return <h4>You are upgraded to the max! For now, at least. Stay tuned.</h4>
+    // return renderPricingTable({
+    //   tableID: useDarkTheme
+    //     ? STRIPE_ALL_OWNED_DARK_PRICING_TABLE_ID
+    //     : STRIPE_ALL_OWNED_LIGHT_PRICING_TABLE_ID,
+    //   userID,
+    // })
   } else if (currentTier >= TIER_25) {
     return renderPricingTable({
       tableID: useDarkTheme

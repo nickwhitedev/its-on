@@ -133,8 +133,7 @@ const EditChannel = ({ channel, isLoading, onClose }: Props) => {
             className='EditChannel-capacity-info-anchor'
             slot='trailing-icon'
             data-tooltip-id='EditChannel-capacity-tooltip'
-            // TODO: Monetization: Remove Coming Soon language
-            data-tooltip-content={`Coming Soon: Upgrade to increase past ${userTier.toLocaleString()}`}
+            data-tooltip-content={`Upgrade to increase past ${userTier.toLocaleString()}`}
           >
             <MDIcon className='EditChannel-capacity-info-icon'>info</MDIcon>
           </a>
