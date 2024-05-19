@@ -90,7 +90,7 @@ const getOverview = async (
         )
         logger.debug('Successful user profile write')
 
-        data.profile = userAttributes
+        data.profile = { id: userID, ...userAttributes }
       } catch (error) {
         logger.error({
           message: 'write user profile failed: ',
