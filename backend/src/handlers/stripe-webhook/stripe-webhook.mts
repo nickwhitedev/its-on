@@ -108,7 +108,7 @@ const stripeWebhook = async (
       const sessionWithLineItems = await stripe.checkout.sessions.retrieve(
         paymentIntent.id,
         {
-          expand: ['line_items'],
+          expand: ['line_items', 'product'],
         },
       )
       logger.debug('sessionWithLineItems', { sessionWithLineItems })
@@ -124,7 +124,9 @@ const stripeWebhook = async (
         let newTier = 5
         let isSubscription = false as boolean
         lineItems.data.forEach(lineItem => {
-          const sku = lineItem.price?.metadata.sku ?? ''
+          const sku =
+            (lineItem.price?.product as Stripe.Product | undefined)?.metadata
+              .sku ?? ''
           if (sku === UNLIMITED_SUBSCRIPTION_SKU) {
             isSubscription = true
           } else if (Object.keys(SKUS_TO_TIERS).includes(sku)) {
