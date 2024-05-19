@@ -111,6 +111,7 @@ describe('Test getOverviewHandler', () => {
       headers: CORS_HEADERS,
       body: JSON.stringify({
         profile: {
+          id: 'nanouserid1',
           channelCount: 0,
           lastNewSubscriberNotification: 0,
           notificationsEnabled: true,

@@ -7,6 +7,7 @@
  */
 interface IUser {
   channelCount: number
+  id: string
   lastNewSubscriberNotification?: number
   notificationTokens?: Record<string, { lastUpdated: number }>
   notificationsEnabled: boolean
