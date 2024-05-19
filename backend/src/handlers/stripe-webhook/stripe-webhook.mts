@@ -111,6 +111,7 @@ const stripeWebhook = async (
           expand: ['line_items'],
         },
       )
+      logger.debug('sessionWithLineItems', { sessionWithLineItems })
       const lineItems = sessionWithLineItems.line_items
       if (lineItems == null || lineItems.data.length === 0) {
         logger.error(
@@ -134,6 +135,7 @@ const stripeWebhook = async (
           } else {
             logger.error(
               'Stripe Webhook checkout.session.completed Error: sku not recognized',
+              { sku },
             )
             throw new Error('sku not recognized')
           }
