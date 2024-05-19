@@ -74,7 +74,7 @@ const stripeWebhook = async (
   const headers = event.headers
   const payload = event.body ?? ''
 
-  const signature = headers['stripe-signature'] ?? ''
+  const signature = headers['Stripe-Signature'] ?? ''
 
   let stripeEvent
 
