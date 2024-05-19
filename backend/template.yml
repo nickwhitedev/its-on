@@ -671,10 +671,14 @@ Resources:
             SecretArn:
               'Fn::If':
                 - IsProdEnv
-                - arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnClerkWebhookSecret-zev5G4
-                - arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnClerkDevWebhookSecret-kasu1B
+                - arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnStripeApiSecretKey-PhHuTM
+                - arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnStripeApiDevSecretKey-8GqMiV
         - AWSSecretsManagerGetSecretValuePolicy:
-            SecretArn: arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnIOSFirebaseServiceAccount-pjnCqi
+            SecretArn:
+              'Fn::If':
+                - IsProdEnv
+                - arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnStripeWebhookEndpointSecretKey-FlxNes
+                - arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnStripeDevWebhookEndpointSecretKey-w7Shq0
 
   stripeWebhookLambdaFunctionLogGroup:
     Type: 'AWS::Logs::LogGroup'
