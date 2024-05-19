@@ -79,6 +79,7 @@ describe('Test getOverviewHandler', () => {
           },
         ],
         profile: {
+          id: 'userID',
           channelCount: 3,
           subscriptionCount: 2,
           tier: 10,
