@@ -105,15 +105,14 @@ const stripeWebhook = async (
         break
       }
       // Retrieve the session. If you require line items in the response, you may include them by expanding line_items.
-      const sessionWithLineItems = await stripe.checkout.sessions.retrieve(
+      const lineItems = await stripe.checkout.sessions.listLineItems(
         paymentIntent.id,
         {
-          expand: ['line_items', 'product'],
+          expand: ['data.price.product'],
         },
       )
-      logger.debug('sessionWithLineItems', { sessionWithLineItems })
-      const lineItems = sessionWithLineItems.line_items
-      if (lineItems == null || lineItems.data.length === 0) {
+      logger.debug('lineItems', { lineItems })
+      if (lineItems.data.length === 0) {
         logger.error(
           'Stripe Webhook checkout.session.completed Error: No line items given',
         )
