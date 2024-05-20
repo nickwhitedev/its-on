@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.0.4",
-    "@clerk/themes": "^2.1.4",
+    "@clerk/themes": "^2.1.6",
     "@lit/react": "^1.0.4",
     "@material/web": "^1.4.1",
     "clientjs": "^0.2.1",
