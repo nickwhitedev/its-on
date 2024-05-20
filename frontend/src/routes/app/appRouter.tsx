@@ -7,6 +7,7 @@ import Subscriptions from '../../components/subscriptions/Subscriptions'
 import Support from '../../components/support/Support'
 import ChannelRouteHandler from './channels/ChannelRouteHandler'
 import Profile from '../../components/user/Profile'
+import UpgradeSuccess from '../../components/stripe/UpgradeSuccess'
 
 const appRouter = [
   {
@@ -43,6 +44,10 @@ const appRouter = [
   {
     element: <Support />,
     path: 'support',
+  },
+  {
+    element: <UpgradeSuccess />,
+    path: 'upgrade_success',
   },
 ]
 

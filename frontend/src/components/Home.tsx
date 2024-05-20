@@ -2,32 +2,19 @@ import './Home.css'
 
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useCallback, useEffect, useState } from 'react'
-import { useUser, useUserDispatch } from '../contexts/user/userContext'
+import { useUser } from '../contexts/user/userContext'
 
-import { ChannelsDispatchActionType } from '../contexts/channels/channelsReducer'
 import ItsOnIcon from './icons/ItsOnIcon'
 import MDCircularProgress from './material/progress/MDCircularProgress'
 import MDIcon from './material/MDIcon'
 import MDPrimaryTab from './material/tabs/MDPrimaryTab'
 import MDTabs from './material/tabs/MDTabs'
 import PullToRefresh from 'pulltorefreshjs'
-import { SubscriptionsDispatchActionType } from '../contexts/subscriptions/subscriptionsReducer'
-import { UserDispatchActionType } from '../contexts/user/userReducer'
 import client from '../utils/client'
-import { useChannelsDispatch } from '../contexts/channels/channelsContext'
 import { useUser as useClerkUser } from '@clerk/clerk-react'
 import { useEnableDeviceNotifications } from '../utils/notifications'
 import { useFetchApi } from '../utils/api'
-import { useSubscriptionsDispatch } from '../contexts/subscriptions/subscriptionsContext'
-
-interface OverviewData {
-  channels?: IChannel[]
-  notificationSubscriptions?: {
-    subscriptions: Record<string, PushSubscription>
-  }
-  profile: IUser
-  subscriptions?: IChannel[]
-}
+import { useSyncOverview } from '../utils/requests/syncOverview'
 
 const Home = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true)
@@ -38,14 +25,12 @@ const Home = () => {
   const userContext = useUser()
   const clerkUser = useClerkUser()
 
-  const dispatchChannels = useChannelsDispatch()
-  const dispatchSubscriptions = useSubscriptionsDispatch()
-  const dispatchUser = useUserDispatch()
-
   const navigate = useNavigate()
   const location = useLocation()
   const fetchApi = useFetchApi()
   const enableDeviceNotifications = useEnableDeviceNotifications()
+
+  const syncOverviewRequest = useSyncOverview()
 
   const isChannelsRoute = location.pathname.startsWith('/channels')
   const isSubscriptionsRoute = location.pathname.startsWith('/subscriptions')
@@ -53,25 +38,12 @@ const Home = () => {
   const syncOverview = useCallback(async () => {
     setIsLoading(true)
     try {
-      const response = await fetchApi<OverviewData>('/')
-
-      dispatchChannels({
-        type: ChannelsDispatchActionType.SYNCED,
-        channels: response.channels,
-      })
-      dispatchSubscriptions({
-        type: SubscriptionsDispatchActionType.SYNCED,
-        channels: response.subscriptions,
-      })
-      dispatchUser({
-        type: UserDispatchActionType.SYNCED,
-        user: response.profile,
-      })
+      await syncOverviewRequest()
     } catch (error) {
       setHasOverviewError(true)
     }
     setIsLoading(false)
-  }, [dispatchChannels, dispatchSubscriptions, dispatchUser, fetchApi])
+  }, [syncOverviewRequest])
 
   useEffect(() => {
     if (!isLoading && isEnablingDeviceNotifications) {
