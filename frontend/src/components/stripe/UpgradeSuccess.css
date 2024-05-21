@@ -1,7 +1,7 @@
 .UpgradeSuccess-current-tier {
   display: grid;
   grid:
-    [row-start] 'edit title share' [row-end]
+    [row-start] 'upgrade-success-left upgrade-success-middle upgrade-success-right' [row-end]
     / 2rem auto 2rem;
   width: 100%;
   justify-content: center;
