@@ -3,7 +3,7 @@ import './Profile.css'
 import { UserProfile } from '@clerk/clerk-react'
 import MDIcon from '../material/MDIcon'
 import NotificationSettings from '../notifications/NotificationSettings'
-import StripePricingTable from '../stripe/StripePricingTable'
+import UpgradeSettings from '../stripe/UpgradeSettings'
 
 const Profile = () => {
   return (
@@ -23,7 +23,7 @@ const Profile = () => {
           url='/upgrade'
           labelIcon={<MDIcon className='Profile-button-icon'>upgrade</MDIcon>}
         >
-          <StripePricingTable />
+          <UpgradeSettings />
         </UserProfile.Page>
       </UserProfile>
     </div>
