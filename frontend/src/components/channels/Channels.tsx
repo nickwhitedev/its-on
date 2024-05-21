@@ -81,19 +81,28 @@ const Channels = () => {
         <MDList className='Channels-list'>
           <MDListItem
             className='Channels-list-item'
-            disabled={isCreating || userHasMaxChannels}
             type='button'
-            onClick={() => void handleCreateChannel()}
+            onClick={() => {
+              userHasMaxChannels
+                ? navigate('/profile#/upgrade')
+                : void handleCreateChannel()
+            }}
           >
-            <MDIcon slot='start'>add</MDIcon>
+            <MDIcon slot='start'>
+              {userHasMaxChannels ? 'upgrade' : 'add'}
+            </MDIcon>
             <div slot='headline'>
-              {userHasMaxChannels ? 'Channel limit reached' : 'New Channel'}
+              {userHasMaxChannels ? 'Upgrade' : 'New Channel'}
             </div>
             {userHasMaxChannels ? (
-              <div slot='supporting-text'>
-                Delete a channel to create a new one
-              </div>
+              <div slot='supporting-text'>Channel limit reached</div>
             ) : null}
+            <div slot='trailing-supporting-text'>
+              {user?.channelCount ?? 0}
+              {user?.unlimited ?? false
+                ? null
+                : `/${(user?.tier ?? 5).toString()}`}
+            </div>
           </MDListItem>
           {channels.map(channel => (
             <React.Fragment key={channel.id}>
@@ -123,6 +132,13 @@ const Channels = () => {
                 {(channel.note?.length ?? 0) > 0 ? (
                   <div slot='supporting-text'>{channel.note}</div>
                 ) : null}
+                <div
+                  slot='trailing-supporting-text'
+                  className='Channels-list-item-subscribers'
+                >
+                  <MDIcon>group</MDIcon>
+                  {channel.subscriberCount ?? 0}/{channel.capacity ?? 5}
+                </div>
               </MDListItem>
             </React.Fragment>
           ))}

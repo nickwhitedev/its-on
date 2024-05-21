@@ -9,5 +9,6 @@ interface IUser {
   subscriptionCount?: number
   subscriptionTopics?: Set<string>
   tier?: number
+  unlimited?: boolean
   username?: string
 }
