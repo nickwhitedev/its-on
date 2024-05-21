@@ -37,6 +37,8 @@ import { useRequestNotificationPermissions } from '../../../utils/notifications'
 import { useSendLog } from '../../../utils/logging'
 import EditChannel from './EditChannel'
 import DeleteChannelButton from './DeleteChannelButton'
+import MDIcon from '../../material/MDIcon'
+import MDTextButton from '../../material/button/MDTextButton'
 
 interface Props {
   channelID: string
@@ -81,6 +83,7 @@ const Channel = ({ channelID }: Props) => {
     (channel?.subscriberCount ?? 0) >= (channel?.capacity ?? DEFAULT_USER_TIER)
 
   const userHasMaxSubscriptions =
+    !(user?.unlimited ?? false) &&
     (user?.subscriptionCount ?? 0) >= (user?.tier ?? DEFAULT_USER_TIER)
 
   const channelIsOn = channel != null && isChannelOn(channel)
@@ -419,7 +422,10 @@ const Channel = ({ channelID }: Props) => {
                 <>
                   <p>Subscription limit reached</p>
                   <p>
-                    Unsubscribe from another channel to subscribe to a new one
+                    <MDTextButton href='/profile#/upgrade'>
+                      <MDIcon slot='icon'>upgrade</MDIcon>
+                      Upgrade
+                    </MDTextButton>
                   </p>
                 </>
               ) : null}
