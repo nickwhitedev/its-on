@@ -35,7 +35,9 @@ const Channels = () => {
 
   const [isCreating, setIsCreating] = useState<boolean>(false)
 
-  const userHasMaxChannels = (user?.channelCount ?? 0) >= (user?.tier ?? 5)
+  const userHasMaxChannels =
+    !(user?.unlimited ?? false) &&
+    (user?.channelCount ?? 0) >= (user?.tier ?? 5)
 
   const handleCreateChannel = async () => {
     setIsCreating(true)
@@ -81,6 +83,7 @@ const Channels = () => {
         <MDList className='Channels-list'>
           <MDListItem
             className='Channels-list-item'
+            disabled={userHasMaxChannels}
             type='button'
             onClick={() => {
               userHasMaxChannels
@@ -88,21 +91,13 @@ const Channels = () => {
                 : void handleCreateChannel()
             }}
           >
-            <MDIcon slot='start'>
-              {userHasMaxChannels ? 'upgrade' : 'add'}
-            </MDIcon>
-            <div slot='headline'>
-              {userHasMaxChannels ? 'Upgrade' : 'New Channel'}
-            </div>
+            <MDIcon slot='start'>add</MDIcon>
+            <div slot='headline'>New Channel</div>
             {userHasMaxChannels ? (
-              <div slot='supporting-text'>Channel limit reached</div>
+              <div slot='supporting-text'>
+                Channel limit reached - Upgrade to create more channels
+              </div>
             ) : null}
-            <div slot='trailing-supporting-text'>
-              {user?.channelCount ?? 0}
-              {user?.unlimited ?? false
-                ? null
-                : `/${(user?.tier ?? 5).toString()}`}
-            </div>
           </MDListItem>
           {channels.map(channel => (
             <React.Fragment key={channel.id}>
