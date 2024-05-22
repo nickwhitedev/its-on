@@ -33,7 +33,7 @@ export const handleProfileUpdated = async ({
   let lastEvaluatedKey: Record<string, unknown> | undefined
   let queryBatchCount = 0
   do {
-    logger.debug(`Start Query batch ${++queryBatchCount}`)
+    logger.debug(`Start Query batch ${(++queryBatchCount).toString()}`)
 
     let channels: IDynamoChannelItem[]
 
@@ -93,7 +93,7 @@ export const handleProfileUpdated = async ({
           }),
         )
         logger.debug(
-          `Successful batch update user channels - batch ${++batchCount}`,
+          `Successful batch update user channels - batch ${(++batchCount).toString()}`,
         )
       } catch (error) {
         logger.error('batch update user channels failed', error as Error)
@@ -105,7 +105,7 @@ export const handleProfileUpdated = async ({
   lastEvaluatedKey = undefined
   queryBatchCount = 0
   do {
-    logger.debug(`Start Query batch ${++queryBatchCount}`)
+    logger.debug(`Start Query batch ${(++queryBatchCount).toString()}`)
 
     let subscriptions: IDynamoChannelItem[]
 
@@ -170,7 +170,9 @@ export const handleProfileUpdated = async ({
             ),
           }),
         )
-        logger.debug(`Successful transact update - batch ${++batchCount}`)
+        logger.debug(
+          `Successful transact update - batch ${(++batchCount).toString()}`,
+        )
       } catch (error) {
         logger.error('batch update user channels failed', error as Error)
       }

@@ -11,7 +11,7 @@ export const serializeQueryResponse = (
   const data: Record<string, object | object[]> = {}
 
   queryResponse.forEach(item => {
-    const { pk: _pk, sk, ...itemData } = item
+    const { pk, sk, ...itemData } = item
 
     const isPluralItemType = sk.includes('#')
     const itemKey: string = isPluralItemType
@@ -19,7 +19,7 @@ export const serializeQueryResponse = (
       : sk
 
     if (!isPluralItemType) {
-      data[itemKey] = itemData
+      data[itemKey] = { id: pk.substring(pk.indexOf('#') + 1), ...itemData }
       return
     }
 

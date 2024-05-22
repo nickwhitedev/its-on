@@ -1,0 +1,21 @@
+.UpgradeSuccess-current-tier {
+  display: grid;
+  grid:
+    [row-start] 'upgrade-success-left upgrade-success-middle upgrade-success-right' [row-end]
+    / 2rem auto 2rem;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.UpgradeSuccess-refresh-button {
+  margin: 0 8px;
+  --_icon-size: 16px;
+  --_state-layer-height: 24px;
+  --_state-layer-width: 24px;
+}
+
+.UpgradeSuccess-refresh-spinner {
+  margin: 0 11px;
+  --_size: 18px;
+}

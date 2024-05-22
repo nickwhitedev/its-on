@@ -7,7 +7,6 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  CLERK_PUBLIC_KEY: pk_live_Y2xlcmsuaXRzb24uZnlpJA
   PROD_STACK_NAME: its-on-prod
   PROD_ARTIFACTS_BUCKET: its-on-prod-artifacts
   PROD_CLOUDFORMATION_EXECUTION_ROLE: arn:aws:iam::992382488292:role/aws-sam-cli-managed-prod--CloudFormationExecutionRo-5LY7VkKQdvm7
@@ -312,6 +311,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     needs: [deploy-prod-api]
     runs-on: ubuntu-latest
+    environment: production
     defaults:
       run:
         working-directory: frontend
@@ -328,7 +328,16 @@ jobs:
         run: |
           echo "VITE_BASE_URL=\"${{ needs.deploy-prod-api.outputs.web-endpoint }}\"" >> .env.production
           echo "VITE_API_URL=\"${{ needs.deploy-prod-api.outputs.api-endpoint }}\"" >> .env.production
-          echo "VITE_CLERK_PUBLISHABLE_KEY=\"${{ env.CLERK_PUBLIC_KEY }}\"" >> .env.production
+          echo "VITE_CLERK_PUBLISHABLE_KEY=\"${{ vars.CLERK_PUBLIC_KEY }}\"" >> .env.production
+          echo "VITE_STRIPE_PUBLIC_KEY=\"${{ vars.STRIPE_PUBLIC_KEY }}\"" >> .env.production
+          echo "VITE_STRIPE_ALL_OWNED_LIGHT_PRICING_TABLE_ID=\"${{ vars.STRIPE_ALL_OWNED_LIGHT_PRICING_TABLE_ID }}\"" >> .env.production
+          echo "VITE_STRIPE_25_OWNED_LIGHT_PRICING_TABLE_ID=\"${{ vars.STRIPE_25_OWNED_LIGHT_PRICING_TABLE_ID }}\"" >> .env.production
+          echo "VITE_STRIPE_10_OWNED_LIGHT_PRICING_TABLE_ID=\"${{ vars.STRIPE_10_OWNED_LIGHT_PRICING_TABLE_ID }}\"" >> .env.production
+          echo "VITE_STRIPE_BASE_LIGHT_PRICING_TABLE_ID=\"${{ vars.STRIPE_BASE_LIGHT_PRICING_TABLE_ID }}\"" >> .env.production
+          echo "VITE_STRIPE_ALL_OWNED_DARK_PRICING_TABLE_ID=\"${{ vars.STRIPE_ALL_OWNED_DARK_PRICING_TABLE_ID }}\"" >> .env.production
+          echo "VITE_STRIPE_25_OWNED_DARK_PRICING_TABLE_ID=\"${{ vars.STRIPE_25_OWNED_DARK_PRICING_TABLE_ID }}\"" >> .env.production
+          echo "VITE_STRIPE_10_OWNED_DARK_PRICING_TABLE_ID=\"${{ vars.STRIPE_10_OWNED_DARK_PRICING_TABLE_ID }}\"" >> .env.production
+          echo "VITE_STRIPE_BASE_DARK_PRICING_TABLE_ID=\"${{ vars.STRIPE_BASE_DARK_PRICING_TABLE_ID }}\"" >> .env.production
       - name: Build frontend
         run: CI=true yarn build
       - name: Assume the prod pipeline user role

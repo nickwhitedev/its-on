@@ -35,7 +35,9 @@ const Channels = () => {
 
   const [isCreating, setIsCreating] = useState<boolean>(false)
 
-  const userHasMaxChannels = (user?.channelCount ?? 0) >= (user?.tier ?? 5)
+  const userHasMaxChannels =
+    !(user?.unlimited ?? false) &&
+    (user?.channelCount ?? 0) >= (user?.tier ?? 5)
 
   const handleCreateChannel = async () => {
     setIsCreating(true)
@@ -81,17 +83,19 @@ const Channels = () => {
         <MDList className='Channels-list'>
           <MDListItem
             className='Channels-list-item'
-            disabled={isCreating || userHasMaxChannels}
+            disabled={userHasMaxChannels}
             type='button'
-            onClick={() => void handleCreateChannel()}
+            onClick={() => {
+              userHasMaxChannels
+                ? navigate('/profile#/upgrade')
+                : void handleCreateChannel()
+            }}
           >
             <MDIcon slot='start'>add</MDIcon>
-            <div slot='headline'>
-              {userHasMaxChannels ? 'Channel limit reached' : 'New Channel'}
-            </div>
+            <div slot='headline'>New Channel</div>
             {userHasMaxChannels ? (
               <div slot='supporting-text'>
-                Delete a channel to create a new one
+                Channel limit reached - Upgrade to create more channels
               </div>
             ) : null}
           </MDListItem>
@@ -123,6 +127,13 @@ const Channels = () => {
                 {(channel.note?.length ?? 0) > 0 ? (
                   <div slot='supporting-text'>{channel.note}</div>
                 ) : null}
+                <div
+                  slot='trailing-supporting-text'
+                  className='Channels-list-item-subscribers'
+                >
+                  <MDIcon>group</MDIcon>
+                  {channel.subscriberCount ?? 0}/{channel.capacity ?? 5}
+                </div>
               </MDListItem>
             </React.Fragment>
           ))}

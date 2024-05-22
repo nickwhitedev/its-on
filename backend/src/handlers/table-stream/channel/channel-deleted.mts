@@ -145,11 +145,13 @@ export const handleChannelDeleted = async ({
           },
           ddbDocClient,
         })
-        logger.debug(`Successful batch write/delete - batch ${++batchCount}`)
+        logger.debug(
+          `Successful batch write/delete - batch ${(++batchCount).toString()}`,
+        )
       } catch (error) {
         logger.error('batch write/delete failed', error as Error)
       }
-      logger.debug(`Batches of items written/deleted: ${batchCount}`)
+      logger.debug(`Batches of items written/deleted: ${batchCount.toString()}`)
       // Next batch in the queue
       subscribers.splice(0, 12)
     }

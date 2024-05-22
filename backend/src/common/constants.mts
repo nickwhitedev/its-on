@@ -15,3 +15,11 @@ export const PUSH_NOTIFICATION_PRIVATE_KEY: string =
 export const WEB_URL = process.env.WEB_URL ?? 'https://itson.fyi'
 
 export const ENV = process.env.ENV
+
+export const SKUS_TO_TIERS = {
+  TIER_10: 10,
+  TIER_25: 25,
+  TIER_100: 100,
+}
+
+export const UNLIMITED_SUBSCRIPTION_SKU = 'TIER_UNLIMITED'
