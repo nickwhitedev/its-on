@@ -172,6 +172,13 @@ const TermsOfUse = () => {
       </ul>
       <ul>
         <li>
+          <strong>No Refunds.</strong>
+          &nbsp; It&apos;s On, LLC is not obligated to issue any refunds for
+          purchases made on the Site.
+        </li>
+      </ul>
+      <ul>
+        <li>
           <strong>Ownership.&nbsp; </strong>
           Excluding any User Content that you may provide (defined below), you
           acknowledge that all the intellectual property rights, including
