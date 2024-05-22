@@ -18,6 +18,19 @@ const Splash = () => {
     useState<string>('Browser')
 
   useEffect(() => {
+    const reloadOnVisible = () => {
+      if (document.visibilityState === 'visible') {
+        window.location.reload()
+      }
+    }
+
+    window.addEventListener('visibilitychange', reloadOnVisible)
+    return () => {
+      window.removeEventListener('visibilitychange', reloadOnVisible)
+    }
+  })
+
+  useEffect(() => {
     void (async () => {
       setBrowserDisplayName(await getBrowserDisplayName())
     })()
