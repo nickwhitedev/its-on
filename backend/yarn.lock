@@ -1186,34 +1186,34 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@clerk/backend@1.1.4":
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/@clerk/backend/-/backend-1.1.4.tgz#c68bbb498df803e09b7b07fb5e5d1f3ee5394bb7"
-  integrity sha512-3Tgsh5JIuEX8UePlxf5ULl4DqSr5MKastuyMZ+HjytD4hqG7GALQILUNFCLIJGhvwpnaYnK5ZfQ/T2CH/G445A==
+"@clerk/backend@1.2.1":
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/@clerk/backend/-/backend-1.2.1.tgz#8b9e7992a9adb4a1940c4b7fc2d0fb39362c7e31"
+  integrity sha512-4NxL0VU042dgrhDTqvCFws9v5Kmg+VlA70fD0sQWWBQJxNr2pEnjHfKG21ta7qIqexXPk4Ftr0qZk2/wRiex3A==
   dependencies:
-    "@clerk/shared" "2.1.0"
+    "@clerk/shared" "2.2.1"
     cookie "0.5.0"
     snakecase-keys "5.4.4"
     tslib "2.4.1"
 
-"@clerk/clerk-sdk-node@^5.0.6":
-  version "5.0.6"
-  resolved "https://registry.yarnpkg.com/@clerk/clerk-sdk-node/-/clerk-sdk-node-5.0.6.tgz#44d5924b8441efd55539a3d66b6cd7aaf1580ff3"
-  integrity sha512-O4OLQZiGQZV8Y82S2FzKd4UD+XWgSDIRa9uo0hbCRnJ7jSiZqqwMYqik4nIrCILZ8wkbbFwgRdXTQ+Dovx0LeA==
+"@clerk/clerk-sdk-node@^5.0.9":
+  version "5.0.9"
+  resolved "https://registry.yarnpkg.com/@clerk/clerk-sdk-node/-/clerk-sdk-node-5.0.9.tgz#a1b88f90c02cf6129d9f7bc1be44a325e606c7d9"
+  integrity sha512-j9L+M09ZnHczR/X4uWLPTIx6gS26Ru7d45FZN3E/TjQYga7yfenaGyFaGZyrkO7h/KcZ/JQBaHIQn6640uinzQ==
   dependencies:
-    "@clerk/backend" "1.1.4"
-    "@clerk/shared" "2.1.0"
+    "@clerk/backend" "1.2.1"
+    "@clerk/shared" "2.2.1"
     tslib "2.4.1"
 
-"@clerk/shared@2.1.0":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@clerk/shared/-/shared-2.1.0.tgz#4c48c3844d16dd0ab1bb1e4e81d60125b216278e"
-  integrity sha512-8BwfjHFUHLtvFJzFFFvk66+maXb+EZlrf1NZ2GiRz6pOfT0VoYLK7MzLrY5GtHilNRtsvuTVlzg8Xxvn06AP6g==
+"@clerk/shared@2.2.1":
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/@clerk/shared/-/shared-2.2.1.tgz#185feb8f70eefc7d5d57817032196a1275f9ab1c"
+  integrity sha512-LtaHZLj/T2y9/MuB7IlVXs+HzX5eGkXkXqcBGgE//OlaNYw3zo1CueEVLG9Wm30FlPwVeSnaMYWklOUpSzMVng==
   dependencies:
     glob-to-regexp "0.4.1"
     js-cookie "3.0.1"
     std-env "^3.7.0"
-    swr "2.2.0"
+    swr "^2.2.0"
 
 "@cspotcode/source-map-support@^0.8.0":
   version "0.8.1"
@@ -3022,6 +3022,11 @@ cjs-module-lexer@^1.0.0:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/cjs-module-lexer/-/cjs-module-lexer-1.3.1.tgz#c485341ae8fd999ca4ee5af2d7a1c9ae01e0099c"
   integrity sha512-a3KdPAANPbNE4ZUv9h6LckSl9zLsYOP4MBmhIPkRaeyybt+r4UghLvq+xw/YwUcC1gqylCkL4rdVs3Lwupjm4Q==
+
+client-only@^0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/client-only/-/client-only-0.0.1.tgz#38bba5d403c41ab150bff64a95c85013cf73bca1"
+  integrity sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==
 
 cliui@^8.0.1:
   version "8.0.1"
@@ -5565,11 +5570,12 @@ svix@^1.24.0:
     svix-fetch "^3.0.0"
     url-parse "^1.4.3"
 
-swr@2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/swr/-/swr-2.2.0.tgz#575c6ac1bec087847f4c86a39ccbc0043c834d6a"
-  integrity sha512-AjqHOv2lAhkuUdIiBu9xbuettzAzWXmCEcLONNKJRba87WAefz8Ca9d6ds/SzrPc235n1IxWYdhJ2zF3MNUaoQ==
+swr@^2.2.0:
+  version "2.2.5"
+  resolved "https://registry.yarnpkg.com/swr/-/swr-2.2.5.tgz#063eea0e9939f947227d5ca760cc53696f46446b"
+  integrity sha512-QtxqyclFeAsxEUeZIYmsaQ0UjimSq1RZ9Un7I68/0ClKK/U3LoyQunwkQfJZr2fc22DfIXLNDc2wFyTEikCUpg==
   dependencies:
+    client-only "^0.0.1"
     use-sync-external-store "^1.2.0"
 
 synckit@^0.8.6:
