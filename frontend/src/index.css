@@ -25,17 +25,15 @@
 
 a {
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--md-sys-color-link);
   text-decoration: inherit;
 }
-a.icon {
-  color: rgba(255, 255, 255, 0.87);
-}
+a.icon,
 a:hover,
 a:focus,
 a:active,
 a.active {
-  color: rgba(255, 255, 255, 0.87);
+  color: var(--md-sys-color-link-hovered);
 }
 input,
 textarea,
@@ -85,7 +83,7 @@ h1 {
 button {
   border-radius: 0px;
   border: none;
-  color: rgba(255, 255, 255, 0.87);
+  color: var(--md-sys-color-link-hovered);
   padding: 0.3rem;
   font-size: 1rem;
   font-weight: 500;
@@ -95,7 +93,7 @@ button {
   transition: border-color 0.25s;
 }
 button:disabled {
-  color: rgba(255, 255, 255, 0.38);
+  color: var(--md-sys-color-disabled);
   cursor: default;
 }
 
@@ -103,13 +101,9 @@ button:disabled {
   font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 40;
 }
 
-.instructions {
-  color: rgba(255, 255, 255, 0.5);
-  font-style: italic;
-}
-
+.instructions,
 .secondary-text {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--md-sys-color-secondary-on-background);
 }
 
 .red {
@@ -122,35 +116,4 @@ md-list-item {
 
 .react-tooltip {
   z-index: 2;
-}
-
-@media (prefers-color-scheme: light) {
-  a {
-    color: rgba(0, 0, 0, 0.6);
-  }
-  a:hover,
-  a:focus,
-  a:active,
-  a.active {
-    color: rgba(0, 0, 0, 0.87);
-  }
-  a.icon {
-    color: rgba(0, 0, 0, 0.87);
-  }
-  input {
-    border: 1px rgba(0, 0, 0, 0.6) solid;
-  }
-  button {
-    color: rgba(0, 0, 0, 0.87);
-  }
-  button:disabled {
-    color: rgba(0, 0, 0, 0.38);
-    cursor: default;
-  }
-  .instructions {
-    color: rgba(0, 0, 0, 0.6);
-  }
-  .secondary-text {
-    color: rgba(0, 0, 0, 0.6);
-  }
 }

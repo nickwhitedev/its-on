@@ -15,6 +15,7 @@ import { useUser as useClerkUser } from '@clerk/clerk-react'
 import { useEnableDeviceNotifications } from '../utils/notifications'
 import { useFetchApi } from '../utils/api'
 import { useSyncOverview } from '../utils/requests/syncOverview'
+import { STANDALONE_PAGE_PATHS } from '../utils/urls'
 
 const Home = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true)
@@ -97,33 +98,37 @@ const Home = () => {
 
   return (
     <>
-      <MDTabs
-        className='Home-nav'
-        onChange={(event: Event) => {
-          const activeTabIndex = (
-            event.target as { activeTabIndex: number } | null
-          )?.activeTabIndex
-          navigate(
-            activeTabIndex === 0
-              ? '/channels'
-              : activeTabIndex === 1
-              ? '/'
-              : '/subscriptions',
-          )
-        }}
-      >
-        <MDPrimaryTab active={isChannelsRoute}>Channels</MDPrimaryTab>
-        <MDPrimaryTab
-          active={!isChannelsRoute && !isSubscriptionsRoute}
-          iconOnly
-          aria-label={'Home'}
+      {STANDALONE_PAGE_PATHS.includes(location.pathname.slice(1)) ? null : (
+        <MDTabs
+          className='Home-nav'
+          onChange={(event: Event) => {
+            const activeTabIndex = (
+              event.target as { activeTabIndex: number } | null
+            )?.activeTabIndex
+            navigate(
+              activeTabIndex === 0
+                ? '/channels'
+                : activeTabIndex === 1
+                ? '/'
+                : '/subscriptions',
+            )
+          }}
         >
-          <MDIcon>
-            <ItsOnIcon />
-          </MDIcon>
-        </MDPrimaryTab>
-        <MDPrimaryTab active={isSubscriptionsRoute}>Subscriptions</MDPrimaryTab>
-      </MDTabs>
+          <MDPrimaryTab active={isChannelsRoute}>Channels</MDPrimaryTab>
+          <MDPrimaryTab
+            active={!isChannelsRoute && !isSubscriptionsRoute}
+            iconOnly
+            aria-label={'Home'}
+          >
+            <MDIcon>
+              <ItsOnIcon />
+            </MDIcon>
+          </MDPrimaryTab>
+          <MDPrimaryTab active={isSubscriptionsRoute}>
+            Subscriptions
+          </MDPrimaryTab>
+        </MDTabs>
+      )}
       <div className='Home-content'>
         {isLoading ? (
           <MDCircularProgress className='Home-loading' indeterminate />

@@ -1,0 +1,45 @@
+.UserMenu-button {
+  height: 1.75rem;
+  width: 1.75rem;
+}
+
+.UserMenu-profile-pic {
+  height: 1.75rem;
+  width: 1.75rem;
+  border-radius: 50%;
+}
+
+.UserMenu-menu {
+  background-color: var(--md-sys-color-surface-container);
+  --md-menu-container-color: var(--md-sys-color-surface-container);
+  --md-menu-container-shape: 0.75rem;
+  min-width: 23.5rem;
+  text-align: left;
+}
+
+.UserMenu-menu-item {
+  --md-menu-item-leading-icon-color: var(--md-sys-color-link);
+  --md-menu-item-trailing-icon-color: var(--md-sys-color-link);
+  --md-menu-item-label-text-color: var(--md-sys-color-link);
+  border-bottom: 1px solid var(--md-sys-color-inverse-on-surface);
+}
+
+.UserMenu-menu-item-icon {
+  height: 1rem;
+  width: 1rem;
+  font-size: 1rem;
+}
+
+.UserMenu-menu-text {
+  font-size: 0.8125rem;
+}
+
+.UserMenu-footer {
+  display: flex;
+  flex-flow: row nowrap;
+  font-size: 0.8125rem;
+  justify-content: center;
+  align-items: center;
+  padding-top: 8px;
+  gap: 2rem;
+}

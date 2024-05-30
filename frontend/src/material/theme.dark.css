@@ -1,6 +1,9 @@
 :root {
   --md-sys-color-background: var(--md-sys-color-background-dark);
   --md-sys-color-on-background: var(--md-sys-color-on-background-dark);
+  --md-sys-color-secondary-on-background: var(
+    --md-sys-color-secondary-on-background-dark
+  );
   --md-sys-color-surface: var(--md-sys-color-surface-dark);
   --md-sys-color-surface-dim: var(--md-sys-color-surface-dim-dark);
   --md-sys-color-surface-bright: var(--md-sys-color-surface-bright-dark);
@@ -54,6 +57,9 @@
   --md-sys-color-on-tertiary-container: var(
     --md-sys-color-on-tertiary-container-dark
   );
+  --md-sys-color-link: var(--md-sys-color-link-dark);
+  --md-sys-color-link-hovered: var(--md-sys-color-link-hovered-dark);
+  --md-sys-color-disabled: var(--md-sys-color-disabled-dark);
   --md-sys-color-error: var(--md-sys-color-error-dark);
   --md-sys-color-on-error: var(--md-sys-color-on-error-dark);
   --md-sys-color-error-container: var(--md-sys-color-error-container-dark);

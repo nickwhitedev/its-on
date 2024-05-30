@@ -7,7 +7,7 @@ import ReactDOM from 'react-dom/client'
 import { RouterProvider } from 'react-router-dom'
 import AppContextProvider from './contexts/AppContextProvider'
 import router from './routes/router'
-import { baseUrl } from './utils/urls'
+import { BASE_URL } from './utils/urls'
 import { CLERK_PUBLISHABLE_KEY, useDarkTheme } from './utils/constants'
 
 if (!CLERK_PUBLISHABLE_KEY) {
@@ -23,9 +23,9 @@ if (rootElement != null) {
         appearance={{
           baseTheme: useDarkTheme ? dark : undefined,
           layout: {
-            helpPageUrl: `${baseUrl}/support`,
-            termsPageUrl: `${baseUrl}/terms`,
-            privacyPageUrl: `${baseUrl}/privacy`,
+            helpPageUrl: `${BASE_URL}/support`,
+            termsPageUrl: `${BASE_URL}/terms`,
+            privacyPageUrl: `${BASE_URL}/privacy`,
           },
           variables: {
             colorPrimary: '#17c1e8',
