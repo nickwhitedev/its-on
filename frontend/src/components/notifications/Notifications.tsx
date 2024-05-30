@@ -12,7 +12,7 @@ import { useRequestNotificationPermissions } from '../../utils/notifications'
 import { useState } from 'react'
 import { useSubscriptions } from '../../contexts/subscriptions/subscriptionsContext'
 import { useUser } from '../../contexts/user/userContext'
-import { updatesChannelUrl } from '../../utils/urls'
+import { UPDATES_CHANNEL_URL } from '../../utils/urls'
 import { UPDATES_CHANNEL_ID } from '../../utils/constants'
 
 const Notifications = ({ className }: { className: string }) => {
@@ -85,7 +85,7 @@ const Notifications = ({ className }: { className: string }) => {
         </div>
         <div slot='actions'>
           {!isSubscribedToUpdatesChannel ? (
-            <MDTextButton href={updatesChannelUrl}>Updates</MDTextButton>
+            <MDTextButton href={UPDATES_CHANNEL_URL}>Updates</MDTextButton>
           ) : null}
           <MDTextButton
             onClick={() => {

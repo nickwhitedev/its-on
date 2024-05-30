@@ -39,6 +39,7 @@ import EditChannel from './EditChannel'
 import DeleteChannelButton from './DeleteChannelButton'
 import MDIcon from '../../material/MDIcon'
 import MDTextButton from '../../material/button/MDTextButton'
+import { UPGRADE_PATH } from '../../../utils/urls'
 
 interface Props {
   channelID: string
@@ -422,7 +423,7 @@ const Channel = ({ channelID }: Props) => {
                 <>
                   <p>Subscription limit reached</p>
                   <p>
-                    <MDTextButton href='/profile#/upgrade'>
+                    <MDTextButton href={`/${UPGRADE_PATH}`}>
                       <MDIcon slot='icon'>upgrade</MDIcon>
                       Upgrade
                     </MDTextButton>

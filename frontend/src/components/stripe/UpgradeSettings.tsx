@@ -7,12 +7,12 @@ const UpgradeSettings = () => {
   const user = useUser()
   return (
     <div className='UpgradeSettings'>
-      <div className='UpgradeSettings-heading'>
-        <div />
-        <h1 className='UpgradeSettings-heading-header'>Upgrade</h1>
-        <div className='UpgradeSettings-heading-tier'>
+      <h2 className='UpgradeSettings-heading'>Upgrade</h2>
+      <div className='UpgradeSettings-tier-section'>
+        Current Tier:{' '}
+        <span className='UpgradeSettings-heading-tier'>
           It&apos;s On {user?.tier ?? 5}
-        </div>
+        </span>
       </div>
       <StripePricingTable />
       {/* TODO: Add more upgrade settings here

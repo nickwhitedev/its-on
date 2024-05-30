@@ -1,5 +1,5 @@
 import { APIError } from './errors/apiError'
-import { apiUrl } from './urls'
+import { API_URL } from './urls'
 import { useAuth } from '@clerk/clerk-react'
 
 /**
@@ -13,7 +13,7 @@ export const useFetchApi = (): (<T>(
   const { getToken } = useAuth()
 
   return async <T>(uri: string, method = 'GET', body?: object) => {
-    const response = await fetch(`${apiUrl}${uri}`, {
+    const response = await fetch(`${API_URL}${uri}`, {
       ...(body != null ? { body: JSON.stringify(body) } : {}),
       headers: {
         Authorization: `Bearer ${(await getToken()) ?? ''}`,
