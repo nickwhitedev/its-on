@@ -1,6 +1,9 @@
 :root {
   --md-sys-color-background: var(--md-sys-color-background-light);
   --md-sys-color-on-background: var(--md-sys-color-on-background-light);
+  --md-sys-color-secondary-on-background: var(
+    --md-sys-color-secondary-on-background-light
+  );
   --md-sys-color-surface: var(--md-sys-color-surface-light);
   --md-sys-color-surface-dim: var(--md-sys-color-surface-dim-light);
   --md-sys-color-surface-bright: var(--md-sys-color-surface-bright-light);
@@ -54,6 +57,9 @@
   --md-sys-color-on-tertiary-container: var(
     --md-sys-color-on-tertiary-container-light
   );
+  --md-sys-color-link: var(--md-sys-color-link-light);
+  --md-sys-color-link-hovered: var(--md-sys-color-link-hovered-light);
+  --md-sys-color-disabled: var(--md-sys-color-disabled-light);
   --md-sys-color-error: var(--md-sys-color-error-light);
   --md-sys-color-on-error: var(--md-sys-color-on-error-light);
   --md-sys-color-error-container: var(--md-sys-color-error-container-light);

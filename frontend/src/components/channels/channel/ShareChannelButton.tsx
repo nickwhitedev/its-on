@@ -3,7 +3,7 @@ import './ShareChannelButton.css'
 import MDFilledButton from '../../material/button/MDFilledButton'
 import MDIcon from '../../material/MDIcon'
 import MDIconButton from '../../material/icon-button/MDIconButton'
-import { baseUrl } from '../../../utils/urls'
+import { BASE_URL } from '../../../utils/urls'
 import { channelDisplayTitle } from './channelUtils'
 import { useState } from 'react'
 
@@ -19,7 +19,7 @@ const ShareChannelButton = ({ channel, isUpdating, size }: Props) => {
   const displayTitle = channelDisplayTitle(channel)
 
   const handleClickShareChannel = async () => {
-    const channelURL = `${baseUrl}/${channel.id}`
+    const channelURL = `${BASE_URL}/${channel.id}`
     try {
       await navigator.share({
         title: `It's On - ${displayTitle}`,

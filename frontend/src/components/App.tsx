@@ -5,8 +5,6 @@ import {
   ClerkLoading,
   SignedIn,
   SignedOut,
-  UserButton,
-  useUser as useClerkUser,
 } from '@clerk/clerk-react'
 import { useDisableDeviceNotifications } from '../utils/notifications'
 import { useEffect, useMemo } from 'react'
@@ -19,16 +17,16 @@ import Notifications from './notifications/Notifications'
 import Splash from './Splash'
 import Support from './support/Support'
 import TermsOfUse from './legal/TermsOfUse'
-import { baseUrl } from '../utils/urls'
 import { useError } from '../contexts/error/errorContext'
+import UserMenu from './user/UserMenu'
+import { PRIVACY_PATH, SUPPORT_PATH, TERMS_PATH } from '../utils/urls'
+import PrivacyPolicy from './legal/PrivacyPolicy'
 
 const App = () => {
   const error = useError()
   const location = useLocation()
   const navigate = useNavigate()
   const disableDeviceNotifications = useDisableDeviceNotifications()
-
-  const { user: clerkUser } = useClerkUser()
 
   const { pathname, search } = location
 
@@ -48,14 +46,6 @@ const App = () => {
     })()
   }, [disableDeviceNotifications, navigate, urlParams, urlParamsAction])
 
-  const signedOutURLParams = new URLSearchParams()
-  for (const [key, value] of Object.entries({
-    action: 'signedOut',
-    userID: clerkUser?.id ?? '',
-  })) {
-    signedOutURLParams.append(key, value)
-  }
-
   return (
     <div className='App'>
       <header className='App-header'>
@@ -71,34 +61,32 @@ const App = () => {
         </h1>
         <SignedIn>
           <div className='App-settings'>
-            <UserButton
-              afterSignOutUrl={`${baseUrl}/?${signedOutURLParams.toString()}`}
-              userProfileMode='navigation'
-              userProfileUrl='/profile'
-            />
+            <UserMenu />
           </div>
         </SignedIn>
       </header>
       <main className='App-main'>
-        <ClerkLoading>
-          <MDCircularProgress indeterminate />
-        </ClerkLoading>
-        <ClerkLoaded>
-          <SignedOut>
-            {pathname === '/terms' ? (
-              <TermsOfUse />
-            ) : pathname === '/privacy' ? (
-              <TermsOfUse />
-            ) : pathname === '/support' ? (
-              <Support />
-            ) : (
-              <Splash />
-            )}
-          </SignedOut>
-          <SignedIn>
-            <Home />
-          </SignedIn>
-        </ClerkLoaded>
+        {pathname === `/${TERMS_PATH}` ? (
+          <TermsOfUse />
+        ) : pathname === `/${PRIVACY_PATH}` ? (
+          <PrivacyPolicy />
+        ) : pathname === `/${SUPPORT_PATH}` ? (
+          <Support />
+        ) : (
+          <>
+            <ClerkLoading>
+              <MDCircularProgress indeterminate />
+            </ClerkLoading>
+            <ClerkLoaded>
+              <SignedOut>
+                <Splash />
+              </SignedOut>
+              <SignedIn>
+                <Home />
+              </SignedIn>
+            </ClerkLoaded>
+          </>
+        )}
       </main>
       {error.isVisible ? <ErrorSnackbar>{error.message}</ErrorSnackbar> : null}
     </div>

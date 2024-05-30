@@ -8,6 +8,17 @@ import Support from '../../components/support/Support'
 import ChannelRouteHandler from './channels/ChannelRouteHandler'
 import Profile from '../../components/user/Profile'
 import UpgradeSuccess from '../../components/stripe/UpgradeSuccess'
+import UpgradeSettings from '../../components/stripe/UpgradeSettings'
+import {
+  CHANNELS_PATH,
+  PRIVACY_PATH,
+  PROFILE_PATH,
+  SUBSCRIPTIONS_PATH,
+  SUPPORT_PATH,
+  TERMS_PATH,
+  UPGRADE_PATH,
+  UPGRADE_SUCCESS_PATH,
+} from '../../utils/urls'
 
 const appRouter = [
   {
@@ -16,11 +27,11 @@ const appRouter = [
   },
   {
     element: <Channels />,
-    path: 'channels',
+    path: CHANNELS_PATH,
   },
   {
     element: <Subscriptions />,
-    path: 'subscriptions',
+    path: SUBSCRIPTIONS_PATH,
   },
   {
     element: <ChannelRouteHandler />,
@@ -31,23 +42,27 @@ const appRouter = [
   },
   {
     element: <Profile />,
-    path: 'profile',
+    path: PROFILE_PATH,
   },
   {
     element: <TermsOfUse />,
-    path: 'terms',
+    path: TERMS_PATH,
   },
   {
     element: <PrivacyPolicy />,
-    path: 'privacy',
+    path: PRIVACY_PATH,
   },
   {
     element: <Support />,
-    path: 'support',
+    path: SUPPORT_PATH,
+  },
+  {
+    element: <UpgradeSettings />,
+    path: UPGRADE_PATH,
   },
   {
     element: <UpgradeSuccess />,
-    path: 'upgrade_success',
+    path: UPGRADE_SUCCESS_PATH,
   },
 ]
 

@@ -21,6 +21,7 @@ import MDFilledButton from '../material/button/MDFilledButton'
 import MDList from '../material/list/MDList'
 import MDListItem from '../material/list/MDListItem'
 import { isChannelOn } from './channel/channelUtils'
+import { UPGRADE_PATH } from '../../utils/urls'
 
 const Channels = () => {
   const channels = useChannels()
@@ -87,7 +88,7 @@ const Channels = () => {
             type='button'
             onClick={() => {
               userHasMaxChannels
-                ? navigate('/profile#/upgrade')
+                ? navigate(`/${UPGRADE_PATH}`)
                 : void handleCreateChannel()
             }}
           >
