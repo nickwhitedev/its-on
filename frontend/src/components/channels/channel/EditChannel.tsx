@@ -47,21 +47,19 @@ const EditChannel = ({ channel, isLoading, onClose }: Props) => {
   )
   const [currentNote, setCurrentNote] = useState<string>(channel.note ?? '')
 
-  const [newCapacity, setNewCapacity] = useState<string>(
-    (channel.capacity ?? userTier).toLocaleString(),
+  const [newCapacity, setNewCapacity] = useState<number>(
+    channel.capacity ?? userTier,
   )
 
   const handleChangeCapacity = () => {
-    const targetCapacity = Number(newCapacity)
-
     if (
-      isNaN(targetCapacity) ||
-      targetCapacity > userTier ||
-      targetCapacity === currentCapacity
+      isNaN(newCapacity) ||
+      newCapacity > userTier ||
+      newCapacity === currentCapacity
     )
       return
 
-    setCurrentCapacity(targetCapacity)
+    setCurrentCapacity(newCapacity)
   }
 
   const saveUpdates = async () => {
@@ -112,19 +110,19 @@ const EditChannel = ({ channel, isLoading, onClose }: Props) => {
         <MDOutlinedTextField
           className={'EditChannel-capacity-input'}
           disabled={isUpdating}
-          error={Number(newCapacity) > userTier}
+          error={newCapacity > userTier}
           label='Channel Size'
-          max={userTier.toLocaleString()}
-          min={subscriberCount.toLocaleString()}
+          max={userTier.toString()}
+          min={subscriberCount.toString()}
           step='1'
           supportingText='Subscriber limit'
           type='number'
-          value={newCapacity}
+          value={newCapacity.toString()}
           onInput={event => {
             setNewCapacity(
               Math.floor(
                 Number((event.target as EventTarget & HTMLSelectElement).value),
-              ).toLocaleString(),
+              ),
             )
           }}
           onChange={handleChangeCapacity}
@@ -145,7 +143,7 @@ const EditChannel = ({ channel, isLoading, onClose }: Props) => {
           disabled={isUpdating || isLoading}
           label='Channel Duration'
           supportingText='How long it stays on'
-          value={currentDuration.toLocaleString()}
+          value={currentDuration.toString()}
           onChange={(event: Event) => {
             const newDuration = Number(
               (event.target as EventTarget & HTMLSelectElement).value,
@@ -159,7 +157,7 @@ const EditChannel = ({ channel, isLoading, onClose }: Props) => {
               disabled={isUpdating}
               key={durationOption.value}
               selected={durationOption.value === currentDuration}
-              value={durationOption.value.toLocaleString()}
+              value={durationOption.value.toString()}
             >
               <div slot='headline'>{durationOption.displayName}</div>
             </MDSelectOption>
