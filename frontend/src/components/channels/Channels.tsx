@@ -133,7 +133,8 @@ const Channels = () => {
                   className='Channels-list-item-subscribers'
                 >
                   <MDIcon>group</MDIcon>
-                  {channel.subscriberCount ?? 0}/{channel.capacity ?? 5}
+                  {(channel.subscriberCount ?? 0).toLocaleString()}/
+                  {(channel.capacity ?? 5).toLocaleString()}
                 </div>
               </MDListItem>
             </React.Fragment>
