@@ -127,9 +127,30 @@ const UserMenu = () => {
           </div>
         </MDMenuItem>
         <div className='UserMenu-footer'>
-          <Link to={`/${SUPPORT_PATH}`}>Help</Link>
-          <Link to={`/${PRIVACY_PATH}`}>Privacy</Link>
-          <Link to={`/${TERMS_PATH}`}>Terms</Link>
+          <Link
+            to={`/${SUPPORT_PATH}`}
+            onClick={() => {
+              setIsMenuOpen(false)
+            }}
+          >
+            Help
+          </Link>
+          <Link
+            to={`/${PRIVACY_PATH}`}
+            onClick={() => {
+              setIsMenuOpen(false)
+            }}
+          >
+            Privacy
+          </Link>
+          <Link
+            to={`/${TERMS_PATH}`}
+            onClick={() => {
+              setIsMenuOpen(false)
+            }}
+          >
+            Terms
+          </Link>
         </div>
       </MDMenu>
     </>
