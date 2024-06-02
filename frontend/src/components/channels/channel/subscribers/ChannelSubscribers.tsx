@@ -30,8 +30,10 @@ const ChannelSubscribers = ({
         <MDListItem>
           <div slot='headline'>Subscribers</div>
           <div slot='trailing-supporting-text'>
-            {subscriberCount}
-            {channel.capacity == null ? null : <> / {channel.capacity}</>}
+            {subscriberCount.toLocaleString()}
+            {channel.capacity == null ? null : (
+              <> / {channel.capacity.toLocaleString()}</>
+            )}
           </div>
         </MDListItem>
         {isLoading ? (
