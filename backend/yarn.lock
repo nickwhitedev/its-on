@@ -1757,10 +1757,10 @@
   resolved "https://registry.yarnpkg.com/@js-sdsl/ordered-map/-/ordered-map-4.4.2.tgz#9299f82874bab9e4c7f9c48d865becbfe8d6907c"
   integrity sha512-iUKgm52T8HOE/makSxjqoWhe95ZJA1/G1sYsGev2JDKUSS14KAgg1LHb+Ba+IPow0xflbnSkOsZcO08C7w1gYw==
 
-"@middy/core@^5.3.5":
-  version "5.3.5"
-  resolved "https://registry.yarnpkg.com/@middy/core/-/core-5.3.5.tgz#e51865b2351b09a3a1d21169fa25bbaa3ccbf13a"
-  integrity sha512-kMjnRPC30KA52fR/Vb9sBOqYNCvOPwo0hKMtKZ9QfjB+hnaSg0y+hTTX6EArJm+6iFd+0Y6tEwT//qXpCvhTMQ==
+"@middy/core@^5.4.0":
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/@middy/core/-/core-5.4.0.tgz#0ea8e4a5df99beddc51b0850d318810bcd0bd3db"
+  integrity sha512-jwEGesbVDmhVQesEQbegU9+Y9Kd1FXEQ9OtP3jY8tmrFqWju5k0fJpN16y1LOQqb4ykxi8R/bzb6J4yMRN0B7A==
   dependencies:
     "@datastream/core" "0.0.35"
 
