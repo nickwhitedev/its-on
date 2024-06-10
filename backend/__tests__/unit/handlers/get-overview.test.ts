@@ -40,10 +40,12 @@ describe('Test getOverviewHandler', () => {
         channelCount: 3,
         sk: 'profile',
         pk: `user#userID`,
+        notificationsEnabled: true,
         subscriptionCount: 2,
         tier: 10,
+        upgradeQualifyingEventTimestamps: [],
         username: 'testie',
-      },
+      } as IDynamoUserItem,
     ]
 
     ddbMock.on(QueryCommand).resolves({
@@ -81,8 +83,10 @@ describe('Test getOverviewHandler', () => {
         profile: {
           id: 'userID',
           channelCount: 3,
+          notificationsEnabled: true,
           subscriptionCount: 2,
           tier: 10,
+          upgradeQualifyingEventTimestamps: [],
           username: 'testie',
           notificationTokens: {},
           subscriptionTopics: ['user-_channel-someID2'],
@@ -119,8 +123,9 @@ describe('Test getOverviewHandler', () => {
           notificationTokens: {},
           subscriptionCount: 0,
           tier: 5,
+          upgradeQualifyingEventTimestamps: [],
           username: 'test_user',
-        },
+        } as IUser,
       }),
     }
 
