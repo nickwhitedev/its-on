@@ -1153,34 +1153,44 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@clerk/backend@1.2.1":
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/@clerk/backend/-/backend-1.2.1.tgz#8b9e7992a9adb4a1940c4b7fc2d0fb39362c7e31"
-  integrity sha512-4NxL0VU042dgrhDTqvCFws9v5Kmg+VlA70fD0sQWWBQJxNr2pEnjHfKG21ta7qIqexXPk4Ftr0qZk2/wRiex3A==
+"@clerk/backend@1.2.2":
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@clerk/backend/-/backend-1.2.2.tgz#bc2630376145fd97cf008e3d90f9c6b98cacf9c9"
+  integrity sha512-P007QPL9Ls3bwiBtK3Pat85HcSiL8rhwh/X1wifIEBK6OGF8kez1gOpcvt5/SmoCEecGg8AhH11A2fOIZcwPgA==
   dependencies:
-    "@clerk/shared" "2.2.1"
+    "@clerk/shared" "2.2.2"
+    "@clerk/types" "4.6.0"
     cookie "0.5.0"
     snakecase-keys "5.4.4"
     tslib "2.4.1"
 
-"@clerk/clerk-sdk-node@^5.0.9":
-  version "5.0.9"
-  resolved "https://registry.yarnpkg.com/@clerk/clerk-sdk-node/-/clerk-sdk-node-5.0.9.tgz#a1b88f90c02cf6129d9f7bc1be44a325e606c7d9"
-  integrity sha512-j9L+M09ZnHczR/X4uWLPTIx6gS26Ru7d45FZN3E/TjQYga7yfenaGyFaGZyrkO7h/KcZ/JQBaHIQn6640uinzQ==
+"@clerk/clerk-sdk-node@^5.0.10":
+  version "5.0.10"
+  resolved "https://registry.yarnpkg.com/@clerk/clerk-sdk-node/-/clerk-sdk-node-5.0.10.tgz#543c6ec9c7f824ee86262e6202b3cfeadb6f1218"
+  integrity sha512-3r14aIOM4wFw1YpjNI4U3eekY9IvaMbdVZWPQaeVNTAYZt2wheYpKr3z2BIdEDSZA9U5pFxmKsWLNa+7yjxBsg==
   dependencies:
-    "@clerk/backend" "1.2.1"
-    "@clerk/shared" "2.2.1"
+    "@clerk/backend" "1.2.2"
+    "@clerk/shared" "2.2.2"
+    "@clerk/types" "4.6.0"
     tslib "2.4.1"
 
-"@clerk/shared@2.2.1":
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/@clerk/shared/-/shared-2.2.1.tgz#185feb8f70eefc7d5d57817032196a1275f9ab1c"
-  integrity sha512-LtaHZLj/T2y9/MuB7IlVXs+HzX5eGkXkXqcBGgE//OlaNYw3zo1CueEVLG9Wm30FlPwVeSnaMYWklOUpSzMVng==
+"@clerk/shared@2.2.2":
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/@clerk/shared/-/shared-2.2.2.tgz#542e805acd4b72bc62228004ab2b39a21dbd5a4c"
+  integrity sha512-ThbAXiK5drCabR2TtXSQVHXW0fNtO/RPfiQUiSrjHFdbJAiEkTbPwGSLvPaY1svw5hZHFHLCF735szIDvNHe1A==
   dependencies:
+    "@clerk/types" "4.6.0"
     glob-to-regexp "0.4.1"
-    js-cookie "3.0.1"
+    js-cookie "3.0.5"
     std-env "^3.7.0"
     swr "^2.2.0"
+
+"@clerk/types@4.6.0":
+  version "4.6.0"
+  resolved "https://registry.yarnpkg.com/@clerk/types/-/types-4.6.0.tgz#2dd88a3ee603f4577606ad8ad1a46ae8c70401ec"
+  integrity sha512-kowqVGqLfu0Zl2Pteum70MfkGHqBUoHHeR+u2+yWVl1lKHLCiyY1u8ntYBEIolAylBaQNDuRzxyMIDPSxjPE8g==
+  dependencies:
+    csstype "3.1.1"
 
 "@cspotcode/source-map-support@^0.8.0":
   version "0.8.1"
@@ -3156,6 +3166,11 @@ cross-spawn@^7.0.2, cross-spawn@^7.0.3:
     shebang-command "^2.0.0"
     which "^2.0.1"
 
+csstype@3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/csstype/-/csstype-3.1.1.tgz#841b532c45c758ee546a11d5bd7b7b473c8c30b9"
+  integrity sha512-DJR/VvkAvSZW9bTouZue2sSxDwdTN92uHjqeKVm+0dAqdfNykRzQ95tay8aXMBAAPpUiq4Qcug2L7neoRh2Egw==
+
 debug@4, debug@^4.1.0, debug@^4.1.1, debug@^4.3.1, debug@^4.3.2, debug@^4.3.4:
   version "4.3.4"
   resolved "https://registry.yarnpkg.com/debug/-/debug-4.3.4.tgz#1319f6579357f2338d3337d2cdd4914bb5dcc865"
@@ -4466,10 +4481,10 @@ jose@^4.14.6:
   resolved "https://registry.yarnpkg.com/jose/-/jose-4.15.5.tgz#6475d0f467ecd3c630a1b5dadd2735a7288df706"
   integrity sha512-jc7BFxgKPKi94uOvEmzlSWFFe2+vASyXaKUpdQKatWAESU2MWjDfFf0fdfc83CDKcA5QecabZeNLyfhe3yKNkg==
 
-js-cookie@3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/js-cookie/-/js-cookie-3.0.1.tgz#9e39b4c6c2f56563708d7d31f6f5f21873a92414"
-  integrity sha512-+0rgsUXZu4ncpPxRL+lNEptWMOWl9etvPHc/koSRp6MPwpRYAhmk0dUG00J4bxVV3r9uUzfo24wW0knS07SKSw==
+js-cookie@3.0.5:
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/js-cookie/-/js-cookie-3.0.5.tgz#0b7e2fd0c01552c58ba86e0841f94dc2557dcdbc"
+  integrity sha512-cEiJEAEoIbWfCZYKWhVwFuvPX1gETRYPw6LlaTKoxD3s2AkXzkCjnp6h0V77ozyqj0jakteJ4YqDJT830+lVGw==
 
 js-tokens@^4.0.0:
   version "4.0.0"
