@@ -74,6 +74,7 @@ const getOverview = async (
         notificationTokens: {},
         subscriptionCount: 0,
         tier: 5,
+        upgradeQualifyingEventTimestamps: [],
         username: (event.requestContext.authorizer?.username ?? '') as string,
       }
       // Put a user profile item

@@ -14,6 +14,7 @@ interface IUser {
   subscriptionCount: number
   subscriptionTopics?: Set<string>
   tier: number
+  upgradeQualifyingEventTimestamps: number[]
   username: string
 }
 
@@ -34,6 +35,7 @@ interface IDynamoUserItem {
   subscriptionCount: number
   subscriptionTopics?: Set<string>
   tier: number
+  upgradeQualifyingEventTimestamps: number[]
   username: string
 }
 
@@ -78,6 +80,9 @@ interface IDynamoStreamUserImage {
   }
   tier: {
     N: number
+  }
+  upgradeQualifyingEventTimestamps: {
+    L: number[]
   }
   username: {
     S: string
