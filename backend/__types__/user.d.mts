@@ -14,6 +14,7 @@ interface IUser {
   subscriptionCount: number
   subscriptionTopics?: Set<string>
   tier: number
+  // FIXME: Make optional
   upgradeQualifyingEventTimestamps: number[]
   username: string
 }
@@ -35,6 +36,7 @@ interface IDynamoUserItem {
   subscriptionCount: number
   subscriptionTopics?: Set<string>
   tier: number
+  // FIXME: Make optional
   upgradeQualifyingEventTimestamps: number[]
   username: string
 }
@@ -81,6 +83,7 @@ interface IDynamoStreamUserImage {
   tier: {
     N: number
   }
+  // FIXME: Make optional
   upgradeQualifyingEventTimestamps: {
     L: number[]
   }
