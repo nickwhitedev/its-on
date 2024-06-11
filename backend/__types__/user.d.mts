@@ -7,6 +7,8 @@
  */
 interface IUser {
   channelCount: number
+  // FIXME: Make optional
+  eligibleForUpgrade: boolean
   id: string
   lastNewSubscriberNotification?: number
   notificationTokens?: Record<string, { lastUpdated: number }>
@@ -28,6 +30,8 @@ interface IUser {
  */
 interface IDynamoUserItem {
   channelCount: number
+  // FIXME: Make optional
+  eligibleForUpgrade: boolean
   lastNewSubscriberNotification?: number
   notificationTokens?: Record<string, { lastUpdated: number }>
   notificationsEnabled: boolean
@@ -51,6 +55,10 @@ interface IDynamoUserItem {
 interface IDynamoStreamUserImage {
   channelCount: {
     N: number
+  }
+  // FIXME: Make optional
+  eligibleForUpgrade: {
+    B: boolean
   }
   lastNewSubscriberNotification?: {
     N: number

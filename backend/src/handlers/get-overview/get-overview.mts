@@ -69,6 +69,7 @@ const getOverview = async (
     if (!('profile' in data)) {
       const userAttributes = {
         channelCount: 0,
+        eligibleForUpgrade: false,
         lastNewSubscriberNotification: 0,
         notificationsEnabled: true,
         notificationTokens: {},
