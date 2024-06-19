@@ -7,7 +7,7 @@
   "dependencies": {
     "@aws-lambda-powertools/logger": "^2.1.0",
     "@aws-lambda-powertools/metrics": "^2.1.0",
-    "@aws-sdk/client-dynamodb": "^3.592.0",
+    "@aws-sdk/client-dynamodb": "^3.600.0",
     "@aws-sdk/client-secrets-manager": "^3.592.0",
     "@aws-sdk/lib-dynamodb": "^3.592.0",
     "@clerk/clerk-sdk-node": "^5.0.10",
@@ -30,7 +30,7 @@
     "@types/node": "^20.14.2",
     "@types/web-push": "^3.6.2",
     "@typescript-eslint/eslint-plugin": "^7.11.0",
-    "@typescript-eslint/parser": "^7.13.0",
+    "@typescript-eslint/parser": "^7.13.1",
     "aws-sdk-client-mock": "^4.0.1",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
