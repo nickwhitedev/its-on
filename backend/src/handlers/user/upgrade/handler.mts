@@ -1,0 +1,16 @@
+import { Logger } from '@aws-lambda-powertools/logger'
+import { injectLambdaContext } from '@aws-lambda-powertools/logger/middleware'
+import { Metrics } from '@aws-lambda-powertools/metrics'
+import { logMetrics } from '@aws-lambda-powertools/metrics/middleware'
+import middy from '@middy/core'
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import upgrade from './upgrade.mjs'
+
+const logger = new Logger({ serviceName: 'itsOnUpgrade' })
+const metrics = new Metrics({
+  serviceName: 'itsOnUpgrade',
+})
+export const handler = middy<APIGatewayProxyEvent, APIGatewayProxyResult>()
+  .use(injectLambdaContext(logger))
+  .use(logMetrics(metrics, { captureColdStartMetric: true }))
+  .handler((event, context) => upgrade(event, context, logger, metrics))

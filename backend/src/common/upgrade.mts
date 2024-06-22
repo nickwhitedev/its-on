@@ -70,3 +70,16 @@ export const getUpgradeEventCountGoalForTier = (tier: number): number => {
   }
   return 0
 }
+
+export const getUpgradeTierForTier = (tier: number): number | null => {
+  if (tier < SKUS_TO_TIERS.TIER_10) {
+    return SKUS_TO_TIERS.TIER_10
+  }
+  if (tier < SKUS_TO_TIERS.TIER_25) {
+    return SKUS_TO_TIERS.TIER_25
+  }
+  if (tier < SKUS_TO_TIERS.TIER_100) {
+    return SKUS_TO_TIERS.TIER_100
+  }
+  return null
+}
