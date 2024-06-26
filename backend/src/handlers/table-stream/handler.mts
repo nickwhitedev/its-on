@@ -1,9 +1,9 @@
 import { Logger } from '@aws-lambda-powertools/logger'
-import { injectLambdaContext } from '@aws-lambda-powertools/logger/middleware';
+import { injectLambdaContext } from '@aws-lambda-powertools/logger/middleware'
 import { Metrics } from '@aws-lambda-powertools/metrics'
 import { logMetrics } from '@aws-lambda-powertools/metrics/middleware'
 import middy from '@middy/core'
-import { DynamoDBStreamEvent } from 'aws-lambda'
+import { Context, DynamoDBStreamEvent } from 'aws-lambda'
 import processTableStream from './table-stream.mjs'
 
 const logger = new Logger({ serviceName: 'itsOnTableStream' })
@@ -14,6 +14,6 @@ const metrics = new Metrics({
 export const handler = middy<DynamoDBStreamEvent>()
   .use(injectLambdaContext(logger))
   .use(logMetrics(metrics, { captureColdStartMetric: true }))
-  .handler((event, context) =>
+  .handler((event: DynamoDBStreamEvent, context: Context) =>
     processTableStream(event, context, logger, metrics),
   )
