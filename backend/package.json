@@ -7,11 +7,11 @@
   "dependencies": {
     "@aws-lambda-powertools/logger": "^2.1.0",
     "@aws-lambda-powertools/metrics": "^2.1.0",
-    "@aws-sdk/client-dynamodb": "^3.600.0",
+    "@aws-sdk/client-dynamodb": "^3.602.0",
     "@aws-sdk/client-secrets-manager": "^3.592.0",
     "@aws-sdk/lib-dynamodb": "^3.592.0",
     "@clerk/clerk-sdk-node": "^5.0.10",
-    "@middy/core": "^5.4.0",
+    "@middy/core": "^5.4.2",
     "esbuild": "^0.21.5",
     "firebase-admin": "^12.1.1",
     "jsonwebtoken": "^9.0.2",
@@ -23,13 +23,13 @@
     "web-push": "^3.6.7"
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.138",
+    "@types/aws-lambda": "^8.10.140",
     "@types/jest": "^29.5.12",
     "@types/nanoid": "^3.0.0",
     "@types/nanoid-dictionary": "^4.2.2",
     "@types/node": "^20.14.2",
     "@types/web-push": "^3.6.2",
-    "@typescript-eslint/eslint-plugin": "^7.11.0",
+    "@typescript-eslint/eslint-plugin": "^7.14.1",
     "@typescript-eslint/parser": "^7.13.1",
     "aws-sdk-client-mock": "^4.0.1",
     "eslint": "^8.57.0",
@@ -40,7 +40,7 @@
     "ts-jest": "^29.1.5",
     "ts-jest-resolver": "^2.0.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.4.5"
+    "typescript": "^5.5.2"
   },
   "scripts": {
     "build": "sam build",
