@@ -52,7 +52,7 @@ interface StatementMethod {
 interface PolicyStatement {
   Action: string
   Condition?: ConditionBlock | undefined
-  Effect: string
+  Effect: StatementEffect
   Resource: string[]
 }
 
