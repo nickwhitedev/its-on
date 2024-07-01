@@ -2,19 +2,30 @@ import {
   DynamoDBDocumentClient,
   PutCommand,
   QueryCommand,
+  UpdateCommand,
 } from '@aws-sdk/lib-dynamodb'
 
 import { Logger } from '@aws-lambda-powertools/logger'
 import { Metrics } from '@aws-lambda-powertools/metrics'
 import { DynamoDBRecord } from 'aws-lambda'
-import { DYNAMODB_TABLE_NAME, WEB_URL } from '/opt/nodejs/constants.mjs'
-import { batchWrite } from '/opt/nodejs/dynamo.mjs'
+import {
+  DYNAMODB_TABLE_NAME,
+  TOP_TIER,
+  WEB_URL,
+} from '/opt/nodejs/constants.mjs'
+import { batchWrite, getUserInfo } from '/opt/nodejs/dynamo.mjs'
 import { MS_IN_HOUR } from '/opt/nodejs/time.mjs'
 import {
   getMessagingChannelTopic,
   initializeFirebase,
 } from '/opt/nodejs/firebase.mjs'
 import { getMessaging } from 'firebase-admin/messaging'
+import {
+  getUpgradeEventCountGoalForTier,
+  getUpgradeMinimumIntervalForTier,
+  getUpgradeRequiredSubscriberCountForTier,
+  getUpgradeStreakWindowForTier,
+} from '/opt/nodejs/upgrade.mjs'
 
 interface Params {
   record: DynamoDBRecord
@@ -228,6 +239,75 @@ export const handleChannelUpdated = async ({
       logger.debug('Message sent to notification topic', { topic, messageID })
     } catch (error) {
       logger.error('Error sending notifications', error as Error)
+    }
+
+    // Check for upgrade qualifying events
+    let profile: IDynamoUserItem | undefined
+    try {
+      profile = await getUserInfo({
+        ddbDocClient,
+        userID: channelOwnerID,
+      })
+    } catch (error) {
+      logger.error(
+        'Error updating upgradeQualifyingEventTimestamps',
+        error as Error,
+      )
+    }
+    let eligibleForUpgrade = profile?.eligibleForUpgrade
+
+    // TODO: Unlimited - Add condition to skip if subscribed
+    if (profile != null && profile.tier < TOP_TIER && !eligibleForUpgrade) {
+      const upgradeQualifyingEventTimestamps =
+        profile.upgradeQualifyingEventTimestamps?.filter(
+          upgradeQualifyingEventTimestamp =>
+            upgradeQualifyingEventTimestamp >=
+            Date.now() - getUpgradeStreakWindowForTier(profile.tier),
+        ) ?? []
+
+      if (
+        upgradeQualifyingEventTimestamps.length === 0 ||
+        ((channelInfo.subscriberCount ?? 0) >=
+          getUpgradeRequiredSubscriberCountForTier(profile.tier) &&
+          (channelInfo.lastOn ?? 0) -
+            upgradeQualifyingEventTimestamps[
+              upgradeQualifyingEventTimestamps.length - 1
+            ] >=
+            getUpgradeMinimumIntervalForTier(profile.tier))
+      ) {
+        upgradeQualifyingEventTimestamps.push(channelInfo.lastOn ?? 0)
+        eligibleForUpgrade =
+          upgradeQualifyingEventTimestamps.length >=
+          getUpgradeEventCountGoalForTier(profile.tier)
+
+        try {
+          const ddbResponse = await ddbDocClient.send(
+            new UpdateCommand({
+              Key: {
+                pk: `user#${channelOwnerID}`,
+                sk: `profile`,
+              },
+              ReturnValues: 'ALL_NEW',
+              TableName: DYNAMODB_TABLE_NAME,
+              UpdateExpression:
+                'SET #eligibleForUpgrade = :eligibleForUpgrade, #upgradeQualifyingEventTimestamps = :upgradeQualifyingEventTimestamps',
+              ExpressionAttributeNames: {
+                '#eligibleForUpgrade': 'eligibleForUpgrade',
+                '#upgradeQualifyingEventTimestamps':
+                  'upgradeQualifyingEventTimestamps',
+              },
+              ExpressionAttributeValues: {
+                ':eligibleForUpgrade': eligibleForUpgrade,
+                ':upgradeQualifyingEventTimestamps':
+                  upgradeQualifyingEventTimestamps,
+              },
+            }),
+          )
+          logger.debug('Success - profile updated', { ddbResponse })
+        } catch (error) {
+          logger.error('Error', error as Error)
+        }
+      }
     }
   }
   logger.debug('Finished updating items successfully')

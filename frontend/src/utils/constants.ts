@@ -25,7 +25,6 @@ export const STRIPE_10_OWNED_DARK_PRICING_TABLE_ID = import.meta.env
 export const STRIPE_BASE_DARK_PRICING_TABLE_ID = import.meta.env
   .VITE_STRIPE_BASE_DARK_PRICING_TABLE_ID as string
 
-export const TIER_INFINITE = -1
 export const TIER_5 = 5
 export const TIER_10 = 10
 export const TIER_25 = 25

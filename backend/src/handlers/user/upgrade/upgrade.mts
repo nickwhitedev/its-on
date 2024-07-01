@@ -8,33 +8,55 @@ import {
 import { Logger } from '@aws-lambda-powertools/logger'
 import { Metrics } from '@aws-lambda-powertools/metrics'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
+import { DYNAMODB_TABLE_NAME, TOP_TIER } from '/opt/nodejs/constants.mjs'
 import { createResponse } from '/opt/nodejs/response.mjs'
+import { getUserInfo } from '/opt/nodejs/dynamo.mjs'
+import { getUpgradeTierForTier } from '/opt/nodejs/upgrade.mjs'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
 
 /**
- * Updates profile for the authenticated user
+ * Upgrades tier for the authenticated user if they are eligible
  */
-const updateProfile = async (
+const upgrade = async (
   event: APIGatewayProxyEvent,
   _context: Context,
   logger: Logger,
   _metrics: Metrics,
 ): Promise<APIGatewayProxyResult> => {
-  if (event.httpMethod !== 'PUT') {
+  if (event.httpMethod !== 'POST') {
     throw new Error(
-      `putMethod only accepts PUT method, you tried: ${event.httpMethod} method.`,
+      `postMethod only accepts POST method, you tried: ${event.httpMethod} method.`,
     )
   }
 
   const eventPath = event.path
 
   const userID = (event.requestContext.authorizer?.sub ?? '') as string
-  const { username } = JSON.parse(event.body ?? '{}') as IUser
 
-  // TODO: Use clerk webhook to keep username synced instead of this api endpoint
+  const userProfile = await getUserInfo({ ddbDocClient, userID })
+
+  if (!userProfile?.eligibleForUpgrade) {
+    logger.info('User ineligible for upgrade')
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'You have not unlocked an upgrade.' },
+      statusCode: 428,
+    })
+  }
+
+  const newTier = getUpgradeTierForTier(userProfile.tier)
+
+  if (userProfile.tier >= TOP_TIER || newTier == null) {
+    logger.info('User has top tier already')
+    return createResponse({
+      eventPath,
+      responseBody: { message: 'No upgrade available.' },
+      statusCode: 417,
+    })
+  }
+
   try {
     const ddbResponse = await ddbDocClient.send(
       new UpdateCommand({
@@ -44,12 +66,16 @@ const updateProfile = async (
         },
         ReturnValues: 'ALL_NEW',
         TableName: DYNAMODB_TABLE_NAME,
-        UpdateExpression: 'SET #username = :username',
+        UpdateExpression:
+          'SET #tier = :tier, #upgradeQualifyingEventTimestamps = :upgradeQualifyingEventTimestamps',
         ExpressionAttributeNames: {
-          '#username': 'username',
+          '#tier': 'tier',
+          '#upgradeQualifyingEventTimestamps':
+            'upgradeQualifyingEventTimestamps',
         },
         ExpressionAttributeValues: {
-          ':username': username,
+          ':tier': newTier,
+          ':upgradeQualifyingEventTimestamps': [],
         },
       }),
     )
@@ -69,4 +95,4 @@ const updateProfile = async (
   }
 }
 
-export default updateProfile
+export default upgrade

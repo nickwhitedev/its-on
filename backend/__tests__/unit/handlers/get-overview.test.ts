@@ -38,12 +38,16 @@ describe('Test getOverviewHandler', () => {
       },
       {
         channelCount: 3,
+        eligibleForUpgrade: false,
         sk: 'profile',
         pk: `user#userID`,
+        notificationsEnabled: true,
         subscriptionCount: 2,
         tier: 10,
+        unlimited: false,
+        upgradeQualifyingEventTimestamps: [],
         username: 'testie',
-      },
+      } as IDynamoUserItem,
     ]
 
     ddbMock.on(QueryCommand).resolves({
@@ -81,8 +85,12 @@ describe('Test getOverviewHandler', () => {
         profile: {
           id: 'userID',
           channelCount: 3,
+          eligibleForUpgrade: false,
+          notificationsEnabled: true,
           subscriptionCount: 2,
           tier: 10,
+          unlimited: false,
+          upgradeQualifyingEventTimestamps: [],
           username: 'testie',
           notificationTokens: {},
           subscriptionTopics: ['user-_channel-someID2'],
@@ -114,13 +122,16 @@ describe('Test getOverviewHandler', () => {
         profile: {
           id: 'nanouserid1',
           channelCount: 0,
+          eligibleForUpgrade: false,
           lastNewSubscriberNotification: 0,
           notificationsEnabled: true,
           notificationTokens: {},
           subscriptionCount: 0,
           tier: 5,
+          unlimited: false,
+          upgradeQualifyingEventTimestamps: [],
           username: 'test_user',
-        },
+        } as IUser,
       }),
     }
 

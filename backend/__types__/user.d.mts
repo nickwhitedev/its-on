@@ -7,6 +7,7 @@
  */
 interface IUser {
   channelCount: number
+  eligibleForUpgrade?: boolean
   id: string
   lastNewSubscriberNotification?: number
   notificationTokens?: Record<string, { lastUpdated: number }>
@@ -14,6 +15,8 @@ interface IUser {
   subscriptionCount: number
   subscriptionTopics?: Set<string>
   tier: number
+  unlimited?: boolean
+  upgradeQualifyingEventTimestamps?: number[]
   username: string
 }
 
@@ -26,6 +29,7 @@ interface IUser {
  */
 interface IDynamoUserItem {
   channelCount: number
+  eligibleForUpgrade?: boolean
   lastNewSubscriberNotification?: number
   notificationTokens?: Record<string, { lastUpdated: number }>
   notificationsEnabled: boolean
@@ -34,6 +38,8 @@ interface IDynamoUserItem {
   subscriptionCount: number
   subscriptionTopics?: Set<string>
   tier: number
+  unlimited?: boolean
+  upgradeQualifyingEventTimestamps?: number[]
   username: string
 }
 
@@ -47,6 +53,9 @@ interface IDynamoUserItem {
 interface IDynamoStreamUserImage {
   channelCount: {
     N: number
+  }
+  eligibleForUpgrade?: {
+    B: boolean
   }
   lastNewSubscriberNotification?: {
     N: number
@@ -78,6 +87,12 @@ interface IDynamoStreamUserImage {
   }
   tier: {
     N: number
+  }
+  unlimited?: {
+    B: boolean
+  }
+  upgradeQualifyingEventTimestamps?: {
+    L: number[]
   }
   username: {
     S: string

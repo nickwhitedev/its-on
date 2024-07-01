@@ -69,11 +69,14 @@ const getOverview = async (
     if (!('profile' in data)) {
       const userAttributes = {
         channelCount: 0,
+        eligibleForUpgrade: false,
         lastNewSubscriberNotification: 0,
         notificationsEnabled: true,
         notificationTokens: {},
         subscriptionCount: 0,
         tier: 5,
+        unlimited: false,
+        upgradeQualifyingEventTimestamps: [],
         username: (event.requestContext.authorizer?.username ?? '') as string,
       }
       // Put a user profile item

@@ -7,8 +7,8 @@ import Subscriptions from '../../components/subscriptions/Subscriptions'
 import Support from '../../components/support/Support'
 import ChannelRouteHandler from './channels/ChannelRouteHandler'
 import Profile from '../../components/user/Profile'
-import UpgradeSuccess from '../../components/stripe/UpgradeSuccess'
-import UpgradeSettings from '../../components/stripe/UpgradeSettings'
+import UpgradeSuccess from '../../components/upgrade/UpgradeSuccess'
+import UpgradeSettings from '../../components/upgrade/UpgradeSettings'
 import {
   CHANNELS_PATH,
   PRIVACY_PATH,

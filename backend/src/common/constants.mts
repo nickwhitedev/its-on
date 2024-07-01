@@ -22,4 +22,6 @@ export const SKUS_TO_TIERS = {
   TIER_100: 100,
 }
 
+export const TOP_TIER = SKUS_TO_TIERS.TIER_100
+
 export const UNLIMITED_SUBSCRIPTION_SKU = 'TIER_UNLIMITED'
