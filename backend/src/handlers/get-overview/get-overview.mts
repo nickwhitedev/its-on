@@ -75,6 +75,7 @@ const getOverview = async (
         notificationTokens: {},
         subscriptionCount: 0,
         tier: 5,
+        unlimited: false,
         upgradeQualifyingEventTimestamps: [],
         username: (event.requestContext.authorizer?.username ?? '') as string,
       }

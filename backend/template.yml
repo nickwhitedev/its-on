@@ -583,6 +583,33 @@ Resources:
       LogGroupName:
         !Join ['', ['/aws/lambda/', !Ref updateProfileLambdaFunction]]
 
+  # This is a Lambda function config associated with the source code: upgrade.mts
+  upgradeLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/src/handlers/user/upgrade/
+      Description: Upgrades a user's tier
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ItsOnApi
+            Path: /upgrade
+            Method: POST
+      Handler: handler.handler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnIOSFirebaseServiceAccount-pjnCqi
+
+  upgradeLambdaFunctionLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      RetentionInDays: 30
+      LogGroupName: !Join ['', ['/aws/lambda/', !Ref upgradeLambdaFunction]]
+
   # This is a Lambda function config associated with the source code: post-log.mts
   postLogLambdaFunction:
     Type: AWS::Serverless::Function

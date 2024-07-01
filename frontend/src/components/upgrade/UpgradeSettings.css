@@ -1,23 +1,79 @@
 .UpgradeSettings {
   width: 100%;
   max-width: 90%;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
 }
 
-/* .UpgradeSettings-heading {
-} */
-
-.UpgradeSettings-tier-section {
-  font-size: 0.8rem;
-  margin-bottom: 1rem;
+.UpgradeSettings-tier-heading {
+  margin-bottom: 0;
 }
 
-.UpgradeSettings-heading-tier {
+.UpgradeSettings-heading-tier,
+.UpgradeSettings-streak-current {
   color: var(--md-sys-color-secondary-on-background);
 }
 
-.UpgradeSettings-list {
-  padding-top: 2rem;
-  margin-top: 2rem;
-  background: none;
-  text-align: left;
+.UpgradeSettings-streak {
+  position: relative;
+  border-radius: 16px;
+  padding: 1rem 2rem;
+  background-color: var(--md-sys-color-surface-container);
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  justify-content: center;
+  border-bottom: solid 1px var(--md-sys-color-on-primary);
+  border-top: solid 1px var(--md-sys-color-on-primary);
+  margin-top: 1em;
+  width: 30rem;
+  max-width: 90%;
+  min-width: 40%;
+}
+
+.UpgradeSettings-streak-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1rem 0;
+  width: 100%;
+}
+
+.UpgradeSettings-streak-info-heading {
+  margin: 0;
+}
+
+.UpgradeSettings-streak-upgrade-button {
+  width: 7rem;
+  --md-filled-button-container-color: rgb(23, 193, 232);
+  --md-filled-button-label-text-color: #1a1a1a;
+}
+
+.UpgradeSettings-button-spinner {
+  --_size: 18px;
+}
+
+.UpgradeSettings-streak-progress {
+  width: 100%;
+  --md-sys-color-primary: rgb(23, 193, 232);
+}
+
+.UpgradeSettings-streak-instructions-icon {
+  margin: 0 6px;
+  vertical-align: text-bottom;
+}
+
+.UpgradeSettings-streak-instructions-disclaimer {
+  font-size: 0.8rem;
+  color: var(--md-sys-color-secondary-on-background);
+}
+
+.UpgradeSettings-pay-heading {
+  margin-bottom: 0;
+}
+
+.UpgradeSettings-pricing-table {
+  width: 100%;
 }

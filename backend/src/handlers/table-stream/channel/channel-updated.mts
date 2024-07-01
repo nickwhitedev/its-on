@@ -259,11 +259,11 @@ export const handleChannelUpdated = async ({
     // TODO: Unlimited - Add condition to skip if subscribed
     if (profile != null && profile.tier < TOP_TIER && !eligibleForUpgrade) {
       const upgradeQualifyingEventTimestamps =
-        profile.upgradeQualifyingEventTimestamps.filter(
+        profile.upgradeQualifyingEventTimestamps?.filter(
           upgradeQualifyingEventTimestamp =>
             upgradeQualifyingEventTimestamp >=
             Date.now() - getUpgradeStreakWindowForTier(profile.tier),
-        )
+        ) ?? []
 
       if (
         upgradeQualifyingEventTimestamps.length === 0 ||

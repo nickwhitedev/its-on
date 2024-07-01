@@ -25,9 +25,9 @@ const upgrade = async (
   logger: Logger,
   _metrics: Metrics,
 ): Promise<APIGatewayProxyResult> => {
-  if (event.httpMethod !== 'PUT') {
+  if (event.httpMethod !== 'POST') {
     throw new Error(
-      `putMethod only accepts PUT method, you tried: ${event.httpMethod} method.`,
+      `postMethod only accepts POST method, you tried: ${event.httpMethod} method.`,
     )
   }
 

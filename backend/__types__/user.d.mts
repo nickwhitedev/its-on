@@ -7,8 +7,7 @@
  */
 interface IUser {
   channelCount: number
-  // FIXME: Make optional
-  eligibleForUpgrade: boolean
+  eligibleForUpgrade?: boolean
   id: string
   lastNewSubscriberNotification?: number
   notificationTokens?: Record<string, { lastUpdated: number }>
@@ -16,8 +15,8 @@ interface IUser {
   subscriptionCount: number
   subscriptionTopics?: Set<string>
   tier: number
-  // FIXME: Make optional
-  upgradeQualifyingEventTimestamps: number[]
+  unlimited?: boolean
+  upgradeQualifyingEventTimestamps?: number[]
   username: string
 }
 
@@ -30,8 +29,7 @@ interface IUser {
  */
 interface IDynamoUserItem {
   channelCount: number
-  // FIXME: Make optional
-  eligibleForUpgrade: boolean
+  eligibleForUpgrade?: boolean
   lastNewSubscriberNotification?: number
   notificationTokens?: Record<string, { lastUpdated: number }>
   notificationsEnabled: boolean
@@ -40,8 +38,8 @@ interface IDynamoUserItem {
   subscriptionCount: number
   subscriptionTopics?: Set<string>
   tier: number
-  // FIXME: Make optional
-  upgradeQualifyingEventTimestamps: number[]
+  unlimited?: boolean
+  upgradeQualifyingEventTimestamps?: number[]
   username: string
 }
 
@@ -56,8 +54,7 @@ interface IDynamoStreamUserImage {
   channelCount: {
     N: number
   }
-  // FIXME: Make optional
-  eligibleForUpgrade: {
+  eligibleForUpgrade?: {
     B: boolean
   }
   lastNewSubscriberNotification?: {
@@ -91,8 +88,10 @@ interface IDynamoStreamUserImage {
   tier: {
     N: number
   }
-  // FIXME: Make optional
-  upgradeQualifyingEventTimestamps: {
+  unlimited?: {
+    B: boolean
+  }
+  upgradeQualifyingEventTimestamps?: {
     L: number[]
   }
   username: {
