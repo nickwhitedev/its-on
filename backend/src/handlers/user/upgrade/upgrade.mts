@@ -67,13 +67,15 @@ const upgrade = async (
         ReturnValues: 'ALL_NEW',
         TableName: DYNAMODB_TABLE_NAME,
         UpdateExpression:
-          'SET #tier = :tier, #upgradeQualifyingEventTimestamps = :upgradeQualifyingEventTimestamps',
+          'SET #eligibleForUpgrade = :eligibleForUpgrade, #tier = :tier, #upgradeQualifyingEventTimestamps = :upgradeQualifyingEventTimestamps',
         ExpressionAttributeNames: {
+          '#eligibleForUpgrade': 'eligibleForUpgrade',
           '#tier': 'tier',
           '#upgradeQualifyingEventTimestamps':
             'upgradeQualifyingEventTimestamps',
         },
         ExpressionAttributeValues: {
+          ':eligibleForUpgrade': false,
           ':tier': newTier,
           ':upgradeQualifyingEventTimestamps': [],
         },

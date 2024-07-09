@@ -21,6 +21,7 @@ import { useErrorDispatch } from '../../contexts/error/errorContext'
 import { ErrorDispatchActionType } from '../../contexts/error/errorReducer'
 import MDCircularProgress from '../material/progress/MDCircularProgress'
 import { useState } from 'react'
+import { UPGRADE_SUCCESS_PATH } from '../../utils/urls'
 
 const UpgradeSettings = () => {
   const fetchApi = useFetchApi()
@@ -39,7 +40,7 @@ const UpgradeSettings = () => {
     setIsUpgrading(true)
     try {
       await fetchApi('/upgrade', 'POST')
-      navigate('/upgrade-success')
+      navigate(UPGRADE_SUCCESS_PATH)
     } catch (error) {
       await sendLog('Channel delete error', { error }, 'ERROR')
       dispatchError({
@@ -100,7 +101,6 @@ const UpgradeSettings = () => {
               {getUpgradeMinimumIntervalStringForTier(tier)}
             </p>
           </div>
-          <h3 className='UpgradeSettings-pay-heading'>Pay to Upgrade</h3>
         </>
       ) : null}
       <div className='UpgradeSettings-pricing-table'>

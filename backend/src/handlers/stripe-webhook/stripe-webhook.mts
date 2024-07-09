@@ -150,16 +150,16 @@ const stripeWebhook = async (
             ReturnValues: 'ALL_NEW',
             TableName: DYNAMODB_TABLE_NAME,
             UpdateExpression:
-              'SET #tier = :tier, #eligibleForUpgrade = :eligibleForUpgrade, #upgradeQualifyingEventTimestamps = :upgradeQualifyingEventTimestamps',
+              'SET #eligibleForUpgrade = :eligibleForUpgrade, #tier = :tier, #upgradeQualifyingEventTimestamps = :upgradeQualifyingEventTimestamps',
             ExpressionAttributeNames: {
-              '#tier': isSubscription ? 'unlimited' : 'tier',
               '#eligibleForUpgrade': 'eligibleForUpgrade',
+              '#tier': isSubscription ? 'unlimited' : 'tier',
               '#upgradeQualifyingEventTimestamps':
                 'upgradeQualifyingEventTimestamps',
             },
             ExpressionAttributeValues: {
-              ':tier': isSubscription ? true : newTier,
               ':eligibleForUpgrade': false,
+              ':tier': isSubscription ? true : newTier,
               ':upgradeQualifyingEventTimestamps': [],
             },
           }),
