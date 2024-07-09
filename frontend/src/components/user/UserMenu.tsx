@@ -8,7 +8,7 @@ import { MdMenu } from '@material/web/menu/menu'
 import { MdIconButton } from '@material/web/iconbutton/icon-button'
 import MDMenu from '../material/menu/MDMenu'
 import MDMenuItem from '../material/menu/MDMenuItem'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import MDListItem from '../material/list/MDListItem'
 import {
   PRIVACY_PATH,
@@ -27,8 +27,9 @@ const UserMenu = () => {
   const { signOut } = useClerk()
 
   const dispatchError = useErrorDispatch()
-  const sendLog = useSendLog()
   const disableDeviceNotifications = useDisableDeviceNotifications()
+  const navigate = useNavigate()
+  const sendLog = useSendLog()
 
   const menuAnchorRef = useRef<MdIconButton | null>(null)
   const menuRef = useRef<MdMenu | null>(null)
@@ -55,9 +56,8 @@ const UserMenu = () => {
   const handleSignOut = async () => {
     try {
       await disableDeviceNotifications()
-      await signOut({
-        redirectUrl: `/`,
-      })
+      await signOut()
+      navigate('/')
     } catch (error) {
       await sendLog('Error signing user out', { error }, 'ERROR')
       dispatchError({
