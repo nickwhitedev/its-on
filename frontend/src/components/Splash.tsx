@@ -8,9 +8,11 @@ import { SignInButton, SignUpButton } from '@clerk/clerk-react'
 import MDOutlinedButton from './material/button/MDOutlinedButton'
 import MDFilledTonalButton from './material/button/MDFilledTonalButton'
 import { useGetBrowserDisplayName } from '../utils/browser'
+import { useLocation } from 'react-router-dom'
 
 const Splash = () => {
   const getBrowserDisplayName = useGetBrowserDisplayName()
+  const { pathname } = useLocation()
 
   const [isOn, setIsOn] = useState<boolean>(false)
   const [isUsingOnWeb, setIsUsingOnWeb] = useState<boolean>(false)
@@ -62,7 +64,11 @@ const Splash = () => {
         </>
       ) : (
         <div>
-          <SignInButton mode='modal'>
+          <SignInButton
+            mode='modal'
+            forceRedirectUrl={pathname}
+            signUpForceRedirectUrl={pathname}
+          >
             <MDOutlinedButton className='Splash-auth-button'>
               Sign In
             </MDOutlinedButton>
