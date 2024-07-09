@@ -11,17 +11,24 @@ import MDMenuItem from '../material/menu/MDMenuItem'
 import { Link } from 'react-router-dom'
 import MDListItem from '../material/list/MDListItem'
 import {
-  BASE_URL,
   PRIVACY_PATH,
   PROFILE_PATH,
   SUPPORT_PATH,
   TERMS_PATH,
   UPGRADE_PATH,
 } from '../../utils/urls'
+import { useDisableDeviceNotifications } from '../../utils/notifications'
+import { useErrorDispatch } from '../../contexts/error/errorContext'
+import { useSendLog } from '../../utils/logging'
+import { ErrorDispatchActionType } from '../../contexts/error/errorReducer'
 
 const UserMenu = () => {
   const { isLoaded, user: clerkUser } = useClerkUser()
   const { signOut } = useClerk()
+
+  const dispatchError = useErrorDispatch()
+  const sendLog = useSendLog()
+  const disableDeviceNotifications = useDisableDeviceNotifications()
 
   const menuAnchorRef = useRef<MdIconButton | null>(null)
   const menuRef = useRef<MdMenu | null>(null)
@@ -45,12 +52,18 @@ const UserMenu = () => {
     }
   }, [menuAnchorRef, menuRef])
 
-  const signedOutURLParams = new URLSearchParams()
-  for (const [key, value] of Object.entries({
-    action: 'signedOut',
-    userID: clerkUser?.id ?? '',
-  })) {
-    signedOutURLParams.append(key, value)
+  const handleSignOut = async () => {
+    try {
+      await disableDeviceNotifications()
+      await signOut({
+        redirectUrl: `/`,
+      })
+    } catch (error) {
+      await sendLog('Error signing user out', { error }, 'ERROR')
+      dispatchError({
+        type: ErrorDispatchActionType.ERROR_SNACKBAR_TRIGGERED,
+      })
+    }
   }
 
   if (!isLoaded) return null
@@ -113,11 +126,7 @@ const UserMenu = () => {
         <MDMenuItem
           className='UserMenu-menu-item'
           type='button'
-          onClick={() => {
-            void signOut({
-              redirectUrl: `${BASE_URL}/?${signedOutURLParams.toString()}`,
-            })
-          }}
+          onClick={() => void handleSignOut()}
         >
           <MDIcon className='UserMenu-menu-item-icon' slot='start'>
             logout

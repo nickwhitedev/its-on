@@ -6,8 +6,6 @@ import {
   SignedIn,
   SignedOut,
 } from '@clerk/clerk-react'
-import { useDisableDeviceNotifications } from '../utils/notifications'
-import { useEffect, useMemo } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import ErrorSnackbar from './errors/ErrorSnackbar'
@@ -26,25 +24,8 @@ const App = () => {
   const error = useError()
   const location = useLocation()
   const navigate = useNavigate()
-  const disableDeviceNotifications = useDisableDeviceNotifications()
 
-  const { pathname, search } = location
-
-  const urlParams = useMemo(() => new URLSearchParams(search), [search])
-  const urlParamsAction = urlParams.get('action')
-
-  useEffect(() => {
-    void (async () => {
-      if (urlParamsAction === 'signedOut') {
-        try {
-          await disableDeviceNotifications()
-        } catch {
-          // empty
-        }
-        navigate('/')
-      }
-    })()
-  }, [disableDeviceNotifications, navigate, urlParams, urlParamsAction])
+  const { pathname } = location
 
   return (
     <div className='App'>
