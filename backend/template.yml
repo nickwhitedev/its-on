@@ -753,6 +753,44 @@ Resources:
       RetentionInDays: 30
       LogGroupName: !Join ['', ['/aws/lambda/', !Ref tableStreamLambdaFunction]]
 
+  ItsOnLambdaWarmerRule:
+    Type: 'AWS::Events::Rule'
+    Properties:
+      ScheduleExpression: rate(10 minutes)
+      Targets:
+        - Arn:
+            Fn::GetAtt:
+              - getOverviewLambdaFunction
+              - Arn
+          Id: getOverviewFunction
+        - Arn:
+            Fn::GetAtt:
+              - getChannelLambdaFunction
+              - Arn
+          Id: getChannelFunction
+
+  PermissionForWarmerRuleToInvokeGetOverviewLambdaFunction:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref getOverviewLambdaFunction
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn:
+        Fn::GetAtt:
+          - ItsOnLambdaWarmerRule
+          - Arn
+
+  PermissionForWarmerRuleToInvokeGetChannelLambdaFunction:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref getChannelLambdaFunction
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn:
+        Fn::GetAtt:
+          - ItsOnLambdaWarmerRule
+          - Arn
+
   # DynamoDB table to store item: {id: &lt;ID&gt;, name: &lt;NAME&gt;}
   ItsOnTable:
     Type: AWS::DynamoDB::Table
