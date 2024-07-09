@@ -11,7 +11,6 @@ import {
   TIER_100,
   TIER_25,
   TIER_5,
-  TIER_INFINITE,
   useDarkTheme,
 } from '../../utils/constants'
 
@@ -51,7 +50,7 @@ const StripePricingTable = () => {
     }
   }, [])
 
-  if (currentTier === TIER_INFINITE || currentTier >= TIER_100) {
+  if (user?.unlimited === true || currentTier >= TIER_100) {
     // TODO: Add subscription
     return <h4>You are upgraded to the max! For now, at least. Stay tuned.</h4>
     // return renderPricingTable({

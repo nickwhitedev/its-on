@@ -583,6 +583,33 @@ Resources:
       LogGroupName:
         !Join ['', ['/aws/lambda/', !Ref updateProfileLambdaFunction]]
 
+  # This is a Lambda function config associated with the source code: upgrade.mts
+  upgradeLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/src/handlers/user/upgrade/
+      Description: Upgrades a user's tier
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ItsOnApi
+            Path: /upgrade
+            Method: POST
+      Handler: handler.handler
+      Policies:
+        # Give Create/Read/Update/Delete Permissions to the ItsOnTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItsOnTable
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: arn:aws:secretsmanager:us-east-1:992382488292:secret:ItsOnIOSFirebaseServiceAccount-pjnCqi
+
+  upgradeLambdaFunctionLogGroup:
+    Type: 'AWS::Logs::LogGroup'
+    Properties:
+      RetentionInDays: 30
+      LogGroupName: !Join ['', ['/aws/lambda/', !Ref upgradeLambdaFunction]]
+
   # This is a Lambda function config associated with the source code: post-log.mts
   postLogLambdaFunction:
     Type: AWS::Serverless::Function
@@ -725,6 +752,44 @@ Resources:
     Properties:
       RetentionInDays: 30
       LogGroupName: !Join ['', ['/aws/lambda/', !Ref tableStreamLambdaFunction]]
+
+  ItsOnLambdaWarmerRule:
+    Type: 'AWS::Events::Rule'
+    Properties:
+      ScheduleExpression: rate(10 minutes)
+      Targets:
+        - Arn:
+            Fn::GetAtt:
+              - getOverviewLambdaFunction
+              - Arn
+          Id: getOverviewFunction
+        - Arn:
+            Fn::GetAtt:
+              - getChannelLambdaFunction
+              - Arn
+          Id: getChannelFunction
+
+  PermissionForWarmerRuleToInvokeGetOverviewLambdaFunction:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref getOverviewLambdaFunction
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn:
+        Fn::GetAtt:
+          - ItsOnLambdaWarmerRule
+          - Arn
+
+  PermissionForWarmerRuleToInvokeGetChannelLambdaFunction:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref getChannelLambdaFunction
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn:
+        Fn::GetAtt:
+          - ItsOnLambdaWarmerRule
+          - Arn
 
   # DynamoDB table to store item: {id: &lt;ID&gt;, name: &lt;NAME&gt;}
   ItsOnTable:

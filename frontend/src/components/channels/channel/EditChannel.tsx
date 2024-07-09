@@ -40,7 +40,7 @@ const EditChannel = ({ channel, isLoading, onClose }: Props) => {
   const [isUpdating, setIsUpdating] = useState<boolean>(false)
   const [currentTitle, setCurrentTitle] = useState<string>(channel.title ?? '')
   const [currentCapacity, setCurrentCapacity] = useState<number>(
-    user?.tier ?? DEFAULT_USER_TIER,
+    channel.capacity ?? userTier,
   )
   const [currentDuration, setCurrentDuration] = useState<number>(
     channel.duration ?? MS_IN_HOUR,
