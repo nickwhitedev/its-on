@@ -24,6 +24,7 @@
   margin: 1rem 0;
   place-self: center;
   user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .App-notifications {
