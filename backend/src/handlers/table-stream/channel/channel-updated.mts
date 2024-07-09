@@ -257,7 +257,12 @@ export const handleChannelUpdated = async ({
     let eligibleForUpgrade = profile?.eligibleForUpgrade
 
     // TODO: Unlimited - Add condition to skip if subscribed
-    if (profile != null && profile.tier < TOP_TIER && !eligibleForUpgrade) {
+    if (
+      profile != null &&
+      profile.unlimited !== true &&
+      profile.tier < TOP_TIER &&
+      !eligibleForUpgrade
+    ) {
       const upgradeQualifyingEventTimestamps =
         profile.upgradeQualifyingEventTimestamps?.filter(
           upgradeQualifyingEventTimestamp =>
@@ -266,9 +271,9 @@ export const handleChannelUpdated = async ({
         ) ?? []
 
       if (
-        upgradeQualifyingEventTimestamps.length === 0 ||
-        ((channelInfo.subscriberCount ?? 0) >=
+        (channelInfo.subscriberCount ?? 0) >=
           getUpgradeRequiredSubscriberCountForTier(profile.tier) &&
+        (upgradeQualifyingEventTimestamps.length === 0 ||
           (channelInfo.lastOn ?? 0) -
             upgradeQualifyingEventTimestamps[
               upgradeQualifyingEventTimestamps.length - 1
