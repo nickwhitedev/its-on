@@ -1284,10 +1284,10 @@
   dependencies:
     "@jridgewell/trace-mapping" "0.3.9"
 
-"@datastream/core@0.0.35":
-  version "0.0.35"
-  resolved "https://registry.yarnpkg.com/@datastream/core/-/core-0.0.35.tgz#48be2dbfd736c2ba56e3779e5bbed82bab32194e"
-  integrity sha512-jmKFcDTYqtDy8DHPahaheg3MlLBiQboYX4jYX8oxE1tO5x7cfLl5M6bqR/o46RCEFZ3M9yMVfEEh0hy5raErEw==
+"@datastream/core@0.0.36":
+  version "0.0.36"
+  resolved "https://registry.yarnpkg.com/@datastream/core/-/core-0.0.36.tgz#b8a3bf8509127f2d0019cbc9a37edb89fd56454b"
+  integrity sha512-qec5ckpnhrLL04sFkN4lOZVyYCLSUYjxmODEaEmO7qNzDwXF9laX6brgD2bd2+vXostv63yQ29yhsBNZQU6QsQ==
   dependencies:
     cloneable-readable "3.0.0"
 
@@ -1852,12 +1852,12 @@
   resolved "https://registry.yarnpkg.com/@js-sdsl/ordered-map/-/ordered-map-4.4.2.tgz#9299f82874bab9e4c7f9c48d865becbfe8d6907c"
   integrity sha512-iUKgm52T8HOE/makSxjqoWhe95ZJA1/G1sYsGev2JDKUSS14KAgg1LHb+Ba+IPow0xflbnSkOsZcO08C7w1gYw==
 
-"@middy/core@^5.4.2":
-  version "5.4.2"
-  resolved "https://registry.yarnpkg.com/@middy/core/-/core-5.4.2.tgz#527f397ea4f24d8ac4b6361aa79cf814beeed021"
-  integrity sha512-58xZaDDuJ/oaxdFp73R46GOZMR3NfWMzcbKYO6KmPgIwJLMTyHzQGJUbDicpKHkE4Hy2J2zxYioQrO62KPRiLg==
+"@middy/core@^5.4.5":
+  version "5.4.5"
+  resolved "https://registry.yarnpkg.com/@middy/core/-/core-5.4.5.tgz#3cf8af0d273249f0c17afac9a9750aabef9c333e"
+  integrity sha512-SnCplyrjp97YWeo1TzlnnBuqXZ4iA8jlXBVNmXSwa5w9KOh6LurSMgEKTi3ktJnt0Cm71vGa+8EumVcwSEKMtQ==
   dependencies:
-    "@datastream/core" "0.0.35"
+    "@datastream/core" "0.0.36"
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
