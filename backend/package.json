@@ -27,7 +27,7 @@
     "@types/jest": "^29.5.12",
     "@types/nanoid": "^3.0.0",
     "@types/nanoid-dictionary": "^4.2.2",
-    "@types/node": "^20.14.2",
+    "@types/node": "^20.14.10",
     "@types/web-push": "^3.6.2",
     "@typescript-eslint/eslint-plugin": "^7.14.1",
     "@typescript-eslint/parser": "^7.13.1",
