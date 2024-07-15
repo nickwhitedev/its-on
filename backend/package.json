@@ -5,13 +5,13 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@aws-lambda-powertools/logger": "^2.1.0",
+    "@aws-lambda-powertools/logger": "^2.5.0",
     "@aws-lambda-powertools/metrics": "^2.1.0",
     "@aws-sdk/client-dynamodb": "^3.609.0",
     "@aws-sdk/client-secrets-manager": "^3.592.0",
     "@aws-sdk/lib-dynamodb": "^3.610.0",
     "@clerk/clerk-sdk-node": "^5.0.10",
-    "@middy/core": "^5.4.2",
+    "@middy/core": "^5.4.5",
     "esbuild": "^0.21.5",
     "firebase-admin": "^12.2.0",
     "jsonwebtoken": "^9.0.2",
@@ -19,7 +19,7 @@
     "nanoid": "^5.0.7",
     "nanoid-dictionary": "^5.0.0-beta.1",
     "stripe": "^16.2.0",
-    "svix": "^1.24.0",
+    "svix": "^1.25.0",
     "web-push": "^3.6.7"
   },
   "devDependencies": {
@@ -27,7 +27,7 @@
     "@types/jest": "^29.5.12",
     "@types/nanoid": "^3.0.0",
     "@types/nanoid-dictionary": "^4.2.2",
-    "@types/node": "^20.14.2",
+    "@types/node": "^20.14.10",
     "@types/web-push": "^3.6.2",
     "@typescript-eslint/eslint-plugin": "^7.14.1",
     "@typescript-eslint/parser": "^7.13.1",

@@ -94,17 +94,17 @@
     "@smithy/util-utf8" "^2.0.0"
     tslib "^2.6.2"
 
-"@aws-lambda-powertools/commons@^2.1.1":
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/@aws-lambda-powertools/commons/-/commons-2.1.1.tgz#ee784516b4ee018888ca24023e5404f952c7174a"
-  integrity sha512-QlvZLVJM4yXlO6mpYlYwWGaLCZTJg8WfsIH8/eT061n4BdBljW/VHMj59sHp/IljQn8HE/VdHKYHqM6vPJjYJw==
+"@aws-lambda-powertools/commons@^2.1.1", "@aws-lambda-powertools/commons@^2.5.0":
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/@aws-lambda-powertools/commons/-/commons-2.5.0.tgz#1adda8fd5de22e8b6e6fc8b0fe36976d353c8938"
+  integrity sha512-6LTrCWknv/ey7akvEojN5qoAC2Hbb8twseYX7Efdigxs9+AadcM+P74Qh7BsMSvEiHdsIefHqtb4b13WOhFsJw==
 
-"@aws-lambda-powertools/logger@^2.1.0":
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/@aws-lambda-powertools/logger/-/logger-2.1.1.tgz#f255cfd507c5d1f0d6c9c5acff5e2e99938aa2c7"
-  integrity sha512-OB/ycDef8VD4OpGZcte2dxkdNWQCSxjRu8OJ2nuizh7auqZMI5LX8PYoIBEBRQC138CeJBtKKCwjSi+NOFMY1w==
+"@aws-lambda-powertools/logger@^2.5.0":
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/@aws-lambda-powertools/logger/-/logger-2.5.0.tgz#1f1efc5ef2952080067883c299141e67ab7d3d90"
+  integrity sha512-lNnjvI7H3g6tpnwia8laPclzq5vzsUNlVp89FPbgs/KdSqnp5XaeNhsMGwFVy5QDHttEGI2OrsgAOFbNcf936Q==
   dependencies:
-    "@aws-lambda-powertools/commons" "^2.1.1"
+    "@aws-lambda-powertools/commons" "^2.5.0"
     lodash.merge "^4.6.2"
 
 "@aws-lambda-powertools/metrics@^2.1.0":
@@ -1284,10 +1284,10 @@
   dependencies:
     "@jridgewell/trace-mapping" "0.3.9"
 
-"@datastream/core@0.0.35":
-  version "0.0.35"
-  resolved "https://registry.yarnpkg.com/@datastream/core/-/core-0.0.35.tgz#48be2dbfd736c2ba56e3779e5bbed82bab32194e"
-  integrity sha512-jmKFcDTYqtDy8DHPahaheg3MlLBiQboYX4jYX8oxE1tO5x7cfLl5M6bqR/o46RCEFZ3M9yMVfEEh0hy5raErEw==
+"@datastream/core@0.0.36":
+  version "0.0.36"
+  resolved "https://registry.yarnpkg.com/@datastream/core/-/core-0.0.36.tgz#b8a3bf8509127f2d0019cbc9a37edb89fd56454b"
+  integrity sha512-qec5ckpnhrLL04sFkN4lOZVyYCLSUYjxmODEaEmO7qNzDwXF9laX6brgD2bd2+vXostv63yQ29yhsBNZQU6QsQ==
   dependencies:
     cloneable-readable "3.0.0"
 
@@ -1852,12 +1852,12 @@
   resolved "https://registry.yarnpkg.com/@js-sdsl/ordered-map/-/ordered-map-4.4.2.tgz#9299f82874bab9e4c7f9c48d865becbfe8d6907c"
   integrity sha512-iUKgm52T8HOE/makSxjqoWhe95ZJA1/G1sYsGev2JDKUSS14KAgg1LHb+Ba+IPow0xflbnSkOsZcO08C7w1gYw==
 
-"@middy/core@^5.4.2":
-  version "5.4.2"
-  resolved "https://registry.yarnpkg.com/@middy/core/-/core-5.4.2.tgz#527f397ea4f24d8ac4b6361aa79cf814beeed021"
-  integrity sha512-58xZaDDuJ/oaxdFp73R46GOZMR3NfWMzcbKYO6KmPgIwJLMTyHzQGJUbDicpKHkE4Hy2J2zxYioQrO62KPRiLg==
+"@middy/core@^5.4.5":
+  version "5.4.5"
+  resolved "https://registry.yarnpkg.com/@middy/core/-/core-5.4.5.tgz#3cf8af0d273249f0c17afac9a9750aabef9c333e"
+  integrity sha512-SnCplyrjp97YWeo1TzlnnBuqXZ4iA8jlXBVNmXSwa5w9KOh6LurSMgEKTi3ktJnt0Cm71vGa+8EumVcwSEKMtQ==
   dependencies:
-    "@datastream/core" "0.0.35"
+    "@datastream/core" "0.0.36"
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
@@ -2614,10 +2614,10 @@
   dependencies:
     nanoid "*"
 
-"@types/node@*", "@types/node@>=13.7.0", "@types/node@>=8.1.0", "@types/node@^20.10.3", "@types/node@^20.14.2":
-  version "20.14.2"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.14.2.tgz#a5f4d2bcb4b6a87bffcaa717718c5a0f208f4a18"
-  integrity sha512-xyu6WAMVwv6AKFLB+e/7ySZVr/0zLCzOa7rSpq6jNwpqOrUbcACDWC+53d4n2QHOnDou0fbIsg8wZu/sxrnI4Q==
+"@types/node@*", "@types/node@>=13.7.0", "@types/node@>=8.1.0", "@types/node@^20.10.3", "@types/node@^20.14.10":
+  version "20.14.10"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.14.10.tgz#a1a218290f1b6428682e3af044785e5874db469a"
+  integrity sha512-MdiXf+nDuMvY0gJKxyfZ7/6UFsETO7mGKF54MVD/ekJS6HdFtpZFBgrh6Pseu64XTb2MLyFPlbW6hj8HYRQNOQ==
   dependencies:
     undici-types "~5.26.4"
 
@@ -5594,10 +5594,10 @@ svix-fetch@^3.0.0:
     node-fetch "^2.6.1"
     whatwg-fetch "^3.4.1"
 
-svix@^1.24.0:
-  version "1.24.0"
-  resolved "https://registry.yarnpkg.com/svix/-/svix-1.24.0.tgz#e5a6abd77e60c5509e6970fe0894be6d47671aa0"
-  integrity sha512-TEznBskvdvEJElo/j7BiIZAoaQEWyj/NCmwiV0izlVRf5DnCBFdowkEXERDA3JgUlAYoAJi0S7atWit7nkTMtw==
+svix@^1.25.0:
+  version "1.25.0"
+  resolved "https://registry.yarnpkg.com/svix/-/svix-1.25.0.tgz#e441dae64bcdbeccb1b8d94c456cf43c64aa3dec"
+  integrity sha512-uW9xnwLqxfiUGwoWphKfthnymp7m14D4tdl1S+7MrH6A++ov/E3ONqLKS/6okOarMre64twxMbsg/QlT0PpnLA==
   dependencies:
     "@stablelib/base64" "^1.0.0"
     es6-promise "^4.2.4"
