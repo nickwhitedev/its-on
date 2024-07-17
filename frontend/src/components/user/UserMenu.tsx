@@ -87,7 +87,7 @@ const UserMenu = () => {
         open={isMenuOpen}
         positioning='fixed'
         ref={menuRef}
-        onClosed={() => {
+        onClosing={() => {
           setIsMenuOpen(false)
         }}
       >
