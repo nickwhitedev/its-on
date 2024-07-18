@@ -10,6 +10,7 @@ import Profile from '../../components/user/Profile'
 import UpgradeSuccess from '../../components/upgrade/UpgradeSuccess'
 import UpgradeSettings from '../../components/upgrade/UpgradeSettings'
 import {
+  ABOUT_PATH,
   CHANNELS_PATH,
   PRIVACY_PATH,
   PROFILE_PATH,
@@ -19,6 +20,7 @@ import {
   UPGRADE_PATH,
   UPGRADE_SUCCESS_PATH,
 } from '../../utils/urls'
+import About from '../../components/about/About'
 
 const appRouter = [
   {
@@ -39,6 +41,10 @@ const appRouter = [
       return { channelID: params.channelID ?? null }
     },
     path: ':channelID',
+  },
+  {
+    element: <About />,
+    path: ABOUT_PATH,
   },
   {
     element: <Profile />,

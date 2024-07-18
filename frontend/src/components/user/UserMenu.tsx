@@ -21,6 +21,7 @@ import { useDisableDeviceNotifications } from '../../utils/notifications'
 import { useErrorDispatch } from '../../contexts/error/errorContext'
 import { useSendLog } from '../../utils/logging'
 import { ErrorDispatchActionType } from '../../contexts/error/errorReducer'
+import ItsOnIcon from '../icons/ItsOnIcon'
 
 const UserMenu = () => {
   const { isLoaded, user: clerkUser } = useClerkUser()
@@ -99,6 +100,14 @@ const UserMenu = () => {
             {clerkUser.username}
           </div>
         </MDListItem>
+        <MDMenuItem className='UserMenu-menu-item' type='link' href={'/about'}>
+          <MDIcon className='UserMenu-menu-item-icon' slot='start'>
+            <ItsOnIcon />
+          </MDIcon>
+          <div className='UserMenu-menu-text' slot='headline'>
+            About
+          </div>
+        </MDMenuItem>
         <MDMenuItem
           className='UserMenu-menu-item'
           type='link'
