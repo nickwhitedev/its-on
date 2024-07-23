@@ -3,13 +3,11 @@
     "baseUrl": ".",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "outDir": "./dist",
     "paths": {
-      "/opt/nodejs/*": [
-        "src/common/*"
-      ]
+      "/opt/nodejs/*": ["src/common/*"]
     },
     "preserveConstEnums": true,
     "resolveJsonModule": true,
