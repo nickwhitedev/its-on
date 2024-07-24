@@ -3,3 +3,12 @@
   max-width: 90%;
   min-width: 60%;
 }
+
+.About-example-card {
+  position: relative;
+  width: fit-content;
+  padding: 4px 32px;
+  margin: 0 auto 2rem;
+  border-radius: 12px;
+  background-color: var(--md-sys-color-surface-container);
+}
