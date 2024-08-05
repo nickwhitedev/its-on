@@ -975,21 +975,21 @@
   resolved "https://registry.yarnpkg.com/@canvas/image-data/-/image-data-1.0.0.tgz#3bd2cd856e13fc9e2c25feff360a4056857b0367"
   integrity sha512-BxOqI5LgsIQP1odU5KMwV9yoijleOPzHL18/YvNqF9KFSGF2K/DLlYAbDQsWqd/1nbaFuSkYD/191dpMtNh4vw==
 
-"@clerk/clerk-react@^5.2.5":
-  version "5.2.5"
-  resolved "https://registry.yarnpkg.com/@clerk/clerk-react/-/clerk-react-5.2.5.tgz#c07e70a40d6fdc01a426b4e10c5d144a057f26f4"
-  integrity sha512-Ihf1t2LdWTagW3U5BH5KRwQ8i+ECaZGEUymhJ89eZA+Ux5iXwLfOIBdwCIs45gbVuFiQ8WK0W00eaDgsNaf1mw==
+"@clerk/clerk-react@^5.3.1":
+  version "5.3.1"
+  resolved "https://registry.yarnpkg.com/@clerk/clerk-react/-/clerk-react-5.3.1.tgz#4f65d55a53744c9f5892dd937d266ebc81439882"
+  integrity sha512-TdZxa+kNEWHivUapDjlfnh+GZhEwlgvB3CnpZD3Qq6ovEmEaFL5eqFwo+hDoU+hUd9IkbvQ0WIi1wrVaaL8d2A==
   dependencies:
-    "@clerk/shared" "2.3.1"
-    "@clerk/types" "4.6.1"
+    "@clerk/shared" "2.4.3"
+    "@clerk/types" "4.11.0"
     tslib "2.4.1"
 
-"@clerk/shared@2.3.1":
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/@clerk/shared/-/shared-2.3.1.tgz#dac11f3f63787776b15d605ea801285d15f65c8d"
-  integrity sha512-WX7cCViYqkNMnbFfT2B93ykNcSseoYM1obMUynO60VBl9Zi6Epde5tn9VRamhuOdojgPR+DyYkH9AzBpXFYnSg==
+"@clerk/shared@2.4.3":
+  version "2.4.3"
+  resolved "https://registry.yarnpkg.com/@clerk/shared/-/shared-2.4.3.tgz#6de7463dd76e69c994bd0041a53017aff195602b"
+  integrity sha512-IME50BMoiUOEDrm8Dzx4A3QuMFlPEaoHnQ9kMHulWidcJ/cyj+3TEBPrW0Ls0v5ziwnMWeYsSrIv/XeU15hSNw==
   dependencies:
-    "@clerk/types" "4.6.1"
+    "@clerk/types" "4.11.0"
     glob-to-regexp "0.4.1"
     js-cookie "3.0.5"
     std-env "^3.7.0"
@@ -1002,6 +1002,13 @@
   dependencies:
     "@clerk/types" "4.6.1"
     tslib "2.4.1"
+
+"@clerk/types@4.11.0":
+  version "4.11.0"
+  resolved "https://registry.yarnpkg.com/@clerk/types/-/types-4.11.0.tgz#e7af3961d0fef19c5552858d89a4a778faf79488"
+  integrity sha512-sMp3ATIH5ZoZ9veu9/LNH68GvahDm7sPLJf8xYyjc9hJYILz85xzI0JbwS6iFJw2NpTssvyl9viL7tgBrw46iA==
+  dependencies:
+    csstype "3.1.1"
 
 "@clerk/types@4.6.1":
   version "4.6.1"
