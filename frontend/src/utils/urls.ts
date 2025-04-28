@@ -12,6 +12,7 @@ export const SUBSCRIPTIONS_PATH = 'subscriptions'
 export const PROFILE_PATH = 'profile'
 export const TERMS_PATH = 'terms'
 export const PRIVACY_PATH = 'privacy'
+export const CSAE_PATH = 'csae'
 export const SUPPORT_PATH = 'support'
 export const UPGRADE_PATH = 'upgrade'
 export const UPGRADE_SUCCESS_PATH = 'upgrade_success'
@@ -21,6 +22,7 @@ export const STANDALONE_PAGE_PATHS = [
   PROFILE_PATH,
   TERMS_PATH,
   PRIVACY_PATH,
+  CSAE_PATH,
   SUPPORT_PATH,
   UPGRADE_PATH,
   UPGRADE_SUCCESS_PATH,
