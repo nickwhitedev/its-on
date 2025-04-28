@@ -18,7 +18,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18.x'
-      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      - run: rm -rf node_modules && yarn install --production --frozen-lockfile
       - run: yarn test-ci
 
   lint-backend:
@@ -33,7 +33,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18.x'
-      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      - run: rm -rf node_modules && yarn install --production --frozen-lockfile
       - run: yarn lint
 
   compile-backend:
@@ -48,7 +48,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18.x'
-      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      - run: rm -rf node_modules && yarn install --production --frozen-lockfile
       - run: yarn compile
 
   test-frontend:
@@ -63,7 +63,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18.x'
-      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      - run: rm -rf node_modules && yarn install --production --frozen-lockfile
       - run: CI=true yarn test
 
   lint-frontend:
@@ -78,7 +78,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18.x'
-      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      - run: rm -rf node_modules && yarn install --production --frozen-lockfile
       - run: yarn lint
 
   compile-frontend:
@@ -93,5 +93,5 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18.x'
-      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      - run: rm -rf node_modules && yarn install --production --frozen-lockfile
       - run: tsc

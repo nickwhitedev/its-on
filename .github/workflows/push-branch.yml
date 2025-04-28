@@ -35,7 +35,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18.x'
-      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      - run: rm -rf node_modules && yarn install --production --frozen-lockfile
       - run: yarn test-ci
 
   lint-backend:
@@ -50,7 +50,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18.x'
-      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      - run: rm -rf node_modules && yarn install --production --frozen-lockfile
       - run: yarn lint
 
   compile-backend:
@@ -65,7 +65,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18.x'
-      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      - run: rm -rf node_modules && yarn install --production --frozen-lockfile
       - run: yarn compile
 
   test-frontend:
@@ -80,7 +80,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18.x'
-      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      - run: rm -rf node_modules && yarn install --production --frozen-lockfile
       - run: CI=true yarn test
 
   lint-frontend:
@@ -95,7 +95,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18.x'
-      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      - run: rm -rf node_modules && yarn install --production --frozen-lockfile
       - run: yarn lint
 
   compile-frontend:
@@ -110,7 +110,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18.x'
-      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      - run: rm -rf node_modules && yarn install --production --frozen-lockfile
       - run: tsc
 
   build-and-deploy-branch-api:
@@ -144,7 +144,7 @@ jobs:
       - uses: aws-actions/setup-sam@v2
         with:
           use-installer: true
-      - run: rm -rf node_modules && yarn install --frozen-lockfile
+      - run: rm -rf node_modules && yarn install --production --frozen-lockfile
       # Remove all unit tests to reduce the size of the package that will be ultimately uploaded to Lambda
       - run: rm -rf ./__tests__
       - run: yarn compile
@@ -212,7 +212,7 @@ jobs:
           node-version: '18.x'
 
       - name: Install dependencies
-        run: rm -rf node_modules && yarn install --frozen-lockfile
+        run: rm -rf node_modules && yarn install --production --frozen-lockfile
 
       - name: Set environment variables
         shell: bash
