@@ -12,6 +12,7 @@ import UpgradeSettings from '../../components/upgrade/UpgradeSettings'
 import {
   ABOUT_PATH,
   CHANNELS_PATH,
+  CSAE_PATH,
   PRIVACY_PATH,
   PROFILE_PATH,
   SUBSCRIPTIONS_PATH,
@@ -21,6 +22,7 @@ import {
   UPGRADE_SUCCESS_PATH,
 } from '../../utils/urls'
 import About from '../../components/about/About'
+import CSAEPolicy from '../../components/legal/CSAEPolicy'
 
 const appRouter = [
   {
@@ -57,6 +59,10 @@ const appRouter = [
   {
     element: <PrivacyPolicy />,
     path: PRIVACY_PATH,
+  },
+  {
+    element: <CSAEPolicy />,
+    path: CSAE_PATH,
   },
   {
     element: <Support />,
