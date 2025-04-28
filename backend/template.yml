@@ -12,6 +12,11 @@ Description: >-
 Transform:
   - AWS::Serverless-2016-10-31
 
+Metadata:
+  BuildMethod: esbuild
+  BuildProperties:
+    Minify: true
+
 Parameters:
   Env:
     Type: String
