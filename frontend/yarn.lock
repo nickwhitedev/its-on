@@ -2321,12 +2321,12 @@
   resolved "https://registry.yarnpkg.com/@types/estree/-/estree-1.0.5.tgz#a6ce3e556e00fd9895dd872dd172ad0d4bd687f4"
   integrity sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==
 
-"@types/node@>=12.12.47", "@types/node@>=13.7.0", "@types/node@^22.7.7":
-  version "22.7.7"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-22.7.7.tgz#6cd9541c3dccb4f7e8b141b491443f4a1570e307"
-  integrity sha512-SRxCrrg9CL/y54aiMCG3edPKdprgMVGDXjA3gB8UmmBW5TcXzRUYAh8EWzTnSJFAd1rgImPELza+A3bJ+qxz8Q==
+"@types/node@>=12.12.47", "@types/node@>=13.7.0", "@types/node@^22.15.2":
+  version "22.15.2"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-22.15.2.tgz#1db55aa64618ee93a58c8912f74beefe44aca905"
+  integrity sha512-uKXqKN9beGoMdBfcaTY1ecwz6ctxuJAcUlwE55938g0ZJ8lRxwAZqRz2AJ4pzpt5dHdTPMB863UZ0ESiFUcP7A==
   dependencies:
-    undici-types "~6.19.2"
+    undici-types "~6.21.0"
 
 "@types/prop-types@*":
   version "15.7.12"
@@ -6149,10 +6149,10 @@ unconfig@^0.3.11:
     defu "^6.1.4"
     jiti "^1.21.0"
 
-undici-types@~6.19.2:
-  version "6.19.8"
-  resolved "https://registry.yarnpkg.com/undici-types/-/undici-types-6.19.8.tgz#35111c9d1437ab83a7cdc0abae2f26d88eda0a02"
-  integrity sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==
+undici-types@~6.21.0:
+  version "6.21.0"
+  resolved "https://registry.yarnpkg.com/undici-types/-/undici-types-6.21.0.tgz#691d00af3909be93a7faa13be61b3a5b50ef12cb"
+  integrity sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==
 
 undici@5.28.4:
   version "5.28.4"
