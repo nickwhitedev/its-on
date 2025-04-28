@@ -142,6 +142,8 @@ jobs:
       # Remove all unit tests to reduce the size of the package that will be ultimately uploaded to Lambda
       - run: rm -rf ./__tests__
       - run: yarn compile
+      - run: rm -rf node_modules && yarn install --production --frozen-lockfile
+      - run: yarn set-up-layers
       - name: Build resources
         run: |
           yarn build \

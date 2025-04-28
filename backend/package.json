@@ -44,8 +44,9 @@
   },
   "scripts": {
     "build": "sam build",
-    "compile": "tsc && ./scripts/setup-layers.sh",
+    "compile": "tsc",
     "lint": "eslint . --ext mts --report-unused-disable-directives --max-warnings 0",
+    "set-up-layers": "./scripts/setup-layers.sh",
     "test": "jest",
     "test-ci": "jest --silent"
   }
