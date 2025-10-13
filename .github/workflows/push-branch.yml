@@ -160,7 +160,7 @@ jobs:
               ParameterKey=PushNotificationPrivateKey,ParameterValue=${PUSH_NOTIFICATION_PRIVATE_KEY}
 
       - name: Assume the testing pipeline user role
-        uses: aws-actions/configure-aws-credentials@v4.0.2
+        uses: aws-actions/configure-aws-credentials@v5.1.0
         with:
           role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
           role-session-name: branch-api-deployment
@@ -236,7 +236,7 @@ jobs:
         run: CI=true yarn build
 
       - name: Assume the testing pipeline user role
-        uses: aws-actions/configure-aws-credentials@v4.0.2
+        uses: aws-actions/configure-aws-credentials@v5.1.0
         with:
           role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
           role-session-name: branch-frontend-deployment
