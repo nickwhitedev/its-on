@@ -185,7 +185,7 @@ jobs:
       - uses: aws-actions/setup-sam@v2
         with:
           use-installer: true
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         with:
           name: packaged-dev.yml
           path: backend
