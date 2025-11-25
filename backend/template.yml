@@ -89,7 +89,7 @@ Globals:
       - !Ref ItsOnNodeModulesLambdaLayer
       - !Ref ItsOnCommonLambdaLayer
     MemorySize: 512
-    Runtime: nodejs20.x
+    Runtime: nodejs24.x
     Timeout: 300
 
 # Resources declares the AWS resources that you want to include in the stack
@@ -138,14 +138,14 @@ Resources:
       LayerName: node-modules
       ContentUri: dist/node-modules-layer/
       CompatibleRuntimes:
-        - nodejs20.x
+        - nodejs24.x
   ItsOnCommonLambdaLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
       LayerName: common
       ContentUri: dist/common-layer/
       CompatibleRuntimes:
-        - nodejs20.x
+        - nodejs24.x
 
   # Each Lambda function is defined by properties:
   # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
