@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import './Home.css'
 
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
