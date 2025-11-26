@@ -14,6 +14,7 @@
   "dependencies": {
     "@clerk/clerk-react": "^5.57.0",
     "@clerk/themes": "^2.4.40",
+    "@eslint/compat": "^2.0.0",
     "@lit/react": "^1.0.8",
     "@material/web": "^2.4.1",
     "clientjs": "^0.2.1",
@@ -28,6 +29,8 @@
     "react-tooltip": "^5.30.0"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.39.1",
     "@svgr/cli": "^8.1.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
@@ -46,6 +49,7 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
+    "globals": "^16.5.0",
     "jsdom": "^27.2.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",

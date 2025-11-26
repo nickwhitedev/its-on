@@ -11,9 +11,9 @@ import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
 import mockContext from '../../../../__mocks__/mock-context.js'
 import mockEvent from '../../../../__mocks__/mock-event.js'
-import { CORS_HEADERS } from '../../../../src/common/constants.mjs'
-import { MS_IN_HOUR } from '../../../../src/common/time.mjs'
-import createChannel from '../../../../src/handlers/channel/create-channel/create-channel.mjs'
+import { CORS_HEADERS } from '../../../../src/common/constants.js'
+import { MS_IN_HOUR } from '../../../../src/common/time.js'
+import createChannel from '../../../../src/handlers/channel/create-channel/create-channel.js'
 
 // This includes all tests for createChannel()
 describe('Test createChannel', function () {

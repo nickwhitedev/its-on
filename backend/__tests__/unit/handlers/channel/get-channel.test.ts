@@ -9,8 +9,8 @@ import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
 import mockContext from '../../../../__mocks__/mock-context.js'
 import mockEvent from '../../../../__mocks__/mock-event.js'
-import { CORS_HEADERS } from '../../../../src/common/constants.mjs'
-import getChannel from '../../../../src/handlers/channel/get-channel/get-channel.mjs'
+import { CORS_HEADERS } from '../../../../src/common/constants.js'
+import getChannel from '../../../../src/handlers/channel/get-channel/get-channel.js'
 
 describe('Test getChannelHandler', () => {
   const ddbMock = mockClient(DynamoDBDocumentClient)
