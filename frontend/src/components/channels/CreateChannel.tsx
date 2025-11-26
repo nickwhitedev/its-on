@@ -37,7 +37,7 @@ const CreateChannel = () => {
       })
       setIsCreating(false)
       setTitle('')
-      navigate(`/${newChannel.id}`)
+      void navigate(`/${newChannel.id}`)
     } catch (error) {
       await sendLog('CreateChannel create channel error', { error }, 'ERROR')
       dispatchError({

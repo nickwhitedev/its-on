@@ -58,7 +58,7 @@ const UserMenu = () => {
     try {
       await disableDeviceNotifications()
       await signOut()
-      navigate('/')
+      void navigate('/')
     } catch (error) {
       await sendLog('Error signing user out', { error }, 'ERROR')
       dispatchError({

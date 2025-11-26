@@ -66,7 +66,7 @@ const Notifications = ({ className }: { className: string }) => {
                     type='button'
                     onClick={() => {
                       setIsDialogOpen(false)
-                      navigate(`/${subscription.id}`)
+                      void navigate(`/${subscription.id}`)
                     }}
                   >
                     <div slot='headline'>

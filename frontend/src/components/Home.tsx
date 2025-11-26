@@ -40,7 +40,7 @@ const Home = () => {
     setIsLoading(true)
     try {
       await syncOverviewRequest()
-    } catch (error) {
+    } catch {
       setHasOverviewError(true)
     }
     setIsLoading(false)
@@ -105,7 +105,7 @@ const Home = () => {
             const activeTabIndex = (
               event.target as { activeTabIndex: number } | null
             )?.activeTabIndex
-            navigate(
+            void navigate(
               activeTabIndex === 0
                 ? '/channels'
                 : activeTabIndex === 1

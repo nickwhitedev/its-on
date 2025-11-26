@@ -40,7 +40,7 @@ const UpgradeSettings = () => {
     setIsUpgrading(true)
     try {
       await fetchApi('/upgrade', 'POST')
-      navigate(UPGRADE_SUCCESS_PATH)
+      void navigate(UPGRADE_SUCCESS_PATH)
     } catch (error) {
       await sendLog('Channel delete error', { error }, 'ERROR')
       dispatchError({
