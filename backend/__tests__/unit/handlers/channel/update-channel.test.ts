@@ -11,8 +11,8 @@ import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
 import mockContext from '../../../../__mocks__/mock-context.js'
 import mockEvent from '../../../../__mocks__/mock-event.js'
-import { CORS_HEADERS } from '../../../../src/common/constants.js'
-import updateChannel from '../../../../src/handlers/channel/update-channel/update-channel.js'
+import { CORS_HEADERS } from '../../../../src/common/constants.mjs'
+import updateChannel from '../../../../src/handlers/channel/update-channel/update-channel.mjs'
 
 // This includes all tests for updateChannel()
 describe('Test updateChannel', function () {

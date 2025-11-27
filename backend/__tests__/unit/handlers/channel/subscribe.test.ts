@@ -6,14 +6,14 @@ import {
 } from '@aws-sdk/lib-dynamodb'
 
 import { APIGatewayProxyEvent } from 'aws-lambda'
-import { CORS_HEADERS } from '../../../../src/common/constants.js'
+import { CORS_HEADERS } from '../../../../src/common/constants.mjs'
 import { Logger } from '@aws-lambda-powertools/logger'
 import { Metrics } from '@aws-lambda-powertools/metrics'
 import { jest } from '@jest/globals'
 import { mockClient } from 'aws-sdk-client-mock'
 import mockContext from '../../../../__mocks__/mock-context.js'
 import mockEvent from '../../../../__mocks__/mock-event.js'
-import subscribe from '../../../../src/handlers/channel/subscribe/subscribe.js'
+import subscribe from '../../../../src/handlers/channel/subscribe/subscribe.mjs'
 
 // This includes all tests for subscribe()
 describe('Test subscribe', function () {

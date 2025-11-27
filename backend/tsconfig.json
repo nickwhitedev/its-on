@@ -15,7 +15,8 @@
     "sourceMap": false,
     "strict": true,
     "target": "esnext",
-    "useUnknownInCatchVariables": false
+    "useUnknownInCatchVariables": false,
+    "rootDirs": ["./src", "./__tests__"]
   },
   "exclude": ["node_modules"]
 }

@@ -5,9 +5,9 @@ import {
 } from '@aws-sdk/lib-dynamodb'
 
 import { APIGatewayProxyEvent } from 'aws-lambda'
-import { CORS_HEADERS } from '../../../src/common/constants.js'
+import { CORS_HEADERS } from '../../../src/common/constants.mjs'
 import { Logger } from '@aws-lambda-powertools/logger'
-import getOverview from '../../../src/handlers/get-overview/get-overview.js'
+import getOverview from '../../../src/handlers/get-overview/get-overview.mjs'
 import { mockClient } from 'aws-sdk-client-mock'
 import mockContext from '../../../__mocks__/mock-context.js'
 import mockEvent from '../../../__mocks__/mock-event.js'
