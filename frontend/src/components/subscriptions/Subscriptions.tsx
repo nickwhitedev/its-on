@@ -87,7 +87,7 @@ const Subscriptions = () => {
                   key={index}
                   type='link'
                   onClick={() => {
-                    navigate(`/${channel.id}`)
+                    void navigate(`/${channel.id}`)
                   }}
                 >
                   <MDIcon

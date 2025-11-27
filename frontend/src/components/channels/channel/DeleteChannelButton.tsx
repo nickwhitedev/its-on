@@ -42,7 +42,7 @@ const DeleteChannelButton = ({ channel, isUpdating, setIsUpdating }: Props) => {
       dispatchUser({
         type: UserDispatchActionType.CHANNEL_COUNT_DECREASED,
       })
-      navigate('/channels')
+      void navigate('/channels')
     } catch (error) {
       await sendLog('Channel delete error', { error }, 'ERROR')
       dispatchError({

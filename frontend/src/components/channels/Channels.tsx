@@ -55,7 +55,7 @@ const Channels = () => {
         type: UserDispatchActionType.CHANNEL_COUNT_INCREASED,
       })
       setIsCreating(false)
-      navigate(`/${newChannel.id}`)
+      void navigate(`/${newChannel.id}`)
     } catch (error) {
       await sendLog('Channels create channel error', { error }, 'ERROR')
       dispatchError({
@@ -86,11 +86,11 @@ const Channels = () => {
             className='Channels-list-item'
             disabled={userHasMaxChannels}
             type='button'
-            onClick={() => {
+            onClick={() =>
               userHasMaxChannels
-                ? navigate(`/${UPGRADE_PATH}`)
+                ? void navigate(`/${UPGRADE_PATH}`)
                 : void handleCreateChannel()
-            }}
+            }
           >
             <MDIcon slot='start'>add</MDIcon>
             <div slot='headline'>New Channel</div>
@@ -107,7 +107,7 @@ const Channels = () => {
                 className='Channels-list-item'
                 type='link'
                 onClick={() => {
-                  navigate(`/${channel.id}`)
+                  void navigate(`/${channel.id}`)
                 }}
               >
                 <MDIcon

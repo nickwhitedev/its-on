@@ -11,8 +11,8 @@ import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
 import mockContext from '../../../../__mocks__/mock-context.js'
 import mockEvent from '../../../../__mocks__/mock-event.js'
-import { CORS_HEADERS } from '../../../../src/common/constants.mjs'
-import itsOn from '../../../../src/handlers/channel/its-on/its-on.mjs'
+import { CORS_HEADERS } from '../../../../src/common/constants.js'
+import itsOn from '../../../../src/handlers/channel/its-on/its-on.js'
 
 describe('Test itsOnHandler', function () {
   const ddbMock = mockClient(DynamoDBDocumentClient)

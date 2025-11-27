@@ -7,8 +7,8 @@ import { APIGatewayProxyEvent } from 'aws-lambda'
 import { mockClient } from 'aws-sdk-client-mock'
 import mockContext from '../../../../__mocks__/mock-context.js'
 import mockEvent from '../../../../__mocks__/mock-event.js'
-import { CORS_HEADERS } from '../../../../src/common/constants.mjs'
-import deleteChannel from '../../../../src/handlers/channel/delete-channel/delete-channel.mjs'
+import { CORS_HEADERS } from '../../../../src/common/constants.js'
+import deleteChannel from '../../../../src/handlers/channel/delete-channel/delete-channel.js'
 
 describe('Test deleteHandler', function () {
   const ddbMock = mockClient(DynamoDBDocumentClient)

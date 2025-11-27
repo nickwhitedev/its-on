@@ -1,4 +1,3 @@
-import { LoaderFunctionArgs } from '@remix-run/router/dist/utils'
 import HomeBody from '../../components/HomeBody'
 import Channels from '../../components/channels/Channels'
 import PrivacyPolicy from '../../components/legal/PrivacyPolicy'
@@ -23,6 +22,7 @@ import {
 } from '../../utils/urls'
 import About from '../../components/about/About'
 import CSAEPolicy from '../../components/legal/CSAEPolicy'
+import { LoaderFunctionArgs } from 'react-router-dom'
 
 const appRouter = [
   {

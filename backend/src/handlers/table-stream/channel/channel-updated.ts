@@ -1,0 +1,319 @@
+import {
+  DynamoDBDocumentClient,
+  PutCommand,
+  QueryCommand,
+  UpdateCommand,
+} from '@aws-sdk/lib-dynamodb'
+
+import { Logger } from '@aws-lambda-powertools/logger'
+import { Metrics } from '@aws-lambda-powertools/metrics'
+import { DynamoDBRecord } from 'aws-lambda'
+import {
+  DYNAMODB_TABLE_NAME,
+  TOP_TIER,
+  WEB_URL,
+} from '../../../common/constants.js'
+import { batchWrite, getUserInfo } from '../../../common/dynamo.js'
+import { MS_IN_HOUR } from '../../../common/time.js'
+import {
+  getMessagingChannelTopic,
+  initializeFirebase,
+} from '../../../common/firebase.js'
+import { getMessaging } from 'firebase-admin/messaging'
+import {
+  getUpgradeEventCountGoalForTier,
+  getUpgradeMinimumIntervalForTier,
+  getUpgradeRequiredSubscriberCountForTier,
+  getUpgradeStreakWindowForTier,
+} from '../../../common/upgrade.js'
+
+interface Params {
+  record: DynamoDBRecord
+  ddbDocClient: DynamoDBDocumentClient
+  logger: Logger
+  metrics: Metrics
+}
+
+export const handleChannelUpdated = async ({
+  record,
+  ddbDocClient,
+  logger,
+}: Params) => {
+  const [pk, sk] = [
+    record.dynamodb?.Keys?.pk.S ?? '',
+    record.dynamodb?.Keys?.sk.S ?? '',
+  ]
+
+  const channelOwnerID = pk.substring(pk.indexOf('#') + 1)
+  const channelID = sk.substring(sk.indexOf('#') + 1)
+
+  const channelInfo: IDynamoChannelItem = {
+    canceled: record.dynamodb?.NewImage?.canceled.BOOL ?? false,
+    capacity: parseInt(record.dynamodb?.NewImage?.capacity.N ?? '5'),
+    duration: parseInt(
+      record.dynamodb?.NewImage?.duration.N ?? MS_IN_HOUR.toString(),
+    ),
+    lastOn: parseInt(record.dynamodb?.NewImage?.lastOn.N ?? '0'),
+    lastOnDuration: parseInt(
+      record.dynamodb?.NewImage?.lastOnDuration.N ?? MS_IN_HOUR.toString(),
+    ),
+    lastUpdated: parseInt(record.dynamodb?.NewImage?.lastUpdated.N ?? '0'),
+    note: record.dynamodb?.NewImage?.note.S ?? '',
+    owner: record.dynamodb?.NewImage?.owner.S ?? '',
+    ownerID: record.dynamodb?.NewImage?.ownerID.S ?? '',
+    pk,
+    sk,
+    subscriberCount: parseInt(
+      record.dynamodb?.NewImage?.subscriberCount.N ?? '0',
+    ),
+    title: record.dynamodb?.NewImage?.title.S ?? '',
+  }
+
+  const oldChannelInfo: IDynamoChannelItem = {
+    canceled: record.dynamodb?.OldImage?.canceled.BOOL ?? false,
+    capacity: parseInt(record.dynamodb?.OldImage?.capacity.N ?? '5'),
+    duration: parseInt(
+      record.dynamodb?.OldImage?.duration.N ?? MS_IN_HOUR.toString(),
+    ),
+    lastOn: parseInt(record.dynamodb?.OldImage?.lastOn.N ?? '0'),
+    lastOnDuration: parseInt(
+      record.dynamodb?.OldImage?.lastOnDuration.N ?? MS_IN_HOUR.toString(),
+    ),
+    lastUpdated: parseInt(record.dynamodb?.OldImage?.lastUpdated.N ?? '0'),
+    note: record.dynamodb?.OldImage?.note.S ?? '',
+    owner: record.dynamodb?.OldImage?.owner.S ?? '',
+    ownerID: record.dynamodb?.OldImage?.ownerID.S ?? '',
+    pk,
+    sk,
+    subscriberCount: parseInt(
+      record.dynamodb?.OldImage?.subscriberCount.N ?? '0',
+    ),
+    title: record.dynamodb?.OldImage?.title.S ?? '',
+  }
+
+  // Put a public channel
+  try {
+    await ddbDocClient.send(
+      new PutCommand({
+        TableName: DYNAMODB_TABLE_NAME,
+        Item: {
+          ...channelInfo,
+          pk: `channel#${channelID}`,
+          sk: 'info',
+        } as IDynamoChannelItem,
+      }),
+    )
+    logger.debug('Successful public channel write')
+  } catch (error) {
+    logger.error('write public channel failed', error as Error)
+    return
+  }
+
+  let lastEvaluatedKey: Record<string, unknown> | undefined
+  let queryBatchCount = 0
+  do {
+    logger.debug(`Start Query batch ${(++queryBatchCount).toString()}`)
+
+    let subscribers: IDynamoChannelSubscriber[]
+
+    try {
+      const ddbResponse = await ddbDocClient.send(
+        new QueryCommand({
+          TableName: DYNAMODB_TABLE_NAME,
+          KeyConditionExpression:
+            '#pk = :pkvalue and begins_with(sk, :skprefix)',
+          ExpressionAttributeNames: {
+            '#pk': 'pk',
+          },
+          ExpressionAttributeValues: {
+            ':pkvalue': `channel#${channelID}`,
+            ':skprefix': 'subscriber',
+          },
+          Limit: 100,
+          ...(lastEvaluatedKey != null
+            ? { ExclusiveStartKey: lastEvaluatedKey }
+            : {}),
+        }),
+      )
+      subscribers = (ddbResponse.Items ?? []) as IDynamoChannelSubscriber[]
+      lastEvaluatedKey = ddbResponse.LastEvaluatedKey
+      logger.debug('Get public channel subscribers', { ddbResponse })
+    } catch (error) {
+      logger.error('Get public channel subscribers error', error as Error)
+      return
+    }
+
+    // bulk write all channel copies
+    let batchCount = 0
+    const subscribersToUpdate = [...subscribers]
+    while (subscribersToUpdate.length > 0) {
+      // Limiting to 12 to stay under batch write limit, which is 25 requests per batch write
+      const subscriberChunk = subscribersToUpdate.splice(0, 12)
+      try {
+        await batchWrite({
+          batchWriteInput: {
+            RequestItems: {
+              [DYNAMODB_TABLE_NAME]: subscriberChunk.map(
+                ({ pk: subscriberPK, sk: subscriberSK }) => {
+                  return {
+                    PutRequest: {
+                      Item: {
+                        ...channelInfo,
+                        pk: `user#${subscriberSK.substring(
+                          subscriberSK.indexOf('#') + 1,
+                        )}`,
+                        sk: `subscription#${subscriberPK.substring(
+                          subscriberPK.indexOf('#') + 1,
+                        )}`,
+                      } as IDynamoChannelItem,
+                    },
+                  }
+                },
+              ),
+            },
+          },
+          ddbDocClient,
+        })
+        logger.debug(
+          `Successful batch write - batch ${(++batchCount).toString()}`,
+        )
+      } catch (error) {
+        logger.error('batch write failed', error as Error)
+        return
+      }
+    }
+  } while (lastEvaluatedKey != null && Object.keys(lastEvaluatedKey).length > 0)
+
+  // Send notifications if it's on
+  if (
+    !channelInfo.canceled &&
+    (channelInfo.lastOn ?? 0) >
+      (oldChannelInfo.lastOn ?? 0) + (oldChannelInfo.lastOnDuration ?? 0)
+  ) {
+    try {
+      await initializeFirebase()
+    } catch (error) {
+      logger.error('Failed to initialize Firebase', error as Error)
+    }
+
+    try {
+      const topic = getMessagingChannelTopic({ channelID, channelOwnerID })
+      const channelURL = `${WEB_URL}/${channelID}`
+      const messageID = await getMessaging().send({
+        apns: {
+          headers: {
+            'apns-expiration': Math.floor(
+              (Date.now() + (channelInfo.duration ?? MS_IN_HOUR * 12)) / 1000,
+            ).toString(),
+          },
+          payload: {
+            aps: {
+              alert: {
+                body: channelInfo.note ?? '',
+                title: `${channelInfo.title ?? 'Untitled Channel'} • ${
+                  channelInfo.owner ?? 'unknown'
+                }`,
+              },
+            },
+          },
+        },
+        topic,
+        webpush: {
+          fcmOptions: {
+            link: channelURL,
+          },
+          headers: {
+            ttl: (channelInfo.duration ?? (MS_IN_HOUR * 12) / 1000).toString(),
+          },
+          notification: {
+            badge: '/monochrome-icon-96.png',
+            body: channelInfo.note ?? '',
+            data: { url: channelURL },
+            icon: '/icon-512.png',
+            title: `${channelInfo.title ?? 'Untitled Channel'} • ${
+              channelInfo.owner ?? 'unknown'
+            }`,
+          },
+        },
+      })
+      logger.debug('Message sent to notification topic', { topic, messageID })
+    } catch (error) {
+      logger.error('Error sending notifications', error as Error)
+    }
+
+    // Check for upgrade qualifying events
+    let profile: IDynamoUserItem | undefined
+    try {
+      profile = await getUserInfo({
+        ddbDocClient,
+        userID: channelOwnerID,
+      })
+    } catch (error) {
+      logger.error(
+        'Error updating upgradeQualifyingEventTimestamps',
+        error as Error,
+      )
+    }
+    let eligibleForUpgrade = profile?.eligibleForUpgrade
+
+    // TODO: Unlimited - Add condition to skip if subscribed
+    if (
+      profile != null &&
+      profile.unlimited !== true &&
+      profile.tier < TOP_TIER &&
+      !eligibleForUpgrade
+    ) {
+      const upgradeQualifyingEventTimestamps =
+        profile.upgradeQualifyingEventTimestamps?.filter(
+          upgradeQualifyingEventTimestamp =>
+            upgradeQualifyingEventTimestamp >=
+            Date.now() - getUpgradeStreakWindowForTier(profile.tier),
+        ) ?? []
+
+      if (
+        (channelInfo.subscriberCount ?? 0) >=
+          getUpgradeRequiredSubscriberCountForTier(profile.tier) &&
+        (upgradeQualifyingEventTimestamps.length === 0 ||
+          (channelInfo.lastOn ?? 0) -
+            upgradeQualifyingEventTimestamps[
+              upgradeQualifyingEventTimestamps.length - 1
+            ] >=
+            getUpgradeMinimumIntervalForTier(profile.tier))
+      ) {
+        upgradeQualifyingEventTimestamps.push(channelInfo.lastOn ?? 0)
+        eligibleForUpgrade =
+          upgradeQualifyingEventTimestamps.length >=
+          getUpgradeEventCountGoalForTier(profile.tier)
+
+        try {
+          const ddbResponse = await ddbDocClient.send(
+            new UpdateCommand({
+              Key: {
+                pk: `user#${channelOwnerID}`,
+                sk: `profile`,
+              },
+              ReturnValues: 'ALL_NEW',
+              TableName: DYNAMODB_TABLE_NAME,
+              UpdateExpression:
+                'SET #eligibleForUpgrade = :eligibleForUpgrade, #upgradeQualifyingEventTimestamps = :upgradeQualifyingEventTimestamps',
+              ExpressionAttributeNames: {
+                '#eligibleForUpgrade': 'eligibleForUpgrade',
+                '#upgradeQualifyingEventTimestamps':
+                  'upgradeQualifyingEventTimestamps',
+              },
+              ExpressionAttributeValues: {
+                ':eligibleForUpgrade': eligibleForUpgrade,
+                ':upgradeQualifyingEventTimestamps':
+                  upgradeQualifyingEventTimestamps,
+              },
+            }),
+          )
+          logger.debug('Success - profile updated', { ddbResponse })
+        } catch (error) {
+          logger.error('Error', error as Error)
+        }
+      }
+    }
+  }
+  logger.debug('Finished updating items successfully')
+}

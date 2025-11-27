@@ -28,7 +28,7 @@ const ShareChannelButton = ({ channel, isUpdating, size }: Props) => {
         }`,
         url: channelURL,
       })
-    } catch (error) {
+    } catch {
       await navigator.clipboard.writeText(channelURL)
       setChannelCopied(true)
     }

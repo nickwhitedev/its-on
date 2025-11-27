@@ -7,7 +7,7 @@ export default {
     '/opt/nodejs/(.*)': '<rootDir>/src/common/$1',
   },
   modulePathIgnorePatterns: ['.aws', 'dist'],
-  preset: 'ts-jest',
+  preset: 'ts-jest/presets/default-esm', // Explicit ES Module preset
   resolver: 'ts-jest-resolver',
   setupFiles: ['<rootDir>/__tests__/setupTests.ts'],
   testMatch: [
@@ -16,6 +16,13 @@ export default {
   ],
   testPathIgnorePatterns: ['/node_modules/', '/dist/'],
   transform: {
-    '^.+\\.mts?$': 'ts-jest',
+    '^.+\\.m?ts$': [
+      'ts-jest',
+      {
+        useESM: true,
+        tsconfig: 'tsconfig.json',
+      },
+    ],
   },
+  extensionsToTreatAsEsm: ['.ts', '.mts'],
 }
