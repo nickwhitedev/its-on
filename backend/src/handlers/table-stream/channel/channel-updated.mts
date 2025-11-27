@@ -12,20 +12,20 @@ import {
   DYNAMODB_TABLE_NAME,
   TOP_TIER,
   WEB_URL,
-} from 'opt/nodejs/common/constants.mjs'
-import { batchWrite, getUserInfo } from 'opt/nodejs/common/dynamo.mjs'
-import { MS_IN_HOUR } from 'opt/nodejs/common/time.mjs'
+} from '/opt/nodejs/constants.mjs'
+import { batchWrite, getUserInfo } from '/opt/nodejs/dynamo.mjs'
+import { MS_IN_HOUR } from '/opt/nodejs/time.mjs'
 import {
   getMessagingChannelTopic,
   initializeFirebase,
-} from 'opt/nodejs/common/firebase.mjs'
+} from '/opt/nodejs/firebase.mjs'
 import { getMessaging } from 'firebase-admin/messaging'
 import {
   getUpgradeEventCountGoalForTier,
   getUpgradeMinimumIntervalForTier,
   getUpgradeRequiredSubscriberCountForTier,
   getUpgradeStreakWindowForTier,
-} from 'opt/nodejs/common/upgrade.mjs'
+} from '/opt/nodejs/upgrade.mjs'
 
 interface Params {
   record: DynamoDBRecord

@@ -8,10 +8,10 @@ import {
 import { Logger } from '@aws-lambda-powertools/logger'
 import { MetricUnit, Metrics } from '@aws-lambda-powertools/metrics'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DYNAMODB_TABLE_NAME } from 'opt/nodejs/common/constants.mjs'
-import { getChannel } from 'opt/nodejs/common/dynamo.mjs'
-import { createResponse } from 'opt/nodejs/common/response.mjs'
-import { MS_IN_HOUR } from 'opt/nodejs/common/time.mjs'
+import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
+import { getChannel } from '/opt/nodejs/dynamo.mjs'
+import { createResponse } from '/opt/nodejs/response.mjs'
+import { MS_IN_HOUR } from '/opt/nodejs/time.mjs'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)

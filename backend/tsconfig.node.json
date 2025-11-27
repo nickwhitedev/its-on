@@ -38,7 +38,7 @@
 
     // Output Configuration
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": ".",
 
     // Path Aliases (if needed)
     "paths": {

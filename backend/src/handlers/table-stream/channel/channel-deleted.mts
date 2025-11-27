@@ -9,8 +9,8 @@ import {
 import { Logger } from '@aws-lambda-powertools/logger'
 import { DynamoDBRecord } from 'aws-lambda'
 import { nanoid } from 'nanoid'
-import { DYNAMODB_TABLE_NAME } from 'opt/nodejs/common/constants.mjs'
-import { batchWrite, getUserInfo } from 'opt/nodejs/common/dynamo.mjs'
+import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
+import { batchWrite, getUserInfo } from '/opt/nodejs/dynamo.mjs'
 
 interface Params {
   record: DynamoDBRecord

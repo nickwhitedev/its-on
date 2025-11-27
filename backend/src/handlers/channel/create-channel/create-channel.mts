@@ -7,16 +7,16 @@ import {
   APIGatewayProxyResult,
   Context,
 } from 'aws-lambda'
-import { getChannel, getUserInfo } from 'opt/nodejs/common/dynamo.mjs'
+import { getChannel, getUserInfo } from '/opt/nodejs/dynamo.mjs'
 
 import { Logger } from '@aws-lambda-powertools/logger'
 import { MetricUnit, Metrics } from '@aws-lambda-powertools/metrics'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { customAlphabet } from 'nanoid'
 import { alphanumeric } from 'nanoid-dictionary'
-import { DYNAMODB_TABLE_NAME } from 'opt/nodejs/common/constants.mjs'
-import { createResponse } from 'opt/nodejs/common/response.mjs'
-import { MS_IN_HOUR } from 'opt/nodejs/common/time.mjs'
+import { DYNAMODB_TABLE_NAME } from '/opt/nodejs/constants.mjs'
+import { createResponse } from '/opt/nodejs/response.mjs'
+import { MS_IN_HOUR } from '/opt/nodejs/time.mjs'
 
 const nanoid = customAlphabet(alphanumeric, 11)
 

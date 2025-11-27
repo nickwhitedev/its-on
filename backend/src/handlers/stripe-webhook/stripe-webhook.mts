@@ -16,8 +16,8 @@ import {
   DYNAMODB_TABLE_NAME,
   SKUS_TO_TIERS,
   UNLIMITED_SUBSCRIPTION_SKU,
-} from 'opt/nodejs/common/constants.mjs'
-import { createResponse } from 'opt/nodejs/common/response.mjs'
+} from '/opt/nodejs/constants.mjs'
+import { createResponse } from '/opt/nodejs/response.mjs'
 import Stripe from 'stripe'
 
 const client = new DynamoDBClient({})

@@ -16,7 +16,7 @@
     "strict": true,
     "target": "esnext",
     "useUnknownInCatchVariables": false,
-    "rootDirs": ["./src", "./__tests__"]
+    "rootDirs": ["."]
   },
   "exclude": ["node_modules"]
 }

@@ -8,10 +8,10 @@ import {
 import { Logger } from '@aws-lambda-powertools/logger'
 import { Metrics } from '@aws-lambda-powertools/metrics'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DYNAMODB_TABLE_NAME, TOP_TIER } from 'opt/nodejs/common/constants.mjs'
-import { createResponse } from 'opt/nodejs/common/response.mjs'
-import { getUserInfo } from 'opt/nodejs/common/dynamo.mjs'
-import { getUpgradeTierForTier } from 'opt/nodejs/common/upgrade.mjs'
+import { DYNAMODB_TABLE_NAME, TOP_TIER } from '/opt/nodejs/constants.mjs'
+import { createResponse } from '/opt/nodejs/response.mjs'
+import { getUserInfo } from '/opt/nodejs/dynamo.mjs'
+import { getUpgradeTierForTier } from '/opt/nodejs/upgrade.mjs'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)
