@@ -2,7 +2,7 @@
 import './Home.css'
 
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useUser } from '../contexts/user/userContext'
 
 import ItsOnIcon from './icons/ItsOnIcon'
@@ -34,8 +34,14 @@ const Home = () => {
 
   const syncOverviewRequest = useSyncOverview()
 
-  const isChannelsRoute = location.pathname.startsWith('/channels')
-  const isSubscriptionsRoute = location.pathname.startsWith('/subscriptions')
+  const isChannelsRoute = useMemo(
+    () => location.pathname.startsWith('/channels'),
+    [location.pathname],
+  )
+  const isSubscriptionsRoute = useMemo(
+    () => location.pathname.startsWith('/subscriptions'),
+    [location.pathname],
+  )
 
   const syncOverview = useCallback(async () => {
     setIsLoading(true)
