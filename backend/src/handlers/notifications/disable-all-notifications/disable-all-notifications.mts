@@ -7,10 +7,13 @@ import {
 
 import { Logger } from '@aws-lambda-powertools/logger'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DYNAMODB_TABLE_NAME } from '../../../common/constants.mjs'
-import { createResponse } from '../../../common/response.mjs'
-import { getUserTopic, initializeFirebase } from '../../../common/firebase.mjs'
-import { getUserInfo } from '../../../common/dynamo.mjs'
+import { DYNAMODB_TABLE_NAME } from 'opt/nodejs/common/constants.mjs'
+import { createResponse } from 'opt/nodejs/common/response.mjs'
+import {
+  getUserTopic,
+  initializeFirebase,
+} from 'opt/nodejs/common/firebase.mjs'
+import { getUserInfo } from 'opt/nodejs/common/dynamo.mjs'
 import { getMessaging } from 'firebase-admin/messaging'
 
 const client = new DynamoDBClient({})

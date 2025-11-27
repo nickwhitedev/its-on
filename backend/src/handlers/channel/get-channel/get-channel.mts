@@ -7,11 +7,11 @@ import {
 
 import { Logger } from '@aws-lambda-powertools/logger'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DYNAMODB_TABLE_NAME } from '../../../common/constants.mjs'
-import * as dynamo from '../../../common/dynamo.mjs'
-import { ChannelCopyTypeEnum } from '../../../common/enums.mjs'
-import { createResponse } from '../../../common/response.mjs'
-import { serializeQueryResponse } from '../../../common/serialize.mjs'
+import { DYNAMODB_TABLE_NAME } from 'opt/nodejs/common/constants.mjs'
+import * as dynamo from 'opt/nodejs/common/dynamo.mjs'
+import { ChannelCopyTypeEnum } from 'opt/nodejs/common/enums.mjs'
+import { createResponse } from 'opt/nodejs/common/response.mjs'
+import { serializeQueryResponse } from 'opt/nodejs/common/serialize.mjs'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)

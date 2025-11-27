@@ -7,7 +7,7 @@ import {
 import { Logger } from '@aws-lambda-powertools/logger'
 import { MetricUnit, Metrics } from '@aws-lambda-powertools/metrics'
 import { LogLevel } from 'esbuild'
-import { createResponse } from '../../common/response.mjs'
+import { createResponse } from 'opt/nodejs/common/response.mjs'
 
 interface IPayload {
   log: {

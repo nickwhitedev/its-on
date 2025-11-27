@@ -7,8 +7,11 @@ import {
 
 import { Logger } from '@aws-lambda-powertools/logger'
 import { DynamoDBRecord } from 'aws-lambda'
-import { DYNAMODB_TABLE_NAME } from '../../../common/constants.mjs'
-import { getUserTopic, initializeFirebase } from '../../../common/firebase.mjs'
+import { DYNAMODB_TABLE_NAME } from 'opt/nodejs/common/constants.mjs'
+import {
+  getUserTopic,
+  initializeFirebase,
+} from 'opt/nodejs/common/firebase.mjs'
 import { getMessaging } from 'firebase-admin/messaging'
 
 interface Params {

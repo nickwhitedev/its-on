@@ -8,15 +8,15 @@ import {
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { APIGatewayProxyEvent, Context } from 'aws-lambda'
-import { DYNAMODB_TABLE_NAME } from '../../common/constants.mjs'
-import { createResponse } from '../../common/response.mjs'
-import { serializeQueryResponse } from '../../common/serialize.mjs'
-import { MS_IN_DAY } from '../../common/time.mjs'
+import { DYNAMODB_TABLE_NAME } from 'opt/nodejs/common/constants.mjs'
+import { createResponse } from 'opt/nodejs/common/response.mjs'
+import { serializeQueryResponse } from 'opt/nodejs/common/serialize.mjs'
+import { MS_IN_DAY } from 'opt/nodejs/common/time.mjs'
 import {
   getMessagingChannelTopic,
   getUserTopic,
   initializeFirebase,
-} from '../../common/firebase.mjs'
+} from 'opt/nodejs/common/firebase.mjs'
 import { getMessaging } from 'firebase-admin/messaging'
 
 const client = new DynamoDBClient({})

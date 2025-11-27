@@ -7,9 +7,9 @@ import {
 
 import { Logger } from '@aws-lambda-powertools/logger'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DYNAMODB_TABLE_NAME } from '../../../common/constants.mjs'
-import { getChannel } from '../../../common/dynamo.mjs'
-import { createResponse } from '../../../common/response.mjs'
+import { DYNAMODB_TABLE_NAME } from 'opt/nodejs/common/constants.mjs'
+import { getChannel } from 'opt/nodejs/common/dynamo.mjs'
+import { createResponse } from 'opt/nodejs/common/response.mjs'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)

@@ -11,9 +11,9 @@ import {
 import { Logger } from '@aws-lambda-powertools/logger'
 import { MetricUnit, Metrics } from '@aws-lambda-powertools/metrics'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DYNAMODB_TABLE_NAME } from '../../../common/constants.mjs'
-import { getChannel, getUserInfo } from '../../../common/dynamo.mjs'
-import { createResponse } from '../../../common/response.mjs'
+import { DYNAMODB_TABLE_NAME } from 'opt/nodejs/common/constants.mjs'
+import { getChannel, getUserInfo } from 'opt/nodejs/common/dynamo.mjs'
+import { createResponse } from 'opt/nodejs/common/response.mjs'
 
 const client = new DynamoDBClient({})
 const ddbDocClient = DynamoDBDocumentClient.from(client)

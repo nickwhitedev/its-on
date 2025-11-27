@@ -2,12 +2,15 @@ import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 
 import { Logger } from '@aws-lambda-powertools/logger'
 import { DynamoDBRecord } from 'aws-lambda'
-import { DYNAMODB_TABLE_NAME, WEB_URL } from '../../../common/constants.mjs'
-import { getChannel, getUserInfo } from '../../../common/dynamo.mjs'
-import { getUserTopic, initializeFirebase } from '../../../common/firebase.mjs'
+import { DYNAMODB_TABLE_NAME, WEB_URL } from 'opt/nodejs/common/constants.mjs'
+import { getChannel, getUserInfo } from 'opt/nodejs/common/dynamo.mjs'
+import {
+  getUserTopic,
+  initializeFirebase,
+} from 'opt/nodejs/common/firebase.mjs'
 import { getMessaging } from 'firebase-admin/messaging'
-import { MS_IN_HOUR } from '../../../common/time.mjs'
-import { getNewSubscriberNotificationCooldown } from '../../../common/channel.mjs'
+import { MS_IN_HOUR } from 'opt/nodejs/common/time.mjs'
+import { getNewSubscriberNotificationCooldown } from 'opt/nodejs/common/channel.mjs'
 
 interface Params {
   record: DynamoDBRecord

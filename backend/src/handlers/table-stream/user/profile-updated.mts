@@ -7,7 +7,7 @@ import {
 
 import { Logger } from '@aws-lambda-powertools/logger'
 import { DynamoDBRecord } from 'aws-lambda'
-import { DYNAMODB_TABLE_NAME } from '../../../common/constants.mjs'
+import { DYNAMODB_TABLE_NAME } from 'opt/nodejs/common/constants.mjs'
 
 interface Params {
   record: DynamoDBRecord
