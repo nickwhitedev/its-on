@@ -22,7 +22,7 @@
     "nanoid": "^5.1.6",
     "nanoid-dictionary": "^5.0.0",
     "stripe": "^20.0.0",
-    "svix": "^1.81.0",
+    "svix": "^1.82.0",
     "web-push": "^3.6.7"
   },
   "devDependencies": {
