@@ -840,15 +840,15 @@
   resolved "https://registry.yarnpkg.com/@canvas/image-data/-/image-data-1.1.0.tgz#ead4e594515f144cc372892cacb4b24ec6d43629"
   integrity sha512-QdObRRjRbcXGmM1tmJ+MrHcaz1MftF2+W7YI+MsphnsCrmtyfS0d5qJbk0MeSbUeyM/jCb0hmnkXPsy026L7dA==
 
-"@clerk/clerk-react@^5.57.0":
-  version "5.57.0"
-  resolved "https://registry.yarnpkg.com/@clerk/clerk-react/-/clerk-react-5.57.0.tgz#fce6dd904fb0eb2c5eef8e9b16dd5ca4e036680e"
-  integrity sha512-GCBFF03HjEWvx58myjauJ7NrwTqhxHdetjWWxVM3YJGPOsAVXg4WuquL/hyn8KDuduCYSkRin4Hg6+QVP1NXAg==
+"@clerk/clerk-react@^5.58.1":
+  version "5.58.1"
+  resolved "https://registry.yarnpkg.com/@clerk/clerk-react/-/clerk-react-5.58.1.tgz#20013682928f211b2191121309d15794d0152493"
+  integrity sha512-jN6mfuqwZakm99CKRQlTahMZEa8qLOpr3Z4lG6XtyJfIcyADleOdRxuOXYoN9sV8ZhNfDDAs+eKjUeusIzPpbg==
   dependencies:
-    "@clerk/shared" "^3.36.0"
+    "@clerk/shared" "^3.39.0"
     tslib "2.8.1"
 
-"@clerk/shared@^3.36.0", "@clerk/shared@^3.39.0":
+"@clerk/shared@^3.39.0":
   version "3.39.0"
   resolved "https://registry.yarnpkg.com/@clerk/shared/-/shared-3.39.0.tgz#1fc5e915ebc7018b5bca8e9de9cd0f78944ee68d"
   integrity sha512-9kqqXGMPAdMQ7SXo5ZwUhbzbLLQeLp/1jdb8FQS5qlhmL0S0bAYKcyDjcmMB8xZPXNc7vZJRT72QHsGSlUAJxw==
