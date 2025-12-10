@@ -11,7 +11,7 @@
     "@aws-lambda-powertools/logger": "^2.29.0",
     "@aws-lambda-powertools/metrics": "^2.29.0",
     "@aws-sdk/client-dynamodb": "^3.940.0",
-    "@aws-sdk/client-secrets-manager": "^3.940.0",
+    "@aws-sdk/client-secrets-manager": "^3.946.0",
     "@aws-sdk/lib-dynamodb": "^3.940.0",
     "@clerk/clerk-sdk-node": "^5.1.6",
     "@middy/core": "^6.4.5",
@@ -22,7 +22,7 @@
     "nanoid": "^5.1.6",
     "nanoid-dictionary": "^5.0.0",
     "stripe": "^20.0.0",
-    "svix": "^1.81.0",
+    "svix": "^1.82.0",
     "web-push": "^3.6.7"
   },
   "devDependencies": {
@@ -35,7 +35,7 @@
     "@types/node": "^24.10.1",
     "@types/web-push": "^3.6.4",
     "@typescript-eslint/eslint-plugin": "^8.48.0",
-    "@typescript-eslint/parser": "^8.48.0",
+    "@typescript-eslint/parser": "^8.48.1",
     "aws-sdk-client-mock": "^4.1.0",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
@@ -43,7 +43,7 @@
     "globals": "^16.5.0",
     "jest": "^30.2.0",
     "prettier": "^3.7.4",
-    "ts-jest": "^29.4.5",
+    "ts-jest": "^29.4.6",
     "ts-jest-resolver": "^2.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
