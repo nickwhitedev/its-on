@@ -15,7 +15,6 @@ import {
   PROFILE_PATH,
   SUPPORT_PATH,
   TERMS_PATH,
-  UPGRADE_PATH,
 } from '../../utils/urls'
 import { useDisableDeviceNotifications } from '../../utils/notifications'
 import { useErrorDispatch } from '../../contexts/error/errorContext'
@@ -120,18 +119,22 @@ const UserMenu = () => {
             Manage Account
           </div>
         </MDMenuItem>
-        <MDMenuItem
-          className='UserMenu-menu-item'
-          type='link'
-          href={`/${UPGRADE_PATH}`}
-        >
-          <MDIcon className='UserMenu-menu-item-icon' slot='start'>
-            upgrade
-          </MDIcon>
-          <div className='UserMenu-menu-text' slot='headline'>
-            Upgrade
-          </div>
-        </MDMenuItem>
+        {
+          // (
+          // <MDMenuItem
+          //   className='UserMenu-menu-item'
+          //   type='link'
+          //   href={`/${UPGRADE_PATH}`}
+          // >
+          //   <MDIcon className='UserMenu-menu-item-icon' slot='start'>
+          //       upgrade
+          //     </MDIcon>
+          //     <div className='UserMenu-menu-text' slot='headline'>
+          //       Upgrade
+          //     </div>
+          //   </MDMenuItem>
+          // ) : null
+        }
         <MDMenuItem
           className='UserMenu-menu-item'
           type='button'
