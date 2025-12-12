@@ -67,7 +67,7 @@ const disableAllNotifications = async (
     await initializeFirebase()
     const userInfo = await getUserInfo({ ddbDocClient, userID })
     await Promise.all([
-      ...Object.keys(userInfo?.notificationTokens ?? {}).map(token => [
+      ...Object.keys(userInfo?.notificationTokens ?? {}).flatMap(token => [
         getMessaging().unsubscribeFromTopic(token, getUserTopic(userID)),
         ...Array.from(userInfo?.subscriptionTopics ?? new Set([])).map(
           subscriptionTopic =>

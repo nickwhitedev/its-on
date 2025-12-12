@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   root: true,
   env: { browser: true, es2022: true },
   extends: [
@@ -11,7 +11,7 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
+    project: ['./tsconfig.json'],
     tsconfigRootDir: __dirname,
   },
   rules: {

@@ -23,8 +23,8 @@ export const handleChannelDeleted = async ({
   ddbDocClient,
   logger,
 }: Params) => {
-  const channelPK = record.dynamodb?.Keys?.pk?.S ?? ''
-  const channelSK = record.dynamodb?.Keys?.sk?.S ?? ''
+  const channelPK = record.dynamodb?.Keys?.pk.S ?? ''
+  const channelSK = record.dynamodb?.Keys?.sk.S ?? ''
 
   const ownerID = channelPK.substring(channelPK.indexOf('#') + 1)
   const channelID = channelSK.substring(channelSK.indexOf('#') + 1)

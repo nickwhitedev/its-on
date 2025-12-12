@@ -1,21 +1,22 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "isolatedModules": true,
     "outDir": "./dist",
     "paths": {
-      "/opt/nodejs/*": ["src/common/*"]
+      "/opt/nodejs/*": ["./src/common/*"]
     },
     "preserveConstEnums": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "sourceMap": false,
     "strict": true,
-    "target": "ESNext",
-    "useUnknownInCatchVariables": false
+    "target": "esnext",
+    "useUnknownInCatchVariables": false,
+    "rootDirs": ["."]
   },
   "exclude": ["node_modules"]
 }

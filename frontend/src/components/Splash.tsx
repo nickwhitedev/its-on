@@ -39,8 +39,8 @@ const Splash = () => {
   }, [getBrowserDisplayName])
 
   const isUsingApp =
-    (('standalone' in window.navigator && window.navigator.standalone) ||
-      window.matchMedia('(display-mode: standalone)').matches) == true
+    ('standalone' in window.navigator && window.navigator.standalone == true) ||
+    window.matchMedia('(display-mode: standalone)').matches
 
   return (
     <div className='Splash'>

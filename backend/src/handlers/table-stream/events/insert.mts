@@ -18,8 +18,8 @@ export const handleInsertEvent = async ({
   logger,
 }: Params) => {
   const [pk, sk] = [
-    record.dynamodb?.Keys?.pk?.S ?? '',
-    record.dynamodb?.Keys?.sk?.S ?? '',
+    record.dynamodb?.Keys?.pk.S ?? '',
+    record.dynamodb?.Keys?.sk.S ?? '',
   ]
   if (pk.startsWith('user') && sk.startsWith('channel')) {
     await handleChannelAdded({ record, ddbDocClient, logger })

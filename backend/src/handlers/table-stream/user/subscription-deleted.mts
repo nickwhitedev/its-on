@@ -27,13 +27,13 @@ export const handleSubscriptionDeleted = async ({
     logger.error('Failed to initialize Firebase', error as Error)
   }
 
-  const subscriptionPK = record.dynamodb?.Keys?.pk?.S ?? ''
+  const subscriptionPK = record.dynamodb?.Keys?.pk.S ?? ''
   const userID = subscriptionPK.substring(subscriptionPK.indexOf('#') + 1)
 
-  const subscriptionSK = record.dynamodb?.Keys?.sk?.S ?? ''
+  const subscriptionSK = record.dynamodb?.Keys?.sk.S ?? ''
   const channelID = subscriptionSK.substring(subscriptionSK.indexOf('#') + 1)
 
-  const channelOwnerID = record.dynamodb?.OldImage?.ownerID?.S ?? ''
+  const channelOwnerID = record.dynamodb?.OldImage?.ownerID.S ?? ''
 
   const userInfo = await getUserInfo({ ddbDocClient, userID })
 

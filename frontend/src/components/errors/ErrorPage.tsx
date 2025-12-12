@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { isRouteErrorResponse, useRouteError } from 'react-router-dom'
 
 import { useSendLog } from '../../utils/logging'
@@ -6,31 +6,36 @@ import { useSendLog } from '../../utils/logging'
 export default function ErrorPage() {
   const error = useRouteError()
   const sendLog = useSendLog()
+  const hasLoggedRef = useRef<boolean>(false)
 
-  let errorMessage: string
+  const errorMessage = (() => {
+    if (isRouteErrorResponse(error)) {
+      return error.statusText
+    }
 
-  const [sendError, setSendError] = useState<boolean>(false)
+    if (error instanceof Error) {
+      return error.message
+    }
+
+    if (typeof error === 'string') {
+      return error
+    }
+
+    return 'Unknown error'
+  })()
 
   useEffect(() => {
-    if (sendError) {
-      void (async () => {
-        await sendLog('ErrorPage unknown error')
-      })()
-      setSendError(false)
+    // Log unknown or unexpected errors only once
+    if (
+      !hasLoggedRef.current &&
+      !isRouteErrorResponse(error) &&
+      !(error instanceof Error) &&
+      typeof error !== 'string'
+    ) {
+      void sendLog('ErrorPage unknown error')
+      hasLoggedRef.current = true
     }
-  }, [sendError, sendLog, setSendError])
-
-  if (isRouteErrorResponse(error)) {
-    // error is type `ErrorResponse`
-    errorMessage = error.statusText
-  } else if (error instanceof Error) {
-    errorMessage = error.message
-  } else if (typeof error === 'string') {
-    errorMessage = error
-  } else {
-    setSendError(true)
-    errorMessage = 'Unknown error'
-  }
+  }, [error, sendLog])
 
   return (
     <div>

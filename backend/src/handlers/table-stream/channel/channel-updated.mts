@@ -40,55 +40,55 @@ export const handleChannelUpdated = async ({
   logger,
 }: Params) => {
   const [pk, sk] = [
-    record.dynamodb?.Keys?.pk?.S ?? '',
-    record.dynamodb?.Keys?.sk?.S ?? '',
+    record.dynamodb?.Keys?.pk.S ?? '',
+    record.dynamodb?.Keys?.sk.S ?? '',
   ]
 
   const channelOwnerID = pk.substring(pk.indexOf('#') + 1)
   const channelID = sk.substring(sk.indexOf('#') + 1)
 
   const channelInfo: IDynamoChannelItem = {
-    canceled: record.dynamodb?.NewImage?.canceled?.BOOL ?? false,
-    capacity: parseInt(record.dynamodb?.NewImage?.capacity?.N ?? '5'),
+    canceled: record.dynamodb?.NewImage?.canceled.BOOL ?? false,
+    capacity: parseInt(record.dynamodb?.NewImage?.capacity.N ?? '5'),
     duration: parseInt(
-      record.dynamodb?.NewImage?.duration?.N ?? MS_IN_HOUR.toString(),
+      record.dynamodb?.NewImage?.duration.N ?? MS_IN_HOUR.toString(),
     ),
-    lastOn: parseInt(record.dynamodb?.NewImage?.lastOn?.N ?? '0'),
+    lastOn: parseInt(record.dynamodb?.NewImage?.lastOn.N ?? '0'),
     lastOnDuration: parseInt(
-      record.dynamodb?.NewImage?.lastOnDuration?.N ?? MS_IN_HOUR.toString(),
+      record.dynamodb?.NewImage?.lastOnDuration.N ?? MS_IN_HOUR.toString(),
     ),
-    lastUpdated: parseInt(record.dynamodb?.NewImage?.lastUpdated?.N ?? '0'),
-    note: record.dynamodb?.NewImage?.note?.S ?? '',
-    owner: record.dynamodb?.NewImage?.owner?.S ?? '',
-    ownerID: record.dynamodb?.NewImage?.ownerID?.S ?? '',
+    lastUpdated: parseInt(record.dynamodb?.NewImage?.lastUpdated.N ?? '0'),
+    note: record.dynamodb?.NewImage?.note.S ?? '',
+    owner: record.dynamodb?.NewImage?.owner.S ?? '',
+    ownerID: record.dynamodb?.NewImage?.ownerID.S ?? '',
     pk,
     sk,
     subscriberCount: parseInt(
-      record.dynamodb?.NewImage?.subscriberCount?.N ?? '0',
+      record.dynamodb?.NewImage?.subscriberCount.N ?? '0',
     ),
-    title: record.dynamodb?.NewImage?.title?.S ?? '',
+    title: record.dynamodb?.NewImage?.title.S ?? '',
   }
 
   const oldChannelInfo: IDynamoChannelItem = {
-    canceled: record.dynamodb?.OldImage?.canceled?.BOOL ?? false,
-    capacity: parseInt(record.dynamodb?.OldImage?.capacity?.N ?? '5'),
+    canceled: record.dynamodb?.OldImage?.canceled.BOOL ?? false,
+    capacity: parseInt(record.dynamodb?.OldImage?.capacity.N ?? '5'),
     duration: parseInt(
-      record.dynamodb?.OldImage?.duration?.N ?? MS_IN_HOUR.toString(),
+      record.dynamodb?.OldImage?.duration.N ?? MS_IN_HOUR.toString(),
     ),
-    lastOn: parseInt(record.dynamodb?.OldImage?.lastOn?.N ?? '0'),
+    lastOn: parseInt(record.dynamodb?.OldImage?.lastOn.N ?? '0'),
     lastOnDuration: parseInt(
-      record.dynamodb?.OldImage?.lastOnDuration?.N ?? MS_IN_HOUR.toString(),
+      record.dynamodb?.OldImage?.lastOnDuration.N ?? MS_IN_HOUR.toString(),
     ),
-    lastUpdated: parseInt(record.dynamodb?.OldImage?.lastUpdated?.N ?? '0'),
-    note: record.dynamodb?.OldImage?.note?.S ?? '',
-    owner: record.dynamodb?.OldImage?.owner?.S ?? '',
-    ownerID: record.dynamodb?.OldImage?.ownerID?.S ?? '',
+    lastUpdated: parseInt(record.dynamodb?.OldImage?.lastUpdated.N ?? '0'),
+    note: record.dynamodb?.OldImage?.note.S ?? '',
+    owner: record.dynamodb?.OldImage?.owner.S ?? '',
+    ownerID: record.dynamodb?.OldImage?.ownerID.S ?? '',
     pk,
     sk,
     subscriberCount: parseInt(
-      record.dynamodb?.OldImage?.subscriberCount?.N ?? '0',
+      record.dynamodb?.OldImage?.subscriberCount.N ?? '0',
     ),
-    title: record.dynamodb?.OldImage?.title?.S ?? '',
+    title: record.dynamodb?.OldImage?.title.S ?? '',
   }
 
   // Put a public channel

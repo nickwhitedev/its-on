@@ -1,7 +1,8 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import './Home.css'
 
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useUser } from '../contexts/user/userContext'
 
 import ItsOnIcon from './icons/ItsOnIcon'
@@ -33,14 +34,20 @@ const Home = () => {
 
   const syncOverviewRequest = useSyncOverview()
 
-  const isChannelsRoute = location.pathname.startsWith('/channels')
-  const isSubscriptionsRoute = location.pathname.startsWith('/subscriptions')
+  const isChannelsRoute = useMemo(
+    () => location.pathname.startsWith('/channels'),
+    [location.pathname],
+  )
+  const isSubscriptionsRoute = useMemo(
+    () => location.pathname.startsWith('/subscriptions'),
+    [location.pathname],
+  )
 
   const syncOverview = useCallback(async () => {
     setIsLoading(true)
     try {
       await syncOverviewRequest()
-    } catch (error) {
+    } catch {
       setHasOverviewError(true)
     }
     setIsLoading(false)
@@ -105,7 +112,7 @@ const Home = () => {
             const activeTabIndex = (
               event.target as { activeTabIndex: number } | null
             )?.activeTabIndex
-            navigate(
+            void navigate(
               activeTabIndex === 0
                 ? '/channels'
                 : activeTabIndex === 1

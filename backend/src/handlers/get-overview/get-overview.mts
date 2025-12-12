@@ -182,13 +182,16 @@ const getOverview = async (
       // Subscribe user to channel notification topics
       try {
         await Promise.all([
-          ...Object.keys(data.profile.notificationTokens ?? {}).map(token => [
-            getMessaging().subscribeToTopic(token, getUserTopic(userID)),
-            ...Array.from(data.profile?.subscriptionTopics ?? new Set([])).map(
-              subscriptionTopic =>
+          ...Object.keys(data.profile.notificationTokens ?? {}).flatMap(
+            token => [
+              getMessaging().subscribeToTopic(token, getUserTopic(userID)),
+              ...Array.from(
+                data.profile?.subscriptionTopics ?? new Set([]),
+              ).map(subscriptionTopic =>
                 getMessaging().subscribeToTopic(token, subscriptionTopic),
-            ),
-          ]),
+              ),
+            ],
+          ),
         ])
       } catch (error) {
         logger.error(
@@ -206,7 +209,7 @@ const getOverview = async (
       // Prune expired tokens
       try {
         await Promise.all([
-          ...expiredTokens.map(([token, _tokenData]) => [
+          ...expiredTokens.flatMap(([token, _tokenData]) => [
             getMessaging().unsubscribeFromTopic(token, getUserTopic(userID)),
             ...Array.from(data.profile?.subscriptionTopics ?? new Set([])).map(
               subscriptionTopic =>

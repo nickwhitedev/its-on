@@ -21,13 +21,13 @@ export const handleProfileUpdated = async ({
   logger,
 }: Params) => {
   if (
-    record.dynamodb?.OldImage?.username?.S ===
-    record.dynamodb?.NewImage?.username?.S
+    record.dynamodb?.OldImage?.username.S ===
+    record.dynamodb?.NewImage?.username.S
   ) {
     return
   }
 
-  const pk = record.dynamodb?.Keys?.pk?.S
+  const pk = record.dynamodb?.Keys?.pk.S
 
   // get and update user channels
   let lastEvaluatedKey: Record<string, unknown> | undefined
@@ -86,7 +86,7 @@ export const handleProfileUpdated = async ({
                   '#owner': 'owner',
                 },
                 ExpressionAttributeValues: {
-                  ':owner': record.dynamodb?.NewImage?.username?.S,
+                  ':owner': record.dynamodb?.NewImage?.username.S,
                 },
               },
             })),
@@ -163,7 +163,7 @@ export const handleProfileUpdated = async ({
                     '#username': 'username',
                   },
                   ExpressionAttributeValues: {
-                    ':username': record.dynamodb?.NewImage?.username?.S,
+                    ':username': record.dynamodb?.NewImage?.username.S,
                   },
                 },
               }),

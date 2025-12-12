@@ -1,0 +1,54 @@
+{
+  "compilerOptions": {
+    // Basic Compilation Settings
+    "target": "es2022", // Match Node.js 24 capabilities
+    "module": "nodenext", // Align with ES modules
+    "moduleResolution": "nodenext",
+
+    // Strict Type Checking
+    "strict": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+
+    // Additional Type Safety
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+
+    // Module and Import Handling
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+
+    // Source Map and Debugging
+    "sourceMap": true,
+    "inlineSources": true,
+
+    // Performance and Compatibility
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+
+    // Node.js Specific
+    "lib": ["es2022"],
+    "types": ["node"],
+
+    // Output Configuration
+    "outDir": "./dist",
+    "rootDir": ".",
+
+    // Path Aliases (if needed)
+    "paths": {
+      "/opt/nodejs/*": ["./src/common/*"]
+    }
+  },
+
+  // Exclude unnecessary directories
+  "exclude": ["node_modules", "dist", "**/*.spec.ts", "**/*.test.ts"],
+
+  // Include project source files
+  "include": ["src/**/*.ts", "src/**/*.mts"]
+}

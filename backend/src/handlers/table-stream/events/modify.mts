@@ -20,8 +20,8 @@ export const handleModifyEvent = async ({
   metrics,
 }: Params) => {
   const [pk, sk] = [
-    record.dynamodb?.Keys?.pk?.S ?? '',
-    record.dynamodb?.Keys?.sk?.S ?? '',
+    record.dynamodb?.Keys?.pk.S ?? '',
+    record.dynamodb?.Keys?.sk.S ?? '',
   ]
   if (pk.startsWith('user') && sk.startsWith('channel')) {
     await handleChannelUpdated({ record, ddbDocClient, logger, metrics })

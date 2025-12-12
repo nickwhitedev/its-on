@@ -35,7 +35,7 @@ const App = () => {
         </SignedIn>
         <h1
           onClick={() => {
-            navigate('/')
+            void navigate('/')
           }}
         >
           It&apos;s On

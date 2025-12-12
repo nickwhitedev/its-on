@@ -16,7 +16,7 @@ export const handleChannelAdded = async ({
   ddbDocClient,
   logger,
 }: Params) => {
-  const channelPK = record.dynamodb?.Keys?.pk?.S ?? ''
+  const channelPK = record.dynamodb?.Keys?.pk.S ?? ''
 
   const userID = channelPK.substring(channelPK.indexOf('#') + 1)
 

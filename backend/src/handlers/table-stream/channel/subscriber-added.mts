@@ -26,21 +26,17 @@ export const handleChannelSubscriberAdded = async ({
     logger.error('Failed to initialize Firebase', error as Error)
   }
 
-  const subscriberPK = record.dynamodb?.Keys?.pk?.S ?? ''
+  const subscriberPK = record.dynamodb?.Keys?.pk.S ?? ''
   const channelID = subscriberPK.substring(subscriberPK.indexOf('#') + 1)
 
   const channel = await getChannel({ channelID, ddbDocClient })
   const channelOwnerID = channel?.ownerID ?? ''
 
-  if (
-    (await getChannel({
-      channelID,
-      ddbDocClient,
-      userID: channelOwnerID,
-    })) == null
-  ) {
-    return
-  }
+  await getChannel({
+    channelID,
+    ddbDocClient,
+    userID: channelOwnerID,
+  })
 
   // Increment channel's subscriber count
   try {

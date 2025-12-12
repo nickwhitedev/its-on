@@ -30,11 +30,11 @@ jobs:
       run:
         working-directory: backend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '24.x'
       - run: rm -rf node_modules && yarn install --frozen-lockfile
       - run: yarn test-ci
 
@@ -45,11 +45,11 @@ jobs:
       run:
         working-directory: backend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '24.x'
       - run: rm -rf node_modules && yarn install --frozen-lockfile
       - run: yarn lint
 
@@ -60,11 +60,11 @@ jobs:
       run:
         working-directory: backend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '24.x'
       - run: rm -rf node_modules && yarn install --frozen-lockfile
       - run: yarn compile
 
@@ -75,11 +75,11 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '24.x'
       - run: rm -rf node_modules && yarn install --frozen-lockfile
       - run: CI=true yarn test
 
@@ -90,11 +90,11 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '24.x'
       - run: rm -rf node_modules && yarn install --frozen-lockfile
       - run: yarn lint
 
@@ -105,11 +105,11 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '24.x'
       - run: rm -rf node_modules && yarn install --frozen-lockfile
       - run: tsc
 
@@ -136,11 +136,11 @@ jobs:
       web-endpoint: ${{ steps.set-env-vars.outputs.WebEndpoint }}
       api-endpoint: ${{ steps.set-env-vars.outputs.ApiEndpoint }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '24.x'
       - uses: aws-actions/setup-sam@v2
         with:
           use-installer: true
@@ -160,7 +160,7 @@ jobs:
               ParameterKey=PushNotificationPrivateKey,ParameterValue=${PUSH_NOTIFICATION_PRIVATE_KEY}
 
       - name: Assume the testing pipeline user role
-        uses: aws-actions/configure-aws-credentials@v4.0.2
+        uses: aws-actions/configure-aws-credentials@v5.1.1
         with:
           role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
           role-session-name: branch-api-deployment
@@ -207,11 +207,11 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '24.x'
 
       - name: Install dependencies
         run: rm -rf node_modules && yarn install --frozen-lockfile
@@ -236,7 +236,7 @@ jobs:
         run: CI=true yarn build
 
       - name: Assume the testing pipeline user role
-        uses: aws-actions/configure-aws-credentials@v4.0.2
+        uses: aws-actions/configure-aws-credentials@v5.1.1
         with:
           role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
           role-session-name: branch-frontend-deployment

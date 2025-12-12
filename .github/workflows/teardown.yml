@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Assume the testing pipeline user role
-        uses: aws-actions/configure-aws-credentials@v4.0.2
+        uses: aws-actions/configure-aws-credentials@v5.1.1
         with:
           role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
           role-session-name: destroy-frontend
@@ -44,13 +44,13 @@ jobs:
       run:
         working-directory: backend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: aws-actions/setup-sam@v2
         with:
           use-installer: true
 
       - name: Assume the testing pipeline user role
-        uses: aws-actions/configure-aws-credentials@v4.0.2
+        uses: aws-actions/configure-aws-credentials@v5.1.1
         with:
           role-to-assume: ${{ env.TESTING_PIPELINE_EXECUTION_ROLE }}
           role-session-name: destroy-api

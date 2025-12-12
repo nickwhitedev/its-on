@@ -13,11 +13,11 @@ jobs:
       run:
         working-directory: backend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '24.x'
       - run: rm -rf node_modules && yarn install --frozen-lockfile
       - run: yarn test-ci
 
@@ -28,11 +28,11 @@ jobs:
       run:
         working-directory: backend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '24.x'
       - run: rm -rf node_modules && yarn install --frozen-lockfile
       - run: yarn lint
 
@@ -43,11 +43,11 @@ jobs:
       run:
         working-directory: backend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '24.x'
       - run: rm -rf node_modules && yarn install --frozen-lockfile
       - run: yarn compile
 
@@ -58,11 +58,11 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '24.x'
       - run: rm -rf node_modules && yarn install --frozen-lockfile
       - run: CI=true yarn test
 
@@ -73,11 +73,11 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '24.x'
       - run: rm -rf node_modules && yarn install --frozen-lockfile
       - run: yarn lint
 
@@ -88,10 +88,10 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '24.x'
       - run: rm -rf node_modules && yarn install --frozen-lockfile
       - run: tsc

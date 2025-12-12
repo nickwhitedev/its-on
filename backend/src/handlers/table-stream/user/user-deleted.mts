@@ -22,7 +22,7 @@ export const handleUserDeleted = async ({
   ddbDocClient,
   logger,
 }: Params) => {
-  const pk = record.dynamodb?.Keys?.pk?.S
+  const pk = record.dynamodb?.Keys?.pk.S
 
   // get and delete user channels
   let lastEvaluatedKey: Record<string, unknown> | undefined
@@ -194,11 +194,11 @@ export const handleUserDeleted = async ({
     await initializeFirebase()
     await Promise.all([
       ...Object.keys(
-        record.dynamodb?.OldImage?.notificationTokens?.M ?? {},
-      ).map(token => [
+        record.dynamodb?.OldImage?.notificationTokens.M ?? {},
+      ).flatMap(token => [
         getMessaging().unsubscribeFromTopic(token, getUserTopic(userID)),
         ...Array.from(
-          record.dynamodb?.OldImage?.subscriptionTopics?.SS ?? new Set([]),
+          record.dynamodb?.OldImage?.subscriptionTopics.SS ?? new Set([]),
         ).map(subscriptionTopic =>
           getMessaging().unsubscribeFromTopic(token, subscriptionTopic),
         ),

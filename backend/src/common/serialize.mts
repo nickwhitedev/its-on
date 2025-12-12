@@ -8,7 +8,7 @@
 export const serializeQueryResponse = (
   queryResponse: Record<string, string>[],
 ): object => {
-  const data: Record<string, object | object[]> = {}
+  const data: Record<string, object> = {}
 
   queryResponse.forEach(item => {
     const { pk, sk, ...itemData } = item
