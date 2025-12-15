@@ -17,7 +17,7 @@
     "@middy/core": "^6.4.5",
     "esbuild": "^0.27.0",
     "firebase-admin": "^13.6.0",
-    "jsonwebtoken": "^9.0.2",
+    "jsonwebtoken": "^9.0.3",
     "jwks-rsa": "^3.2.0",
     "nanoid": "^5.1.6",
     "nanoid-dictionary": "^5.0.0",
