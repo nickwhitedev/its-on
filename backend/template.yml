@@ -89,7 +89,7 @@ Globals:
       - !Ref ItsOnNodeModulesLambdaLayer
       - !Ref ItsOnCommonLambdaLayer
     MemorySize: 512
-    ReservedConcurrentExecutions: 5
+    ReservedConcurrentExecutions: 10
     Runtime: nodejs20.x
     Timeout: 300
 
