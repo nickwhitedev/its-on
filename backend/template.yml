@@ -88,8 +88,8 @@ Globals:
     Layers:
       - !Ref ItsOnNodeModulesLambdaLayer
       - !Ref ItsOnCommonLambdaLayer
-    MemorySize: 512
-    ReservedConcurrentExecutions: 10
+    MemorySize: 512 # 128 with ReservedConcurrentExecutions = 1 would stay in free tier
+    # ReservedConcurrentExecutions: 1
     Runtime: nodejs20.x
     Timeout: 300
 
