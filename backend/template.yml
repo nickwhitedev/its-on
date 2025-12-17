@@ -88,7 +88,8 @@ Globals:
     Layers:
       - !Ref ItsOnNodeModulesLambdaLayer
       - !Ref ItsOnCommonLambdaLayer
-    MemorySize: 512
+    MemorySize: 512 # 128 with ReservedConcurrentExecutions = 1 would stay in free tier
+    # ReservedConcurrentExecutions: 1
     Runtime: nodejs20.x
     Timeout: 300
 
@@ -816,8 +817,16 @@ Resources:
         - AttributeName: sk
           KeyType: RANGE
       ProvisionedThroughput:
-        ReadCapacityUnits: 2
-        WriteCapacityUnits: 2
+        ReadCapacityUnits:
+          'Fn::If':
+            - IsProdEnv
+            - 5
+            - 2
+        WriteCapacityUnits:
+          'Fn::If':
+            - IsProdEnv
+            - 5
+            - 2
       StreamSpecification:
         StreamViewType: NEW_AND_OLD_IMAGES
       Tags:
@@ -904,7 +913,7 @@ Resources:
           Compress: true
           TargetOriginId: ItsOnFrontendBucket
           ViewerProtocolPolicy: redirect-to-https
-        PriceClass: PriceClass_All
+        PriceClass: PriceClass_100
         ViewerCertificate:
           AcmCertificateArn: arn:aws:acm:us-east-1:992382488292:certificate/197d9b24-eb88-4153-b506-f5816e4868c7
           SslSupportMethod: sni-only
