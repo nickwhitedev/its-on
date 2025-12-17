@@ -40,13 +40,6 @@
     "@smithy/util-utf8" "^2.0.0"
     tslib "^2.6.2"
 
-"@aws-lambda-powertools/commons@2.29.0":
-  version "2.29.0"
-  resolved "https://registry.yarnpkg.com/@aws-lambda-powertools/commons/-/commons-2.29.0.tgz#fcb123d3332098f2630222c6221f90c6b10fb897"
-  integrity sha512-QM65MP6B4wBrwkEUuZX+hcFUv3wjJBY0mPRn30dTPIOW3UVLIEec9L92fNtWhQZKMaEYK/ezDlyAV+8AuiebfA==
-  dependencies:
-    "@aws/lambda-invoke-store" "0.2.1"
-
 "@aws-lambda-powertools/commons@2.30.0":
   version "2.30.0"
   resolved "https://registry.yarnpkg.com/@aws-lambda-powertools/commons/-/commons-2.30.0.tgz#920d00d560511e76ee7da767f9eeec396a2a527a"
@@ -63,12 +56,13 @@
     "@aws/lambda-invoke-store" "0.2.2"
     lodash.merge "^4.6.2"
 
-"@aws-lambda-powertools/metrics@^2.29.0":
-  version "2.29.0"
-  resolved "https://registry.yarnpkg.com/@aws-lambda-powertools/metrics/-/metrics-2.29.0.tgz#d504e669c645be6f9acf69f88e3005008b945140"
-  integrity sha512-FZYsdbOb4J4oUdrAlZdhTJOyxAaalO55f4F7YapbzE2Ckxm1TApUa7hWQrN84RdvGP6pZTw114mbYXa/yxa3XQ==
+"@aws-lambda-powertools/metrics@^2.30.0":
+  version "2.30.0"
+  resolved "https://registry.yarnpkg.com/@aws-lambda-powertools/metrics/-/metrics-2.30.0.tgz#fd9712f851230c0f4368c741f0bd300f3459eb64"
+  integrity sha512-m3S5q7W1mJAl37WeNkJFFw5QOwrgRME8X7E7goqdPrJObU9XQrbgnj/6c61UDoi0M8m13eFdqIWlupcgZe4G/Q==
   dependencies:
-    "@aws-lambda-powertools/commons" "2.29.0"
+    "@aws-lambda-powertools/commons" "2.30.0"
+    "@aws/lambda-invoke-store" "0.2.2"
 
 "@aws-sdk/client-dynamodb@^3.948.0":
   version "3.948.0"
@@ -580,11 +574,6 @@
     "@smithy/types" "^4.9.0"
     fast-xml-parser "5.2.5"
     tslib "^2.6.2"
-
-"@aws/lambda-invoke-store@0.2.1":
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/@aws/lambda-invoke-store/-/lambda-invoke-store-0.2.1.tgz#ceecff9ebe1f6199369e6911f38633fac3322811"
-  integrity sha512-sIyFcoPZkTtNu9xFeEoynMef3bPJIAbOfUh+ueYcfhVl6xm2VRtMcMclSxmZCMnHHd4hlYKJeq/aggmBEWynww==
 
 "@aws/lambda-invoke-store@0.2.2", "@aws/lambda-invoke-store@^0.2.2":
   version "0.2.2"
