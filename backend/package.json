@@ -21,7 +21,7 @@
     "jwks-rsa": "^3.2.0",
     "nanoid": "^5.1.6",
     "nanoid-dictionary": "^5.0.0",
-    "stripe": "^20.1.2",
+    "stripe": "^20.2.0",
     "svix": "^1.82.0",
     "web-push": "^3.6.7"
   },
