@@ -14,7 +14,7 @@
   "dependencies": {
     "@clerk/clerk-react": "^5.58.1",
     "@clerk/themes": "^2.4.47",
-    "@eslint/compat": "^2.0.1",
+    "@eslint/compat": "^2.0.2",
     "@lit/react": "^1.0.8",
     "@material/web": "^2.4.1",
     "clientjs": "^0.2.1",
