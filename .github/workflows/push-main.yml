@@ -135,7 +135,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '24.x'
-      - uses: aws-actions/setup-sam@v2
+      - uses: aws-actions/setup-sam@v3
         with:
           use-installer: true
       - run: rm -rf node_modules && yarn install --frozen-lockfile
@@ -203,7 +203,7 @@ jobs:
         working-directory: backend
     steps:
       - uses: actions/checkout@v6
-      - uses: aws-actions/setup-sam@v2
+      - uses: aws-actions/setup-sam@v3
         with:
           use-installer: true
       - uses: actions/download-artifact@v7
@@ -262,7 +262,7 @@ jobs:
     # environment: <configured-environment>
     steps:
       - uses: actions/checkout@v6
-      - uses: aws-actions/setup-sam@v2
+      - uses: aws-actions/setup-sam@v3
         with:
           use-installer: true
       - uses: actions/download-artifact@v7
