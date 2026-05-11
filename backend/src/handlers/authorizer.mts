@@ -70,7 +70,7 @@ export const handler: APIGatewayTokenAuthorizerHandler = async event => {
     )
   } catch (error) {
     console.error(error)
-    throw new Error('Unauthorized')
+    throw new Error('Unauthorized', { cause: error })
   }
 
   const principalId = `user|${claims.sub ?? 'noid'}`
