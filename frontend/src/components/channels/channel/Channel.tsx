@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/set-state-in-effect */
+
 import './Channel.css'
 
 import Countdown, { zeroPad } from 'react-countdown'
