@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/set-state-in-effect */
+
 import './Channel.css'
 
 import Countdown, { zeroPad } from 'react-countdown'
@@ -27,7 +29,6 @@ import ItsOnIcon from '../../icons/ItsOnIcon'
 import MDCircularProgress from '../../material/progress/MDCircularProgress'
 import MDFilledButton from '../../material/button/MDFilledButton'
 import MDFilledTonalButton from '../../material/button/MDFilledTonalButton'
-import MDRipple from '../../material/MDRipple'
 import { SubscriptionsDispatchActionType } from '../../../contexts/subscriptions/subscriptionsReducer'
 import { UserDispatchActionType } from '../../../contexts/user/userReducer'
 import { useErrorDispatch } from '../../../contexts/error/errorContext'
@@ -318,7 +319,6 @@ const Channel = ({ channelID }: Props) => {
                 disabled={isUpdating}
                 onClick={() => void handleClickItsOn()}
               >
-                <MDRipple />
                 <ItsOnIcon className='Channel-button-image' />
               </button>
               <div className='Channel-duration-display'>
