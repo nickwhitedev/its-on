@@ -6,7 +6,6 @@ samconfig.toml
 node_modules
 
 
-
 # Logs
 logs
 *.log
