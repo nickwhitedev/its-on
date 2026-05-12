@@ -2,7 +2,6 @@ import './Splash.css'
 
 import { useEffect, useState } from 'react'
 import ItsOnIcon from './icons/ItsOnIcon'
-import MDRipple from './material/MDRipple'
 import StoreBadge from 'react-store-badge'
 import { SignInButton, SignUpButton } from '@clerk/clerk-react'
 import MDOutlinedButton from './material/button/MDOutlinedButton'
@@ -87,7 +86,6 @@ const Splash = () => {
           setIsOn(prev => !prev)
         }}
       >
-        <MDRipple />
         <ItsOnIcon className='Splash-button-image' />
       </button>
       <p>
