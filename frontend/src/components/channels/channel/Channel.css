@@ -30,6 +30,10 @@
   animation: pulsate 8s ease-out infinite;
 }
 
+.Channel-button:active {
+  opacity: 97%;
+}
+
 .Channel-delete-section {
   margin-bottom: 1.8rem;
 }
