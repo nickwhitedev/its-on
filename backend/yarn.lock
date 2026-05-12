@@ -4402,7 +4402,7 @@ jose@^4.15.4:
   resolved "https://registry.yarnpkg.com/jose/-/jose-4.15.9.tgz#9b68eda29e9a0614c042fa29387196c7dd800100"
   integrity sha512-1vUQX+IdDMVPj4k8kOxgUqlcK518yluMuGZwqlr44FS1ppZB/5GWh4rZG89erpOBOJjU/OBsnCVFfapsRz6nEA==
 
-jose@^6.1.3:
+jose@^6.2.3:
   version "6.2.3"
   resolved "https://registry.yarnpkg.com/jose/-/jose-6.2.3.tgz#0975197ad973251221c658a3cddc4b951a250c2d"
   integrity sha512-YYVDInQKFJfR/xa3ojUTl8c2KoTwiL1R5Wg9YCydwH0x0B9grbzlg5HC7mMjCtUJjbQ/YnGEZIhI5tCgfTb4Hw==
@@ -4469,7 +4469,7 @@ json5@^2.2.3:
   resolved "https://registry.yarnpkg.com/json5/-/json5-2.2.3.tgz#78cd6f1a19bdc12b73db5ad0c61efd66c1e29283"
   integrity sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==
 
-jsonwebtoken@^9.0.0, jsonwebtoken@^9.0.3:
+jsonwebtoken@^9.0.0:
   version "9.0.3"
   resolved "https://registry.yarnpkg.com/jsonwebtoken/-/jsonwebtoken-9.0.3.tgz#6cd57ab01e9b0ac07cb847d53d3c9b6ee31f7ae2"
   integrity sha512-MT/xP0CrubFRNLNKvxJ2BYfy53Zkm++5bX9dtuPbqAeQpTVe0MQTFhao8+Cp//EmJp244xt6Drw/GVEGCUj40g==
@@ -4509,17 +4509,6 @@ jwks-rsa@^3.1.0:
     jose "^4.15.4"
     limiter "^1.1.5"
     lru-memoizer "^2.2.0"
-
-jwks-rsa@^4.0.1:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/jwks-rsa/-/jwks-rsa-4.0.1.tgz#bf40d05869adbcd4764843d567547aeff71ad0c8"
-  integrity sha512-poXwUA8S4cP9P5N8tZS3xnUDJH8WmwSGfKK9gIaRPdjLHyJtd9iX/cngX9CUIe0Caof5JhK2EbN7N5lnnaf9NA==
-  dependencies:
-    "@types/jsonwebtoken" "^9.0.4"
-    debug "^4.3.4"
-    jose "^6.1.3"
-    limiter "^1.1.5"
-    lru-memoizer "^3.0.0"
 
 jws@^4.0.0, jws@^4.0.1:
   version "4.0.1"
@@ -4652,11 +4641,6 @@ lru-cache@^10.2.0:
   resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-10.4.3.tgz#410fc8a17b70e598013df257c2446b7f3383f119"
   integrity sha512-JNAzZcXrCt42VGLuYz0zfAzDfAvJWW6AfYlDBQyDV5DClI2m5sAmK+OIO7s59XfsRsWHp02jAJrRadPRGTt6SQ==
 
-lru-cache@^11.0.1:
-  version "11.3.6"
-  resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-11.3.6.tgz#f0306ad6e9f0a5dc25b16aeba4e8f57b7ec2df55"
-  integrity sha512-Gf/KoL3C/MlI7Bt0PGI9I+TeTC/I6r/csU58N4BSNc4lppLBeKsOdFYkK+dX0ABDUMJNfCHTyPpzwwO21Awd3A==
-
 lru-cache@^5.1.1:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-5.1.1.tgz#1da27e6710271947695daf6848e847f01d84b920"
@@ -4671,14 +4655,6 @@ lru-memoizer@^2.2.0:
   dependencies:
     lodash.clonedeep "^4.5.0"
     lru-cache "6.0.0"
-
-lru-memoizer@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/lru-memoizer/-/lru-memoizer-3.0.0.tgz#b75907de33ae84d4aa318c3083b9a774c7e5e767"
-  integrity sha512-m83w/cYXLdUIboKSPxzPAGfYnk+vqeDYXuoSrQRw1q+yVEd8IXhvMufN8Q5TIPe7e2jyX4SRNrDJI2Skw1yznQ==
-  dependencies:
-    lodash.clonedeep "^4.5.0"
-    lru-cache "^11.0.1"
 
 make-dir@^4.0.0:
   version "4.0.0"

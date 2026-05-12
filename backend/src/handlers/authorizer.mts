@@ -1,3 +1,4 @@
+import type { JWTPayload } from 'jose'
 import {
   APIGatewayAuthorizerResult,
   APIGatewayTokenAuthorizerHandler,
@@ -8,23 +9,7 @@ import {
   GetSecretValueCommand,
   SecretsManagerClient,
 } from '@aws-sdk/client-secrets-manager'
-import jwt, { JwtPayload } from 'jsonwebtoken'
-import jwksClient from 'jwks-rsa'
-
-interface JWK {
-  alg: string
-  kty: string
-  use: string
-  n: string
-  e: string
-  kid: string
-  x5t: string
-  x5c: string[]
-}
-
-interface JWKS {
-  keys: JWK[]
-}
+import { jwtVerify, createRemoteJWKSet } from 'jose'
 
 interface APIOptions {
   region: string
@@ -63,7 +48,7 @@ export const handler: APIGatewayTokenAuthorizerHandler = async event => {
 
   // validate the incoming token
   // and produce the principal user identifier associated with the token
-  let claims: JwtPayload
+  let claims: JWTPayload
   try {
     claims = await verifyAccessToken(
       event.authorizationToken.replace('Bearer ', ''),
@@ -119,8 +104,9 @@ export const handler: APIGatewayTokenAuthorizerHandler = async event => {
   return authResponse
 }
 
-async function verifyAccessToken(accessToken: string): Promise<JwtPayload> {
+async function verifyAccessToken(accessToken: string): Promise<JWTPayload> {
   const jwksEndpoint = process.env.JWKS_ENDPOINT ?? ''
+
   const secretKey = await new SecretsManagerClient({
     region: 'us-east-1',
   }).send(
@@ -129,38 +115,30 @@ async function verifyAccessToken(accessToken: string): Promise<JwtPayload> {
     }),
   )
 
-  const requestHeaders = {
-    Authorization: `Bearer ${secretKey.SecretString ?? ''}`,
-  }
+  const authHeader = `Bearer ${secretKey.SecretString ?? ''}`
 
-  const client = jwksClient({
-    jwksUri: jwksEndpoint,
-    requestHeaders,
+  // Create a JWKS remote set that jose will use to fetch and cache keys
+  const JWKS = createRemoteJWKSet(new URL(jwksEndpoint), {
+    headers: {
+      Authorization: authHeader,
+    },
   })
 
-  const jwksResponse = await fetch(jwksEndpoint, {
-    headers: requestHeaders,
-  })
+  // jose handles key selection automatically based on the token's kid
+  const { payload } = await jwtVerify(accessToken, JWKS)
 
-  if (!jwksResponse.ok) {
-    throw new Error('Bad jwks response')
+  // Validate expiration and not-before claims
+  const now = Math.floor(Date.now() / 1000) // jose uses seconds, not milliseconds
+
+  if ((payload.exp ?? 0) < now) {
+    throw new Error('Token expired')
   }
 
-  const jwks = (await jwksResponse.json()) as JWKS
-
-  const key = await client.getSigningKey(jwks.keys[0].kid)
-
-  const claims = jwt.verify(accessToken, key.getPublicKey())
-
-  if (typeof claims === 'string') {
-    throw new Error('verifyAccessToken returned a string')
-  }
-  const now = Date.now()
-  if ((claims.exp ?? 0) * 1000 < now || (claims.nbf ?? 0 * 1000) > now) {
-    throw new Error('Claim not valid - expired or early')
+  if ((payload.nbf ?? 0) > now) {
+    throw new Error('Token not yet valid')
   }
 
-  return claims
+  return payload
 }
 
 /**

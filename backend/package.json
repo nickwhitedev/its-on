@@ -3,6 +3,7 @@
   "description": "It's On Backend",
   "version": "0.0.1",
   "private": true,
+  "type": "module",
   "engines": {
     "node": ">=24.0.0"
   },
@@ -16,8 +17,7 @@
     "@middy/core": "^7.5.0",
     "esbuild": "^0.28.0",
     "firebase-admin": "^13.6.0",
-    "jsonwebtoken": "^9.0.3",
-    "jwks-rsa": "^4.0.1",
+    "jose": "^6.2.3",
     "nanoid": "^5.1.6",
     "nanoid-dictionary": "^5.0.0",
     "stripe": "^20.3.1",
