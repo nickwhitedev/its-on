@@ -47,12 +47,12 @@
   dependencies:
     "@aws/lambda-invoke-store" "0.2.3"
 
-"@aws-lambda-powertools/commons@2.31.0":
-  version "2.31.0"
-  resolved "https://registry.yarnpkg.com/@aws-lambda-powertools/commons/-/commons-2.31.0.tgz#8e4b745a3f245f0a8395aab5ea59dd7513b2df22"
-  integrity sha512-K5Hy3WtU/n0M8/kgsgw6OVlF709PHOfnTfsWrJS2Cs1vVjEeBvW22a6u9n3VPNpDeqJ7GIodmSkbuzvQzq6vaA==
+"@aws-lambda-powertools/commons@2.33.0":
+  version "2.33.0"
+  resolved "https://registry.yarnpkg.com/@aws-lambda-powertools/commons/-/commons-2.33.0.tgz#b5b7d40ccf9c9d50b5c2d191b3d3d2576a015087"
+  integrity sha512-cXGfWT4FXtLO7Ny/shep6V/xYzgVN7hvukOA0bTa4nlg2GWiQsPoBoKvCEcfQ9I8GIS0tPyDfRkdx80SvA7LpA==
   dependencies:
-    "@aws/lambda-invoke-store" "0.2.3"
+    "@aws/lambda-invoke-store" "0.2.4"
 
 "@aws-lambda-powertools/logger@^2.30.2":
   version "2.30.2"
@@ -62,13 +62,13 @@
     "@aws-lambda-powertools/commons" "2.30.2"
     "@aws/lambda-invoke-store" "0.2.3"
 
-"@aws-lambda-powertools/metrics@^2.31.0":
-  version "2.31.0"
-  resolved "https://registry.yarnpkg.com/@aws-lambda-powertools/metrics/-/metrics-2.31.0.tgz#deadd234c7f4186a696e274bce4ad03ea87fcc15"
-  integrity sha512-7yBYWqdgZOCMl4yRZgdqjEGCX26HZE8l76UAspHFyCP4WDjuBrWe5znYN1rHlQIL5eiAP1TFw0GuCxkBHn6d+A==
+"@aws-lambda-powertools/metrics@^2.33.0":
+  version "2.33.0"
+  resolved "https://registry.yarnpkg.com/@aws-lambda-powertools/metrics/-/metrics-2.33.0.tgz#0b81ffc465c7ed44de2ffc8d550b4d05969d9779"
+  integrity sha512-VFAd+k6WmOQv3O3dWCyRbZyCBWmIpZerh3VEw2S4Do8AMyiT8ccFAkf14H7m4XE9f0zFCzqgaWunFSTr7385Aw==
   dependencies:
-    "@aws-lambda-powertools/commons" "2.31.0"
-    "@aws/lambda-invoke-store" "0.2.3"
+    "@aws-lambda-powertools/commons" "2.33.0"
+    "@aws/lambda-invoke-store" "0.2.4"
 
 "@aws-sdk/client-dynamodb@^3.989.0":
   version "3.989.0"
@@ -598,10 +598,15 @@
     fast-xml-parser "5.3.4"
     tslib "^2.6.2"
 
-"@aws/lambda-invoke-store@0.2.3", "@aws/lambda-invoke-store@^0.2.2":
+"@aws/lambda-invoke-store@0.2.3":
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@aws/lambda-invoke-store/-/lambda-invoke-store-0.2.3.tgz#f1137f56209ccc69c15f826242cbf37f828617dd"
   integrity sha512-oLvsaPMTBejkkmHhjf09xTgk71mOqyr/409NKhRIL08If7AhVfUsJhVsx386uJaqNd42v9kWamQ9lFbkoC2dYw==
+
+"@aws/lambda-invoke-store@0.2.4", "@aws/lambda-invoke-store@^0.2.2":
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/@aws/lambda-invoke-store/-/lambda-invoke-store-0.2.4.tgz#802f6a50f6b6589063ef63ba8acdee86fcb9f395"
+  integrity sha512-iY8yvjE0y651BixKNPgmv1WrQc+GZ142sb0z4gYnChDDY2YqI4P/jsSopBWrKfAt7LOJAkOXt7rC/hms+WclQQ==
 
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.27.1":
   version "7.27.1"
