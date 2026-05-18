@@ -26,7 +26,7 @@
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.10.1",
     "react-store-badge": "^3.0.0",
-    "react-tooltip": "^5.30.0"
+    "react-tooltip": "^6.0.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
