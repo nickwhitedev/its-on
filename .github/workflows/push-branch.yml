@@ -30,7 +30,7 @@ jobs:
       run:
         working-directory: backend
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
@@ -45,7 +45,7 @@ jobs:
       run:
         working-directory: backend
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
@@ -60,7 +60,7 @@ jobs:
       run:
         working-directory: backend
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
@@ -75,7 +75,7 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
@@ -90,7 +90,7 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
@@ -105,7 +105,7 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
@@ -136,7 +136,7 @@ jobs:
       web-endpoint: ${{ steps.set-env-vars.outputs.WebEndpoint }}
       api-endpoint: ${{ steps.set-env-vars.outputs.ApiEndpoint }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
@@ -207,7 +207,7 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
